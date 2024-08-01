@@ -1,0 +1,45 @@
+{
+  "name": "@phemvault/server",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "tap --reporter=list",
+    "test:help": "tap --help"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.3",
+    "@babel/preset-env": "^7.23.3",
+    "@babel/preset-typescript": "^7.23.3",
+    "@types/jest": "^29.5.8",
+    "@types/node": "^20.9.2",
+    "@types/supertest": "^2.0.16",
+    "nodemon": "^3.0.1",
+    "tap": "^18.7.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "undici": "^6.11.1"
+  },
+  "dependencies": {
+    "@fastify/compress": "^7.0.0",
+    "@fastify/helmet": "^11.1.1",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^4.0.1",
+    "@opentelemetry/api": "^1.7.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.40.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.45.1",
+    "@opentelemetry/resources": "^1.18.1",
+    "@opentelemetry/sdk-node": "^0.45.1",
+    "@opentelemetry/sdk-trace-base": "^1.18.1",
+    "@opentelemetry/semantic-conventions": "^1.18.1",
+    "fastify": "^4.28.1",
+    "fastify-type-provider-zod": "^2.0.0",
+    "http-graceful-shutdown": "^3.1.13",
+    "ioredis": "^5.4.1",
+    "pino": "^8.16.2",
+    "zod": "^3.22.4"
+  }
+}
