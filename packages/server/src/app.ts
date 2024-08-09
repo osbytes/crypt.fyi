@@ -31,7 +31,7 @@ export const initApp = async (config: Config, logger: pino.Logger) => {
   const app = Fastify({
     logger,
     trustProxy: true,
-    bodyLimit: 1024,
+    bodyLimit: config.bodyLimit,
     genReqId: () => randomUUID(),
   });
   app.setValidatorCompiler(validatorCompiler);
@@ -54,8 +54,8 @@ export const initApp = async (config: Config, logger: pino.Logger) => {
   app.register(fastifyRateLimit, {
     redis: redis,
     nameSpace: "rate-limit:",
-    max: 100,
-    timeWindow: 1000 * 60,
+    max: config.rateLimitMax,
+    timeWindow: config.rateLimitWindowMs,
   });
 
   app.register(helmet);
@@ -98,9 +98,9 @@ export const initApp = async (config: Config, logger: pino.Logger) => {
         p: z.boolean().default(false).describe("password was set"),
         ttl: z
           .number()
-          .min(1)
-          .max(1000 * 60 * 60)
-          .default(1000 * 60 * 5)
+          .min(config.vaultEntryTTLMsMin)
+          .max(config.vaultEntryTTLMsMax)
+          .default(config.vaultEntryTTLMsDefault)
           .describe("time to live (TTL) in milliseconds"),
       }),
       response: {

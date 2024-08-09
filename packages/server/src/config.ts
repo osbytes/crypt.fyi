@@ -1,4 +1,5 @@
 import { z } from "zod";
+import bytes from "bytes";
 
 export enum Environment {
   Dev,
@@ -26,6 +27,30 @@ const configSchema = z.object({
     .default(Environment.Dev)
     .describe("environment"),
   logLevel: z.enum(logLevels).default("info").describe("log level"),
+  rateLimitMax: z
+    .number({ coerce: true })
+    .default(100)
+    .describe("max requests per 'rate limit time window'"),
+  rateLimitWindowMs: z
+    .number({ coerce: true })
+    .default(1000 * 60)
+    .describe("rate limit time window in milliseconds"),
+  vaultEntryTTLMsMin: z
+    .number({ coerce: true })
+    .default(1)
+    .describe("vault entry time to live minimum in milliseconds"),
+  vaultEntryTTLMsMax: z
+    .number({ coerce: true })
+    .default(1000 * 60 * 60)
+    .describe("vault entry time to live maximum in milliseconds"),
+  vaultEntryTTLMsDefault: z
+    .number({ coerce: true })
+    .default(1000 * 60 * 5)
+    .describe("vault entry time to live default in milliseconds"),
+  bodyLimit: z
+    .number()
+    .default(1024 * 1024)
+    .describe("body limit in bytes"),
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -37,6 +62,12 @@ export const initConfig = async (): Promise<Config> => {
     healthCheckEndpoint: process.env.HEALTH_CHECK_ENDPOINT,
     env: getEnv(),
     logLevel: process.env.LOG_LEVEL,
+    rateLimitMax: process.env.RATE_LIMIT_MAX,
+    rateLimitWindowMs: process.env.RATE_LIMIT_WINDOW_MS,
+    vaultEntryTTLMsMin: process.env.VAULT_ENTRY_TTL_MS_MIN,
+    vaultEntryTTLMsMax: process.env.VAULT_ENTRY_TTL_MS_MAX,
+    vaultEntryTTLMsDefault: process.env.VAULT_ENTRY_TTL_MS_DEFAULT,
+    bodyLimit: bytes(process.env.BODY_LIMIT ?? "1mb"),
   });
 };
 
