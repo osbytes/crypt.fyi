@@ -26,7 +26,7 @@ declare module "fastify" {
 
 export const initApp = async (config: Config, logger: pino.Logger) => {
   const redis = new Redis();
-  const vault = createRedisVault(redis);
+  const vault = createRedisVault(redis, logger);
 
   const app = Fastify({
     logger,
@@ -98,6 +98,7 @@ export const initApp = async (config: Config, logger: pino.Logger) => {
         p: z.boolean().default(false).describe("password was set"),
         ttl: z
           .number()
+          .min(1)
           .max(1000 * 60 * 60)
           .default(1000 * 60 * 5)
           .describe("time to live (TTL) in milliseconds"),

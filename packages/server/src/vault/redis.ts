@@ -1,8 +1,10 @@
 import Redis from "ioredis";
+import pino from "pino";
 import { Vault, VaultValue, createTokens, vaultValueSchema } from "./vault";
 import { isDefined } from "../util";
+import { retryable } from "../retry";
 
-export const createRedisVault = (redis: Redis): Vault => {
+export const createRedisVault = (redis: Redis, logger: pino.Logger): Vault => {
   const getKey = (id: string) => `vault:${id}`;
 
   return {
@@ -17,9 +19,7 @@ export const createRedisVault = (redis: Redis): Vault => {
         key,
         JSON.stringify({ c, b, p, dt, _cd: Date.now() } satisfies VaultValue),
       );
-      if (ttl) {
-        tx.pexpire(key, ttl);
-      }
+      tx.pexpire(key, ttl);
       const result = await tx.exec();
       if (!result) {
         throw new Error("unexpected null result");
@@ -45,8 +45,9 @@ export const createRedisVault = (redis: Redis): Vault => {
 
       const { c, b, p } = vaultValueSchema.parse(JSON.parse(result));
       if (b) {
-        // TODO: retry operation in event of failure as it will be run in the background
-        redis.del(key);
+        retryable(() => redis.del(key), { retries: 3 }).catch((err) => {
+          logger.error(`error deleting key ${id}`, err);
+        });
       }
 
       return {
