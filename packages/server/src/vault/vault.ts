@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { promisify } from "node:util";
 import z from "zod";
+import { Config } from "../config";
 
 const randomBytesAsync = promisify(randomBytes);
 
@@ -21,11 +22,14 @@ export interface Vault {
   del(id: string, dt: string): Promise<boolean>;
 }
 
-export const createTokens = async () => {
+export const createTokens = async (config: Config) => {
   const [id, dt] = await Promise.all([
-    // TODO: env configurable lengths on these
-    (await randomBytesAsync(15)).toString("base64url"),
-    (await randomBytesAsync(28)).toString("base64url"),
+    (await randomBytesAsync(config.vaultEntryIdentifierLength)).toString(
+      "base64url",
+    ).slice(0, config.vaultEntryIdentifierLength),
+    (await randomBytesAsync(config.vaultEntryDeleteTokenLength)).toString(
+      "base64url",
+    ).slice(0, config.vaultEntryDeleteTokenLength),
   ]);
   return { id, dt };
 };

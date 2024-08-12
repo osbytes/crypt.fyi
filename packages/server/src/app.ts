@@ -26,7 +26,7 @@ declare module "fastify" {
 
 export const initApp = async (config: Config, logger: pino.Logger) => {
   const redis = new Redis();
-  const vault = createRedisVault(redis, logger);
+  const vault = createRedisVault(redis, config, logger);
 
   const app = Fastify({
     logger,
@@ -173,7 +173,9 @@ export const initApp = async (config: Config, logger: pino.Logger) => {
 
     if (res.sent) return;
 
-    res.status(500).send({ msg: "Something went wrong" });
+    res
+      .status(error.statusCode ?? 500)
+      .send({ msg: error.message || "Something went wrong" });
   });
 
   await app.ready();

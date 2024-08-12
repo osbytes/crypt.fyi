@@ -2,9 +2,9 @@ import { z } from "zod";
 import bytes from "bytes";
 
 export enum Environment {
-  Dev,
-  Test,
-  Prod,
+  Dev = "development",
+  Test = "test",
+  Prod = "production",
 }
 
 const logLevels = ["trace", "debug", "info", "warn", "error", "fatal"] as const;
@@ -47,6 +47,14 @@ const configSchema = z.object({
     .number({ coerce: true })
     .default(1000 * 60 * 5)
     .describe("vault entry time to live default in milliseconds"),
+  vaultEntryIdentifierLength: z
+    .number({ coerce: true })
+    .default(20)
+    .describe("vault entry ID length"),
+  vaultEntryDeleteTokenLength: z
+    .number({ coerce: true })
+    .default(20)
+    .describe("vault entry delete token length"),
   bodyLimit: z
     .number()
     .default(1024 * 1024)
@@ -67,7 +75,9 @@ export const initConfig = async (): Promise<Config> => {
     vaultEntryTTLMsMin: process.env.VAULT_ENTRY_TTL_MS_MIN,
     vaultEntryTTLMsMax: process.env.VAULT_ENTRY_TTL_MS_MAX,
     vaultEntryTTLMsDefault: process.env.VAULT_ENTRY_TTL_MS_DEFAULT,
-    bodyLimit: bytes(process.env.BODY_LIMIT ?? "1mb"),
+    vaultEntryIdentifierLength: process.env.VAULT_ENTRY_IDENTIFIER_LENGTH,
+    vaultEntryDeleteTokenLength: process.env.VAULT_ENTRY_DELETE_TOKEN_LENGTH,
+    bodyLimit: bytes(process.env.BODY_LIMIT_BYTES ?? "50KB"),
   });
 };
 

@@ -3,14 +3,19 @@ import pino from "pino";
 import { Vault, VaultValue, createTokens, vaultValueSchema } from "./vault";
 import { isDefined } from "../util";
 import { retryable } from "../retry";
+import { Config } from "../config";
 
-export const createRedisVault = (redis: Redis, logger: pino.Logger): Vault => {
+export const createRedisVault = (
+  redis: Redis,
+  config: Config,
+  logger: pino.Logger,
+): Vault => {
   const getKey = (id: string) => `vault:${id}`;
 
   return {
     async set(value) {
       const { c, b, p, ttl } = value;
-      const { id, dt } = await createTokens();
+      const { id, dt } = await createTokens(config);
 
       const key = getKey(id);
 
