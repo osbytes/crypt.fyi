@@ -68,12 +68,11 @@ export const createRedisVault = (
         return false;
       }
 
-      const { dt: actualDt } = vaultValueSchema.parse(result);
+      const { dt: actualDt } = vaultValueSchema.parse(JSON.parse(result));
       if (dt !== actualDt) {
         return false;
       }
 
-      // TODO: retry operation in event of failure
       const delResult = await redis.del(key);
 
       return delResult === 1;

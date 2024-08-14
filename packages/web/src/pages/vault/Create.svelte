@@ -47,12 +47,23 @@
     }
   }
 
-  // TODO: figure out deletion
-  // async function deleteVault() {
-  //     await fetch(`${config.API_URL}/vault/${id}?dt=${dt}`, {
-  //         method: "DELETE",
-  //     });
-  // }
+  async function deleteVault() {
+    await fetch(`${config.API_URL}/vault/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ dt }),
+    }).then((r) => {
+      if (!r.ok) throw new Error("something went wrong");
+
+      id = "";
+      dt = "";
+      rawValue = "";
+      password = "";
+      key = "";
+    });
+  }
 </script>
 
 <main>
@@ -83,12 +94,13 @@
       class="pointer">Create</button
     >
   {:else}
-    <pre><a href="{window.location.origin}/{id}">{window.location.origin}/{id}</a></pre>
+    <pre><a href="{window.location.origin}/{id}"
+        >{window.location.origin}/{id}</a
+      ></pre>
     <pre>{key}</pre>
-    <!-- {#if dt}
-            TODO: figure out deletion
-            <button on:click={deleteVault}>delete</button>
-        {/if} -->
+    {#if dt}
+      <button on:click={deleteVault}>delete</button>
+    {/if}
   {/if}
 </main>
 

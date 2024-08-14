@@ -150,8 +150,8 @@ export const initApp = async (config: Config, logger: pino.Logger) => {
       params: z.object({
         vaultId: z.string(),
       }),
-      querystring: z.object({
-        dt: z.string().describe("delete token"),
+      body: z.object({
+        dt: z.string(),
       }),
       response: {
         200: z.null(),
@@ -159,7 +159,7 @@ export const initApp = async (config: Config, logger: pino.Logger) => {
       },
     },
     async handler(req, res) {
-      const result = await vault.del(req.params.vaultId, req.query.dt);
+      const result = await vault.del(req.params.vaultId, req.body.dt);
       if (!result) {
         return res.status(404).send();
       }
