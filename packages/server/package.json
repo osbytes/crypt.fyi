@@ -7,13 +7,14 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "tap --reporter=silent",
+    "test": "tap",
     "test:help": "tap --help"
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",
     "@babel/preset-env": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
+    "@tapjs/typescript": "^3.0.0",
     "@types/bytes": "^3.1.4",
     "@types/jest": "^29.5.8",
     "@types/node": "^20.9.2",

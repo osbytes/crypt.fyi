@@ -2850,7 +2850,7 @@
     typescript "5.5"
     walk-up-path "^4.0.0"
 
-"@tapjs/typescript@3.0.0":
+"@tapjs/typescript@3.0.0", "@tapjs/typescript@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@tapjs/typescript/-/typescript-3.0.0.tgz#8bc4b5d4ab277071b09a0ecc1f96f812f86d90df"
   integrity sha512-gKDv+07vdNuplN32sQvkzuEnai9JqJlUX5BuqTrSeWMsoKCoGPdyt8YNwaoebVeyBpt7IgjOBln8YLhfI3AcpA==
