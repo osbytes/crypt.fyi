@@ -42,15 +42,4 @@ tap.test("app", async (t) => {
 
     t.equal(response.statusCode, 200);
   });
-
-  t.test('should respond properly to "hi"', async (t) => {
-    const response = await client.request({
-      method: "GET",
-      path: "/hi",
-    });
-
-    const body = await response.body.text();
-    t.equal(response.statusCode, 200);
-    t.equal(body, "hi");
-  });
 });

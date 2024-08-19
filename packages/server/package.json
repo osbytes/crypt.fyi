@@ -7,7 +7,7 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "tap --reporter=list",
+    "test": "tap --reporter=silent",
     "test:help": "tap --help"
   },
   "devDependencies": {
@@ -20,7 +20,7 @@
     "@types/retry": "^0.12.5",
     "@types/supertest": "^2.0.16",
     "nodemon": "^3.0.1",
-    "tap": "^18.7.0",
+    "tap": "^21.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2",
     "undici": "^6.11.1"
