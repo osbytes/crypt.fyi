@@ -1,6 +1,5 @@
 import { randomUUID } from "node:crypto";
 import Fastify from "fastify";
-import pino from "pino";
 import helmet from "@fastify/helmet";
 import compression from "@fastify/compress";
 import {
@@ -13,10 +12,11 @@ import z from "zod";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
 import fastifyRateLimit from "@fastify/rate-limit";
-import Redis from "ioredis";
 
 import { Config } from "./config";
-import { createRedisVault } from "./vault/redis";
+import { Logger } from "./logging";
+import { Vault } from "./vault/vault";
+import { Redis } from "ioredis";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -24,9 +24,14 @@ declare module "fastify" {
   }
 }
 
-export const initApp = async (config: Config, logger: pino.Logger) => {
-  const redis = new Redis();
-  const vault = createRedisVault(redis, config, logger);
+export type AppDeps = {
+  logger: Logger;
+  vault: Vault;
+  redis: Redis;
+};
+
+export const initApp = async (config: Config, deps: AppDeps) => {
+  const { logger, vault, redis } = deps;
 
   const app = Fastify({
     logger,
@@ -49,11 +54,11 @@ export const initApp = async (config: Config, logger: pino.Logger) => {
     transform: jsonSchemaTransform,
   });
   app.register(fastifySwaggerUI, {
-    routePrefix: "/docs",
+    routePrefix: config.swaggerUIPath,
   });
   app.register(fastifyRateLimit, {
-    redis: redis,
-    nameSpace: "rate-limit:",
+    redis,
+    nameSpace: config.rateLimitNameSpace,
     max: config.rateLimitMax,
     timeWindow: config.rateLimitWindowMs,
   });

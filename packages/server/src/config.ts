@@ -35,6 +35,10 @@ const configSchema = z.object({
     .number({ coerce: true })
     .default(1000 * 60)
     .describe("rate limit time window in milliseconds"),
+  rateLimitNameSpace: z
+    .string()
+    .default("rate-limit:")
+    .describe("rate limit namespace"),
   vaultEntryTTLMsMin: z
     .number({ coerce: true })
     .default(1)
@@ -59,6 +63,7 @@ const configSchema = z.object({
     .number()
     .default(1024 * 1024)
     .describe("body limit in bytes"),
+  swaggerUIPath: z.string().default("/docs").describe("swagger UI path"),
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -72,12 +77,14 @@ export const initConfig = async (): Promise<Config> => {
     logLevel: process.env.LOG_LEVEL,
     rateLimitMax: process.env.RATE_LIMIT_MAX,
     rateLimitWindowMs: process.env.RATE_LIMIT_WINDOW_MS,
+    rateLimitNameSpace: process.env.RATE_LIMIT_NAMESPACE,
     vaultEntryTTLMsMin: process.env.VAULT_ENTRY_TTL_MS_MIN,
     vaultEntryTTLMsMax: process.env.VAULT_ENTRY_TTL_MS_MAX,
     vaultEntryTTLMsDefault: process.env.VAULT_ENTRY_TTL_MS_DEFAULT,
     vaultEntryIdentifierLength: process.env.VAULT_ENTRY_IDENTIFIER_LENGTH,
     vaultEntryDeleteTokenLength: process.env.VAULT_ENTRY_DELETE_TOKEN_LENGTH,
     bodyLimit: bytes(process.env.BODY_LIMIT_BYTES ?? "50KB"),
+    swaggerUIPath: process.env.SWAGGER_UI_PATH,
   });
 };
 

@@ -1,14 +1,14 @@
 import Redis from "ioredis";
-import pino from "pino";
 import { Vault, VaultValue, createTokens, vaultValueSchema } from "./vault";
 import { isDefined } from "../util";
 import { retryable } from "../retry";
 import { Config } from "../config";
+import { Logger } from "../logging";
 
 export const createRedisVault = (
   redis: Redis,
   config: Config,
-  logger: pino.Logger,
+  logger: Logger,
 ): Vault => {
   const getKey = (id: string) => `vault:${id}`;
 

@@ -5,6 +5,8 @@ import { initConfig, Config } from "./config";
 import tap, { Test } from "tap";
 import { Client } from "undici";
 import { AddressInfo } from "node:net";
+import Redis from "ioredis";
+import { createRedisVault } from "./vault/redis";
 
 const initAppTest = async (t: Test) => {
   const config = {
@@ -12,7 +14,14 @@ const initAppTest = async (t: Test) => {
     healthCheckEndpoint: "/some-health-check-endpoint",
     vaultEntryTTLMsDefault: 1000,
   } satisfies Config;
-  const app = await initApp(config, pino({ enabled: false }));
+  const logger = pino({ enabled: false });
+  const redis = new Redis();
+  const vault = createRedisVault(redis, config, logger);
+  const app = await initApp(config, {
+    logger,
+    vault,
+    redis,
+  });
   await app.fastify.listen();
   const baseUrl = `http://localhost:${
     (app.fastify.server.address() as AddressInfo).port

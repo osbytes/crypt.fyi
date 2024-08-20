@@ -3,11 +3,20 @@ import { initApp } from "./app";
 import { Environment, initConfig } from "./config";
 import { initLogging } from "./logging";
 import gracefulShutdown from "http-graceful-shutdown";
+import Redis from "ioredis";
+import { createRedisVault } from "./vault/redis";
 
 const main = async () => {
   const config = await initConfig();
   const logger = await initLogging(config);
-  const app = await initApp(config, logger);
+  const redis = new Redis();
+  const vault = createRedisVault(redis, config, logger);
+
+  const app = await initApp(config, {
+    logger,
+    vault,
+    redis,
+  });
 
   app.fastify.listen({
     port: config.port,
