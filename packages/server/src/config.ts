@@ -39,6 +39,7 @@ const configSchema = z.object({
     .string()
     .default("rate-limit:")
     .describe("rate limit namespace"),
+  redisUrl: z.string().default("redis://localhost:6379").describe("redis URL"),
   vaultEntryTTLMsMin: z
     .number({ coerce: true })
     .default(1)
@@ -78,6 +79,7 @@ export const initConfig = async (): Promise<Config> => {
     rateLimitMax: process.env.RATE_LIMIT_MAX,
     rateLimitWindowMs: process.env.RATE_LIMIT_WINDOW_MS,
     rateLimitNameSpace: process.env.RATE_LIMIT_NAMESPACE,
+    redisUrl: process.env.REDIS_URL,
     vaultEntryTTLMsMin: process.env.VAULT_ENTRY_TTL_MS_MIN,
     vaultEntryTTLMsMax: process.env.VAULT_ENTRY_TTL_MS_MAX,
     vaultEntryTTLMsDefault: process.env.VAULT_ENTRY_TTL_MS_DEFAULT,

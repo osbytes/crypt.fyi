@@ -9,7 +9,7 @@ import { createRedisVault } from "./vault/redis";
 const main = async () => {
   const config = await initConfig();
   const logger = await initLogging(config);
-  const redis = new Redis();
+  const redis = new Redis(config.redisUrl);
   const vault = createRedisVault(redis, config, logger);
 
   const app = await initApp(config, {

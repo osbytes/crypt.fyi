@@ -3,7 +3,11 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "dev": "concurrently \"yarn workspace @phemvault/server dev\" \"yarn workspace @phemvault/web dev\""
+  },
   "devDependencies": {
+    "concurrently": "^9.1.0",
     "prettier": "3.3.3"
   }
 }
