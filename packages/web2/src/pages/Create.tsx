@@ -32,6 +32,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { config } from "@/config";
 import { encrypt, generateRandomString } from "@/lib/encryption";
+import { Card } from "@/components/ui/card";
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -127,104 +128,108 @@ export function CreatePage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-center">Phemvault</h1>
-      <p className="text-center text-sm text-muted-foreground">
-        Open-source tool to securely share secrets online with client-side
-        end-to-end encryption, leaving the server with zero knowledge of the
-        content
-      </p>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 p-4 max-w-xl mx-auto"
-        >
-          <FormField
-            control={form.control}
-            name="c"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Secret content</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    disabled={vaultMutation.isPending || field.disabled}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="p"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    {...field}
-                    disabled={vaultMutation.isPending || field.disabled}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="ttl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Time to live</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value?.toString()}
-                    disabled={vaultMutation.isPending || field.disabled}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select expiration time" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ttlOptions.map(({ label, value }) => (
-                        <SelectItem key={value} value={value.toString()}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="b"
-            render={({ field: { value, onChange, ...rest } }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    {...rest}
-                    checked={value}
-                    onCheckedChange={onChange}
-                    disabled={vaultMutation.isPending || rest.disabled}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Burn after reading</FormLabel>
-                  <FormDescription>
-                    Delete the secret immediately after it is viewed
-                  </FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
-          <Button type="submit" isLoading={vaultMutation.isPending}>
-            Submit
-          </Button>
-        </form>
-      </Form>
+      <div className="p-4 mb-8">
+        <h1 className="text-2xl font-bold text-center">Phemvault</h1>
+        <p className="text-center text-sm text-muted-foreground">
+          Open-source tool to securely share secrets online with client-side
+          end-to-end encryption, leaving the server with zero knowledge of the
+          content
+        </p>
+      </div>
+      <Card className="max-w-xl mx-auto">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 p-4"
+          >
+            <FormField
+              control={form.control}
+              name="c"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Secret content</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      disabled={vaultMutation.isPending || field.disabled}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="p"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      {...field}
+                      disabled={vaultMutation.isPending || field.disabled}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="ttl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time to live</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value?.toString()}
+                      disabled={vaultMutation.isPending || field.disabled}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select expiration time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ttlOptions.map(({ label, value }) => (
+                          <SelectItem key={value} value={value.toString()}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="b"
+              render={({ field: { value, onChange, ...rest } }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      {...rest}
+                      checked={value}
+                      onCheckedChange={onChange}
+                      disabled={vaultMutation.isPending || rest.disabled}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Burn after reading</FormLabel>
+                    <FormDescription>
+                      Delete the secret immediately after it is viewed
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+            <Button type="submit" isLoading={vaultMutation.isPending}>
+              Submit
+            </Button>
+          </form>
+        </Form>
+      </Card>
       <Dialog
         open={isSubmitSuccessful}
         onOpenChange={(open) => {
