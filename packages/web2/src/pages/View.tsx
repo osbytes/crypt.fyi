@@ -52,7 +52,8 @@ export function ViewPage() {
             }
 
             try {
-              return decrypt(result.c, key);
+              const decrypted = await decrypt(result.c, key);
+              return decrypted;
             } catch (error) {
               throw new DecryptError(error);
             }
