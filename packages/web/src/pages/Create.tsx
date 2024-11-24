@@ -34,7 +34,7 @@ import { config } from "@/config";
 import { encrypt, generateRandomString } from "@/lib/encryption";
 import { Card } from "@/components/ui/card";
 import { sleep } from "@/lib/sleep";
-import { LockKeyhole } from "lucide-react";
+import { IconLock } from "@tabler/icons-react";
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -252,7 +252,7 @@ export function CreatePage() {
               )}
             />
             <Button type="submit" isLoading={createMutation.isPending}>
-              <LockKeyhole />
+              <IconLock />
               Create
             </Button>
           </form>

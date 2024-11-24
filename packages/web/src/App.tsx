@@ -9,7 +9,7 @@ import { CreatePage } from "@/pages/Create";
 import { ViewPage } from "@/pages/View";
 import { useEffect, useState } from "react";
 import { Button } from "./components/ui/button";
-import { MoonIcon, SunIcon } from "lucide-react";
+import { IconMoon, IconSun } from "@tabler/icons-react";
 import { z } from "zod";
 
 const router = createBrowserRouter([
@@ -50,8 +50,11 @@ export default function App() {
         }}
       />
       <div className="fixed top-4 right-4">
-        <Button className="p-3" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-          {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+        <Button
+          className="p-3"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? <IconSun /> : <IconMoon />}
         </Button>
       </div>
     </QueryClientProvider>
