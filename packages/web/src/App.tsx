@@ -35,7 +35,19 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <Toaster theme={theme} />
+      <Toaster
+        toastOptions={{
+          classNames: {
+            toast: "bg-background p-2 rounded-lg outline-accent border-accent",
+            title: "text-foreground",
+            description: "text-muted-foreground",
+            closeButton: "text-foreground",
+            actionButton: "text-foreground",
+            cancelButton: "text-foreground",
+            icon: "text-foreground",
+          },
+        }}
+      />
       <div className="fixed top-4 right-4">
         <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
           {theme === "dark" ? <SunIcon /> : <MoonIcon />}
