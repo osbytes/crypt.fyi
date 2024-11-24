@@ -10,6 +10,7 @@ import { ViewPage } from "@/pages/View";
 import { useEffect, useState } from "react";
 import { Button } from "./components/ui/button";
 import { MoonIcon, SunIcon } from "lucide-react";
+import { z } from "zod";
 
 const router = createBrowserRouter([
   {
@@ -49,7 +50,7 @@ export default function App() {
         }}
       />
       <div className="fixed top-4 right-4">
-        <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+        <Button className="p-3" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
           {theme === "dark" ? <SunIcon /> : <MoonIcon />}
         </Button>
       </div>
@@ -57,10 +58,15 @@ export default function App() {
   );
 }
 
+const themeSchema = z.enum(["dark", "light"]);
+type Theme = z.infer<typeof themeSchema>;
+
 function useTheme() {
-  const [theme, setTheme] = useState<"dark" | "light">(() => {
-    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
-    return savedTheme || "dark";
+  const [theme, setTheme] = useState<Theme>(() => {
+    const savedThemeResult = themeSchema.safeParse(
+      localStorage.getItem("theme"),
+    );
+    return savedThemeResult.success ? savedThemeResult.data : "dark";
   });
 
   useEffect(() => {
@@ -75,7 +81,10 @@ function useTheme() {
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "theme") {
-        setTheme(e.newValue as "dark" | "light");
+        const newThemeResult = themeSchema.safeParse(e.newValue);
+        if (newThemeResult.success) {
+          setTheme(newThemeResult.data);
+        }
       }
     };
 
