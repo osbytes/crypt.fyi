@@ -34,6 +34,7 @@ import { config } from "@/config";
 import { encrypt, generateRandomString } from "@/lib/encryption";
 import { Card } from "@/components/ui/card";
 import { sleep } from "@/lib/sleep";
+import { LockKeyhole } from "lucide-react";
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -251,7 +252,8 @@ export function CreatePage() {
               )}
             />
             <Button type="submit" isLoading={createMutation.isPending}>
-              Submit
+              <LockKeyhole />
+              Create
             </Button>
           </form>
         </Form>

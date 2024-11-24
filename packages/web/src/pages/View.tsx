@@ -6,7 +6,12 @@ import invariant from "tiny-invariant";
 import { decrypt } from "@/lib/encryption";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -92,11 +97,13 @@ export function ViewPage() {
   return (
     <>
       <Card className="p-4 max-w-3xl mx-auto mt-24">
-        {typeof query.data === 'object' && query.data.p ? (
-          decryptedContent || "Waiting for password..."
-        ) : (
-          typeof query.data === 'object' ? JSON.stringify(query.data) : query.data
-        )}
+        <pre>
+          {typeof query.data === "object" && query.data.p
+            ? decryptedContent || "Waiting for password..."
+            : typeof query.data === "object"
+              ? JSON.stringify(query.data)
+              : query.data}
+        </pre>
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
