@@ -72,5 +72,16 @@ function useTheme() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "theme") {
+        setTheme(e.newValue as "dark" | "light");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [setTheme]);
+
   return [theme, setTheme] as const;
 }
