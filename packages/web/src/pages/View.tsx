@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { sleep } from "@/lib/sleep";
 
 export function ViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +40,7 @@ export function ViewPage() {
       fetch(`${config.API_URL}/vault/${id}`, {
         signal,
       }).then(async (res) => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await sleep(500, { enabled: config.IS_DEV });
         switch (res.status) {
           case 200: {
             const result = await (res.json() as Promise<{
