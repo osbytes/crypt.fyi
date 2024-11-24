@@ -155,12 +155,14 @@ export function CreatePage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-center">Phemvault</h1>
-      <p className="text-center text-sm text-muted-foreground">
-        Open-source tool to securely share secrets online with client-side
-        end-to-end encryption, leaving the server with zero knowledge of the
-        content
-      </p>
+      <div className="space-y-2 p-4 mt-4">
+        <h1 className="text-2xl font-bold text-center">Phemvault</h1>
+        <p className="text-center text-sm text-muted-foreground">
+          Open-source tool to securely share secrets online with client-side
+          end-to-end encryption, leaving the server with zero knowledge of the
+          content
+        </p>
+      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -267,7 +269,7 @@ export function CreatePage() {
           </DialogHeader>
           <DialogDescription asChild>
             <>
-              <pre className="text-muted-foreground text-wrap p-2 rounded bg-slate-100">
+              <pre className="text-muted-foreground text-wrap p-2 rounded bg-accent">
                 {createMutation.data?.url}
               </pre>
               <p>
