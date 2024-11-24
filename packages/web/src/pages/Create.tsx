@@ -34,7 +34,7 @@ import { config } from "@/config";
 import { encrypt, generateRandomString } from "@/lib/encryption";
 import { Card } from "@/components/ui/card";
 import { sleep } from "@/lib/sleep";
-import { IconLock } from "@tabler/icons-react";
+import { IconBrandGithub, IconLock } from "@tabler/icons-react";
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -159,11 +159,22 @@ export function CreatePage() {
   return (
     <div className="p-4 max-w-xl mx-auto">
       <div className="space-y-2 p-4">
-        <h1 className="text-2xl font-bold text-center">Phemvault</h1>
+        <h1 className="text-xl font-bold text-center">Phemvault</h1>
         <p className="text-center text-sm text-muted-foreground">
-          Open-source tool to securely share secrets online with client-side
-          end-to-end encryption, leaving the server with zero knowledge of the
-          content
+          Securely share secrets with{" "}
+          <a
+            href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"
+            target="_blank"
+          >
+            AES-256
+          </a>{" "}
+          zero-knowledge{" "}
+          <a
+            href="https://en.wikipedia.org/wiki/End-to-end_encryption"
+            target="_blank"
+          >
+            end-to-end encryption
+          </a>
         </p>
       </div>
       <Card className="p-4">
@@ -258,6 +269,11 @@ export function CreatePage() {
           </form>
         </Form>
       </Card>
+      <div className="flex items-center justify-center space-x-2 p-4">
+        <a href="https://github.com/dillonstreator/phemvault" target="_blank">
+          <IconBrandGithub className="text-muted-foreground" />
+        </a>
+      </div>
       <Dialog
         open={isSubmitSuccessful}
         onOpenChange={(open) => {
