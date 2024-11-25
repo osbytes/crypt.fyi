@@ -34,8 +34,15 @@ import { config } from "@/config";
 import { encrypt, generateRandomString } from "@/lib/encryption";
 import { Card } from "@/components/ui/card";
 import { sleep } from "@/lib/sleep";
-import { IconBrandGithub, IconLock } from "@tabler/icons-react";
+import {
+  IconBrandGithub,
+  IconLock,
+  IconCopy,
+  IconEye,
+  IconEyeOff,
+} from "@tabler/icons-react";
 import { sha256 } from "@/lib/hash";
+import { useState } from "react";
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -158,6 +165,19 @@ export function CreatePage() {
       reset();
     },
   });
+
+  const [isUrlMasked, setIsUrlMasked] = useState(true);
+  let maskedUrl = createMutation.data?.url;
+  if (createMutation.data) {
+    maskedUrl = maskedUrl?.replace(
+      createMutation.data.id,
+      "*".repeat(createMutation.data.id.length),
+    );
+    maskedUrl = maskedUrl?.replace(
+      createMutation.data.key,
+      "*".repeat(createMutation.data.key.length),
+    );
+  }
 
   return (
     <div className="p-4 max-w-xl mx-auto">
@@ -286,12 +306,43 @@ export function CreatePage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Secret created</DialogTitle>
+            <DialogTitle asChild>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold">Secret created</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsUrlMasked(!isUrlMasked)}
+                  type="button"
+                >
+                  {isUrlMasked ? (
+                    <IconEye size={16} />
+                  ) : (
+                    <IconEyeOff size={16} />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={async () => {
+                    if (createMutation.data?.url) {
+                      await navigator.clipboard.writeText(
+                        createMutation.data.url,
+                      );
+                      toast.info("URL copied to clipboard");
+                    }
+                  }}
+                  type="button"
+                >
+                  <IconCopy size={16} />
+                </Button>
+              </div>
+            </DialogTitle>
           </DialogHeader>
           <DialogDescription asChild>
             <>
               <pre className="text-muted-foreground text-wrap p-2 rounded bg-accent">
-                {createMutation.data?.url}
+                {isUrlMasked ? maskedUrl : createMutation.data?.url}
               </pre>
               <p>
                 Your secret has been created. The URL has been copied to your
