@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { sleep } from "@/lib/sleep";
+import { sha256 } from "@/lib/hash";
 
 export function ViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -41,35 +42,36 @@ export function ViewPage() {
 
   const query = useQuery({
     queryKey: ["view", id, key],
-    queryFn: ({ signal }) =>
-      fetch(`${config.API_URL}/vault/${id}`, {
+    queryFn: async ({ signal }) => {
+      const h = await sha256(key);
+      const res = await fetch(`${config.API_URL}/vault/${id}?h=${h}`, {
         signal,
-      }).then(async (res) => {
-        await sleep(500, { enabled: config.IS_DEV });
-        switch (res.status) {
-          case 200: {
-            const result = await (res.json() as Promise<{
-              c: string;
-              p: boolean;
-            }>);
-            if (result.p) {
-              setIsDialogOpen(true);
-              return result;
-            }
-
-            try {
-              const decrypted = await decrypt(result.c, key);
-              return decrypted;
-            } catch (error) {
-              throw new DecryptError(error);
-            }
+      });
+      await sleep(500, { enabled: config.IS_DEV });
+      switch (res.status) {
+        case 200: {
+          const result = await (res.json() as Promise<{
+            c: string;
+            p: boolean;
+          }>);
+          if (result.p) {
+            setIsDialogOpen(true);
+            return result;
           }
-          case 404:
-            throw new NotFoundError();
-          default:
-            throw new Error(`unexpected status code ${res.status}`);
+
+          try {
+            const decrypted = await decrypt(result.c, key);
+            return decrypted;
+          } catch (error) {
+            throw new DecryptError(error);
+          }
         }
-      }),
+        case 404:
+          throw new NotFoundError();
+        default:
+          throw new Error(`unexpected status code ${res.status}`);
+      }
+    },
     retry: (_, error) => {
       return (
         !(error instanceof NotFoundError) && !(error instanceof DecryptError)

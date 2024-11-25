@@ -99,8 +99,12 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     schema: {
       body: z.object({
         c: z.string().describe("encrypted content"),
+        h: z.string().describe("sha256 hash of the encryption key"),
         b: z.boolean().default(true).describe("burn after reading"),
-        p: z.boolean().default(false).describe("password was set"),
+        p: z
+          .boolean()
+          .default(false)
+          .describe("password was used to layer encryption"),
         ttl: z
           .number()
           .min(config.vaultEntryTTLMsMin)
@@ -110,8 +114,8 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       }),
       response: {
         201: z.object({
-          id: z.string(),
-          dt: z.string(),
+          id: z.string().describe("vault id"),
+          dt: z.string().describe("delete token"),
         }),
       },
     },
@@ -129,17 +133,20 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       params: z.object({
         vaultId: z.string(),
       }),
+      querystring: z.object({
+        h: z.string().describe("sha256 hash of the encryption key"),
+      }),
       response: {
         200: z.object({
-          c: z.string(),
-          b: z.boolean(),
-          p: z.boolean(),
+          c: z.string().describe("encrypted content"),
+          b: z.boolean().describe("burn after reading"),
+          p: z.boolean().describe("password was used to layer encryption"),
         }),
         404: z.null(),
       },
     },
     async handler(req, res) {
-      const result = await vault.get(req.params.vaultId);
+      const result = await vault.get(req.params.vaultId, req.query.h);
       if (!result) {
         return res.status(404).send();
       }

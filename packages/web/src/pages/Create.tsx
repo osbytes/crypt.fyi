@@ -35,6 +35,7 @@ import { encrypt, generateRandomString } from "@/lib/encryption";
 import { Card } from "@/components/ui/card";
 import { sleep } from "@/lib/sleep";
 import { IconBrandGithub, IconLock } from "@tabler/icons-react";
+import { sha256 } from "@/lib/hash";
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -88,6 +89,7 @@ export function CreatePage() {
       if (input.p) {
         encrypted = await encrypt(encrypted, input.p);
       }
+      const h = await sha256(key);
 
       const result = await fetch(`${config.API_URL}/vault`, {
         method: "POST",
@@ -96,6 +98,7 @@ export function CreatePage() {
         },
         body: JSON.stringify({
           c: encrypted,
+          h,
           b: input.b,
           p: !!input.p,
         }),

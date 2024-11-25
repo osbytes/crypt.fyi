@@ -14,7 +14,7 @@ export const createRedisVault = (
 
   return {
     async set(value) {
-      const { c, b, p, ttl } = value;
+      const { c, h, b, p, ttl } = value;
       const { id, dt } = await createTokens(config);
 
       const key = getKey(id);
@@ -22,7 +22,14 @@ export const createRedisVault = (
       const tx = redis.multi();
       tx.setnx(
         key,
-        JSON.stringify({ c, b, p, dt, _cd: Date.now() } satisfies VaultValue),
+        JSON.stringify({
+          c,
+          h,
+          b,
+          p,
+          dt,
+          _cd: Date.now(),
+        } satisfies VaultValue),
       );
       tx.pexpire(key, ttl);
       const result = await tx.exec();
@@ -41,14 +48,23 @@ export const createRedisVault = (
 
       return { id, dt };
     },
-    async get(id) {
+    async get(id, h) {
       const key = getKey(id);
       const result = await redis.get(key);
       if (!result) {
         return undefined;
       }
 
-      const { c, b, p } = vaultValueSchema.parse(JSON.parse(result));
+      const {
+        c,
+        h: actualH,
+        b,
+        p,
+      } = vaultValueSchema.parse(JSON.parse(result));
+      if (actualH !== h) {
+        return undefined;
+      }
+
       if (b) {
         retryable(() => redis.del(key), { retries: 3 }).catch((err) => {
           logger.error(`error deleting key ${id}`, err);
