@@ -161,14 +161,13 @@ export function CreatePage() {
       <div className="space-y-2 p-4">
         <h1 className="text-xl font-bold text-center">Phemvault</h1>
         <p className="text-center text-sm text-muted-foreground">
-          Securely share secrets with{" "}
+          Securely share secrets with zero-knowledge{" "}
           <a
             href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"
             target="_blank"
           >
             AES-256
           </a>{" "}
-          zero-knowledge{" "}
           <a
             href="https://en.wikipedia.org/wiki/End-to-end_encryption"
             target="_blank"
