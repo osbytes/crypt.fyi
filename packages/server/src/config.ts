@@ -42,11 +42,11 @@ const configSchema = z.object({
   redisUrl: z.string().default("redis://localhost:6379").describe("redis URL"),
   vaultEntryTTLMsMin: z
     .number({ coerce: true })
-    .default(1)
+    .default(1000)
     .describe("vault entry time to live minimum in milliseconds"),
   vaultEntryTTLMsMax: z
     .number({ coerce: true })
-    .default(1000 * 60 * 60)
+    .default(1000 * 60 * 60 * 24 * 7)
     .describe("vault entry time to live maximum in milliseconds"),
   vaultEntryTTLMsDefault: z
     .number({ coerce: true })

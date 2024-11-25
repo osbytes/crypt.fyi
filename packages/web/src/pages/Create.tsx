@@ -74,7 +74,6 @@ const ttlOptions = [
   { label: "1 hour", value: HOUR },
   { label: "1 day", value: DAY },
   { label: "1 week", value: WEEK },
-  { label: "1 month", value: 30 * DAY },
 ];
 
 export function CreatePage() {
@@ -108,6 +107,7 @@ export function CreatePage() {
           h,
           b: input.b,
           p: !!input.p,
+          ttl: input.ttl,
         }),
       });
 
@@ -242,7 +242,9 @@ export function CreatePage() {
                   <FormLabel>Time to live</FormLabel>
                   <FormControl>
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={(v) => {
+                        field.onChange(Number(v));
+                      }}
                       defaultValue={field.value?.toString()}
                       disabled={createMutation.isPending || field.disabled}
                     >
