@@ -5,7 +5,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import invariant from "tiny-invariant";
 import { decrypt } from "@/lib/encryption";
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -69,6 +69,16 @@ export function ViewPage() {
     },
   });
 
+  const sentRequest = useRef(false);
+  useEffect(() => {
+    if (sentRequest.current || isPasswordSet) {
+      return;
+    }
+    sentRequest.current = true;
+
+    query.mutate();
+  }, [query, isPasswordSet]);
+
   if (query.error instanceof NotFoundError) {
     return (
       <Card className="p-4 max-w-3xl mx-auto mt-24">
@@ -96,7 +106,9 @@ export function ViewPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <Button onClick={() => query.mutate()}>Submit</Button>
+            <Button isLoading={query.isPending} onClick={() => query.mutate()}>
+              Submit
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
