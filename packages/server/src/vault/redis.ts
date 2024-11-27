@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import { Vault, VaultValue, createTokens, vaultValueSchema } from "./vault";
+import { InvalidKeyAndOrPasswordError, Vault, VaultValue, createTokens, vaultValueSchema } from "./vault";
 import { isDefined } from "../util";
 import { retryable } from "../retry";
 import { Config } from "../config";
@@ -14,7 +14,7 @@ export const createRedisVault = (
 
   return {
     async set(value) {
-      const { c, h, b, p, ttl } = value;
+      const { c, h, b, ttl } = value;
       const { id, dt } = await createTokens(config);
 
       const key = getKey(id);
@@ -26,8 +26,8 @@ export const createRedisVault = (
           c,
           h,
           b,
-          p,
           dt,
+          ttl,
           _cd: Date.now(),
         } satisfies VaultValue),
       );
@@ -59,10 +59,11 @@ export const createRedisVault = (
         c,
         h: actualH,
         b,
-        p,
+        ttl,
+        _cd,
       } = vaultValueSchema.parse(JSON.parse(result));
       if (actualH !== h) {
-        return undefined;
+        throw new InvalidKeyAndOrPasswordError();
       }
 
       if (b) {
@@ -74,7 +75,8 @@ export const createRedisVault = (
       return {
         c,
         b,
-        p,
+        ttl,
+        _cd,
       };
     },
     async del(id, dt) {

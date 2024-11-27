@@ -15,7 +15,7 @@ import fastifyRateLimit from "@fastify/rate-limit";
 
 import { Config } from "./config";
 import { Logger } from "./logging";
-import { Vault } from "./vault/vault";
+import { InvalidKeyAndOrPasswordError, Vault } from "./vault/vault";
 import { Redis } from "ioredis";
 
 declare module "fastify" {
@@ -99,12 +99,10 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     schema: {
       body: z.object({
         c: z.string().describe("encrypted content"),
-        h: z.string().describe("sha256 hash of the encryption key"),
+        h: z
+          .string()
+          .describe("sha256 hash of the encryption key + optional password"),
         b: z.boolean().default(true).describe("burn after reading"),
-        p: z
-          .boolean()
-          .default(false)
-          .describe("password was used to layer encryption"),
         ttl: z
           .number()
           .min(config.vaultEntryTTLMsMin)
@@ -134,24 +132,36 @@ export const initApp = async (config: Config, deps: AppDeps) => {
         vaultId: z.string(),
       }),
       querystring: z.object({
-        h: z.string().describe("sha256 hash of the encryption key"),
+        h: z
+          .string()
+          .describe("sha256 hash of the encryption key + optional password"),
       }),
       response: {
         200: z.object({
           c: z.string().describe("encrypted content"),
           b: z.boolean().describe("burn after reading"),
-          p: z.boolean().describe("password was used to layer encryption"),
+          ttl: z.number().describe("time to live (TTL) in milliseconds"),
+          _cd: z.number().describe("created date"),
         }),
         404: z.null(),
+        400: z.null(),
       },
     },
     async handler(req, res) {
-      const result = await vault.get(req.params.vaultId, req.query.h);
-      if (!result) {
-        return res.status(404).send();
-      }
+      try {
+        const result = await vault.get(req.params.vaultId, req.query.h);
+        if (!result) {
+          return res.status(404).send();
+        }
 
-      return res.send(result);
+        return res.send(result);
+      } catch (error) {
+        if (error instanceof InvalidKeyAndOrPasswordError) {
+          return res.status(400).send();
+        }
+
+        throw error;
+      }
     },
   });
 

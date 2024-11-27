@@ -1,6 +1,6 @@
 import { config } from "@/config";
 import { Loader } from "@/components/ui/loader";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import invariant from "tiny-invariant";
 import { decrypt } from "@/lib/encryption";
@@ -24,73 +24,55 @@ export function ViewPage() {
   const [searchParams] = useSearchParams();
   const key = searchParams.get("key");
   invariant(key);
+  const isPasswordSet = searchParams.get("p") === "true";
   const [password, setPassword] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [decryptedContent, setDecryptedContent] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
 
-  const handlePasswordSubmit = async () => {
-    try {
-      const data = query.data as { c: string; p: boolean };
-      const firstDecryption = await decrypt(data.c, password);
-      const finalContent = await decrypt(firstDecryption, key);
-      setDecryptedContent(finalContent);
-      setIsDialogOpen(false);
-    } catch (error) {
-      toast.error("Invalid password");
-    }
-  };
-
-  const query = useQuery({
-    queryKey: ["view", id, key],
-    queryFn: async ({ signal }) => {
-      const h = await sha256(key);
-      const res = await fetch(`${config.API_URL}/vault/${id}?h=${h}`, {
-        signal,
-      });
+  const query = useMutation({
+    mutationKey: ["view", id, key, password],
+    mutationFn: async () => {
+      const h = await sha256(key + (isPasswordSet ? password : ""));
+      const res = await fetch(`${config.API_URL}/vault/${id}?h=${h}`);
       await sleep(500, { enabled: config.IS_DEV });
+
       switch (res.status) {
         case 200: {
           const result = await (res.json() as Promise<{
             c: string;
             p: boolean;
           }>);
-          if (result.p) {
-            setIsDialogOpen(true);
-            return result;
-          }
 
           try {
-            const decrypted = await decrypt(result.c, key);
+            const decrypted = isPasswordSet
+              ? await decrypt(result.c, password).then((d) => decrypt(d, key))
+              : await decrypt(result.c, key);
             return decrypted;
           } catch (error) {
             throw new DecryptError(error);
           }
         }
+        case 400:
+          throw new Error("invalid key and/or password");
         case 404:
+          setIsDialogOpen(false);
           throw new NotFoundError();
         default:
           throw new Error(`unexpected status code ${res.status}`);
       }
     },
-    retry: (_, error) => {
-      return (
-        !(error instanceof NotFoundError) && !(error instanceof DecryptError)
-      );
+    retry: () => false,
+    onSuccess() {
+      setIsDialogOpen(false);
     },
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchInterval: 0,
-    enabled: !!id && !!key,
+    onError(error) {
+      toast.error(error.message);
+    },
   });
 
-  if (query.isLoading) {
-    return <Loader />;
-  }
-
-  if (query.isError) {
+  if (query.error instanceof NotFoundError) {
     return (
       <Card className="p-4 max-w-3xl mx-auto mt-24">
-        <p>{query.error.message}</p>
+        <p>Not found</p>
         <Link to="/">Back home</Link>
       </Card>
     );
@@ -99,13 +81,7 @@ export function ViewPage() {
   return (
     <>
       <Card className="p-4 max-w-3xl mx-auto mt-24">
-        <pre>
-          {typeof query.data === "object" && query.data.p
-            ? decryptedContent || "Waiting for password..."
-            : typeof query.data === "object"
-              ? JSON.stringify(query.data)
-              : query.data}
-        </pre>
+        <pre>{query.data ?? <Loader />}</pre>
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -120,7 +96,7 @@ export function ViewPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <Button onClick={handlePasswordSubmit}>Submit</Button>
+            <Button onClick={() => query.mutate()}>Submit</Button>
           </div>
         </DialogContent>
       </Dialog>

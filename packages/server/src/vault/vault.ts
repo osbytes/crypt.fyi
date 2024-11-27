@@ -7,10 +7,12 @@ const randomBytesAsync = promisify(randomBytes);
 
 export const vaultValueSchema = z.object({
   c: z.string().describe("encrypted content"),
-  h: z.string().describe("sha256 hash of the encryption key"),
+  h: z
+    .string()
+    .describe("sha256 hash of the encryption key + optional password"),
   b: z.boolean().describe("burn after reading"),
-  p: z.boolean().describe("password was set"),
   dt: z.string().describe("delete token"),
+  ttl: z.number().describe("time to live (TTL) in milliseconds"),
   _cd: z.number().describe("created date"),
 });
 export type VaultValue = z.infer<typeof vaultValueSchema>;
@@ -19,10 +21,7 @@ export interface Vault {
   set(
     value: Omit<VaultValue, "dt" | "_cd"> & { ttl: number },
   ): Promise<{ id: string; dt: string }>;
-  get(
-    id: string,
-    h: string,
-  ): Promise<Omit<VaultValue, "dt" | "_cd" | "h"> | undefined>;
+  get(id: string, h: string): Promise<Omit<VaultValue, "dt" | "h"> | undefined>;
   del(id: string, dt: string): Promise<boolean>;
 }
 
@@ -37,3 +36,9 @@ export const createTokens = async (config: Config) => {
   ]);
   return { id, dt };
 };
+
+export class InvalidKeyAndOrPasswordError extends Error {
+  constructor() {
+    super("invalid key and/or password");
+  }
+}

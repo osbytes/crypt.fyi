@@ -95,7 +95,7 @@ export function CreatePage() {
       if (input.p) {
         encrypted = await encrypt(encrypted, input.p);
       }
-      const h = await sha256(key);
+      const h = await sha256(key + (input.p ?? ""));
 
       const result = await fetch(`${config.API_URL}/vault`, {
         method: "POST",
@@ -117,7 +117,12 @@ export function CreatePage() {
         id: string;
         dt: string;
       }>);
-      const url = `${window.location.origin}/${data.id}?key=${key}`;
+      const searchParams = new URLSearchParams();
+      searchParams.set("key", key);
+      if (input.p) {
+        searchParams.set("p", "true");
+      }
+      const url = `${window.location.origin}/${data.id}?${searchParams.toString()}`;
       await navigator.clipboard.writeText(url);
       toast.info("URL copied to clipboard");
 
