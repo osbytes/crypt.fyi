@@ -106,7 +106,6 @@ export function CreatePage() {
           c: encrypted,
           h,
           b: input.b,
-          p: !!input.p,
           ttl: input.ttl,
         }),
       });
