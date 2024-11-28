@@ -42,14 +42,14 @@ export function ViewPage() {
         case 200: {
           const result = await (res.json() as Promise<{
             c: string;
-            p: boolean;
+            b: boolean;
           }>);
 
           try {
             const decrypted = isPasswordSet
               ? await decrypt(result.c, password).then((d) => decrypt(d, key))
               : await decrypt(result.c, key);
-            return decrypted;
+            return { value: decrypted, burned: result.b };
           } catch (error) {
             throw new DecryptError(error);
           }
@@ -112,7 +112,7 @@ export function ViewPage() {
             variant="secondary"
             size="icon"
             onClick={() => {
-              navigator.clipboard.writeText(query.data);
+              navigator.clipboard.writeText(query.data.value);
               toast.success("Copied to clipboard");
             }}
             title="Copy to clipboard"
@@ -120,11 +120,16 @@ export function ViewPage() {
             <IconCopy className="h-4 w-4" />
           </Button>
         </div>
+        {query.data.burned && (
+          <p className="text-xs text-center text-muted-foreground">
+            This message was deleted after your reading
+          </p>
+        )}
         <Card className="p-4">
           <pre
             className={cn(" text-wrap", !isRevealed && "blur-md select-none")}
           >
-            {query.data}
+            {query.data?.value}
           </pre>
         </Card>
       </>
