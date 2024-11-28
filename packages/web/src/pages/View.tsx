@@ -93,12 +93,14 @@ export function ViewPage() {
     content = <pre>{query.data}</pre>;
   } else if (query.isPending) {
     content = <Loader />;
-  } else {
+  } else if (isPasswordSet) {
     content = (
-      <>
-        <p>Not found</p>
-        <Link to="/">Back home</Link>
-      </>
+      <p
+        className="text-center text-muted-foreground"
+        onClick={() => setIsDialogOpen(true)}
+      >
+        waiting for password...
+      </p>
     );
   }
 
