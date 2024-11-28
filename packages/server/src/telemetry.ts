@@ -13,7 +13,7 @@ import {
 
 const telemetryEnabled = process.env.OTEL_ENABLED?.toLowerCase() === "true";
 
-let sdk: NodeSDK;
+let sdk: NodeSDK | undefined = undefined;
 
 if (telemetryEnabled) {
   let exporter: SpanExporter;
@@ -26,7 +26,7 @@ if (telemetryEnabled) {
     exporter = new ConsoleSpanExporter();
   }
 
-  const sdk = new NodeSDK({
+  sdk = new NodeSDK({
     resource: new Resource({
       [SEMRESATTRS_SERVICE_NAME]: process.env.SERVICE_NAME || "phemvault",
       [SEMRESATTRS_SERVICE_VERSION]: process.env.SERVICE_VERSION || "v1.0.0",
