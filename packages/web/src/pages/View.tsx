@@ -99,17 +99,24 @@ export function ViewPage() {
           <DialogHeader>
             <DialogTitle>Enter Password</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <form
+            className="space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              query.mutate();
+            }}
+          >
             <Input
               type="password"
               placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
-            <Button isLoading={query.isPending} onClick={() => query.mutate()}>
+            <Button type="submit" isLoading={query.isPending}>
               Submit
             </Button>
-          </div>
+          </form>
         </DialogContent>
       </Dialog>
     </>
