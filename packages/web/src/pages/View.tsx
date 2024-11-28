@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { sleep } from "@/lib/sleep";
 import { sha256 } from "@/lib/hash";
+import { IconEye, IconEyeOff, IconCopy } from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
 
 export function ViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +29,7 @@ export function ViewPage() {
   const isPasswordSet = searchParams.get("p") === "true";
   const [password, setPassword] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
+  const [isRevealed, setIsRevealed] = useState(false);
 
   const query = useMutation({
     mutationKey: ["view", id, key, password],
@@ -90,13 +93,48 @@ export function ViewPage() {
 
   let content = null;
   if (query.data) {
-    content = <pre>{query.data}</pre>;
+    content = (
+      <>
+        <div className="flex justify-center gap-2 mb-4">
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={() => setIsRevealed(!isRevealed)}
+            title={isRevealed ? "Hide content" : "Show content"}
+          >
+            {isRevealed ? (
+              <IconEyeOff className="h-4 w-4" />
+            ) : (
+              <IconEye className="h-4 w-4" />
+            )}
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={() => {
+              navigator.clipboard.writeText(query.data);
+              toast.success("Copied to clipboard");
+            }}
+            title="Copy to clipboard"
+          >
+            <IconCopy className="h-4 w-4" />
+          </Button>
+        </div>
+        <Card className="p-4">
+          <pre
+            className={cn(" text-wrap", !isRevealed && "blur-md select-none")}
+          >
+            {query.data}
+          </pre>
+        </Card>
+      </>
+    );
   } else if (query.isPending) {
     content = <Loader />;
   } else if (isPasswordSet) {
     content = (
       <p
-        className="text-center text-muted-foreground"
+        className="text-center text-muted-foreground cursor-pointer"
         onClick={() => setIsDialogOpen(true)}
       >
         waiting for password...
@@ -105,8 +143,8 @@ export function ViewPage() {
   }
 
   return (
-    <>
-      <Card className="p-4 max-w-3xl mx-auto mt-24">{content}</Card>
+    <div className="max-w-3xl mx-auto mt-24">
+      {content}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
@@ -133,7 +171,7 @@ export function ViewPage() {
           </form>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }
 
