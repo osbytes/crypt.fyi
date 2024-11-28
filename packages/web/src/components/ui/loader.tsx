@@ -9,7 +9,7 @@ export function Loader({ size = "default" }: LoaderProps) {
         lg: "h-5 w-5"
     }
 
-    return <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+    return <span className="relative h-full w-full flex items-center justify-center">
         <svg
             className={`animate-spin ${sizeClasses[size]}`}
             xmlns="http://www.w3.org/2000/svg"

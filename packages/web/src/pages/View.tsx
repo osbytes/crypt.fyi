@@ -88,11 +88,23 @@ export function ViewPage() {
     );
   }
 
+  let content = null;
+  if (query.data) {
+    content = <pre>{query.data}</pre>;
+  } else if (query.isPending) {
+    content = <Loader />;
+  } else {
+    content = (
+      <>
+        <p>Not found</p>
+        <Link to="/">Back home</Link>
+      </>
+    );
+  }
+
   return (
     <>
-      <Card className="p-4 max-w-3xl mx-auto mt-24">
-        <pre>{query.data ?? <Loader />}</pre>
-      </Card>
+      <Card className="p-4 max-w-3xl mx-auto mt-24">{content}</Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
