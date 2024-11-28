@@ -19,6 +19,7 @@ const main = async () => {
   });
 
   app.fastify.listen({
+    host: "0.0.0.0",
     port: config.port,
   });
 
