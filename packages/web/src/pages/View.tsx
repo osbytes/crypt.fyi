@@ -84,7 +84,7 @@ export function ViewPage() {
 
   if (query.error instanceof NotFoundError) {
     return (
-      <Card className="p-4 max-w-3xl mx-auto mt-24">
+      <Card className="p-4 max-w-3xl mx-auto">
         <p>Not found</p>
         <Link to="/">Back home</Link>
       </Card>
@@ -121,7 +121,7 @@ export function ViewPage() {
           </Button>
         </div>
         {query.data.burned && (
-          <p className="text-xs text-center text-muted-foreground">
+          <p className="text-xs text-center text-muted-foreground mb-2">
             This message was deleted after your reading
           </p>
         )}
@@ -148,7 +148,7 @@ export function ViewPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto mt-24">
+    <div className="max-w-3xl mx-auto">
       {content}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

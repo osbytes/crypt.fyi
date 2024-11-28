@@ -7,32 +7,33 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { CreatePage } from "@/pages/Create";
 import { ViewPage } from "@/pages/View";
-import { useEffect, useState } from "react";
-import { Button } from "./components/ui/button";
-import { IconMoon, IconSun } from "@tabler/icons-react";
-import { z } from "zod";
+import { Layout } from "@/components/layout";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <CreatePage />,
-  },
-  {
-    path: "/:id",
-    element: <ViewPage />,
-  },
-  {
-    path: "*",
-    loader: () => redirect("/"),
-    element: null,
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: <CreatePage />,
+      },
+      {
+        path: "/:id",
+        element: <ViewPage />,
+      },
+      {
+        path: "*",
+        loader: () => redirect("/"),
+        element: null,
+      },
+    ],
   },
 ]);
 
 const queryClient = new QueryClient();
 
 export default function App() {
-  const [theme, setTheme] = useTheme();
-
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
@@ -49,51 +50,6 @@ export default function App() {
           },
         }}
       />
-      <div className="fixed top-4 right-4">
-        <Button
-          className="p-3"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        >
-          {theme === "dark" ? <IconSun /> : <IconMoon />}
-        </Button>
-      </div>
     </QueryClientProvider>
   );
-}
-
-const themeSchema = z.enum(["dark", "light"]);
-type Theme = z.infer<typeof themeSchema>;
-
-function useTheme() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const savedThemeResult = themeSchema.safeParse(
-      localStorage.getItem("theme"),
-    );
-    return savedThemeResult.success ? savedThemeResult.data : "dark";
-  });
-
-  useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "theme") {
-        const newThemeResult = themeSchema.safeParse(e.newValue);
-        if (newThemeResult.success) {
-          setTheme(newThemeResult.data);
-        }
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [setTheme]);
-
-  return [theme, setTheme] as const;
 }

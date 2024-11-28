@@ -184,25 +184,7 @@ export function CreatePage() {
   }
 
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <div className="space-y-2 p-4">
-        <h1 className="text-xl font-bold text-center">Phemvault</h1>
-        <p className="text-center text-sm text-muted-foreground">
-          Securely share secrets with zero-knowledge{" "}
-          <a
-            href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"
-            target="_blank"
-          >
-            AES-256
-          </a>{" "}
-          <a
-            href="https://en.wikipedia.org/wiki/End-to-end_encryption"
-            target="_blank"
-          >
-            end-to-end encryption
-          </a>
-        </p>
-      </div>
+    <div className="max-w-xl mx-auto">
       <Card className="p-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
