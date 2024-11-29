@@ -152,6 +152,7 @@ export function CreatePage() {
       });
       if (!result.ok) {
         if (result.status === 404) {
+          setIsUrlMasked(true);
           reset();
           throw new Error("secret not found");
         }
@@ -163,6 +164,7 @@ export function CreatePage() {
     },
     onSuccess() {
       toast.success("Secret deleted");
+      setIsUrlMasked(true);
       reset();
     },
   });
