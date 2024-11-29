@@ -1,7 +1,7 @@
 import { IconBrandGithub, IconMoon, IconSun } from "@tabler/icons-react";
 import { Button } from "./ui/button";
 import { useTheme } from "@/theme";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
 export function Layout() {
   const [theme, setTheme] = useTheme();
@@ -11,7 +11,9 @@ export function Layout() {
       <header className="border-b p-2">
         <div className="container flex items-center justify-between mx-auto">
           <div>
-            <h1 className="text-xl font-bold">Phemvault</h1>
+            <Link to="/">
+              <h1 className="text-xl font-bold">Phemvault</h1>
+            </Link>
             <p className="text-xs text-muted-foreground">
               Securely share secrets with zero-knowledge{" "}
               <a

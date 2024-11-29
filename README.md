@@ -67,25 +67,21 @@ DELETE /vault/:vaultId
 - Backend: Node.js with Fastify
 - Storage: Redis
 - Encryption: Web Crypto API
-- Monitoring: OpenTelemetry
+- Performance Monitoring: OpenTelemetry
 
 ## Development
 
 1. Clone the repository
 2. Install dependencies:
    ```bash
-   npm install
+   yarn install
    ```
 3. Set up environment variables (see `.env.example`)
 4. Start the development server:
    ```bash
-   npm run dev
+   yarn run dev
    ```
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-[License Type] - See LICENSE file for details
