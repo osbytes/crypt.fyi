@@ -1,6 +1,8 @@
+import { formatDistance } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Form,
   FormControl,
@@ -21,13 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { config } from "@/config";
@@ -40,6 +35,8 @@ import {
   IconCopy,
   IconEye,
   IconEyeOff,
+  IconFlame,
+  IconClock,
 } from "@tabler/icons-react";
 import { sha256 } from "@/lib/hash";
 import { useState } from "react";
@@ -172,188 +169,240 @@ export function CreatePage() {
 
   const [isUrlMasked, setIsUrlMasked] = useState(true);
   let maskedUrl = createMutation.data?.url;
-  if (createMutation.data) {
-    maskedUrl = maskedUrl?.replace(
-      createMutation.data.id,
-      "*".repeat(createMutation.data.id.length),
-    );
-    maskedUrl = maskedUrl?.replace(
-      createMutation.data.key,
-      "*".repeat(createMutation.data.key.length),
-    );
+  if (isUrlMasked && createMutation.data?.url) {
+    const url = new URL(createMutation.data.url);
+    const searchParams = new URLSearchParams(url.search);
+    const key = searchParams.get("key");
+
+    if (key) {
+      searchParams.set("key", "*".repeat(key.length));
+    }
+
+    maskedUrl = `${url.origin}/${"*".repeat(createMutation.data.id.length)}?${searchParams.toString()}`;
   }
 
   return (
     <div className="max-w-xl mx-auto">
-      <Card className="p-4">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="c"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Secret content</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      disabled={createMutation.isPending || field.disabled}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="p"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      {...field}
-                      disabled={createMutation.isPending || field.disabled}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="ttl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Time to live</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={(v) => {
-                        field.onChange(Number(v));
+      <AnimatePresence mode="wait">
+        {!isSubmitSuccessful ? (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="p-4">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="c"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Secret content</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            disabled={
+                              createMutation.isPending || field.disabled
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="p"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            {...field}
+                            disabled={
+                              createMutation.isPending || field.disabled
+                            }
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="ttl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Time to live</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={(v) => {
+                              field.onChange(Number(v));
+                            }}
+                            defaultValue={field.value?.toString()}
+                            disabled={
+                              createMutation.isPending || field.disabled
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select expiration time" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {ttlOptions.map(({ label, value }) => (
+                                <SelectItem
+                                  key={value}
+                                  value={value.toString()}
+                                >
+                                  {label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="b"
+                    render={({ field: { value, onChange, ...rest } }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            {...rest}
+                            checked={value}
+                            onCheckedChange={onChange}
+                            disabled={createMutation.isPending || rest.disabled}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Burn after reading</FormLabel>
+                          <FormDescription>
+                            Delete the secret immediately after it is viewed
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" isLoading={createMutation.isPending}>
+                    <IconLock />
+                    Create
+                  </Button>
+                </form>
+              </Form>
+            </Card>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="p-4">
+              <div className="space-y-4">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold mb-2">Secret Created!</h2>
+                  <p className="text-muted-foreground">
+                    Your secret has been created and the URL has been copied to
+                    your clipboard
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-2 p-4 bg-muted rounded-lg">
+                  <Input
+                    type={isUrlMasked ? "password" : "text"}
+                    value={isUrlMasked ? maskedUrl : createMutation.data?.url}
+                    readOnly
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsUrlMasked(!isUrlMasked)}
+                  >
+                    {isUrlMasked ? <IconEyeOff /> : <IconEye />}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      if (createMutation.data?.url) {
+                        navigator.clipboard.writeText(createMutation.data.url);
+                        toast.info("URL copied to clipboard");
+                      }
+                    }}
+                  >
+                    <IconCopy />
+                  </Button>
+                </div>
+
+                <div className="flex justify-end flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsUrlMasked(true);
+                      reset();
+                    }}
+                  >
+                    Create Another
+                  </Button>
+                  {createMutation.data && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        if (createMutation.data) {
+                          deleteMutation.mutate({
+                            id: createMutation.data.id,
+                            dt: createMutation.data.dt,
+                          });
+                        }
                       }}
-                      defaultValue={field.value?.toString()}
-                      disabled={createMutation.isPending || field.disabled}
+                      isLoading={deleteMutation.isPending}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select expiration time" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ttlOptions.map(({ label, value }) => (
-                          <SelectItem key={value} value={value.toString()}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="b"
-              render={({ field: { value, onChange, ...rest } }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      {...rest}
-                      checked={value}
-                      onCheckedChange={onChange}
-                      disabled={createMutation.isPending || rest.disabled}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Burn after reading</FormLabel>
-                    <FormDescription>
-                      Delete the secret immediately after it is viewed
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-            <Button type="submit" isLoading={createMutation.isPending}>
-              <IconLock />
-              Create
-            </Button>
-          </form>
-        </Form>
-      </Card>
+                      Delete Secret
+                    </Button>
+                  )}
+                </div>
+                <div className="grid grid-cols-[auto_1fr] gap-2 text-xs">
+                  <IconClock className="text-muted-foreground size-4" />
+                  <p className="text-muted-foreground">
+                    Expires in: {formatDistance(form.watch("ttl"), 0)}
+                  </p>
+                  {form.watch("b") && (
+                    <>
+                      <IconFlame className="text-muted-foreground size-4" />
+                      <p className="text-muted-foreground">
+                        Secret will be deleted after it is viewed
+                      </p>
+                    </>
+                  )}
+                  {form.watch("p") && (
+                    <>
+                      <IconLock className="text-muted-foreground size-4" />
+                      <p className="text-muted-foreground">
+                        Password protected
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="flex items-center justify-center space-x-2 p-4">
         <a href="https://github.com/dillonstreator/phemvault" target="_blank">
           <IconBrandGithub className="text-muted-foreground" />
         </a>
       </div>
-      <Dialog
-        open={isSubmitSuccessful}
-        onOpenChange={(open) => {
-          if (!open) {
-            reset();
-          }
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle asChild>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold">Secret created</h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsUrlMasked(!isUrlMasked)}
-                  type="button"
-                >
-                  {isUrlMasked ? (
-                    <IconEye size={16} />
-                  ) : (
-                    <IconEyeOff size={16} />
-                  )}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={async () => {
-                    if (createMutation.data?.url) {
-                      await navigator.clipboard.writeText(
-                        createMutation.data.url,
-                      );
-                      toast.info("URL copied to clipboard");
-                    }
-                  }}
-                  type="button"
-                >
-                  <IconCopy size={16} />
-                </Button>
-              </div>
-            </DialogTitle>
-          </DialogHeader>
-          <DialogDescription asChild>
-            <>
-              <pre className="text-muted-foreground text-wrap p-2 rounded bg-accent">
-                {isUrlMasked ? maskedUrl : createMutation.data?.url}
-              </pre>
-              <p>
-                Your secret has been created. The URL has been copied to your
-                clipboard.
-              </p>
-              {createMutation.data && (
-                <Button
-                  variant="destructive"
-                  isLoading={deleteMutation.isPending}
-                  onClick={() =>
-                    deleteMutation.mutate({
-                      id: createMutation.data.id,
-                      dt: createMutation.data.dt,
-                    })
-                  }
-                >
-                  Delete
-                </Button>
-              )}
-            </>
-          </DialogDescription>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
