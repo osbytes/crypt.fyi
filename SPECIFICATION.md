@@ -77,7 +77,8 @@ PhemVault follows a client-server architecture with the following main component
    - AES-256-GCM encryption
    - All encryption/decryption occurs in the browser
    - Unique encryption key per secret
-   - Optional password protection (double encryption)
+   - Optional password protection (layered encryption)
+     - Password is not embedded in the URL and is ideally shared/transmitted separately from the URL
 
 2. **Key Management**
    - Decryption key never transmitted to server
@@ -98,17 +99,16 @@ PhemVault follows a client-server architecture with the following main component
    - Secure deletion from Redis
 
 ### 4.3 Transport Security
-1. **API Security**
-   - CORS protection
-   - Rate limiting
-   - Request size limits
-   - TLS transport encryption
-   - Strict Content Security Policy (CSP)
-     - No eval() or unsafe-inline
-     - Restricted source origins
-     - Frame ancestors disabled
-     - Strict MIME type checking
-     - XSS protection headers
+  - CORS protection
+  - Rate limiting
+  - Request size limits
+  - TLS transport encryption
+  - Strict Content Security Policy (CSP)
+    - No eval() or unsafe-inline
+    - Restricted source origins
+    - Frame ancestors disabled
+    - Strict MIME type checking
+    - XSS protection headers
 
 ## 5. Client Implementation
 

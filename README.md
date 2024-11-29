@@ -25,7 +25,8 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 
 - Client-side encryption/decryption only
 - Unique encryption key per secret
-- Optional password protection (double encryption)
+- Optional password protection (layered encryption)
+  - Password is not embedded in the URL and is ideally shared/transmitted separately from the URL
 - No server-side logging of sensitive data
 - Automatic data expiration
 - TLS transport encryption
