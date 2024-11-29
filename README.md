@@ -14,12 +14,15 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 
 ## How It Works
 
-1. Your secret is encrypted in your browser using AES-256-GCM
-2. The encrypted data is stored temporarily on our servers
-3. A unique URL containing the decryption key is generated
-4. Share the URL with your recipient
-5. When accessed, the secret is decrypted in the recipient's browser
-6. Optional: Secret is automatically destroyed after being read
+1. Encryption key is generated on the client
+1. Password is optionally provided
+1. Encryption key and password are used to encrypt the secret
+1. Encryption key and password are **hashed** and stored along with the encrypted secret for verification on retrieval - the raw key and password are **never** stored or transmitted on the server
+1. The unique URL containing the decryption key is generated
+1. Share the URL with your recipient and separately the password if specified
+1. When accessed, only when the decryption key and password match via server-side verification of the hashes, the encrypted secret is shared and decrypted in the recipient's browser
+1. Optional: Secret is automatically destroyed after being read
+1. If retrieval doesn't happen within the TTL, the secret is automatically destroyed
 
 ## Security Features
 
@@ -32,43 +35,22 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 - TLS transport encryption
 - CORS protection and rate limiting
 - Strict Content Security Policy (CSP) to prevent XSS attacks and unauthorized resource loading
+- Rate limits to mitigate brute-force attacks
+
+[RFC](./SPECIFICATION.md)
 
 ## API Usage
 
-### Store a Secret
-
-```typescript
-POST /vault
-{
-  "c": string,    // encrypted content
-  "h": string,    // sha256 hash of encryption key + optional password
-  "b": boolean,   // burn after reading flag
-  "ttl": number   // time-to-live in milliseconds
-}
-```
-
-### Retrieve a Secret
-
-```typescript
-GET /vault/:vaultId?h=<key_hash>
-```
-
-### Delete a Secret
-
-```typescript
-DELETE /vault/:vaultId
-{
-  "dt": string    // delete token
-}
-```
+[OpenAPI Specification](https://phemvaultserver-production.up.railway.app/docs)
 
 ## Technical Stack
 
-- Frontend: React-based SPA
-- Backend: Node.js with Fastify
-- Storage: Redis
-- Encryption: Web Crypto API
-- Performance Monitoring: OpenTelemetry
+- React SPA
+- [shadcn/ui](https://ui.shadcn.com/docs)
+- Node.js with [Fastify](https://fastify.dev/)
+- [Redis](https://redis.io/)
+- [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API)
+- [OpenTelemetry](https://opentelemetry.io/)
 
 ## Development
 
@@ -85,4 +67,4 @@ DELETE /vault/:vaultId
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit an [Issue](https://github.com/dillonstreator/phemvault/issues) or [Pull Request](https://github.com/dillonstreator/phemvault/pulls) on [GitHub](https://github.com/dillonstreator/phemvault).
