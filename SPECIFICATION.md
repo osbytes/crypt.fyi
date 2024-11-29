@@ -162,26 +162,12 @@ PhemVault follows a client-server architecture with the following main component
 - No data recovery
 - Immediate deletion post-read (optional)
 
-## 9. Implementation Notes
-
-### 9.1 Server Implementation
-- Node.js with Fastify
-- Redis for temporary storage
-- OpenTelemetry for performance monitoring
-- Health check endpoint
-
-### 9.2 Client Implementation
-- React-based SPA
-- Web Crypto API for encryption
-- Zero external dependencies for crypto
-- Dark/Light theme support
-
 ## 10. Future Considerations
 
 ### 10.1 Potential Enhancements
 - File encryption support
 - Notification of read receipts
-- Deferred time to available
+- Deferred time to available w/ read-side email subscription for availability notifications
 
 ---
 
