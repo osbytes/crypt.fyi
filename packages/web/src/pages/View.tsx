@@ -22,10 +22,10 @@ import { cn } from "@/lib/utils";
 
 export function ViewPage() {
   const { id } = useParams<{ id: string }>();
-  invariant(id);
+  invariant(id, "`id` is required in URL");
   const [searchParams] = useSearchParams();
   const key = searchParams.get("key");
-  invariant(key);
+  invariant(key, "`key` is required in URL query parameters");
   const isPasswordSet = searchParams.get("p") === "true";
   const [password, setPassword] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
