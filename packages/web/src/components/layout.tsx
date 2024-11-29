@@ -1,8 +1,14 @@
-import { IconBrandGithub, IconMoon, IconSun } from "@tabler/icons-react";
+import {
+  IconApi,
+  IconBrandGithub,
+  IconMoon,
+  IconSun,
+} from "@tabler/icons-react";
 import { Button } from "./ui/button";
 import { useTheme } from "@/theme";
 import { Link, Outlet } from "react-router-dom";
 import { ErrorBoundary } from "./error-boundary";
+import { config } from "@/config";
 
 export function Layout() {
   const [theme, setTheme] = useTheme();
@@ -43,11 +49,21 @@ export function Layout() {
                     : "Switch to dark theme"
                 }
               >
-                {theme === "dark" ? (
-                  <IconSun className="h-5 w-5" />
-                ) : (
-                  <IconMoon className="h-5 w-5" />
-                )}
+                {theme === "dark" ? <IconSun /> : <IconMoon />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+                title="OpenAPI specification"
+              >
+                <a
+                  href={`${config.API_URL}/docs`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <IconApi />
+                </a>
               </Button>
               <Button
                 variant="ghost"
@@ -60,7 +76,7 @@ export function Layout() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <IconBrandGithub className="h-5 w-5" />
+                  <IconBrandGithub />
                 </a>
               </Button>
             </div>
