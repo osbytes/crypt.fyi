@@ -1,5 +1,12 @@
+import crypto from "node:crypto";
 import Redis from "ioredis";
-import { InvalidKeyAndOrPasswordError, Vault, VaultValue, createTokens, vaultValueSchema } from "./vault";
+import {
+  InvalidKeyAndOrPasswordError,
+  Vault,
+  VaultValue,
+  createTokens,
+  vaultValueSchema,
+} from "./vault";
 import { isDefined } from "../util";
 import { retryable } from "../retry";
 import { Config } from "../config";
@@ -62,7 +69,7 @@ export const createRedisVault = (
         ttl,
         _cd,
       } = vaultValueSchema.parse(JSON.parse(result));
-      if (actualH !== h) {
+      if (!crypto.timingSafeEqual(Buffer.from(actualH), Buffer.from(h))) {
         throw new InvalidKeyAndOrPasswordError();
       }
 
