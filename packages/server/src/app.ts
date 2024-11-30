@@ -68,6 +68,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
   await app.after();
 
   app.addHook("onRequest", async (req, res) => {
+    // TODO: configurable cors headers
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "*");
     res.header("Access-Control-Allow-Headers", "*");
