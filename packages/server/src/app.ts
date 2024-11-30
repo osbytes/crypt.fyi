@@ -1,25 +1,25 @@
-import { randomUUID } from "node:crypto";
-import Fastify from "fastify";
-import helmet from "@fastify/helmet";
-import compression from "@fastify/compress";
+import { randomUUID } from 'node:crypto';
+import Fastify from 'fastify';
+import helmet from '@fastify/helmet';
+import compression from '@fastify/compress';
 import {
   jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
   ZodTypeProvider,
-} from "fastify-type-provider-zod";
-import z from "zod";
-import fastifySwagger from "@fastify/swagger";
-import fastifySwaggerUI from "@fastify/swagger-ui";
-import fastifyRateLimit from "@fastify/rate-limit";
-import os from "node:os";
-import * as openTelemetry from "@opentelemetry/api";
-import { Config } from "./config";
-import { Logger } from "./logging";
-import { InvalidKeyAndOrPasswordError, Vault } from "./vault/vault";
-import { Redis } from "ioredis";
+} from 'fastify-type-provider-zod';
+import z from 'zod';
+import fastifySwagger from '@fastify/swagger';
+import fastifySwaggerUI from '@fastify/swagger-ui';
+import fastifyRateLimit from '@fastify/rate-limit';
+import os from 'node:os';
+import * as openTelemetry from '@opentelemetry/api';
+import { Config } from './config';
+import { Logger } from './logging';
+import { InvalidKeyAndOrPasswordError, Vault } from './vault/vault';
+import { Redis } from 'ioredis';
 
-declare module "fastify" {
+declare module 'fastify' {
   interface FastifyRequest {
     abortSignal: AbortSignal;
   }
@@ -74,39 +74,39 @@ export const initApp = async (config: Config, deps: AppDeps) => {
 
   await app.after();
 
-  app.addHook("onRequest", async (req, res) => {
+  app.addHook('onRequest', async (req, res) => {
     // TODO: configurable cors headers
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "*");
-    res.header("Access-Control-Allow-Headers", "*");
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', '*');
+    res.header('Access-Control-Allow-Headers', '*');
 
-    if (req.method === "OPTIONS") {
+    if (req.method === 'OPTIONS') {
       return res.send();
     }
 
     const ac = new AbortController();
     req.abortSignal = ac.signal;
 
-    req.raw.on("close", () => {
+    req.raw.on('close', () => {
       if (req.raw.destroyed) {
         ac.abort();
       }
     });
   });
 
-  const meter = openTelemetry.metrics.getMeter("phemvault");
+  const meter = openTelemetry.metrics.getMeter('phemvault');
 
-  const redisEntriesGauge = meter.createObservableGauge("redis.entries", {
-    description: "Number of entries in Redis",
-    unit: "entries",
+  const redisEntriesGauge = meter.createObservableGauge('redis.entries', {
+    description: 'Number of entries in Redis',
+    unit: 'entries',
   });
-  const memoryGauge = meter.createObservableCounter("system.memory.usage", {
-    description: "Process memory usage",
-    unit: "bytes",
+  const memoryGauge = meter.createObservableCounter('system.memory.usage', {
+    description: 'Process memory usage',
+    unit: 'bytes',
   });
-  const cpuGauge = meter.createObservableGauge("system.cpu.usage", {
-    description: "Process CPU usage",
-    unit: "percentage",
+  const cpuGauge = meter.createObservableGauge('system.cpu.usage', {
+    description: 'Process CPU usage',
+    unit: 'percentage',
   });
 
   app.get(config.healthCheckEndpoint, (_, res) => {
@@ -128,26 +128,24 @@ export const initApp = async (config: Config, deps: AppDeps) => {
   });
 
   app.withTypeProvider<ZodTypeProvider>().route({
-    method: "POST",
-    url: "/vault",
+    method: 'POST',
+    url: '/vault',
     schema: {
       body: z.object({
-        c: z.string().describe("encrypted content"),
-        h: z
-          .string()
-          .describe("sha256 hash of the encryption key + optional password"),
-        b: z.boolean().default(true).describe("burn after reading"),
+        c: z.string().describe('encrypted content'),
+        h: z.string().describe('sha256 hash of the encryption key + optional password'),
+        b: z.boolean().default(true).describe('burn after reading'),
         ttl: z
           .number()
           .min(config.vaultEntryTTLMsMin)
           .max(config.vaultEntryTTLMsMax)
           .default(config.vaultEntryTTLMsDefault)
-          .describe("time to live (TTL) in milliseconds"),
+          .describe('time to live (TTL) in milliseconds'),
       }),
       response: {
         201: z.object({
-          id: z.string().describe("vault id"),
-          dt: z.string().describe("delete token"),
+          id: z.string().describe('vault id'),
+          dt: z.string().describe('delete token'),
         }),
       },
     },
@@ -159,23 +157,21 @@ export const initApp = async (config: Config, deps: AppDeps) => {
   });
 
   app.withTypeProvider<ZodTypeProvider>().route({
-    method: "GET",
-    url: "/vault/:vaultId",
+    method: 'GET',
+    url: '/vault/:vaultId',
     schema: {
       params: z.object({
         vaultId: z.string(),
       }),
       querystring: z.object({
-        h: z
-          .string()
-          .describe("sha256 hash of the encryption key + optional password"),
+        h: z.string().describe('sha256 hash of the encryption key + optional password'),
       }),
       response: {
         200: z.object({
-          c: z.string().describe("encrypted content"),
-          b: z.boolean().describe("burn after reading"),
-          ttl: z.number().describe("time to live (TTL) in milliseconds"),
-          _cd: z.number().describe("created date"),
+          c: z.string().describe('encrypted content'),
+          b: z.boolean().describe('burn after reading'),
+          ttl: z.number().describe('time to live (TTL) in milliseconds'),
+          _cd: z.number().describe('created date'),
         }),
         404: z.null(),
         400: z.null(),
@@ -200,8 +196,8 @@ export const initApp = async (config: Config, deps: AppDeps) => {
   });
 
   app.withTypeProvider<ZodTypeProvider>().route({
-    method: "DELETE",
-    url: "/vault/:vaultId",
+    method: 'DELETE',
+    url: '/vault/:vaultId',
     schema: {
       params: z.object({
         vaultId: z.string(),
@@ -229,9 +225,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
 
     if (res.sent) return;
 
-    res
-      .status(error.statusCode ?? 500)
-      .send({ msg: error.message || "Something went wrong" });
+    res.status(error.statusCode ?? 500).send({ msg: error.message || 'Something went wrong' });
   });
 
   await app.ready();

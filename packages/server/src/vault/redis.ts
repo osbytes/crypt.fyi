@@ -1,22 +1,18 @@
-import crypto from "node:crypto";
-import Redis from "ioredis";
+import crypto from 'node:crypto';
+import Redis from 'ioredis';
 import {
   InvalidKeyAndOrPasswordError,
   Vault,
   VaultValue,
   createTokens,
   vaultValueSchema,
-} from "./vault";
-import { isDefined } from "../util";
-import { retryable } from "../retry";
-import { Config } from "../config";
-import { Logger } from "../logging";
+} from './vault';
+import { isDefined } from '../util';
+import { retryable } from '../retry';
+import { Config } from '../config';
+import { Logger } from '../logging';
 
-export const createRedisVault = (
-  redis: Redis,
-  config: Config,
-  logger: Logger,
-): Vault => {
+export const createRedisVault = (redis: Redis, config: Config, logger: Logger): Vault => {
   const getKey = (id: string) => `vault:${id}`;
 
   return {
@@ -41,16 +37,16 @@ export const createRedisVault = (
       tx.pexpire(key, ttl);
       const result = await tx.exec();
       if (!result) {
-        throw new Error("unexpected null result");
+        throw new Error('unexpected null result');
       }
 
       if (result[0][1] !== 1) {
-        throw new Error("something went wrong");
+        throw new Error('something went wrong');
       }
 
       const errors = result.map((v) => v[0]).filter(isDefined);
       if (errors.length > 0) {
-        throw new Error(errors.map((e) => e.message).join(", "));
+        throw new Error(errors.map((e) => e.message).join(', '));
       }
 
       return { id, dt };
@@ -62,13 +58,7 @@ export const createRedisVault = (
         return undefined;
       }
 
-      const {
-        c,
-        h: actualH,
-        b,
-        ttl,
-        _cd,
-      } = vaultValueSchema.parse(JSON.parse(result));
+      const { c, h: actualH, b, ttl, _cd } = vaultValueSchema.parse(JSON.parse(result));
       if (!crypto.timingSafeEqual(Buffer.from(actualH), Buffer.from(h))) {
         throw new InvalidKeyAndOrPasswordError();
       }

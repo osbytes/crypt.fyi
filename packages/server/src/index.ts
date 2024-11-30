@@ -1,10 +1,10 @@
-import { otlpShutdown } from "./telemetry";
-import { initApp } from "./app";
-import { Environment, initConfig } from "./config";
-import { initLogging } from "./logging";
-import gracefulShutdown from "http-graceful-shutdown";
-import Redis from "ioredis";
-import { createRedisVault } from "./vault/redis";
+import { otlpShutdown } from './telemetry';
+import { initApp } from './app';
+import { Environment, initConfig } from './config';
+import { initLogging } from './logging';
+import gracefulShutdown from 'http-graceful-shutdown';
+import Redis from 'ioredis';
+import { createRedisVault } from './vault/redis';
 
 const main = async () => {
   const config = await initConfig();
@@ -19,7 +19,7 @@ const main = async () => {
   });
 
   app.fastify.listen({
-    host: "0.0.0.0",
+    host: '0.0.0.0',
     port: config.port,
   });
 
@@ -27,14 +27,14 @@ const main = async () => {
     timeout: config.shutdownTimeoutMs,
     development: config.env !== Environment.Prod,
     preShutdown: async (signal) => {
-      logger.info({ signal }, "Shutdown signal received");
+      logger.info({ signal }, 'Shutdown signal received');
     },
     onShutdown: async () => {
       await app.shutdown();
       await otlpShutdown();
     },
     finally: () => {
-      logger.info("Shutdown complete");
+      logger.info('Shutdown complete');
     },
   });
 };

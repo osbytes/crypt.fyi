@@ -2,13 +2,18 @@
   "name": "@phemvault/server",
   "version": "0.0.1",
   "main": "dist/index.js",
+  "type": "module",
   "description": "Phemvault server",
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "tap",
-    "test:help": "tap --help"
+    "test:help": "tap --help",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\""
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",
@@ -20,7 +25,13 @@
     "@types/node": "^20.9.2",
     "@types/retry": "^0.12.5",
     "@types/supertest": "^2.0.16",
+    "@typescript-eslint/eslint-plugin": "^8.16.0",
+    "@typescript-eslint/parser": "^8.16.0",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "nodemon": "^3.0.1",
+    "prettier": "^3.4.1",
     "tap": "^21.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2",
