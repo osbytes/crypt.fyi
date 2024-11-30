@@ -16,7 +16,7 @@ const initAppTest = async (t: Test) => {
   } satisfies Config;
   const logger = pino({ enabled: false });
   const redis = new Redis();
-  const vault = createRedisVault(redis, config, logger);
+  const vault = createRedisVault(redis, config);
   const app = await initApp(config, {
     logger,
     vault,

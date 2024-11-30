@@ -13,12 +13,12 @@ This document outlines the system architecture, security measures, and interacti
 ### 2.1 High-Level Overview
 PhemVault follows a client-server architecture with the following main components:
 - Web Client (Browser-based interface)
-- API Server (Redis-backed storage)
-- Redis (Encrypted data store)
+- API Server
+- Data Store (Ephemeral storage)
 
 ### 2.2 Component Interaction Flow
 ```
-[Web Client] <--> [API Server] <--> [Redis Store]
+[Web Client] <--> [API Server] <--> [Data Store]
      ^
      |
 [Client-side Encryption/Decryption]
@@ -95,8 +95,11 @@ PhemVault follows a client-server architecture with the following main component
 2. **Data Security**
    - Automatic data expiration (TTL)
    - Burn after reading option
+     - Must be implemented using atomic operations
+     - Must guarantee exactly one successful read when burn is enabled
+     - Must prevent race conditions in concurrent access scenarios
    - No persistent storage
-   - Secure deletion from Redis
+   - Secure deletion of data
 
 ### 4.3 Transport Security
   - CORS protection
@@ -110,9 +113,40 @@ PhemVault follows a client-server architecture with the following main component
     - Strict MIME type checking
     - XSS protection headers
 
-## 5. Client Implementation
+## 5. Data Storage Requirements
 
-### 5.1 Encryption Process
+### 5.1 Storage Properties
+1. **Ephemeral Nature**
+   - All data must be temporary
+   - Configurable Time-To-Live (TTL) per entry
+   - Automatic expiration and cleanup
+
+2. **Concurrency Requirements**
+   - Must support concurrent access
+   - Must maintain data consistency
+   - Must provide atomic operations for critical functions
+     - Especially for burn-after-reading functionality
+     - For deletion operations
+
+3. **Performance Requirements**
+   - Fast read and write operations
+   - Efficient handling of concurrent requests
+   - Scalable storage solution
+
+### 5.2 Data Integrity
+1. **Consistency**
+   - Atomic operations where required
+   - Proper handling of race conditions
+   - Guaranteed execution order for critical operations
+
+2. **Reliability**
+   - Data available until expiration or deletion
+   - Proper error handling
+   - Recovery from system failures
+
+## 6. Client Implementation
+
+### 6.1 Encryption Process
 1. **Creating a Secret**
    - Generate random encryption key
    - Encrypt content with AES-256-GCM
@@ -127,44 +161,55 @@ PhemVault follows a client-server architecture with the following main component
    - Decrypt with key (and password if set)
    - Optional: Automatic deletion after reading
 
-## 6. Error Handling
+## 7. System Constraints
 
-### 6.1 Error Responses
+### 7.1 API Rate Limits
+- Configurable per-IP rate limiting
+- Default: Specified in server configuration
+- Must be enforced at the API level
+
+### 7.2 Content Limits
+- Maximum content size: 50KB
+- Enforced at the API level
+
+## 8. Error Handling
+
+### 8.1 Error Responses
 - 400: Invalid key/password
 - 404: Secret not found
 - 429: Rate limit exceeded
 - 500: Server error
 
-## 7. Rate Limiting and Quotas
+## 9. Rate Limiting and Quotas
 
-### 7.1 API Rate Limits
+### 9.1 API Rate Limits
 - Configurable per-IP rate limiting
 - Default: Specified in server configuration
-- Enforced by Redis
+- Enforced by server
 
-### 7.2 Content Limits
+### 9.2 Content Limits
 - Maximum content size: 50KB
 - Minimum TTL: Configurable
 - Maximum TTL: Configurable
 - Default TTL: Configurable
 
-## 8. Privacy Considerations
+## 10. Privacy Considerations
 
-### 8.1 Data Privacy
+### 10.1 Data Privacy
 - No user tracking
 - No analytics
 - No logs of secret content
 - No metadata collection
 
-### 8.2 Data Retention
+### 10.2 Data Retention
 - Automatic expiration
 - No backups
 - No data recovery
 - Immediate deletion post-read (optional)
 
-## 10. Future Considerations
+## 11. Future Considerations
 
-### 10.1 Potential Enhancements
+### 11.1 Potential Enhancements
 - File encryption support
 - Notification of read receipts
 - Deferred time to available w/ read-side email subscription for availability notifications

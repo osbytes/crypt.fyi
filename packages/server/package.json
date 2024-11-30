@@ -22,17 +22,16 @@
     "@types/bytes": "^3.1.4",
     "@types/jest": "^29.5.8",
     "@types/node": "^20.9.2",
-    "@types/retry": "^0.12.5",
     "@types/supertest": "^2.0.16",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "@typescript-eslint/parser": "^8.16.0",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "nodemon": "^3.0.1",
+    "nodemon": "^3.1.7",
     "prettier": "^3.4.1",
     "tap": "^21.0.1",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
     "undici": "^6.11.1"
   },
@@ -55,7 +54,6 @@
     "http-graceful-shutdown": "^3.1.13",
     "ioredis": "^5.4.1",
     "pino": "^8.16.2",
-    "retry": "^0.13.1",
     "zod": "^3.22.4"
   }
 }

@@ -1,4 +1,3 @@
-import crypto from 'node:crypto';
 import Redis from 'ioredis';
 import {
   InvalidKeyAndOrPasswordError,
@@ -8,11 +7,9 @@ import {
   vaultValueSchema,
 } from './vault';
 import { isDefined } from '../util';
-import { retryable } from '../retry';
 import { Config } from '../config';
-import { Logger } from '../logging';
 
-export const createRedisVault = (redis: Redis, config: Config, logger: Logger): Vault => {
+export const createRedisVault = (redis: Redis, config: Config): Vault => {
   const getKey = (id: string) => `vault:${id}`;
 
   return {
@@ -53,22 +50,39 @@ export const createRedisVault = (redis: Redis, config: Config, logger: Logger): 
     },
     async get(id, h) {
       const key = getKey(id);
-      const result = await redis.get(key);
+
+      const result = (await redis.eval(
+        // https://redis.io/docs/latest/develop/interact/programmability/lua-api/
+        // https://redis.io/docs/latest/develop/interact/programmability/lua-api/#cjson-library
+        `
+  local value = redis.call('get', KEYS[1])
+  if not value then
+    return nil
+  end
+
+  local data = cjson.decode(value)
+  if data.h ~= ARGV[1] then
+    return false
+  end
+
+  if data.b == true then
+    redis.call('del', KEYS[1])
+  end
+
+  return value
+`,
+        1,
+        key,
+        h,
+      )) as string | null | false;
       if (!result) {
+        if (result === false) {
+          throw new InvalidKeyAndOrPasswordError();
+        }
         return undefined;
       }
 
-      const { c, h: actualH, b, ttl, _cd } = vaultValueSchema.parse(JSON.parse(result));
-      if (!crypto.timingSafeEqual(Buffer.from(actualH), Buffer.from(h))) {
-        throw new InvalidKeyAndOrPasswordError();
-      }
-
-      if (b) {
-        retryable(() => redis.del(key), { retries: 3 }).catch((err) => {
-          logger.error(`error deleting key ${id}`, err);
-        });
-      }
-
+      const { c, b, ttl, _cd } = vaultValueSchema.parse(JSON.parse(result));
       return {
         c,
         b,
