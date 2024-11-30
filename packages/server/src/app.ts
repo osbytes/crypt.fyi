@@ -12,6 +12,8 @@ import z from "zod";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
 import fastifyRateLimit from "@fastify/rate-limit";
+import os from "node:os";
+import * as openTelemetry from "@opentelemetry/api";
 import { Config } from "./config";
 import { Logger } from "./logging";
 import { InvalidKeyAndOrPasswordError, Vault } from "./vault/vault";
@@ -28,6 +30,11 @@ export type AppDeps = {
   vault: Vault;
   redis: Redis;
 };
+
+const hostname = os.hostname();
+const BASE_OTEL_ATTRIBUTES = {
+  hostname,
+} satisfies openTelemetry.Attributes;
 
 export const initApp = async (config: Config, deps: AppDeps) => {
   const { logger, vault, redis } = deps;
@@ -87,8 +94,35 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     });
   });
 
-  app.get(config.healthCheckEndpoint, (req, res) => {
-    // TODO: throttled otel gauges for redis entries, cpu, memory, etc.
+  const meter = openTelemetry.metrics.getMeter("phemvault");
+
+  const redisEntriesGauge = meter.createObservableGauge("redis.entries", {
+    description: "Number of entries in Redis",
+    unit: "entries",
+  });
+  const memoryGauge = meter.createObservableCounter("system.memory.usage", {
+    description: "Process memory usage",
+    unit: "bytes",
+  });
+  const cpuGauge = meter.createObservableGauge("system.cpu.usage", {
+    description: "Process CPU usage",
+    unit: "percentage",
+  });
+
+  app.get(config.healthCheckEndpoint, (_, res) => {
+    redisEntriesGauge.addCallback(async (result) => {
+      const count = await redis.dbsize();
+      result.observe(count, BASE_OTEL_ATTRIBUTES);
+    });
+    memoryGauge.addCallback((result) => {
+      const memoryUsage = process.memoryUsage();
+      result.observe(memoryUsage.heapUsed, BASE_OTEL_ATTRIBUTES);
+    });
+    cpuGauge.addCallback((result) => {
+      const cpuUsage = process.cpuUsage();
+      const totalCPUTime = cpuUsage.user + cpuUsage.system;
+      result.observe(totalCPUTime / 1000000, BASE_OTEL_ATTRIBUTES);
+    });
 
     res.status(200).send();
   });
