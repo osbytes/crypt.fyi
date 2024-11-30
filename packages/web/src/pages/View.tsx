@@ -84,10 +84,17 @@ export function ViewPage() {
 
   if (query.error instanceof NotFoundError) {
     return (
-      <Card className="p-4 max-w-3xl mx-auto">
-        <p>Not found</p>
-        <Link to="/">Back home</Link>
-      </Card>
+      <div className="max-w-3xl mx-auto mt-8 text-center">
+        <Card className="p-8">
+          <h1 className="text-2xl font-semibold mb-4">Secret Not Found</h1>
+          <p className="text-muted-foreground mb-6">
+            This secret may have expired or been deleted.
+          </p>
+          <Button asChild>
+            <Link to="/">Create New Secret</Link>
+          </Button>
+        </Card>
+      </div>
     );
   }
 
@@ -95,64 +102,79 @@ export function ViewPage() {
   if (query.data) {
     content = (
       <>
-        <div className="flex justify-center gap-2 mb-4">
+        <div className="flex justify-center gap-3 mb-6">
           <Button
-            variant="secondary"
+            variant="outline"
             size="icon"
             onClick={() => setIsRevealed(!isRevealed)}
             title={isRevealed ? "Hide content" : "Show content"}
+            className="hover:bg-muted"
           >
             {isRevealed ? (
-              <IconEyeOff className="h-4 w-4" />
+              <IconEyeOff className="h-5 w-5" />
             ) : (
-              <IconEye className="h-4 w-4" />
+              <IconEye className="h-5 w-5" />
             )}
           </Button>
           <Button
-            variant="secondary"
+            variant="outline"
             size="icon"
             onClick={() => {
               navigator.clipboard.writeText(query.data.value);
-              toast.success("Copied to clipboard");
+              toast.success("Secret copied to clipboard");
             }}
             title="Copy to clipboard"
+            className="hover:bg-muted"
           >
-            <IconCopy className="h-4 w-4" />
+            <IconCopy className="h-5 w-5" />
           </Button>
         </div>
         {query.data.burned && (
-          <p className="text-xs text-center text-muted-foreground mb-2">
-            This message was deleted after your reading
-          </p>
+          <div className="bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-lg p-3 mb-4 text-sm text-center">
+            This secret was deleted after your viewing for security
+          </div>
         )}
-        <Card className="p-4">
+        <Card className="p-6 relative">
           <pre
-            className={cn(" text-wrap", !isRevealed && "blur-md select-none")}
+            className={cn(
+              "text-wrap break-words whitespace-pre-wrap font-mono text-sm",
+              !isRevealed && "blur-md select-none"
+            )}
+            role="textbox"
+            aria-label="Secret content"
           >
             {query.data?.value}
           </pre>
+          {!isRevealed && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-muted-foreground">Click the eye icon above to reveal the secret</p>
+            </div>
+          )}
         </Card>
       </>
     );
   } else if (query.isPending) {
-    content = <Loader />;
+    content = (
+      <div className="flex flex-col items-center gap-4 p-8">
+        <Loader />
+      </div>
+    );
   } else if (isPasswordSet) {
     content = (
-      <p
-        className="text-center text-muted-foreground cursor-pointer"
-        onClick={() => setIsDialogOpen(true)}
-      >
-        waiting for password...
-      </p>
+      <Card className="p-6 text-center cursor-pointer" onClick={() => setIsDialogOpen(true)}>
+        <p className="text-muted-foreground">
+          This secret is password protected. Click to enter password.
+        </p>
+      </Card>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto p-4">
       {content}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Enter Password</DialogTitle>
           </DialogHeader>
@@ -163,16 +185,25 @@ export function ViewPage() {
               query.mutate();
             }}
           >
-            <Input
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <Button type="submit" isLoading={query.isPending}>
-              Submit
-            </Button>
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Enter the password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoFocus
+                className="text-lg"
+              />
+              <p className="text-sm text-muted-foreground">
+                This secret is protected with a password - request from the sender
+              </p>
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button type="submit" isLoading={query.isPending}>
+                Confirm
+              </Button>
+            </div>
           </form>
         </DialogContent>
       </Dialog>

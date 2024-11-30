@@ -293,10 +293,12 @@ export function CreatePage() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" isLoading={createMutation.isPending}>
-                    <IconLock />
-                    Create
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button type="submit" isLoading={createMutation.isPending}>
+                      <IconLock />
+                      Create
+                    </Button>
+                  </div>
                 </form>
               </Form>
             </Card>
