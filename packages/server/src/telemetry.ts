@@ -7,9 +7,10 @@ import {
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { Resource } from "@opentelemetry/resources";
 import {
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_SERVICE_VERSION,
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION,
 } from "@opentelemetry/semantic-conventions";
+import { SERVICE_NAME, SERVICE_VERSION } from "./config";
 
 const telemetryEnabled = process.env.OTEL_ENABLED?.toLowerCase() === "true";
 
@@ -28,8 +29,8 @@ if (telemetryEnabled) {
 
   sdk = new NodeSDK({
     resource: new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: process.env.SERVICE_NAME || "phemvault",
-      [SEMRESATTRS_SERVICE_VERSION]: process.env.SERVICE_VERSION || "v1.0.0",
+      [ATTR_SERVICE_NAME]: SERVICE_NAME,
+      [ATTR_SERVICE_VERSION]: SERVICE_VERSION,
     }),
     traceExporter: exporter,
     instrumentations: [getNodeAutoInstrumentations()],

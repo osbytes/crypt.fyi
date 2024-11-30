@@ -12,7 +12,6 @@ import z from "zod";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
 import fastifyRateLimit from "@fastify/rate-limit";
-
 import { Config } from "./config";
 import { Logger } from "./logging";
 import { InvalidKeyAndOrPasswordError, Vault } from "./vault/vault";
@@ -45,9 +44,9 @@ export const initApp = async (config: Config, deps: AppDeps) => {
   app.register(fastifySwagger, {
     openapi: {
       info: {
-        title: "phemvault-server",
-        description: "phemvault-server",
-        version: "1.0.0",
+        title: config.name,
+        description: config.description,
+        version: config.version,
       },
       servers: [],
     },

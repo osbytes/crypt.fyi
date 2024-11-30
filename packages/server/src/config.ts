@@ -1,5 +1,17 @@
 import { z } from "zod";
 import bytes from "bytes";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, "../package.json"), "utf-8"),
+);
+
+export const SERVICE_NAME = process.env.SERVICE_NAME ?? packageJson.name;
+export const SERVICE_VERSION =
+  process.env.SERVICE_VERSION ?? packageJson.version;
+export const SERVICE_DESCRIPTION =
+  process.env.SERVICE_DESCRIPTION ?? packageJson.description;
 
 export enum Environment {
   Dev = "development",
@@ -10,6 +22,9 @@ export enum Environment {
 const logLevels = ["trace", "debug", "info", "warn", "error", "fatal"] as const;
 
 const configSchema = z.object({
+  name: z.string().default(SERVICE_NAME),
+  description: z.string().default(SERVICE_DESCRIPTION),
+  version: z.string().default(SERVICE_VERSION),
   shutdownTimeoutMs: z
     .number({ coerce: true })
     .default(1000 * 30)
@@ -71,6 +86,8 @@ export type Config = z.infer<typeof configSchema>;
 
 export const initConfig = async (): Promise<Config> => {
   return configSchema.parse({
+    name: SERVICE_NAME,
+    version: SERVICE_VERSION,
     shutdownTimeoutMs: process.env.SHUTDOWN_TIMEOUT_MS,
     port: process.env.PORT,
     healthCheckEndpoint: process.env.HEALTH_CHECK_ENDPOINT,
