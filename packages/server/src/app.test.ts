@@ -61,7 +61,7 @@ tap.test('app', async (t) => {
       body: JSON.stringify({
         c: 'foobar',
         b: true,
-        p: true,
+        h: 'abc123',
       }),
     });
 
@@ -72,19 +72,85 @@ tap.test('app', async (t) => {
 
     const getResponse1 = await client.request({
       method: 'GET',
-      path: `/vault/${id}`,
+      path: `/vault/${id}?h=abc123`,
     });
     t.equal(getResponse1.statusCode, 200);
-    const { c, b, p } = (await getResponse1.body.json()) as Record<string, unknown>;
+    const { c, b } = (await getResponse1.body.json()) as Record<string, unknown>;
     t.equal(c, 'foobar');
     t.equal(b, true);
-    t.equal(p, true);
 
     const getResponse2 = await client.request({
       method: 'GET',
-      path: `/vault/${id}`,
+      path: `/vault/${id}?h=abc123`,
     });
     t.equal(getResponse2.statusCode, 404);
+  });
+
+  t.test('only one client receives burned vault entry during concurrent requests', async (t) => {
+    const createResponse = await client.request({
+      method: 'POST',
+      path: '/vault',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        c: 'secret-content',
+        b: true,
+        ttl: 5000,
+        h: 'abc123',
+      }),
+    });
+
+    t.equal(createResponse.statusCode, 201);
+    const { id } = (await createResponse.body.json()) as Record<string, unknown>;
+    t.equal(typeof id, 'string');
+
+    // Create multiple clients to simulate concurrent requests
+    const numClients = 5;
+
+    // Send concurrent requests from all clients
+    const responses = await Promise.all(
+      Array.from({ length: numClients }).map(() =>
+        client
+          .request({
+            method: 'GET',
+            path: `/vault/${id}?h=abc123`,
+          })
+          .then(async (response) => ({
+            status: response.statusCode,
+            body:
+              response.statusCode === 200
+                ? ((await response.body.json()) as Record<string, unknown>)
+                : null,
+          })),
+      ),
+    );
+
+    // Count successful responses (status 200)
+    const successfulResponses = responses.filter((r) => r.status === 200);
+    t.equal(successfulResponses.length, 1, 'Only one request should succeed');
+
+    // Verify the successful response has the correct content
+    const successfulResponse = successfulResponses[0];
+    t.equal(
+      successfulResponse.body?.c,
+      'secret-content',
+      'Successful response should have correct content',
+    );
+    t.equal(successfulResponse.body?.b, true, 'Successful response should indicate burn status');
+
+    // Verify all other responses are 404
+    const failedResponses = responses.filter((r) => r.status !== 200);
+    t.equal(failedResponses.length, numClients - 1, 'All other requests should fail');
+    failedResponses.forEach((response) => {
+      t.equal(response.status, 404, 'Failed requests should return 404');
+    });
+
+    const verifyResponse = await client.request({
+      method: 'GET',
+      path: `/vault/${id}?h=abc123`,
+    });
+    t.equal(verifyResponse.statusCode, 404, 'Subsequent request should fail');
   });
 
   t.test('deletes vault entry', async (t) => {
@@ -97,7 +163,7 @@ tap.test('app', async (t) => {
       body: JSON.stringify({
         c: 'foobar',
         b: true,
-        p: true,
+        h: 'abc123',
       }),
     });
     const { id, dt } = (await createResponse.body.json()) as Record<string, unknown>;
@@ -116,7 +182,7 @@ tap.test('app', async (t) => {
 
     const getResponse = await client.request({
       method: 'GET',
-      path: `/vault/${id}`,
+      path: `/vault/${id}?h=abc123`,
     });
     t.equal(getResponse.statusCode, 404);
   });
