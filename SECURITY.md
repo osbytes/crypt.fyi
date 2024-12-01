@@ -18,12 +18,6 @@ Please include the following information in your report:
 - Proof-of-concept or exploit code (if possible)
 - Impact of the issue, including how an attacker might exploit it
 
-## Supported Versions
-
-| Version | Supported          |
-| ------- | ------------------ |
-| latest  | :white_check_mark: |
-
 ## Best Practices
 
 ### Data Protection
