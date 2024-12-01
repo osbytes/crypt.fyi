@@ -5,12 +5,10 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 ## Features
 
 - 🔒 End-to-end encryption using AES-256-GCM
-- 🤫 Zero-knowledge architecture - server never sees unencrypted data
+- 🤫 Zero-knowledge architecture - server never sees unencrypted data or decryption keys
 - 🔥 Burn after reading option
 - ⏰ Automatic expiration (Time-To-Live)
 - 🔑 Optional password protection
-- 🚫 No user accounts or tracking
-- 🌓 Dark/Light theme support
 
 ## How It Works
 
