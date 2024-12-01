@@ -105,12 +105,31 @@ tap.test('app', async (t) => {
     const { id } = (await createResponse.body.json()) as Record<string, unknown>;
     t.equal(typeof id, 'string');
 
-    // Create multiple clients to simulate concurrent requests
+    const config = {
+      ...(await initConfig()),
+      healthCheckEndpoint: '/some-health-check-endpoint',
+      vaultEntryTTLMsDefault: 1000,
+    } satisfies Config;
+    const logger = pino({ enabled: false });
+    const redis = new Redis();
+    const vault = createRedisVault(redis, config);
+    const app = await initApp(config, {
+      logger,
+      vault,
+      redis,
+    });
+    await app.fastify.listen();
+    const baseUrl = `http://localhost:${(app.fastify.server.address() as AddressInfo).port}`;
     const numClients = 5;
+    const clients = Array.from({ length: numClients }, () => new Client(baseUrl));
+    t.teardown(() => {
+      app.shutdown();
+      app.fastify.close();
+      clients.forEach((c) => c.close());
+    });
 
-    // Send concurrent requests from all clients
     const responses = await Promise.all(
-      Array.from({ length: numClients }).map(() =>
+      clients.map((client) =>
         client
           .request({
             method: 'GET',
@@ -126,11 +145,9 @@ tap.test('app', async (t) => {
       ),
     );
 
-    // Count successful responses (status 200)
     const successfulResponses = responses.filter((r) => r.status === 200);
     t.equal(successfulResponses.length, 1, 'Only one request should succeed');
 
-    // Verify the successful response has the correct content
     const successfulResponse = successfulResponses[0];
     t.equal(
       successfulResponse.body?.c,
@@ -139,7 +156,6 @@ tap.test('app', async (t) => {
     );
     t.equal(successfulResponse.body?.b, true, 'Successful response should indicate burn status');
 
-    // Verify all other responses are 404
     const failedResponses = responses.filter((r) => r.status !== 200);
     t.equal(failedResponses.length, numClients - 1, 'All other requests should fail');
     failedResponses.forEach((response) => {
