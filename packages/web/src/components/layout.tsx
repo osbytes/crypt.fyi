@@ -23,7 +23,7 @@ export function Layout() {
                 <h1 className="text-xl font-bold">Phemvault</h1>
               </Link>
               <p className="text-xs text-muted-foreground">
-                Securely share secrets with zero-knowledge{" "}
+                Ephemeral secret sharing with zero-knowledge{" "}
                 <a
                   href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"
                   target="_blank"
