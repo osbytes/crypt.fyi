@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { CreatePage } from "@/pages/Create";
 import { ViewPage } from "@/pages/View";
+import { About } from "@/pages/About";
 import { Layout } from "@/components/layout";
 
 const router = createBrowserRouter([
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <CreatePage />,
+      },
+      {
+        path: "/about",
+        element: <About />,
       },
       {
         path: "/:id",

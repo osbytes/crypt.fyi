@@ -15,12 +15,12 @@ export function Layout() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <header className="border-b p-2">
           <div className="container flex items-center justify-between mx-auto">
             <div>
               <Link to="/">
-                <h1 className="text-xl font-bold">Phemvault</h1>
+                <h1 className="text-xl font-bold">PhemVault</h1>
               </Link>
               <p className="text-xs text-muted-foreground">
                 Ephemeral secret sharing with zero-knowledge{" "}
@@ -39,6 +39,9 @@ export function Layout() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              <Link to="/about">
+                <Button variant="ghost" size="sm">About</Button>
+              </Link>
               <Button
                 variant="ghost"
                 size="icon"
@@ -82,9 +85,37 @@ export function Layout() {
             </div>
           </div>
         </header>
-        <main className="container mx-auto py-8 px-4">
+        <main className="container mx-auto py-8 px-4 flex-1">
           <Outlet />
         </main>
+        <footer className="border-t mt-auto">
+          <div className="container mx-auto py-6 px-4">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="flex items-center gap-4">
+                <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground">
+                  About
+                </Link>
+                <a 
+                  href="https://github.com/dillonstreator/phemvault" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  GitHub
+                </a>
+                {/* <a 
+                  href="mailto:hi@phemvault.com"
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Contact
+                </a> */}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Built with security and privacy in mind
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </ErrorBoundary>
   );
