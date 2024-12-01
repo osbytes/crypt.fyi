@@ -17,11 +17,11 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 1. Encryption key is generated on the client
 1. Password is optionally provided
 1. Encryption key and password are used to encrypt the secret
-1. Encryption key and password are **hashed** and stored along with the encrypted secret for verification on retrieval - the raw key and password are **never** stored or transmitted on the server
-1. The unique URL containing the decryption key is generated
+1. Encryption key and password are **hashed** and stored along with the encrypted secret for verification on retrieval - the raw key and password are **never** stored or transmitted on/to the server
+1. The unique URL containing the decryption key is generated on the client
 1. Share the URL with your recipient and separately the password if specified
 1. When accessed, only when the decryption key and password match via server-side verification of the hashes, the encrypted secret is shared and decrypted in the recipient's browser
-1. Optional: Secret is automatically destroyed after being read
+1. Optionally, the secret is automatically destroyed after being read in an atomic read & delete operation guaranteeing only one person can access the secret
 1. If retrieval doesn't happen within the TTL, the secret is automatically destroyed
 
 ## Security Features
