@@ -19,6 +19,7 @@ import { sleep } from "@/lib/sleep";
 import { sha256 } from "@/lib/hash";
 import { IconEye, IconEyeOff, IconCopy } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
+import { clipboardCopy } from "@/lib/clipboardCopy";
 
 export function ViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -120,7 +121,7 @@ export function ViewPage() {
             variant="outline"
             size="icon"
             onClick={() => {
-              navigator.clipboard.writeText(query.data.value);
+              clipboardCopy(query.data.value);
               toast.success("Secret copied to clipboard");
             }}
             title="Copy to clipboard"

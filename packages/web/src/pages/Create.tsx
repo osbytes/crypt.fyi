@@ -40,6 +40,7 @@ import {
 } from "@tabler/icons-react";
 import { sha256 } from "@/lib/hash";
 import { useState } from "react";
+import { clipboardCopy } from "@/lib/clipboardCopy";
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -119,7 +120,7 @@ export function CreatePage() {
         searchParams.set("p", "true");
       }
       const url = `${window.location.origin}/${data.id}?${searchParams.toString()}`;
-      await navigator.clipboard.writeText(url);
+      await clipboardCopy(url);
       toast.info("URL copied to clipboard");
 
       return {
@@ -339,7 +340,7 @@ export function CreatePage() {
                     size="icon"
                     onClick={() => {
                       if (createMutation.data?.url) {
-                        navigator.clipboard.writeText(createMutation.data.url);
+                        clipboardCopy(createMutation.data.url);
                         toast.info("URL copied to clipboard");
                       }
                     }}
