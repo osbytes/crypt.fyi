@@ -67,7 +67,7 @@ export function About() {
           </div>
           <div className="p-6 border rounded-lg">
             <IconFlame className="w-12 h-12 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">3. Self-Destruct</h3>
+            <h3 className="text-xl font-semibold mb-2">3. Burn after read</h3>
             <p>Once accessed, if 'burn after read' is checked, the secret is permanently deleted from our servers. No traces left behind.</p>
           </div>
         </div>

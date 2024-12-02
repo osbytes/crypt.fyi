@@ -287,7 +287,7 @@ export function CreatePage() {
                         <div className="space-y-1 leading-none">
                           <FormLabel>Burn after reading</FormLabel>
                           <FormDescription>
-                            Delete the secret immediately after it is viewed
+                            Delete the secret immediately after it is viewed, guaranteeing only one recipient can access it
                           </FormDescription>
                         </div>
                       </FormItem>
