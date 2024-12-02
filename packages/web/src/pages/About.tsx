@@ -58,17 +58,17 @@ export function About() {
           <div className="p-6 border rounded-lg">
             <IconLock className="w-12 h-12 mb-4" />
             <h3 className="text-xl font-semibold mb-2">1. Encrypt</h3>
-            <p>Your secret is encrypted right in your browser before it ever leaves your device. Only people with the special link can decrypt it.</p>
+            <p>Your secret is encrypted right in your browser before it ever leaves your device. Only people with the special link, that you've explicitly shared, can decrypt it.</p>
           </div>
           <div className="p-6 border rounded-lg">
             <IconShare className="w-12 h-12 mb-4" />
             <h3 className="text-xl font-semibold mb-2">2. Share</h3>
-            <p>Share the secure link with your intended recipient. The link contains everything needed to decrypt the message.</p>
+            <p>Share the secure link with your intended recipient. The link contains everything needed to decrypt the message, unless a password is specified.</p>
           </div>
           <div className="p-6 border rounded-lg">
             <IconFlame className="w-12 h-12 mb-4" />
             <h3 className="text-xl font-semibold mb-2">3. Self-Destruct</h3>
-            <p>Once accessed, the secret is permanently deleted from our servers. No traces left behind.</p>
+            <p>Once accessed, if 'burn after read' is checked, the secret is permanently deleted from our servers. No traces left behind.</p>
           </div>
         </div>
       </section>
@@ -100,6 +100,7 @@ export function About() {
             <h3 className="text-xl font-semibold mb-2">Data Protection</h3>
             <p className="mb-2">Multiple layers of security ensure your data remains protected:</p>
             <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
+              <li>Client-side encryption/decryption</li>
               <li>TLS encryption for all API communications</li>
               <li>Automatic secret destruction after access</li>
               <li>No server-side logging of sensitive data</li>
