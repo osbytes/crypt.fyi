@@ -5,7 +5,6 @@ export function About() {
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-8">About PhemVault</h1>
       
-      {/* Introduction Section */}
       <section className="mb-12">
         <h2 className="text-2xl font-semibold mb-4">What is PhemVault?</h2>
         <p className="text-lg mb-4">
@@ -15,7 +14,44 @@ export function About() {
         </p>
       </section>
 
-      {/* How it Works - User Friendly */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-4">Why PhemVault?</h2>
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-xl font-semibold mb-2">The Problem with Common Practices</h3>
+            <p className="text-lg mb-4">
+              Every day, sensitive information like passwords, API keys, and private data is shared through insecure channels:
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
+              <li>Email - can be intercepted, stored indefinitely, and forwarded without control</li>
+              <li>Slack/Teams messages - remain in chat history and company logs</li>
+              <li>SMS/Text messages - stored on multiple devices and carrier servers</li>
+              <li>Instant messaging - often lacks proper encryption and data deletion</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Existing Solutions and Their Limitations</h3>
+            <p className="text-lg mb-4">
+              While there are other tools in this space, each has its limitations:
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
+              <li>1Password - excellent for team password management, but <a href="https://1password.community/discussion/148998/feature-request-share-sensitive-data-from-non-1password-user-to-1password-user" target="_blank">doesn't support external non-users sharing internally</a></li>
+              <li>PrivateBin/OneTimeSecret - similar core functionality, but dated user interfaces and technology stacks</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold mb-2">The PhemVault Approach</h3>
+            <p className="text-lg">
+              PhemVault was built to address these challenges while embracing modern web technologies. It combines the security principles
+              of existing solutions with a clean, intuitive interface and a modern tech stack. The result is a tool that's both
+              highly secure and pleasant to use.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="mb-12">
         <h2 className="text-2xl font-semibold mb-4">How It Works</h2>
         <div className="grid md:grid-cols-3 gap-8">
@@ -37,7 +73,6 @@ export function About() {
         </div>
       </section>
 
-      {/* Technical Details */}
       <section className="mb-12">
         <h2 className="text-2xl font-semibold mb-4">Security Implementation</h2>
         <div className="space-y-6">
@@ -74,11 +109,10 @@ export function About() {
         </div>
       </section>
 
-      {/* Open Source */}
       <section>
         <h2 className="text-2xl font-semibold mb-4">Open Source</h2>
         <p className="text-lg">
-          PhemVault is open source and auditable. You can review our code, contribute, or report security issues on{" "}
+          PhemVault is open source and auditable. You can review our code, submit issues, and contribute on{" "}
           <a 
             href="https://github.com/dillonstreator/phemvault" 
             target="_blank" 
