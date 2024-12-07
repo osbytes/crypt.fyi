@@ -28,7 +28,7 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
           b,
           dt,
           ttl,
-          _cd: Date.now(),
+          cd: Date.now(),
         } satisfies VaultValue),
       );
       tx.pexpire(key, ttl);
@@ -82,12 +82,12 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
         return undefined;
       }
 
-      const { c, b, ttl, _cd } = vaultValueSchema.parse(JSON.parse(result));
+      const { c, b, ttl, cd } = vaultValueSchema.parse(JSON.parse(result));
       return {
         c,
         b,
         ttl,
-        _cd,
+        cd,
       };
     },
     async del(id, dt) {

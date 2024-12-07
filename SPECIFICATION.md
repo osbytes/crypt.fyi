@@ -57,7 +57,7 @@ PhemVault follows a client-server architecture with the following main component
     c: string;    // encrypted content
     b: boolean;   // burn after reading flag
     ttl: number;  // time-to-live in milliseconds
-    _cd: number;  // created date (unix timestamp)
+    cd: number;  // created date time (unix timestamp)
   }
   ```
 - Error Responses:

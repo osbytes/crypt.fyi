@@ -171,7 +171,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
           c: z.string().describe('encrypted content'),
           b: z.boolean().describe('burn after reading'),
           ttl: z.number().describe('time to live (TTL) in milliseconds'),
-          _cd: z.number().describe('created date'),
+          cd: z.number().describe('created date time'),
         }),
         404: z.null(),
         400: z.null(),

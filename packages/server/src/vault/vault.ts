@@ -11,12 +11,12 @@ export const vaultValueSchema = z.object({
   b: z.boolean().describe('burn after reading'),
   dt: z.string().describe('delete token'),
   ttl: z.number().describe('time to live (TTL) in milliseconds'),
-  _cd: z.number().describe('created date'),
+  cd: z.number().describe('created date time'),
 });
 export type VaultValue = z.infer<typeof vaultValueSchema>;
 
 export interface Vault {
-  set(value: Omit<VaultValue, 'dt' | '_cd'> & { ttl: number }): Promise<{ id: string; dt: string }>;
+  set(value: Omit<VaultValue, 'dt' | 'cd'> & { ttl: number }): Promise<{ id: string; dt: string }>;
   get(id: string, h: string): Promise<Omit<VaultValue, 'dt' | 'h'> | undefined>;
   del(id: string, dt: string): Promise<boolean>;
 }
