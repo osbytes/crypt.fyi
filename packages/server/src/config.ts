@@ -15,6 +15,8 @@ export enum Environment {
   Prod = 'production',
 }
 
+const env = getEnv();
+
 const logLevels = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const;
 
 const configSchema = z.object({
@@ -49,7 +51,7 @@ const configSchema = z.object({
     .describe('vault entry time to live maximum in milliseconds'),
   vaultEntryTTLMsDefault: z
     .number({ coerce: true })
-    .default(1000 * 60 * 5)
+    .default(1000 * 60 * 60)
     .describe('vault entry time to live default in milliseconds'),
   vaultEntryIdentifierLength: z
     .number({ coerce: true })
@@ -64,18 +66,36 @@ const configSchema = z.object({
     .default(1024 * 1024)
     .describe('body limit in bytes'),
   swaggerUIPath: z.string().default('/docs').describe('swagger UI path'),
+  corsOrigin: z.string().describe('allowed CORS origins (comma-separated)'),
+  corsMethods: z
+    .string()
+    .default('GET,POST,DELETE,OPTIONS')
+    .describe('allowed CORS methods (comma-separated)'),
+  corsHeaders: z
+    .string()
+    .default('Content-Type')
+    .describe('allowed CORS headers (comma-separated)'),
 });
 
 export type Config = z.infer<typeof configSchema>;
 
 export const initConfig = async (): Promise<Config> => {
+  let corsOrigin: string | undefined = process.env.CORS_ORIGIN;
+  if (!corsOrigin) {
+    if (env === Environment.Dev) {
+      corsOrigin = '*';
+    } else {
+      throw new Error('CORS_ORIGIN is required in non-development environments');
+    }
+  }
+
   return configSchema.parse({
     name: SERVICE_NAME,
     version: SERVICE_VERSION,
     shutdownTimeoutMs: process.env.SHUTDOWN_TIMEOUT_MS,
     port: process.env.PORT,
     healthCheckEndpoint: process.env.HEALTH_CHECK_ENDPOINT,
-    env: getEnv(),
+    env,
     logLevel: process.env.LOG_LEVEL,
     rateLimitMax: process.env.RATE_LIMIT_MAX,
     rateLimitWindowMs: process.env.RATE_LIMIT_WINDOW_MS,
@@ -88,6 +108,9 @@ export const initConfig = async (): Promise<Config> => {
     vaultEntryDeleteTokenLength: process.env.VAULT_ENTRY_DELETE_TOKEN_LENGTH,
     bodyLimit: bytes(process.env.BODY_LIMIT_BYTES ?? '50KB'),
     swaggerUIPath: process.env.SWAGGER_UI_PATH,
+    corsOrigin,
+    corsMethods: process.env.CORS_METHODS,
+    corsHeaders: process.env.CORS_HEADERS,
   });
 };
 

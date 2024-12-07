@@ -75,12 +75,21 @@ export const initApp = async (config: Config, deps: AppDeps) => {
   await app.after();
 
   app.addHook('onRequest', async (req, res) => {
-    // TODO: configurable cors headers
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', '*');
-    res.header('Access-Control-Allow-Headers', '*');
+    const origins = config.corsOrigin
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean);
+    const requestOrigin = req.headers.origin;
+
+    if (origins.length > 0) {
+      if (requestOrigin && (origins.includes('*') || origins.includes(requestOrigin))) {
+        res.header('Access-Control-Allow-Origin', requestOrigin);
+      }
+    }
 
     if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Methods', config.corsMethods);
+      res.header('Access-Control-Allow-Headers', config.corsHeaders);
       return res.send();
     }
 
