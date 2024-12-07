@@ -57,9 +57,14 @@ PhemVault follows a client-server architecture with the following main component
     c: string;    // encrypted content
     b: boolean;   // burn after reading flag
     ttl: number;  // time-to-live in milliseconds
-    _cd: number;  // created date
+    _cd: number;  // created date (unix timestamp)
   }
   ```
+- Error Responses:
+  - 400: Invalid key/password hash
+  - 404: Secret not found or already burned
+  - 429: Rate limit exceeded
+  - 500: Server error
 
 #### DELETE /vault/:vaultId
 - Purpose: Delete a secret
@@ -74,11 +79,11 @@ PhemVault follows a client-server architecture with the following main component
 
 ### 4.1 Encryption
 1. **Client-Side Encryption**
-   - AES-256-GCM encryption
-   - All encryption/decryption occurs in the browser
+   - AES-256-GCM encryption with PBKDF2 key derivation and random salt and initialization vector (IV)
    - Unique encryption key per secret
-   - Optional password protection (layered encryption)
-     - Password is not embedded in the URL and is ideally shared/transmitted separately from the URL
+   - All encryption/decryption occurs in the browser
+   - Optional password protection for layered encryption
+     - Password is not embedded in the URL and is ideally shared/transmitted to the recipient separately from the unique vault URL
 
 2. **Key Management**
    - Decryption key never transmitted to server
@@ -175,37 +180,53 @@ PhemVault follows a client-server architecture with the following main component
 ## 8. Error Handling
 
 ### 8.1 Error Responses
-- 400: Invalid key/password
-- 404: Secret not found
+- 400: Invalid key/password hash
+- 404: Secret not found or already burned
 - 429: Rate limit exceeded
 - 500: Server error
+
+Each error response will have an appropriate error message in the response body.
 
 ## 9. Rate Limiting and Quotas
 
 ### 9.1 API Rate Limits
-- Configurable per-IP rate limiting
-- Default: Specified in server configuration
-- Enforced by server
+- Per-IP rate limiting enforced
+- Configurable rate limit window and request quota
+- Rate limits apply to all API endpoints
 
 ### 9.2 Content Limits
 - Maximum content size: 50KB
-- Minimum TTL: Configurable
-- Maximum TTL: Configurable
-- Default TTL: Configurable
+- TTL Constraints:
+  - Minimum: 1 second
+  - Maximum: 7 days
+  - Default: 1 hour
 
-## 10. Privacy Considerations
+## 10. Security Measures
 
-### 10.1 Data Privacy
-- No user tracking
-- No analytics
-- No logs of secret content
-- No metadata collection
+### 10.1 Transport Security
+- Mandatory HTTPS for all API endpoints
+- Strict Transport Security (HSTS) enforcement
+- Modern TLS protocols only
 
-### 10.2 Data Retention
-- Automatic expiration
-- No backups
-- No data recovery
-- Immediate deletion post-read (optional)
+### 10.2 Security Headers
+- Content Security Policy (CSP)
+  - No eval() or unsafe-inline
+  - Restricted source origins
+  - Frame ancestors disabled
+  - Strict MIME type checking
+- Cross-Origin Resource Sharing (CORS)
+  - Strict origin validation
+  - Limited allowed methods
+  - Controlled header exposure
+- XSS Protection Headers
+- Content Type Options
+- Referrer Policy
+
+### 10.3 Request/Response Security
+- Request size limits
+- Response sanitization
+- No sensitive data in logs
+- Secure error handling
 
 ## 11. Future Considerations
 
