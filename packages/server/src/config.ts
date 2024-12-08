@@ -75,18 +75,20 @@ const configSchema = z.object({
     .string()
     .default('Content-Type')
     .describe('allowed CORS headers (comma-separated)'),
+  encryptionKey: z.string().describe('encryption key'),
 });
 
 export type Config = z.infer<typeof configSchema>;
 
 export const initConfig = async (): Promise<Config> => {
   let corsOrigin: string | undefined = process.env.CORS_ORIGIN;
-  if (!corsOrigin) {
-    if (env === Environment.Dev) {
-      corsOrigin = '*';
-    } else {
-      throw new Error('CORS_ORIGIN is required in non-development environments');
-    }
+  if (!corsOrigin && env !== Environment.Prod) {
+    corsOrigin = '*';
+  }
+
+  let encryptionKey = process.env.ENCRYPTION_KEY;
+  if (!encryptionKey && env !== Environment.Prod) {
+    encryptionKey = 'foobar';
   }
 
   return configSchema.parse({
@@ -111,6 +113,7 @@ export const initConfig = async (): Promise<Config> => {
     corsOrigin,
     corsMethods: process.env.CORS_METHODS,
     corsHeaders: process.env.CORS_HEADERS,
+    encryptionKey,
   });
 };
 

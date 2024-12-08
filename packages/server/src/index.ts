@@ -5,12 +5,13 @@ import { initLogging } from './logging';
 import gracefulShutdown from 'http-graceful-shutdown';
 import Redis from 'ioredis';
 import { createRedisVault } from './vault/redis';
+import { EncryptedVault } from './vault/encrypted-vault';
 
 const main = async () => {
   const config = await initConfig();
   const logger = await initLogging(config);
   const redis = new Redis(config.redisUrl);
-  const vault = createRedisVault(redis, config);
+  const vault = new EncryptedVault(createRedisVault(redis, config), config.encryptionKey);
 
   const app = await initApp(config, {
     logger,
