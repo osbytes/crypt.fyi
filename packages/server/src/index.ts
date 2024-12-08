@@ -5,7 +5,7 @@ import { initLogging } from './logging';
 import gracefulShutdown from 'http-graceful-shutdown';
 import Redis from 'ioredis';
 import { createRedisVault } from './vault/redis';
-import { EncryptedVault } from './vault/encrypted-vault';
+import { EncryptedVault } from './vault/encrypted';
 
 const main = async () => {
   const config = await initConfig();
