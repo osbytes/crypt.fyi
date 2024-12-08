@@ -1,5 +1,10 @@
+import { promisify } from 'node:util';
+import { deflate, inflate } from 'node:zlib';
 import { Vault, VaultValue } from './vault';
 import { encrypt, decrypt } from '../encryption';
+
+const deflateAsync = promisify(deflate);
+const inflateAsync = promisify(inflate);
 
 export class EncryptedVault implements Vault {
   constructor(
@@ -11,9 +16,10 @@ export class EncryptedVault implements Vault {
     value: Omit<VaultValue, 'dt' | 'cd'> & { ttl: number },
   ): Promise<{ id: string; dt: string }> {
     const encryptedContent = await encrypt(value.c, this.encryptionKey);
+    const deflatedContent = (await deflateAsync(encryptedContent)).toString('base64');
     const { id, dt } = await this.vault.set({
       ...value,
-      c: encryptedContent,
+      c: deflatedContent,
     });
     return { id, dt };
   }
@@ -23,7 +29,8 @@ export class EncryptedVault implements Vault {
     if (!value) {
       return undefined;
     }
-    const decryptedContent = await decrypt(value.c, this.encryptionKey);
+    const inflatedContent = (await inflateAsync(Buffer.from(value.c, 'base64'))).toString();
+    const decryptedContent = await decrypt(inflatedContent, this.encryptionKey);
     return {
       ...value,
       c: decryptedContent,
