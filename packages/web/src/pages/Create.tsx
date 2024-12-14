@@ -288,7 +288,7 @@ export function CreatePage() {
                         <div className="space-y-1 leading-none">
                           <FormLabel>Burn after reading</FormLabel>
                           <FormDescription>
-                            Delete the secret immediately after it is viewed, guaranteeing only one recipient can access it
+                            Guarantees only one recipient can access the secret
                           </FormDescription>
                         </div>
                       </FormItem>
@@ -316,9 +316,13 @@ export function CreatePage() {
               <div className="space-y-4">
                 <div className="text-center mb-8">
                   <h2 className="text-xl font-bold mb-2">Secret Created!</h2>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-sm mb-1">
                     Your secret has been created and the URL has been copied to
                     your clipboard
+                  </p>
+                  <p className="text-muted-foreground text-sm">
+                    Share the URL{form.watch("p") && ` and password`} with the
+                    desired recipient
                   </p>
                 </div>
 
