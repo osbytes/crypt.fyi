@@ -218,23 +218,6 @@ export function CreatePage() {
   const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
   const qrCodeRef = useRef<SVGSVGElement>(null);
 
-  const handleCopyQR = async () => {
-    const svg = qrCodeRef.current;
-    if (!svg) return;
-
-    try {
-      const dataUrl = await svgToImage(svg);
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
-      await navigator.clipboard.write([
-        new ClipboardItem({ "image/png": blob }),
-      ]);
-      toast.success("QR code copied to clipboard");
-    } catch (error) {
-      toast.error(`Failed to copy QR code: ${error}`);
-    }
-  };
-
   const handleDownloadQR = async () => {
     const svg = qrCodeRef.current;
     if (!svg) return;
@@ -501,13 +484,12 @@ export function CreatePage() {
               )}
             </div>
             <div className="flex space-x-2">
-              <Button variant="outline" onClick={handleCopyQR}>
-                <IconCopy className="mr-2 size-4" />
-                Copy QR
-              </Button>
-              <Button variant="outline" onClick={handleDownloadQR}>
-                <IconDownload className="mr-2 size-4" />
-                Download
+              <Button
+                title="Download QR Code"
+                variant="outline"
+                onClick={handleDownloadQR}
+              >
+                <IconDownload className="size-4" />
               </Button>
             </div>
           </div>
