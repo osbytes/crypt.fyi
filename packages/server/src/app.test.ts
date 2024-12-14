@@ -1,6 +1,6 @@
 import pino from 'pino';
 import { initApp } from './app';
-import { initConfig, Config } from './config';
+import { config as baseConfig, Config } from './config';
 
 import tap, { Test } from 'tap';
 import { Client } from 'undici';
@@ -10,7 +10,7 @@ import { createRedisVault } from './vault/redis';
 
 const initAppTest = async (t: Test) => {
   const config = {
-    ...(await initConfig()),
+    ...baseConfig,
     healthCheckEndpoint: '/some-health-check-endpoint',
     vaultEntryTTLMsDefault: 1000,
   } satisfies Config;
@@ -106,7 +106,7 @@ tap.test('app', async (t) => {
     t.equal(typeof id, 'string');
 
     const config = {
-      ...(await initConfig()),
+      ...baseConfig,
       healthCheckEndpoint: '/some-health-check-endpoint',
       vaultEntryTTLMsDefault: 1000,
     } satisfies Config;

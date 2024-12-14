@@ -1,6 +1,6 @@
 import { otlpShutdown } from './telemetry';
 import { initApp } from './app';
-import { Environment, initConfig } from './config';
+import { Environment, config } from './config';
 import { initLogging } from './logging';
 import gracefulShutdown from 'http-graceful-shutdown';
 import Redis from 'ioredis';
@@ -8,7 +8,6 @@ import { createRedisVault } from './vault/redis';
 import { EncryptedVault } from './vault/encrypted';
 
 const main = async () => {
-  const config = await initConfig();
   const logger = await initLogging(config);
   const redis = new Redis(config.redisUrl);
   const vault = new EncryptedVault(createRedisVault(redis, config), config.encryptionKey);

@@ -51,9 +51,9 @@ export const initApp = async (config: Config, deps: AppDeps) => {
   app.register(fastifySwagger, {
     openapi: {
       info: {
-        title: config.name,
-        description: config.description,
-        version: config.version,
+        title: config.serviceName,
+        description: config.serviceDescription,
+        version: config.serviceVersion,
       },
       servers: [],
     },

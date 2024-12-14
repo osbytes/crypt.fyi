@@ -5,14 +5,23 @@ import { join } from 'node:path';
 
 const packageJson = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
 
-export const SERVICE_NAME = process.env.SERVICE_NAME ?? packageJson.name;
-export const SERVICE_VERSION = process.env.SERVICE_VERSION ?? packageJson.version;
-export const SERVICE_DESCRIPTION = process.env.SERVICE_DESCRIPTION ?? packageJson.description;
-
 export enum Environment {
   Dev = 'development',
   Test = 'test',
   Prod = 'production',
+}
+
+function getEnv(): Environment {
+  switch (process.env.NODE_ENV?.toLowerCase()) {
+    case 'development':
+      return Environment.Dev;
+    case 'test':
+      return Environment.Test;
+    case 'production':
+      return Environment.Prod;
+    default:
+      return Environment.Dev;
+  }
 }
 
 const env = getEnv();
@@ -20,9 +29,6 @@ const env = getEnv();
 const logLevels = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const;
 
 const configSchema = z.object({
-  name: z.string().default(SERVICE_NAME),
-  description: z.string().default(SERVICE_DESCRIPTION),
-  version: z.string().default(SERVICE_VERSION),
   shutdownTimeoutMs: z
     .number({ coerce: true })
     .default(1000 * 30)
@@ -76,11 +82,25 @@ const configSchema = z.object({
     .default('Content-Type')
     .describe('allowed CORS headers (comma-separated)'),
   encryptionKey: z.string().describe('encryption key'),
+  otelEnabled: z.boolean({ coerce: true }).default(false).describe('enable OpenTelemetry tracing'),
+  otelExporterOtlpEndpoint: z.string().describe('OpenTelemetry collector endpoint').optional(),
+  serviceName: z
+    .string()
+    .default(packageJson.name)
+    .describe('service name from package.json or env'),
+  serviceVersion: z
+    .string()
+    .default(packageJson.version)
+    .describe('service version from package.json or env'),
+  serviceDescription: z
+    .string()
+    .default(packageJson.description)
+    .describe('service description from package.json or env'),
 });
 
 export type Config = z.infer<typeof configSchema>;
 
-export const initConfig = async (): Promise<Config> => {
+export const config = (() => {
   let corsOrigin: string | undefined = process.env.CORS_ORIGIN;
   if (!corsOrigin && env !== Environment.Prod) {
     corsOrigin = '*';
@@ -92,8 +112,6 @@ export const initConfig = async (): Promise<Config> => {
   }
 
   return configSchema.parse({
-    name: SERVICE_NAME,
-    version: SERVICE_VERSION,
     shutdownTimeoutMs: process.env.SHUTDOWN_TIMEOUT_MS,
     port: process.env.PORT,
     healthCheckEndpoint: process.env.HEALTH_CHECK_ENDPOINT,
@@ -114,18 +132,10 @@ export const initConfig = async (): Promise<Config> => {
     corsMethods: process.env.CORS_METHODS,
     corsHeaders: process.env.CORS_HEADERS,
     encryptionKey,
+    otelEnabled: process.env.OTEL_ENABLED,
+    otelExporterOtlpEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
+    serviceName: process.env.SERVICE_NAME,
+    serviceVersion: process.env.SERVICE_VERSION,
+    serviceDescription: process.env.SERVICE_DESCRIPTION,
   });
-};
-
-function getEnv(): Environment {
-  switch (process.env.NODE_ENV?.toLowerCase()) {
-    case 'development':
-      return Environment.Dev;
-    case 'test':
-      return Environment.Test;
-    case 'production':
-      return Environment.Prod;
-    default:
-      return Environment.Dev;
-  }
-}
+})();
