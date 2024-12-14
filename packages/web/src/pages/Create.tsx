@@ -30,7 +30,6 @@ import { encrypt, generateRandomString } from "@/lib/encryption";
 import { Card } from "@/components/ui/card";
 import { sleep } from "@/lib/sleep";
 import {
-  IconBrandGithub,
   IconLock,
   IconCopy,
   IconEye,
@@ -315,9 +314,9 @@ export function CreatePage() {
           >
             <Card className="p-4">
               <div className="space-y-4">
-                <div className="text-center">
-                  <h2 className="text-2xl font-bold mb-2">Secret Created!</h2>
-                  <p className="text-muted-foreground">
+                <div className="text-center mb-8">
+                  <h2 className="text-xl font-bold mb-2">Secret Created!</h2>
+                  <p className="text-muted-foreground text-sm">
                     Your secret has been created and the URL has been copied to
                     your clipboard
                   </p>
@@ -404,11 +403,6 @@ export function CreatePage() {
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="flex items-center justify-center space-x-2 p-4">
-        <a href="https://github.com/dillonstreator/phemvault" target="_blank">
-          <IconBrandGithub className="text-muted-foreground" />
-        </a>
-      </div>
     </div>
   );
 }
