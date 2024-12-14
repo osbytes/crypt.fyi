@@ -40,7 +40,9 @@ export function Layout() {
             </div>
             <div className="flex items-center gap-2">
               <Link to="/about">
-                <Button variant="ghost" size="sm">About</Button>
+                <Button variant="ghost" size="sm">
+                  About
+                </Button>
               </Link>
               <Button
                 variant="ghost"
@@ -92,12 +94,15 @@ export function Layout() {
           <div className="container mx-auto py-6 px-4">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="flex items-center gap-4">
-                <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                  to="/about"
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
                   About
                 </Link>
-                <a 
-                  href="https://github.com/dillonstreator/phemvault" 
-                  target="_blank" 
+                <a
+                  href="https://github.com/dillonstreator/phemvault"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground"
                 >
@@ -111,7 +116,8 @@ export function Layout() {
                 </a> */}
               </div>
               <div className="text-sm text-muted-foreground">
-                Built with security and privacy in mind
+                Built with 💜, security, and privacy in mind - because ignorance{" "}
+                <i>can</i> be bliss
               </div>
             </div>
           </div>

@@ -132,7 +132,7 @@ export function ViewPage() {
         </div>
         {query.data.burned && (
           <div className="bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-lg p-3 mb-4 text-sm text-center">
-            This secret was deleted after your viewing for security
+            This secret was deleted after your viewing, for security
           </div>
         )}
         <Card className="p-6 relative">

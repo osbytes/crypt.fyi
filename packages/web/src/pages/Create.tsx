@@ -228,6 +228,7 @@ export function CreatePage() {
                         <FormControl>
                           <Input
                             type="password"
+                            placeholder="Optional (but recommended)"
                             {...field}
                             disabled={
                               createMutation.isPending || field.disabled
