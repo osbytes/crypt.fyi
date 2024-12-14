@@ -234,6 +234,9 @@ Each error response will have an appropriate error message in the response body.
 - File encryption support
 - Notification of read receipts
 - Deferred time to available w/ read-side email subscription for availability notifications
+- IP whitelisting / blacklisting
+- QR code support
+- Browser extension
 
 ---
 
