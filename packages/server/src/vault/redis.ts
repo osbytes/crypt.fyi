@@ -62,7 +62,7 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
 
   local data = cjson.decode(value)
   if data.h ~= ARGV[1] then
-    return false
+    return 0
   end
 
   if data.b == true then
@@ -74,9 +74,9 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
         1,
         key,
         h,
-      )) as string | null | false;
+      )) as string | null | 0;
       if (!result) {
-        if (result === false) {
+        if (result === 0) {
           throw new InvalidKeyAndOrPasswordError();
         }
         return undefined;

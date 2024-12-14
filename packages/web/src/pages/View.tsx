@@ -1,5 +1,4 @@
 import { config } from "@/config";
-import { Loader } from "@/components/ui/loader";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import invariant from "tiny-invariant";
@@ -139,7 +138,7 @@ export function ViewPage() {
           <pre
             className={cn(
               "text-wrap break-words whitespace-pre-wrap font-mono text-sm",
-              !isRevealed && "blur-md select-none"
+              !isRevealed && "blur-md select-none",
             )}
             role="textbox"
             aria-label="Secret content"
@@ -148,21 +147,20 @@ export function ViewPage() {
           </pre>
           {!isRevealed && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-muted-foreground">Click the eye icon above to reveal the secret</p>
+              <p className="text-muted-foreground">
+                Click the eye icon above to reveal the secret
+              </p>
             </div>
           )}
         </Card>
       </>
     );
-  } else if (query.isPending) {
-    content = (
-      <div className="flex flex-col items-center gap-4 p-8">
-        <Loader />
-      </div>
-    );
   } else if (isPasswordSet) {
     content = (
-      <Card className="p-6 text-center cursor-pointer" onClick={() => setIsDialogOpen(true)}>
+      <Card
+        className="p-6 text-center cursor-pointer"
+        onClick={() => setIsDialogOpen(true)}
+      >
         <p className="text-muted-foreground">
           This secret is password protected. Click to enter password.
         </p>
@@ -197,7 +195,8 @@ export function ViewPage() {
                 className="text-lg"
               />
               <p className="text-sm text-muted-foreground">
-                This secret is protected with a password - request from the sender
+                This secret is protected with a password - request from the
+                sender
               </p>
             </div>
             <div className="flex justify-end gap-3">
