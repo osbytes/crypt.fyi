@@ -12,7 +12,7 @@ import z from 'zod';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import fastifyRateLimit from '@fastify/rate-limit';
-import * as openTelemetry from '@opentelemetry/api';
+import { metrics } from '@opentelemetry/api';
 import { Config } from './config';
 import { Logger } from './logging';
 import { InvalidKeyAndOrPasswordError, Vault } from './vault/vault';
@@ -98,7 +98,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     });
   });
 
-  const meter = openTelemetry.metrics.getMeter('phemvault');
+  const meter = metrics.getMeter(config.serviceName);
 
   const redisEntriesGauge = meter.createObservableGauge('redis.entries', {
     description: 'Number of entries in Redis',
