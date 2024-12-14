@@ -37,9 +37,10 @@ import {
   IconFlame,
   IconClock,
   IconQrcode,
+  IconDownload,
 } from "@tabler/icons-react";
 import { sha256 } from "@/lib/hash";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { clipboardCopy } from "@/lib/clipboardCopy";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -80,6 +81,29 @@ const ttlOptions = [
   { label: "1 day", value: DAY },
   { label: "1 week", value: WEEK },
 ];
+
+function svgToImage(svg: SVGElement): Promise<string> {
+  return new Promise((resolve) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([svgData], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    const url = URL.createObjectURL(svgBlob);
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx?.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/png"));
+    };
+
+    img.src = url;
+  });
+}
 
 export function CreatePage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -192,6 +216,41 @@ export function CreatePage() {
   }
 
   const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
+  const qrCodeRef = useRef<SVGSVGElement>(null);
+
+  const handleCopyQR = async () => {
+    const svg = qrCodeRef.current;
+    if (!svg) return;
+
+    try {
+      const dataUrl = await svgToImage(svg);
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob }),
+      ]);
+      toast.success("QR code copied to clipboard");
+    } catch (error) {
+      toast.error(`Failed to copy QR code: ${error}`);
+    }
+  };
+
+  const handleDownloadQR = async () => {
+    const svg = qrCodeRef.current;
+    if (!svg) return;
+
+    try {
+      const dataUrl = await svgToImage(svg);
+      const link = document.createElement("a");
+      const hash = await sha256(createMutation.data?.url ?? "");
+      link.download = `phemvault-qr-${hash.slice(0, 8)}.png`;
+      link.href = dataUrl;
+      link.click();
+      toast.success("QR code downloaded");
+    } catch (error) {
+      toast.error(`Failed to download QR code: ${error}`);
+    }
+  };
 
   return (
     <div className="max-w-xl mx-auto">
@@ -429,15 +488,28 @@ export function CreatePage() {
           <DialogHeader>
             <DialogTitle>Secret URL QR Code</DialogTitle>
           </DialogHeader>
-          <div className="flex items-center justify-center p-4">
-            {createMutation.data?.url && (
-              <QRCodeSVG
-                value={createMutation.data.url}
-                size={256}
-                marginSize={4}
-                level="H"
-              />
-            )}
+          <div className="flex flex-col items-center space-y-4">
+            <div className="qr-code p-4">
+              {createMutation.data?.url && (
+                <QRCodeSVG
+                  ref={qrCodeRef}
+                  value={createMutation.data.url}
+                  size={256}
+                  marginSize={4}
+                  level="H"
+                />
+              )}
+            </div>
+            <div className="flex space-x-2">
+              <Button variant="outline" onClick={handleCopyQR}>
+                <IconCopy className="mr-2 size-4" />
+                Copy QR
+              </Button>
+              <Button variant="outline" onClick={handleDownloadQR}>
+                <IconDownload className="mr-2 size-4" />
+                Download
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
