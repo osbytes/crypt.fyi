@@ -12,12 +12,12 @@ import z from 'zod';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import fastifyRateLimit from '@fastify/rate-limit';
-import os from 'node:os';
 import * as openTelemetry from '@opentelemetry/api';
 import { Config } from './config';
 import { Logger } from './logging';
 import { InvalidKeyAndOrPasswordError, Vault } from './vault/vault';
 import { Redis } from 'ioredis';
+import { BASE_OTEL_ATTRIBUTES } from './telemetry';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -30,11 +30,6 @@ export type AppDeps = {
   vault: Vault;
   redis: Redis;
 };
-
-const hostname = os.hostname();
-const BASE_OTEL_ATTRIBUTES = {
-  hostname,
-} satisfies openTelemetry.Attributes;
 
 export const initApp = async (config: Config, deps: AppDeps) => {
   const { logger, vault, redis } = deps;

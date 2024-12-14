@@ -5,6 +5,8 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { config } from './config';
+import { Attributes } from '@opentelemetry/api';
+import os from 'node:os';
 
 let sdk: NodeSDK | undefined = undefined;
 
@@ -34,3 +36,8 @@ if (config.otelEnabled) {
 export const otlpShutdown = async () => {
   await sdk?.shutdown();
 };
+
+export const BASE_OTEL_ATTRIBUTES = {
+  hostname: os.hostname(),
+  version: config.serviceVersion,
+} satisfies Attributes;
