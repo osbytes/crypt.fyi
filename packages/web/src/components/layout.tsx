@@ -115,9 +115,9 @@ export function Layout() {
                   Contact
                 </a> */}
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground text-center">
                 Built with 💜, security, and privacy in mind - because ignorance{" "}
-                <i>can</i> be bliss
+                <i>can be</i> bliss
               </div>
             </div>
           </div>
