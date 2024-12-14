@@ -10,6 +10,7 @@ import { EncryptedVault } from './vault/encrypted';
 const main = async () => {
   const logger = await initLogging(config);
   const redis = new Redis(config.redisUrl);
+  await redis.ping();
   const vault = new EncryptedVault(createRedisVault(redis, config), config.encryptionKey);
 
   const app = await initApp(config, {

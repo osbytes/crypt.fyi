@@ -118,7 +118,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     unit: 'percentage',
   });
 
-  app.get(config.healthCheckEndpoint, (_, res) => {
+  app.get(config.healthCheckEndpoint, async (_, res) => {
     redisEntriesGauge.addCallback(async (result) => {
       const count = await redis.dbsize();
       result.observe(count, BASE_OTEL_ATTRIBUTES);
@@ -133,7 +133,13 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       result.observe(totalCPUTime / 1000000, BASE_OTEL_ATTRIBUTES);
     });
 
-    res.status(200).send();
+    const redisPing = await redis.ping();
+
+    res.status(200).send({
+      version: config.serviceVersion,
+      name: config.serviceName,
+      redis: !!redisPing,
+    });
   });
 
   app.withTypeProvider<ZodTypeProvider>().route({
