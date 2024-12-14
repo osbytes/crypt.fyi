@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { sleep } from "@/lib/sleep";
 import { sha256 } from "@/lib/hash";
-import { IconEye, IconEyeOff, IconCopy } from "@tabler/icons-react";
+import { IconEye, IconEyeOff, IconCopy, IconFlame } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { clipboardCopy } from "@/lib/clipboardCopy";
 
@@ -130,8 +130,14 @@ export function ViewPage() {
           </Button>
         </div>
         {query.data.burned && (
-          <div className="bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-lg p-3 mb-4 text-sm text-center">
-            This secret was deleted after your viewing, for security
+          <div className="flex justify-center">
+            <div className="grid grid-cols-[auto_1fr] items-center gap-2 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-lg p-2 mb-2">
+              <IconFlame className="h-4 w-4" />
+              <p className="text-xs">
+                This secret was deleted after your viewing and is no longer
+                available after leaving the page.
+              </p>
+            </div>
           </div>
         )}
         <Card className="p-6 relative">
