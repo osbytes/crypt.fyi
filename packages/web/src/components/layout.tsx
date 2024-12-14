@@ -116,7 +116,7 @@ export function Layout() {
                 </a> */}
               </div>
               <div className="text-sm text-muted-foreground text-center">
-                Built with 💜, security, and privacy in mind - because ignorance{" "}
+                Built with security and privacy in mind - because ignorance{" "}
                 <i>can be</i> bliss
               </div>
             </div>
