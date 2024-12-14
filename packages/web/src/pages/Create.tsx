@@ -36,10 +36,18 @@ import {
   IconEyeOff,
   IconFlame,
   IconClock,
+  IconQrcode,
 } from "@tabler/icons-react";
 import { sha256 } from "@/lib/hash";
 import { useState } from "react";
 import { clipboardCopy } from "@/lib/clipboardCopy";
+import { QRCodeSVG } from "qrcode.react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -182,6 +190,8 @@ export function CreatePage() {
 
     maskedUrl = `${url.origin}/${"*".repeat(createMutation.data.id.length)}?${searchParams.toString()}`;
   }
+
+  const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
 
   return (
     <div className="max-w-xl mx-auto">
@@ -351,6 +361,13 @@ export function CreatePage() {
                   >
                     <IconCopy />
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsQrDialogOpen(true)}
+                  >
+                    <IconQrcode />
+                  </Button>
                 </div>
 
                 <div className="flex justify-end flex-wrap gap-2">
@@ -407,6 +424,23 @@ export function CreatePage() {
           </motion.div>
         )}
       </AnimatePresence>
+      <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Secret URL QR Code</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center p-4">
+            {createMutation.data?.url && (
+              <QRCodeSVG
+                value={createMutation.data.url}
+                size={256}
+                marginSize={4}
+                level="H"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
