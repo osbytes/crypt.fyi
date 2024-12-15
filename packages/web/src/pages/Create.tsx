@@ -284,7 +284,7 @@ export function CreatePage() {
                     if (files.length > 0) {
                       setSelectedFile(files[0]);
                       form.resetField("c");
-                      form.setValue("c", "");
+                      form.setValue("c", `${files[0].name} (file)`);
                     }
                   }}
                   className="space-y-4"
