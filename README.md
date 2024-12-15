@@ -39,7 +39,7 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 
 ## API Usage
 
-[OpenAPI Specification](https://crypt.fyiserver-production.up.railway.app/docs)
+[OpenAPI Specification](https://api.crypt.fyi/docs)
 
 ## Technical Stack
 
