@@ -2,11 +2,11 @@
 
 ## Reporting a Vulnerability
 
-We take the security of PhemVault seriously. If you believe you have found a security vulnerability, please report it to us as described below.
+We take the security of crypt.fyi seriously. If you believe you have found a security vulnerability, please report it to us as described below.
 
 **Please do NOT report security vulnerabilities through public GitHub issues.**
 
-Instead, please report them via email to [hi+security@phemvault.com](mailto:hi+security@phemvault.com). You should receive a response within 48 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
+Instead, please report them via email to [hi+security@crypt.fyi.com](mailto:hi+security@crypt.fyi.com). You should receive a response within 48 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
 
 Please include the following information in your report:
 
@@ -31,6 +31,6 @@ Please include the following information in your report:
 
 ## Acknowledgments
 
-We would like to thank the following individuals who have contributed to the security of PhemVault through responsible disclosure:
+We would like to thank the following individuals who have contributed to the security of crypt.fyi through responsible disclosure:
 
 *This section will be updated as contributions are received.*

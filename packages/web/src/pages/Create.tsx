@@ -253,7 +253,7 @@ export function CreatePage() {
       const dataUrl = await svgToImage(svg);
       const link = document.createElement("a");
       const hash = await sha256(createMutation.data?.url ?? "");
-      link.download = `phemvault-qr-${hash.slice(0, 8)}.png`;
+      link.download = `crypt.fyi-qr-${hash.slice(0, 8)}.png`;
       link.href = dataUrl;
       link.click();
       toast.success("QR code downloaded");

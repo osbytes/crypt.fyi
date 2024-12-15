@@ -20,7 +20,7 @@ export function Layout() {
           <div className="container flex items-center justify-between mx-auto">
             <div>
               <Link to="/">
-                <h1 className="text-xl font-bold">PhemVault</h1>
+                <h1 className="text-xl font-bold">crypt.fyi</h1>
               </Link>
               <p className="text-xs text-muted-foreground">
                 Ephemeral secret sharing with zero-knowledge{" "}
@@ -77,7 +77,7 @@ export function Layout() {
                 title="View source on GitHub"
               >
                 <a
-                  href="https://github.com/dillonstreator/phemvault"
+                  href="https://github.com/osbytes/crypt.fyi"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -101,7 +101,7 @@ export function Layout() {
                   About
                 </Link>
                 <a
-                  href="https://github.com/dillonstreator/phemvault"
+                  href="https://github.com/osbytes/crypt.fyi"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground"
@@ -109,7 +109,7 @@ export function Layout() {
                   GitHub
                 </a>
                 {/* <a 
-                  href="mailto:hi@phemvault.com"
+                  href="mailto:hi@crypt.fyi.com"
                   className="text-sm text-muted-foreground hover:text-foreground"
                 >
                   Contact
