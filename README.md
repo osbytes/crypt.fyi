@@ -1,4 +1,4 @@
-# PhemVault
+# crypt.fyi
 
 A zero-knowledge, end-to-end encrypted secret sharing platform that enables secure transmission of sensitive information.
 
@@ -39,7 +39,7 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 
 ## API Usage
 
-[OpenAPI Specification](https://phemvaultserver-production.up.railway.app/docs)
+[OpenAPI Specification](https://crypt.fyiserver-production.up.railway.app/docs)
 
 ## Technical Stack
 
@@ -65,4 +65,4 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit an [Issue](https://github.com/dillonstreator/phemvault/issues) or [Pull Request](https://github.com/dillonstreator/phemvault/pulls) on [GitHub](https://github.com/dillonstreator/phemvault).
+Contributions are welcome! Please feel free to submit an [Issue](https://github.com/osbytes/crypt.fyi/issues) or [Pull Request](https://github.com/osbytes/crypt.fyi/pulls) on [GitHub](https://github.com/osbytes/crypt.fyi).

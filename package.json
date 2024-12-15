@@ -4,7 +4,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"docker compose up redis\" \"yarn workspace @phemvault/server dev\" \"yarn workspace @phemvault/web dev\""
+    "dev": "concurrently \"docker compose up redis\" \"yarn workspace @crypt.fyi/server dev\" \"yarn workspace @crypt.fyi/web dev\""
   },
   "devDependencies": {
     "concurrently": "^9.1.0",

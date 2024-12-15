@@ -1,17 +1,17 @@
-# PhemVault System Specification (RFC)
+# crypt.fyi System Specification (RFC)
 
 ## 1. Introduction
 
 ### 1.1 Purpose
-PhemVault is a zero-knowledge, end-to-end encrypted secret sharing platform that enables users to securely share sensitive information using AES-256 encryption. The system is designed with a "zero-knowledge" architecture, meaning the server never has access to unencrypted data or encryption keys.
+crypt.fyi is a zero-knowledge, end-to-end encrypted secret sharing platform that enables users to securely share sensitive information using AES-256 encryption. The system is designed with a "zero-knowledge" architecture, meaning the server never has access to unencrypted data or encryption keys.
 
 ### 1.2 Scope
-This document outlines the system architecture, security measures, and interaction patterns between client and server components of the PhemVault system.
+This document outlines the system architecture, security measures, and interaction patterns between client and server components of the crypt.fyi system.
 
 ## 2. System Architecture
 
 ### 2.1 High-Level Overview
-PhemVault follows a client-server architecture with the following main components:
+crypt.fyi follows a client-server architecture with the following main components:
 - Web Client (Browser-based interface)
 - API Server
 - Data Store (Ephemeral storage)

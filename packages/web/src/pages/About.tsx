@@ -7,15 +7,15 @@ export function About() {
 
       <section className="mb-12">
         <p className="text-lg mb-4">
-          PhemVault is a secure, ephemeral secret-sharing platform that enables
+          crypt.fyi is a secure, ephemeral secret-sharing platform that enables
           you to share sensitive information safely. Whether it's passwords, API
-          keys, or confidential messages, PhemVault ensures your data remains
+          keys, or confidential messages, crypt.fyi ensures your data remains
           private and automatically disappears after being accessed.
         </p>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Why PhemVault?</h2>
+        <h2 className="text-2xl font-semibold mb-4">Why crypt.fyi?</h2>
         <div className="space-y-6">
           <div>
             <h3 className="text-xl font-semibold mb-2">
@@ -84,10 +84,10 @@ export function About() {
 
           <div>
             <h3 className="text-xl font-semibold mb-2">
-              The PhemVault Approach
+              The crypt.fyi Approach
             </h3>
             <p className="text-lg">
-              PhemVault was built to address these challenges while embracing
+              crypt.fyi was built to address these challenges while embracing
               modern web technologies. It combines the security principles of
               existing solutions with a clean, intuitive interface and a modern
               tech stack. The result is a tool that's both highly secure and
@@ -188,10 +188,10 @@ export function About() {
       <section>
         <h2 className="text-2xl font-semibold mb-4">Open Source</h2>
         <p className="text-lg">
-          PhemVault is open source and auditable. You can review our code,
+          crypt.fyi is open source and auditable. You can review our code,
           submit issues, and contribute on{" "}
           <a
-            href="https://github.com/dillonstreator/phemvault"
+            href="https://github.com/osbytes/crypt.fyi"
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"
