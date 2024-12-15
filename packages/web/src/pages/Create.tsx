@@ -38,6 +38,7 @@ import {
   IconClock,
   IconQrcode,
   IconDownload,
+  IconX,
 } from "@tabler/icons-react";
 import { sha256 } from "@/lib/hash";
 import { useRef, useState } from "react";
@@ -165,8 +166,32 @@ export function CreatePage() {
     },
   });
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    await createMutation.mutateAsync(data);
+    let content = data.c;
+
+    if (selectedFile) {
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result as string;
+          resolve(base64);
+        };
+        reader.readAsDataURL(selectedFile);
+      });
+
+      content = JSON.stringify({
+        type: "file",
+        name: selectedFile.name,
+        content: base64,
+      });
+    }
+
+    await createMutation.mutateAsync({
+      ...data,
+      c: content,
+    });
   }
 
   const { isSubmitSuccessful } = form.formState;
@@ -215,6 +240,8 @@ export function CreatePage() {
     maskedUrl = `${url.origin}/${"*".repeat(createMutation.data.id.length)}?${searchParams.toString()}`;
   }
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
   const qrCodeRef = useRef<SVGSVGElement>(null);
 
@@ -250,6 +277,16 @@ export function CreatePage() {
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={async (e) => {
+                    e.preventDefault();
+                    const files = Array.from(e.dataTransfer.files);
+                    if (files.length > 0) {
+                      setSelectedFile(files[0]);
+                      form.resetField("c");
+                      form.setValue("c", "");
+                    }
+                  }}
                   className="space-y-4"
                 >
                   <FormField
@@ -262,11 +299,67 @@ export function CreatePage() {
                           <Textarea
                             {...field}
                             disabled={
-                              createMutation.isPending || field.disabled
+                              createMutation.isPending ||
+                              field.disabled ||
+                              !!selectedFile
                             }
+                            placeholder="Enter your secret content here..."
                           />
                         </FormControl>
                         <FormMessage />
+                        <FormDescription>
+                          <div className="flex items-center gap-2">
+                            <p
+                              className="flex items-center justify-between cursor-pointer"
+                              onClick={() => fileInputRef.current?.click()}
+                            >
+                              {selectedFile ? (
+                                <span className="flex items-center gap-2">
+                                  File selected: {selectedFile.name} (
+                                  {(selectedFile.size / 1024).toFixed(1)} KB)
+                                </span>
+                              ) : (
+                                "add a file by drag-n-drop or clicking here"
+                              )}
+                            </p>
+                            {selectedFile && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-4 w-4"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setSelectedFile(null);
+                                  form.resetField("c");
+                                  if (fileInputRef.current) {
+                                    fileInputRef.current.value = "";
+                                    fileInputRef.current.files = null;
+                                  }
+                                }}
+                              >
+                                <IconX className="h-3 w-3" />
+                              </Button>
+                            )}
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              onChange={(e) => {
+                                const files = e.target.files;
+                                if (files?.length) {
+                                  setSelectedFile(files[0]);
+                                  form.resetField("c");
+                                  form.setValue("c", `${files[0].name} (file)`);
+                                }
+                              }}
+                              className="absolute inset-0 opacity-0 w-0 h-0"
+                              disabled={
+                                createMutation.isPending || field.disabled
+                              }
+                            />
+                          </div>
+                        </FormDescription>
                       </FormItem>
                     )}
                   />

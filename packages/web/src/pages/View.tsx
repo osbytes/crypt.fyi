@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { sleep } from "@/lib/sleep";
 import { sha256 } from "@/lib/hash";
-import { IconEye, IconEyeOff, IconCopy, IconFlame } from "@tabler/icons-react";
+import { IconEye, IconEyeOff, IconCopy, IconFlame, IconDownload } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { clipboardCopy } from "@/lib/clipboardCopy";
 
@@ -100,34 +100,50 @@ export function ViewPage() {
 
   let content = null;
   if (query.data) {
+    const decryptedContent = query.data.value;
+    let fileData: { type: 'file'; name: string; content: string } | null = null;
+
+    try {
+      const parsed = JSON.parse(decryptedContent);
+      if (parsed.type === 'file') {
+        fileData = parsed;
+      }
+    } catch {
+      // Not a JSON string, treat as regular text
+    }
+
     content = (
       <>
         <div className="flex justify-center gap-3 mb-6">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setIsRevealed(!isRevealed)}
-            title={isRevealed ? "Hide content" : "Show content"}
-            className="hover:bg-muted"
-          >
-            {isRevealed ? (
-              <IconEyeOff className="h-5 w-5" />
-            ) : (
-              <IconEye className="h-5 w-5" />
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              clipboardCopy(query.data.value);
-              toast.success("Secret copied to clipboard");
-            }}
-            title="Copy to clipboard"
-            className="hover:bg-muted"
-          >
-            <IconCopy className="h-5 w-5" />
-          </Button>
+          {!fileData && (
+            <>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsRevealed(!isRevealed)}
+                title={isRevealed ? "Hide content" : "Show content"}
+                className="hover:bg-muted"
+              >
+                {isRevealed ? (
+                  <IconEyeOff className="h-5 w-5" />
+                ) : (
+                  <IconEye className="h-5 w-5" />
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  clipboardCopy(query.data.value);
+                  toast.success("Secret copied to clipboard");
+                }}
+                title="Copy to clipboard"
+                className="hover:bg-muted"
+              >
+                <IconCopy className="h-5 w-5" />
+              </Button>
+            </>
+          )}
         </div>
         {query.data.burned && (
           <div className="flex justify-center">
@@ -141,22 +157,43 @@ export function ViewPage() {
           </div>
         )}
         <Card className="p-6 relative">
-          <pre
-            className={cn(
-              "text-wrap break-words whitespace-pre-wrap font-mono text-sm",
-              !isRevealed && "blur-md select-none",
-            )}
-            role="textbox"
-            aria-label="Secret content"
-          >
-            {query.data?.value}
-          </pre>
-          {!isRevealed && (
-            <div className="absolute inset-0 flex items-center justify-center">
+          {fileData ? (
+            <div className="text-center space-y-4">
               <p className="text-muted-foreground">
-                Click the eye icon above to reveal the secret
+                A file has been shared with you
               </p>
+              <Button
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = fileData.content;
+                  link.download = fileData.name;
+                  link.click();
+                }}
+              >
+                <IconDownload className="h-5 w-5 mr-2" />
+                Download File
+              </Button>
             </div>
+          ) : (
+            <>
+              <pre
+                className={cn(
+                  "text-wrap break-words whitespace-pre-wrap font-mono text-sm",
+                  !isRevealed && "blur-md select-none"
+                )}
+                role="textbox"
+                aria-label="Secret content"
+              >
+                {decryptedContent}
+              </pre>
+              {!isRevealed && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <p className="text-muted-foreground">
+                    Click the eye icon above to reveal the secret
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </Card>
       </>

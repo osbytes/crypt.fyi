@@ -126,7 +126,7 @@ export const config = (() => {
     vaultEntryTTLMsDefault: process.env.VAULT_ENTRY_TTL_MS_DEFAULT,
     vaultEntryIdentifierLength: process.env.VAULT_ENTRY_IDENTIFIER_LENGTH,
     vaultEntryDeleteTokenLength: process.env.VAULT_ENTRY_DELETE_TOKEN_LENGTH,
-    bodyLimit: bytes(process.env.BODY_LIMIT_BYTES ?? '50KB'),
+    bodyLimit: bytes(process.env.BODY_LIMIT_BYTES ?? '100KB'),
     swaggerUIPath: process.env.SWAGGER_UI_PATH,
     corsOrigin,
     corsMethods: process.env.CORS_METHODS,
