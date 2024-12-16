@@ -50,6 +50,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -105,6 +106,8 @@ function svgToImage(svg: SVGElement): Promise<string> {
     img.src = url;
   });
 }
+
+type DragState = "none" | "dragging" | "invalid";
 
 export function CreatePage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -167,6 +170,14 @@ export function CreatePage() {
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFiles = (files: File[]) => {
+    if (files.length > 0) {
+      setSelectedFile(files[0]);
+      form.resetField("c");
+      form.setValue("c", `${files[0].name} (file)`);
+    }
+  };
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     let content = data.c;
@@ -262,8 +273,80 @@ export function CreatePage() {
     }
   };
 
+  const [dragState, setDragState] = useState<DragState>("none");
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.types.includes("Files")) {
+      setDragState("dragging");
+    } else {
+      setDragState("invalid");
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDragState("none");
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.types.includes("Files")) {
+      setDragState("dragging");
+    } else {
+      setDragState("invalid");
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragState("none");
+
+    const files = Array.from(e.dataTransfer.files);
+    handleFiles(files);
+  };
+
   return (
-    <div className="max-w-xl mx-auto">
+    <div
+      className="max-w-xl mx-auto relative"
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      <AnimatePresence>
+        {dragState !== "none" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={cn(
+              "absolute inset-0 border-2 border-dashed rounded-lg z-50 flex items-center justify-center backdrop-blur-sm",
+              dragState === "dragging"
+                ? "border-primary bg-primary/5"
+                : "border-destructive bg-destructive/5",
+            )}
+          >
+            <p
+              className={cn(
+                "text-2xl font-medium",
+                dragState === "dragging" ? "text-primary" : "text-destructive",
+              )}
+            >
+              {dragState === "dragging"
+                ? "Drop file here"
+                : "Invalid file type"}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence mode="wait">
         {!isSubmitSuccessful ? (
           <motion.div
@@ -277,16 +360,6 @@ export function CreatePage() {
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={async (e) => {
-                    e.preventDefault();
-                    const files = Array.from(e.dataTransfer.files);
-                    if (files.length > 0) {
-                      setSelectedFile(files[0]);
-                      form.resetField("c");
-                      form.setValue("c", `${files[0].name} (file)`);
-                    }
-                  }}
                   className="space-y-4"
                 >
                   <FormField
@@ -346,12 +419,8 @@ export function CreatePage() {
                               type="file"
                               ref={fileInputRef}
                               onChange={(e) => {
-                                const files = e.target.files;
-                                if (files?.length) {
-                                  setSelectedFile(files[0]);
-                                  form.resetField("c");
-                                  form.setValue("c", `${files[0].name} (file)`);
-                                }
+                                const files = Array.from(e.target.files ?? []);
+                                handleFiles(files);
                               }}
                               className="absolute inset-0 opacity-0 w-0 h-0"
                               disabled={
