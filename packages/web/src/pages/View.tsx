@@ -16,9 +16,17 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { sleep } from "@/lib/sleep";
 import { sha256 } from "@/lib/hash";
-import { IconEye, IconEyeOff, IconCopy, IconFlame, IconDownload } from "@tabler/icons-react";
+import {
+  IconEye,
+  IconEyeOff,
+  IconCopy,
+  IconFlame,
+  IconDownload,
+  IconClock,
+} from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { clipboardCopy } from "@/lib/clipboardCopy";
+import { formatDistanceToNow } from "date-fns";
 
 export function ViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -43,13 +51,15 @@ export function ViewPage() {
           const result = await (res.json() as Promise<{
             c: string;
             b: boolean;
+            cd: number;
+            ttl: number;
           }>);
 
           try {
             const decrypted = isPasswordSet
               ? await decrypt(result.c, password).then((d) => decrypt(d, key))
               : await decrypt(result.c, key);
-            return { value: decrypted, burned: result.b };
+            return { value: decrypted, burned: result.b, cd: result.cd, ttl: result.ttl };
           } catch (error) {
             throw new DecryptError(error);
           }
@@ -101,11 +111,11 @@ export function ViewPage() {
   let content = null;
   if (query.data) {
     const decryptedContent = query.data.value;
-    let fileData: { type: 'file'; name: string; content: string } | null = null;
+    let fileData: { type: "file"; name: string; content: string } | null = null;
 
     try {
       const parsed = JSON.parse(decryptedContent);
-      if (parsed.type === 'file') {
+      if (parsed.type === "file") {
         fileData = parsed;
       }
     } catch {
@@ -145,15 +155,24 @@ export function ViewPage() {
             </>
           )}
         </div>
-        {query.data.burned && (
+        {query.data && (
           <div className="flex justify-center">
-            <div className="grid grid-cols-[auto_1fr] items-center gap-2 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-lg p-2 mb-2">
-              <IconFlame className="h-4 w-4" />
-              <p className="text-xs">
-                This secret was deleted after your viewing and is no longer
-                available after leaving the page.
-              </p>
-            </div>
+            {query.data.burned ? (
+              <div className="grid grid-cols-[auto_1fr] items-center gap-2 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-lg p-2 mb-2">
+                <IconFlame className="h-4 w-4" />
+                <p className="text-xs">
+                  This secret was deleted after your viewing and is no longer
+                  available after leaving the page.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-[auto_1fr] items-center gap-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg p-2 mb-2">
+                <IconClock className="h-4 w-4" />
+                <p className="text-xs">
+                  Expires {formatDistanceToNow(new Date(query.data.cd + query.data.ttl), { addSuffix: true })}
+                </p>
+              </div>
+            )}
           </div>
         )}
         <Card className="p-6 relative">
@@ -164,7 +183,7 @@ export function ViewPage() {
               </p>
               <Button
                 onClick={() => {
-                  const link = document.createElement('a');
+                  const link = document.createElement("a");
                   link.href = fileData.content;
                   link.download = fileData.name;
                   link.click();
@@ -179,7 +198,7 @@ export function ViewPage() {
               <pre
                 className={cn(
                   "text-wrap break-words whitespace-pre-wrap font-mono text-sm",
-                  !isRevealed && "blur-md select-none"
+                  !isRevealed && "blur-md select-none",
                 )}
                 role="textbox"
                 aria-label="Secret content"
