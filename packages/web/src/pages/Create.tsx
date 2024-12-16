@@ -51,6 +51,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import parseDuration from "parse-duration";
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -88,6 +89,16 @@ const ttlOptions = [
 ];
 const DEFAULT_TTL = 30 * MINUTE;
 
+function findClosestTTL(duration: number): number {
+  if (duration <= 0) return DEFAULT_TTL;
+
+  return ttlOptions.reduce((prev, curr) => {
+    const prevDiff = Math.abs(prev - duration);
+    const currDiff = Math.abs(curr.value - duration);
+    return currDiff < prevDiff ? curr.value : prev;
+  }, DEFAULT_TTL);
+}
+
 function svgToImage(svg: SVGElement): Promise<string> {
   return new Promise((resolve) => {
     const canvas = document.createElement("canvas");
@@ -113,15 +124,31 @@ function svgToImage(svg: SVGElement): Promise<string> {
 
 type DragState = "none" | "dragging" | "invalid";
 
+function getInitialValues() {
+  const params = new URLSearchParams(window.location.search);
+  const ttlParam = params.get("ttl");
+  const burn = params.get("burn");
+
+  let ttl = DEFAULT_TTL;
+  if (ttlParam) {
+    const parsed = parseDuration(ttlParam);
+    if (parsed) {
+      ttl = findClosestTTL(parsed);
+    }
+  }
+
+  return {
+    c: "",
+    p: "",
+    b: burn !== null ? burn === "true" : true,
+    ttl,
+  };
+}
+
 export function CreatePage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      c: "",
-      p: "",
-      b: true,
-      ttl: DEFAULT_TTL,
-    },
+    defaultValues: getInitialValues(),
   });
 
   const createMutation = useMutation({

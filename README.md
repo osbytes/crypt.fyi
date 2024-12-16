@@ -9,6 +9,8 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 - 🔥 Burn after reading option
 - ⏰ Automatic expiration (Time-To-Live)
 - 🔑 Optional password protection
+- 📁 File sharing support w/ drag and drop
+- 📱 QR code generation
 
 ## How It Works
 
