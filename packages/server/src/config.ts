@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import bytes from 'bytes';
+import parseBytes from 'bytes';
+import parseDuration from 'parse-duration';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -39,7 +40,7 @@ const configSchema = z.object({
   logLevel: z.enum(logLevels).default('info').describe('log level'),
   rateLimitMax: z
     .number({ coerce: true })
-    .default(100)
+    .default(10)
     .describe("max requests per 'rate limit time window'"),
   rateLimitWindowMs: z
     .number({ coerce: true })
@@ -118,7 +119,9 @@ export const config = (() => {
     env,
     logLevel: process.env.LOG_LEVEL,
     rateLimitMax: process.env.RATE_LIMIT_MAX,
-    rateLimitWindowMs: process.env.RATE_LIMIT_WINDOW_MS,
+    rateLimitWindowMs: process.env.RATE_LIMIT_WINDOW
+      ? parseDuration(process.env.RATE_LIMIT_WINDOW)
+      : undefined,
     rateLimitNameSpace: process.env.RATE_LIMIT_NAMESPACE,
     redisUrl: process.env.REDIS_URL,
     vaultEntryTTLMsMin: process.env.VAULT_ENTRY_TTL_MS_MIN,
@@ -126,7 +129,7 @@ export const config = (() => {
     vaultEntryTTLMsDefault: process.env.VAULT_ENTRY_TTL_MS_DEFAULT,
     vaultEntryIdentifierLength: process.env.VAULT_ENTRY_IDENTIFIER_LENGTH,
     vaultEntryDeleteTokenLength: process.env.VAULT_ENTRY_DELETE_TOKEN_LENGTH,
-    bodyLimit: bytes(process.env.BODY_LIMIT_BYTES ?? '100KB'),
+    bodyLimit: parseBytes(process.env.BODY_LIMIT_BYTES ?? '100KB'),
     swaggerUIPath: process.env.SWAGGER_UI_PATH,
     corsOrigin,
     corsMethods: process.env.CORS_METHODS,
