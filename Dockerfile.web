@@ -5,11 +5,18 @@ ENV VITE_API_URL=${VITE_API_URL}
 
 WORKDIR /app
 
+# Copy package files first
+COPY package.json yarn.lock ./
+COPY packages/web/package.json ./packages/web/
+
+# Install dependencies
+RUN yarn install
+RUN cd packages/web && yarn install
+
+# Then copy source files
 COPY . .
 
-RUN yarn install
-
-RUN cd packages/web && yarn install
+# Build the application
 RUN cd packages/web && yarn build
 
 FROM nginx:alpine
