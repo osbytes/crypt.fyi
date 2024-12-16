@@ -6,11 +6,11 @@ COPY package.json yarn.lock ./
 COPY packages/server/package.json ./packages/server/
 
 RUN yarn install
-
 RUN cd packages/server && yarn install
-RUN cd packages/server && yarn build
 
 COPY . .
+
+RUN cd packages/server && yarn build
 
 FROM node:22-alpine
 
