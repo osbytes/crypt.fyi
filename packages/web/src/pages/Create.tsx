@@ -55,7 +55,6 @@ import { cn } from "@/lib/utils";
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
 const DAY = HOUR * 24;
-const WEEK = DAY * 7;
 
 const formSchema = z
   .object({
@@ -79,10 +78,15 @@ const formSchema = z
 
 const ttlOptions = [
   { label: "5 minutes", value: 5 * MINUTE },
+  { label: "30 minutes", value: 30 * MINUTE },
   { label: "1 hour", value: HOUR },
+  { label: "4 hours", value: 4 * HOUR },
+  { label: "12 hours", value: 12 * HOUR },
   { label: "1 day", value: DAY },
-  { label: "1 week", value: WEEK },
+  { label: "3 days", value: 3 * DAY },
+  { label: "7 days", value: 7 * DAY },
 ];
+const DEFAULT_TTL = 30 * MINUTE;
 
 function svgToImage(svg: SVGElement): Promise<string> {
   return new Promise((resolve) => {
@@ -116,7 +120,7 @@ export function CreatePage() {
       c: "",
       p: "",
       b: true,
-      ttl: HOUR,
+      ttl: DEFAULT_TTL,
     },
   });
 
