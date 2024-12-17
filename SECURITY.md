@@ -5,6 +5,7 @@
 We take the security of crypt.fyi seriously. If you believe you have found a security vulnerability, please report it to us through one of the following channels:
 
 1. **GitHub Security Advisory** (Preferred Method)
+
    - Visit our [Security Advisory page](https://github.com/osbytes/crypt.fyi/security/advisories/new)
    - This provides a secure, private channel to discuss and fix vulnerabilities
    - Allows for coordinated disclosure
