@@ -2,11 +2,20 @@
 
 ## Reporting a Vulnerability
 
-We take the security of crypt.fyi seriously. If you believe you have found a security vulnerability, please report it to us as described below.
+We take the security of crypt.fyi seriously. If you believe you have found a security vulnerability, please report it to us through one of the following channels:
+
+1. **GitHub Security Advisory** (Preferred Method)
+   - Visit our [Security Advisory page](https://github.com/osbytes/crypt.fyi/security/advisories/new)
+   - This provides a secure, private channel to discuss and fix vulnerabilities
+   - Allows for coordinated disclosure
+   - Enables direct collaboration with maintainers
+
+2. **Email**
+   If you prefer email communication, you can reach us at [hi+security@crypt.fyi.com](mailto:hi+security@crypt.fyi.com)
 
 **Please do NOT report security vulnerabilities through public GitHub issues.**
 
-Instead, please report them via email to [hi+security@crypt.fyi.com](mailto:hi+security@crypt.fyi.com). You should receive a response within 48 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
+You should receive a response within 48 hours. If for some reason you do not, please follow up to ensure we received your original message.
 
 Please include the following information in your report:
 
