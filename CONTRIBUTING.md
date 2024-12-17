@@ -21,6 +21,7 @@ By participating in this project, you agree to maintain a respectful and constru
 ## Development Setup
 
 1. Install dependencies:
+
    ```bash
    yarn install
    ```
