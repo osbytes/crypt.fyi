@@ -12,7 +12,7 @@ We take the security of crypt.fyi seriously. If you believe you have found a sec
    - Enables direct collaboration with maintainers
 
 2. **Email**
-   If you prefer email communication, you can reach us at [hi+security@crypt.fyi.com](mailto:hi+security@crypt.fyi.com)
+   If you prefer email communication, you can reach us at [hi+security@crypt.fyi](mailto:hi+security@crypt.fyi)
 
 **Please do NOT report security vulnerabilities through public GitHub issues.**
 

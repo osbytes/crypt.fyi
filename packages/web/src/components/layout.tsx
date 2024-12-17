@@ -80,7 +80,7 @@ export function Layout() {
                   GitHub
                 </a>
                 {/* <a 
-                  href="mailto:hi@crypt.fyi.com"
+                  href="mailto:hi@crypt.fyi"
                   className="text-sm text-muted-foreground hover:text-foreground"
                 >
                   Contact
