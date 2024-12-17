@@ -92,7 +92,7 @@ When reporting issues, please include:
 5. Environment details (OS, browser version, etc.)
 6. Screenshots if applicable
 
-For security vulnerabilities, please do NOT create a public issue. Instead, email security@crypt.fyi directly.
+For security vulnerabilities, please do NOT create a public issue. Instead, reference [SECURITY.md](SECURITY.md).
 
 ## Review Process
 
@@ -112,7 +112,6 @@ By contributing to crypt.fyi, you agree that your contributions will be licensed
 If you have questions about contributing, feel free to:
 
 1. Open a GitHub Discussion
-2. Join our community chat
-3. Email contributors@crypt.fyi
+2. Email hi+contributors@crypt.fyi
 
 Thank you for helping make crypt.fyi better!
