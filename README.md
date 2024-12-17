@@ -68,17 +68,20 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 ## Known Issues & Development Considerations
 
 ### Content Security Policy
+
 - The toast notification library (sonner) requires specific style-src hashes in the CSP configuration
 - These hashes are defined in `nginx/nginx.conf`
 - Updates to sonner may require updating these hashes
 - Reference: [sonner#449](https://github.com/emilkowalski/sonner/issues/449)
 
 ### Development Environment
+
 - Ensure Redis is running locally when developing the server
 - The web client expects the API to be available at `http://localhost:4321` by default
 - CSP headers in development may differ from production configuration
 
 ### Security Considerations
+
 - Always test encryption/decryption flows thoroughly when making changes
 - Ensure no sensitive data is logged or exposed in error messages
 - Maintain strict CSP headers to prevent XSS vulnerabilities

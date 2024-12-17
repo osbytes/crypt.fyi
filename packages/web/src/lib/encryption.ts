@@ -1,88 +1,83 @@
-import { Buffer } from "buffer";
+import { Buffer } from 'buffer';
 
 export async function encrypt(content: string, password: string) {
   const encoder = new TextEncoder();
   const data = encoder.encode(content);
 
   const passwordKey = await window.crypto.subtle.importKey(
-    "raw",
+    'raw',
     encoder.encode(password),
-    { name: "PBKDF2" },
+    { name: 'PBKDF2' },
     false,
-    ["deriveKey"],
+    ['deriveKey'],
   );
 
   const salt = window.crypto.getRandomValues(new Uint8Array(16));
 
   const aesKey = await window.crypto.subtle.deriveKey(
     {
-      name: "PBKDF2",
+      name: 'PBKDF2',
       salt: salt,
       iterations: 100000,
-      hash: "SHA-256",
+      hash: 'SHA-256',
     },
     passwordKey,
-    { name: "AES-GCM", length: 256 },
+    { name: 'AES-GCM', length: 256 },
     true,
-    ["encrypt"],
+    ['encrypt'],
   );
 
   const iv = window.crypto.getRandomValues(new Uint8Array(12));
   const encryptedData = await window.crypto.subtle.encrypt(
     {
-      name: "AES-GCM",
+      name: 'AES-GCM',
       iv: iv,
     },
     aesKey,
     data,
   );
 
-  const encryptedBytes = new Uint8Array(
-    salt.byteLength + iv.byteLength + encryptedData.byteLength,
-  );
+  const encryptedBytes = new Uint8Array(salt.byteLength + iv.byteLength + encryptedData.byteLength);
   encryptedBytes.set(salt, 0);
   encryptedBytes.set(iv, salt.byteLength);
-  encryptedBytes.set(
-    new Uint8Array(encryptedData),
-    salt.byteLength + iv.byteLength,
-  );
+  encryptedBytes.set(new Uint8Array(encryptedData), salt.byteLength + iv.byteLength);
 
-  return Buffer.from(encryptedBytes).toString("base64");
+  return Buffer.from(encryptedBytes).toString('base64');
 }
 
 export async function decrypt(content: string, password: string) {
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
-  const encryptedBytes = Buffer.from(content, "base64");
+  const encryptedBytes = Buffer.from(content, 'base64');
 
   const salt = encryptedBytes.subarray(0, 16);
   const iv = encryptedBytes.subarray(16, 28);
   const encryptedData = encryptedBytes.subarray(28);
 
   const passwordKey = await window.crypto.subtle.importKey(
-    "raw",
+    'raw',
     encoder.encode(password),
-    { name: "PBKDF2" },
+    { name: 'PBKDF2' },
     false,
-    ["deriveKey"],
+    ['deriveKey'],
   );
 
   const aesKey = await window.crypto.subtle.deriveKey(
     {
-      name: "PBKDF2",
+      name: 'PBKDF2',
       salt: salt,
       iterations: 100000,
-      hash: "SHA-256",
+      hash: 'SHA-256',
     },
     passwordKey,
-    { name: "AES-GCM", length: 256 },
+    { name: 'AES-GCM', length: 256 },
     true,
-    ["decrypt"],
+    ['decrypt'],
   );
 
   const decryptedData = await window.crypto.subtle.decrypt(
     {
-      name: "AES-GCM",
+      name: 'AES-GCM',
       iv: iv,
     },
     aesKey,
@@ -102,16 +97,15 @@ export async function generateRandomBytes(length: number) {
 export async function generateRandomHexString(length: number): Promise<string> {
   const randomBytes = await generateRandomBytes(length);
   return Array.from(randomBytes)
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
 }
 
-const dictionary =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+const dictionary = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 export async function generateRandomString(length: number): Promise<string> {
   const dictionaryLength = dictionary.length;
   const randomBytes = await generateRandomBytes(length);
-  let randomString = "";
+  let randomString = '';
 
   for (let i = 0; i < length; i++) {
     const randomIndex = randomBytes[i] % dictionaryLength;

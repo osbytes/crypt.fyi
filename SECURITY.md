@@ -21,11 +21,13 @@ Please include the following information in your report:
 ## Best Practices
 
 ### Data Protection
+
 - All sensitive data is encrypted on the client, in transit, and at rest
 - No server-side logging of sensitive data
 - Zero-Trust architecture
 
 ### Development Practices
+
 - Dependencies are regularly updated and monitored for vulnerabilities
 - Code changes undergo security review before deployment
 
@@ -33,4 +35,4 @@ Please include the following information in your report:
 
 We would like to thank the following individuals who have contributed to the security of crypt.fyi through responsible disclosure:
 
-*This section will be updated as contributions are received.*
+_This section will be updated as contributions are received._

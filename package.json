@@ -4,7 +4,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"docker compose up redis\" \"yarn workspace @crypt.fyi/server dev\" \"yarn workspace @crypt.fyi/web dev\""
+    "dev": "concurrently \"docker compose up redis\" \"yarn workspace @crypt.fyi/server dev\" \"yarn workspace @crypt.fyi/web dev\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "concurrently": "^9.1.0",

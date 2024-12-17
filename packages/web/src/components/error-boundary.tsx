@@ -1,6 +1,6 @@
-import { Component, ErrorInfo, ReactNode } from "react";
-import { Button } from "./ui/button";
-import { Link } from "react-router-dom";
+import { Component, ErrorInfo, ReactNode } from 'react';
+import { Button } from './ui/button';
+import { Link } from 'react-router-dom';
 
 interface Props {
   children: ReactNode;
@@ -21,7 +21,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+    console.error('Uncaught error:', error, errorInfo);
   }
 
   public render() {
@@ -31,7 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="text-center p-4">
             <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
             <p className="text-muted-foreground mb-4">
-              {this.state.error?.message || "An unexpected error occurred"}
+              {this.state.error?.message || 'An unexpected error occurred'}
             </p>
             <div className="flex flex-col gap-2">
               <Button
