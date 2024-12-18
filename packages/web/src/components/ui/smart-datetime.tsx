@@ -449,7 +449,7 @@ const DateTimeLocalInput = ({ className, ...props }: DateTimeLocalInputProps) =>
   const { value, onValueChange, Time } = useSmartDateInput();
 
   const formateSelectedDate = React.useCallback(
-    (_date: Date | undefined, selectedDate: Date, _m: any, _e: React.MouseEvent) => {
+    (selectedDate: Date) => {
       const parsedDateTime = parseDateTime(selectedDate);
 
       if (parsedDateTime) {
