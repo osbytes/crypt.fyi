@@ -16,13 +16,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { config } from '@/config';
@@ -47,6 +40,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import parseDuration from 'parse-duration';
+import { SmartDatetimeInput } from '@/components/ui/smart-datetime';
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -468,24 +462,16 @@ export function CreatePage() {
                       <FormItem>
                         <FormLabel>Time to live</FormLabel>
                         <FormControl>
-                          <Select
+                          <SmartDatetimeInput
                             onValueChange={(v) => {
-                              field.onChange(Number(v));
+                              const now = Date.now();
+                              const selectedTime = v.getTime();
+                              const milliseconds = selectedTime - now;
+
+                              field.onChange(milliseconds);
                             }}
-                            defaultValue={field.value?.toString()}
-                            disabled={createMutation.isPending || field.disabled}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select expiration time" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {ttlOptions.map(({ label, value }) => (
-                                <SelectItem key={value} value={value.toString()}>
-                                  {label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            value={field.value < 0 ? new Date(field.value) : undefined}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
