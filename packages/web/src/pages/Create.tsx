@@ -63,7 +63,7 @@ const formSchema = z
     b: z.boolean().default(true).describe('burn after reading'),
     p: z.string().default('').describe('password').optional(),
     ttl: z.number({ coerce: true }).default(HOUR).describe('time to live (TTL) in milliseconds'),
-    ip: z
+    ips: z
       .string()
       .default('')
       .describe('IP address or CIDR block restrictions')
@@ -178,7 +178,7 @@ function getInitialValues() {
     p: '',
     b: burn !== null ? burn === 'true' : true,
     ttl,
-    ip: '',
+    ips: '',
   };
 }
 
@@ -208,7 +208,7 @@ export function CreatePage() {
           h,
           b: input.b,
           ttl: input.ttl,
-          ip: input.ip ? input.ip.split(',').map((ip) => ip.trim()) : undefined,
+          ips: input.ips,
         }),
       });
 
@@ -575,10 +575,10 @@ export function CreatePage() {
                             <div className="space-y-4 pt-4">
                               <FormField
                                 control={form.control}
-                                name="ip"
+                                name="ips"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>IP Allow-list</FormLabel>
+                                    <FormLabel>IP/CIDR Allow-list</FormLabel>
                                     <FormControl>
                                       <Input
                                         type="text"
@@ -707,13 +707,13 @@ export function CreatePage() {
                       <p className="text-muted-foreground">Password protected</p>
                     </>
                   )}
-                  {form.watch('ip') && (
+                  {form.watch('ips') && (
                     <>
                       <IconNetwork className="text-muted-foreground size-4" />
                       <p className="text-muted-foreground">
-                        IP restricted to:{' '}
+                        IP restriction(s):{' '}
                         {form
-                          .watch('ip')
+                          .watch('ips')
                           ?.split(',')
                           .map((ip) => ip.trim())
                           .join(', ')}

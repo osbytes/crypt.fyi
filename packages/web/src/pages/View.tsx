@@ -22,6 +22,7 @@ import {
 import { cn } from '@/lib/utils';
 import { clipboardCopy } from '@/lib/clipboardCopy';
 import { formatDistanceToNow } from 'date-fns';
+import { Loader } from '@/components/ui/loader';
 
 export function ViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -222,6 +223,8 @@ export function ViewPage() {
         </p>
       </Card>
     );
+  } else if (query.isPending) {
+    content = <Loader />;
   }
 
   return (

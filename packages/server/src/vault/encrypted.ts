@@ -24,8 +24,8 @@ export class EncryptedVault implements Vault {
     return { id, dt };
   }
 
-  async get(id: string, h: string): Promise<Omit<VaultValue, 'dt' | 'h'> | undefined> {
-    const value = await this.vault.get(id, h);
+  async get(id: string, h: string, ip: string): Promise<Omit<VaultValue, 'dt' | 'h'> | undefined> {
+    const value = await this.vault.get(id, h, ip);
     if (!value) {
       return undefined;
     }

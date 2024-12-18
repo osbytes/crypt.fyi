@@ -97,6 +97,7 @@ const configSchema = z.object({
     .string()
     .default(packageJson.description)
     .describe('service description from package.json or env'),
+  maxIpRestrictions: z.number({ coerce: true }).default(3).describe('max IP restrictions'),
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -140,5 +141,6 @@ export const config = (() => {
     serviceName: process.env.SERVICE_NAME,
     serviceVersion: process.env.SERVICE_VERSION,
     serviceDescription: process.env.SERVICE_DESCRIPTION,
+    maxIpRestrictions: process.env.MAX_IP_RESTRICTIONS,
   });
 })();

@@ -8,13 +8,14 @@ import {
 } from './vault';
 import { isDefined } from '../util';
 import { Config } from '../config';
+import { isIpAllowed } from './ips';
 
 export const createRedisVault = (redis: Redis, config: Config): Vault => {
   const getKey = (id: string) => `vault:${id}`;
 
   return {
     async set(value) {
-      const { c, h, b, ttl } = value;
+      const { c, h, b, ttl, ips } = value;
       const { id, dt } = await createTokens(config);
 
       const key = getKey(id);
@@ -29,6 +30,7 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
           dt,
           ttl,
           cd: Date.now(),
+          ips,
         } satisfies VaultValue),
       );
       tx.pexpire(key, ttl);
@@ -48,10 +50,21 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
 
       return { id, dt };
     },
-    async get(id, h) {
+    async get(id, h, ip) {
       const key = getKey(id);
 
-      const result = (await redis.eval(
+      // TODO: try to not pull the full redis entry into memory until the ip address is confirmed to be allowed
+      const result = await redis.get(key);
+      if (!result) {
+        return undefined;
+      }
+
+      const { ips, c, b, ttl, cd } = vaultValueSchema.parse(JSON.parse(result));
+      if (!isIpAllowed(ip, ips)) {
+        return undefined;
+      }
+
+      const outcome = (await redis.eval(
         // https://redis.io/docs/latest/develop/interact/programmability/lua-api/
         // https://redis.io/docs/latest/develop/interact/programmability/lua-api/#cjson-library
         `
@@ -69,20 +82,19 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
     redis.call('del', KEYS[1])
   end
 
-  return value
+  return 1
 `,
         1,
         key,
         h,
-      )) as string | null | 0;
-      if (!result) {
-        if (result === 0) {
+      )) as null | 0 | 1;
+      if (!outcome) {
+        if (outcome === 0) {
           throw new InvalidKeyAndOrPasswordError();
         }
         return undefined;
       }
 
-      const { c, b, ttl, cd } = vaultValueSchema.parse(JSON.parse(result));
       return {
         c,
         b,
