@@ -388,53 +388,51 @@ export function CreatePage() {
                           />
                         </FormControl>
                         <FormMessage />
-                        <FormDescription>
-                          <div className="flex items-center gap-2">
-                            <p
-                              className="flex items-center justify-between cursor-pointer"
-                              onClick={() => fileInputRef.current?.click()}
-                            >
-                              {selectedFile ? (
-                                <span className="flex items-center gap-2">
-                                  File selected: {selectedFile.name} (
-                                  {(selectedFile.size / 1024).toFixed(1)} KB)
-                                </span>
-                              ) : (
-                                'add a file by drag-n-drop or clicking here'
-                              )}
-                            </p>
-                            {selectedFile && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-4 w-4"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setSelectedFile(null);
-                                  form.resetField('c');
-                                  if (fileInputRef.current) {
-                                    fileInputRef.current.value = '';
-                                    fileInputRef.current.files = null;
-                                  }
-                                }}
-                              >
-                                <IconX className="h-3 w-3" />
-                              </Button>
+                        <div className="flex items-center gap-2 text-[0.8rem] text-muted-foreground">
+                          <p
+                            className="flex items-center justify-between cursor-pointer"
+                            onClick={() => fileInputRef.current?.click()}
+                          >
+                            {selectedFile ? (
+                              <span className="flex items-center gap-2">
+                                File selected: {selectedFile.name} (
+                                {(selectedFile.size / 1024).toFixed(1)} KB)
+                              </span>
+                            ) : (
+                              'add a file by drag-n-drop or clicking here'
                             )}
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              onChange={(e) => {
-                                const files = Array.from(e.target.files ?? []);
-                                handleFiles(files);
+                          </p>
+                          {selectedFile && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-4 w-4"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSelectedFile(null);
+                                form.resetField('c');
+                                if (fileInputRef.current) {
+                                  fileInputRef.current.value = '';
+                                  fileInputRef.current.files = null;
+                                }
                               }}
-                              className="absolute inset-0 opacity-0 w-0 h-0"
-                              disabled={createMutation.isPending || field.disabled}
-                            />
-                          </div>
-                        </FormDescription>
+                            >
+                              <IconX className="h-3 w-3" />
+                            </Button>
+                          )}
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files ?? []);
+                              handleFiles(files);
+                            }}
+                            className="absolute inset-0 opacity-0 w-0 h-0"
+                            disabled={createMutation.isPending || field.disabled}
+                          />
+                        </div>
                       </FormItem>
                     )}
                   />
