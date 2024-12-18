@@ -5250,13 +5250,6 @@ ip-address@^9.0.5:
     jsbn "1.1.0"
     sprintf-js "^1.1.3"
 
-ip-cidr@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/ip-cidr/-/ip-cidr-4.0.2.tgz#c41f9e4298fc1fb57cbbd89ee307fb0c21c4d13d"
-  integrity sha512-KifhLKBjdS/hB3TD4UUOalVp1BpzPFvRpgJvXcP0Ya98tuSQTUQ71iI7EW7CKddkBJTYB3GfTWl5eJwpLOXj2A==
-  dependencies:
-    ip-address "^9.0.5"
-
 ip-range-check@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/ip-range-check/-/ip-range-check-0.2.0.tgz#e67f126c8fb36c8f11d4c07d7924b7e364365157"
