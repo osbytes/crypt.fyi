@@ -1,4 +1,4 @@
-# crypt.fyi
+# [crypt.fyi](https://crypt.fyi)
 
 A zero-knowledge, end-to-end encrypted secret sharing platform that enables secure transmission of sensitive information.
 
