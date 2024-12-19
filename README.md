@@ -6,10 +6,12 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 
 - 🔒 End-to-end encryption using AES-256-GCM
 - 🤫 Zero-knowledge architecture - server never sees unencrypted data or decryption keys
-- 🔥 Burn after reading option
+- 🔥 Burn after reading
 - ⏰ Automatic expiration (Time-To-Live)
-- 🔑 Optional password protection
+- 🔑 Password protection
 - 📁 File sharing support w/ drag and drop
+- 🌐 IP/CIDR allow-listing
+- 🔢 Read count limits
 - 📱 QR code generation
 
 ## How It Works
@@ -30,6 +32,11 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 - Cryptographically secure and unique encryption key per secret
 - Optional password protection (layered encryption)
   - Password is not embedded in the URL and is ideally shared/transmitted separately from the URL
+- IP-based access restrictions
+  - Limit access to specific IP addresses or CIDR ranges
+- Configurable read count limits
+  - Set maximum number of times a secret can be accessed
+  - Alternative to burn-after-reading for controlled sharing
 - No server-side logging of sensitive data
 - Automatic data expiration
 - TLS transport encryption
