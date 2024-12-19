@@ -15,7 +15,7 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
 
   return {
     async set(value) {
-      const { c, h, b, ttl, ips } = value;
+      const { c, h, b, ttl, ips, rc } = value;
       const { id, dt } = await createTokens(config);
 
       const key = getKey(id);
@@ -31,6 +31,7 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
           ttl,
           cd: Date.now(),
           ips,
+          rc,
         } satisfies VaultValue),
       );
       tx.pexpire(key, ttl);
@@ -76,6 +77,27 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
   local data = cjson.decode(value)
   if data.h ~= ARGV[1] then
     return 0
+  end
+
+  -- Handle read count logic
+  if data.rc then
+    data.rc = data.rc - 1
+    if data.rc <= 0 then
+      redis.call('del', KEYS[1])
+    else
+      -- Get the remaining TTL before updating
+      local remainingTTL = redis.call('pttl', KEYS[1])
+      if remainingTTL > 0 then
+        -- Update the stored value with decremented rc
+        redis.call('set', KEYS[1], cjson.encode(data))
+        -- Restore the remaining TTL
+        redis.call('pexpire', KEYS[1], remainingTTL)
+      else
+        -- If TTL has expired or is invalid, delete the key
+        redis.call('del', KEYS[1])
+      end
+    end
+    return 1
   end
 
   if data.b == true then

@@ -171,6 +171,96 @@ tap.test('app', async (t) => {
     t.equal(verifyResponse.statusCode, 404, 'Subsequent request should fail');
   });
 
+  t.test(
+    'only "read count" number of clients receive vault entry during concurrent requests',
+    async (t) => {
+      const readCount = 3;
+      const createResponse = await client.request({
+        method: 'POST',
+        path: '/vault',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          c: 'secret-content',
+          ttl: 5000,
+          h: 'abc123',
+          b: false,
+          rc: readCount,
+        }),
+      });
+
+      t.equal(createResponse.statusCode, 201);
+      const { id } = (await createResponse.body.json()) as Record<string, unknown>;
+      t.equal(typeof id, 'string');
+
+      const config = {
+        ...baseConfig,
+        healthCheckEndpoint: '/some-health-check-endpoint',
+        vaultEntryTTLMsDefault: 1000,
+        rateLimitMax: 100,
+      } satisfies Config;
+      const logger = pino({ enabled: false });
+      const redis = new Redis();
+      const vault = createRedisVault(redis, config);
+      const app = await initApp(config, {
+        logger,
+        vault,
+        redis,
+      });
+      await app.fastify.listen();
+      const baseUrl = `http://localhost:${(app.fastify.server.address() as AddressInfo).port}`;
+      const numClients = 5;
+      const clients = Array.from({ length: numClients }, () => new Client(baseUrl));
+      t.teardown(() => {
+        app.shutdown();
+        app.fastify.close();
+        clients.forEach((c) => c.close());
+      });
+
+      const responses = await Promise.all(
+        clients.map((client) =>
+          client
+            .request({
+              method: 'GET',
+              path: `/vault/${id}?h=abc123`,
+            })
+            .then(async (response) => ({
+              status: response.statusCode,
+              body:
+                response.statusCode === 200
+                  ? ((await response.body.json()) as Record<string, unknown>)
+                  : null,
+            })),
+        ),
+      );
+
+      const successfulResponses = responses.filter((r) => r.status === 200);
+      t.equal(successfulResponses.length, readCount, `Only ${readCount} request should succeed`);
+
+      successfulResponses.forEach((response) => {
+        t.equal(
+          response.body?.c,
+          'secret-content',
+          'Successful response should have correct content',
+        );
+        t.equal(response.body?.b, false, 'Successful response should not indicate burn status');
+      });
+
+      const failedResponses = responses.filter((r) => r.status !== 200);
+      t.equal(failedResponses.length, numClients - readCount, 'All other requests should fail');
+      failedResponses.forEach((response) => {
+        t.equal(response.status, 404, 'Failed requests should return 404');
+      });
+
+      const verifyResponse = await client.request({
+        method: 'GET',
+        path: `/vault/${id}?h=abc123`,
+      });
+      t.equal(verifyResponse.statusCode, 404, 'Subsequent request should fail');
+    },
+  );
+
   t.test('deletes vault entry', async (t) => {
     const createResponse = await client.request({
       method: 'POST',

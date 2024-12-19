@@ -102,6 +102,13 @@ const formSchema = z
 
         return true;
       }),
+    rc: z
+      .number({ coerce: true })
+      .optional()
+      .describe('maximum number of times the secret can be read')
+      .refine((val) => !val || (val >= 2 && val <= 10), {
+        message: 'Read count must be between 2 and 10',
+      }),
   })
   .superRefine((data, ctx) => {
     if (data.c.length === 0) {
@@ -109,6 +116,13 @@ const formSchema = z
         code: z.ZodIssueCode.custom,
         path: ['c'],
         message: 'Content is required',
+      });
+    }
+    if (data.b && data.rc) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['rc'],
+        message: 'Read count cannot be used with burn after reading',
       });
     }
   });
@@ -179,6 +193,7 @@ function getInitialValues() {
     b: burn !== null ? burn === 'true' : true,
     ttl,
     ips: '',
+    rc: undefined,
   };
 }
 
@@ -209,6 +224,7 @@ export function CreatePage() {
           b: input.b,
           ttl: input.ttl,
           ips: input.ips,
+          rc: input.rc,
         }),
       });
 
@@ -578,7 +594,7 @@ export function CreatePage() {
                                 name="ips"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>IP/CIDR Allow-list</FormLabel>
+                                    <FormLabel>IP/CIDR allow-list</FormLabel>
                                     <FormControl>
                                       <Input
                                         type="text"
@@ -591,6 +607,30 @@ export function CreatePage() {
                                       Restrict access to specific IP addresses or CIDR blocks (comma
                                       separated)
                                     </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name="rc"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Read count</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        type="number"
+                                        placeholder="Maximum number of times the secret can be read"
+                                        {...field}
+                                        onChange={(e) => {
+                                          form.setValue('b', !e.target.value);
+                                          field.onChange(e.target.value);
+                                        }}
+                                        disabled={createMutation.isPending || !!field.disabled}
+                                        min={2}
+                                        max={10}
+                                      />
+                                    </FormControl>
                                     <FormMessage />
                                   </FormItem>
                                 )}
@@ -718,6 +758,12 @@ export function CreatePage() {
                           .map((ip) => ip.trim())
                           .join(', ')}
                       </p>
+                    </>
+                  )}
+                  {form.watch('rc') && (
+                    <>
+                      <IconEye className="text-muted-foreground size-4" />
+                      <p className="text-muted-foreground">Read count: {form.watch('rc')}</p>
                     </>
                   )}
                 </div>

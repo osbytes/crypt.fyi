@@ -98,6 +98,7 @@ const configSchema = z.object({
     .default(packageJson.description)
     .describe('service description from package.json or env'),
   maxIpRestrictions: z.number({ coerce: true }).default(3).describe('max IP restrictions'),
+  maxReadCount: z.number({ coerce: true }).default(10).describe('max read count'),
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -142,5 +143,6 @@ export const config = (() => {
     serviceVersion: process.env.SERVICE_VERSION,
     serviceDescription: process.env.SERVICE_DESCRIPTION,
     maxIpRestrictions: process.env.MAX_IP_RESTRICTIONS,
+    maxReadCount: process.env.MAX_READ_COUNT,
   });
 })();

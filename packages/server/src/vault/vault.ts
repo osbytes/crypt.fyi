@@ -13,6 +13,7 @@ export const vaultValueSchema = z.object({
   ttl: z.number().describe('time to live (TTL) in milliseconds'),
   cd: z.number().describe('created date time'),
   ips: z.string().describe('ip/cidr allow-list').optional(),
+  rc: z.number().describe('maximum number of times the secret can be read').optional(),
 });
 export type VaultValue = z.infer<typeof vaultValueSchema>;
 
