@@ -12,12 +12,13 @@ export const vaultValueSchema = z.object({
   dt: z.string().describe('delete token'),
   ttl: z.number().describe('time to live (TTL) in milliseconds'),
   cd: z.number().describe('created date time'),
+  ips: z.string().describe('ip/cidr allow-list').optional(),
 });
 export type VaultValue = z.infer<typeof vaultValueSchema>;
 
 export interface Vault {
   set(value: Omit<VaultValue, 'dt' | 'cd'> & { ttl: number }): Promise<{ id: string; dt: string }>;
-  get(id: string, h: string): Promise<Omit<VaultValue, 'dt' | 'h'> | undefined>;
+  get(id: string, h: string, ip: string): Promise<Omit<VaultValue, 'dt' | 'h'> | undefined>;
   del(id: string, dt: string): Promise<boolean>;
 }
 

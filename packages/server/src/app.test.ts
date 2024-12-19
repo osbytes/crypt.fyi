@@ -13,6 +13,7 @@ const initAppTest = async (t: Test) => {
     ...baseConfig,
     healthCheckEndpoint: '/some-health-check-endpoint',
     vaultEntryTTLMsDefault: 1000,
+    rateLimitMax: 100,
   } satisfies Config;
   const logger = pino({ enabled: false });
   const redis = new Redis();
@@ -109,6 +110,7 @@ tap.test('app', async (t) => {
       ...baseConfig,
       healthCheckEndpoint: '/some-health-check-endpoint',
       vaultEntryTTLMsDefault: 1000,
+      rateLimitMax: 100,
     } satisfies Config;
     const logger = pino({ enabled: false });
     const redis = new Redis();

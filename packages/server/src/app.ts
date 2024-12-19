@@ -151,6 +151,45 @@ export const initApp = async (config: Config, deps: AppDeps) => {
           .max(config.vaultEntryTTLMsMax)
           .default(config.vaultEntryTTLMsDefault)
           .describe('time to live (TTL) in milliseconds'),
+        ips: z
+          .string()
+          .default('')
+          .describe('IP address or CIDR block restrictions')
+          .optional()
+          .superRefine((val, ctx) => {
+            if (!val) return true;
+            const ips = val.split(',');
+
+            if (ips.length > config.maxIpRestrictions) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.too_big,
+                maximum: config.maxIpRestrictions,
+                type: 'array',
+                inclusive: true,
+                message: `Too many IP restrictions (max ${config.maxIpRestrictions})`,
+              });
+              return false;
+            }
+
+            for (const ip of ips) {
+              const trimmed = ip.trim();
+              const isValidIP = z.string().ip().safeParse(trimmed).success;
+              const isValidCIDR = z
+                .string()
+                .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
+                .safeParse(trimmed).success;
+
+              if (!isValidIP && !isValidCIDR) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: `Invalid IP address or CIDR block: ${trimmed}`,
+                });
+                return false;
+              }
+            }
+
+            return true;
+          }),
       }),
       response: {
         201: z.object({
@@ -189,7 +228,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     },
     async handler(req, res) {
       try {
-        const result = await vault.get(req.params.vaultId, req.query.h);
+        const result = await vault.get(req.params.vaultId, req.query.h, req.ip);
         if (!result) {
           return res.status(404).send();
         }

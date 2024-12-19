@@ -39,6 +39,8 @@ import {
   IconQrcode,
   IconDownload,
   IconX,
+  IconNetwork,
+  IconChevronDown,
 } from '@tabler/icons-react';
 import { sha256 } from '@/lib/hash';
 import { useRef, useState } from 'react';
@@ -47,10 +49,13 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import parseDuration from 'parse-duration';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
 const DAY = HOUR * 24;
+
+const MAX_IP_RESTRICTIONS = 3;
 
 const formSchema = z
   .object({
@@ -58,6 +63,45 @@ const formSchema = z
     b: z.boolean().default(true).describe('burn after reading'),
     p: z.string().default('').describe('password').optional(),
     ttl: z.number({ coerce: true }).default(HOUR).describe('time to live (TTL) in milliseconds'),
+    ips: z
+      .string()
+      .default('')
+      .describe('IP address or CIDR block restrictions')
+      .optional()
+      .superRefine((val, ctx) => {
+        if (!val) return true;
+        const ips = val.split(',');
+
+        if (ips.length > MAX_IP_RESTRICTIONS) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_big,
+            maximum: MAX_IP_RESTRICTIONS,
+            type: 'array',
+            inclusive: true,
+            message: `Too many IP restrictions (max ${MAX_IP_RESTRICTIONS})`,
+          });
+          return false;
+        }
+
+        for (const ip of ips) {
+          const trimmed = ip.trim();
+          const isValidIP = z.string().ip().safeParse(trimmed).success;
+          const isValidCIDR = z
+            .string()
+            .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
+            .safeParse(trimmed).success;
+
+          if (!isValidIP && !isValidCIDR) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Invalid IP address or CIDR block: ${trimmed}`,
+            });
+            return false;
+          }
+        }
+
+        return true;
+      }),
   })
   .superRefine((data, ctx) => {
     if (data.c.length === 0) {
@@ -134,6 +178,7 @@ function getInitialValues() {
     p: '',
     b: burn !== null ? burn === 'true' : true,
     ttl,
+    ips: '',
   };
 }
 
@@ -163,6 +208,7 @@ export function CreatePage() {
           h,
           b: input.b,
           ttl: input.ttl,
+          ips: input.ips,
         }),
       });
 
@@ -511,6 +557,50 @@ export function CreatePage() {
                       </FormItem>
                     )}
                   />
+                  <div className="space-y-2">
+                    <Collapsible>
+                      <CollapsibleTrigger className="group flex w-full items-center justify-start gap-2 text-sm text-muted-foreground hover:text-foreground">
+                        <IconChevronDown className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                        advanced configuration
+                      </CollapsibleTrigger>
+                      <AnimatePresence initial={false}>
+                        <CollapsibleContent asChild>
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="space-y-4 pt-4">
+                              <FormField
+                                control={form.control}
+                                name="ips"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>IP/CIDR Allow-list</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        type="text"
+                                        placeholder="192.168.1.1, 10.0.0.0/24, etc."
+                                        {...field}
+                                        disabled={createMutation.isPending || field.disabled}
+                                      />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Restrict access to specific IP addresses or CIDR blocks (comma
+                                      separated)
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </motion.div>
+                        </CollapsibleContent>
+                      </AnimatePresence>
+                    </Collapsible>
+                  </div>
                   <div className="flex justify-end">
                     <Button type="submit" isLoading={createMutation.isPending}>
                       <IconLock />
@@ -615,6 +705,19 @@ export function CreatePage() {
                     <>
                       <IconLock className="text-muted-foreground size-4" />
                       <p className="text-muted-foreground">Password protected</p>
+                    </>
+                  )}
+                  {form.watch('ips') && (
+                    <>
+                      <IconNetwork className="text-muted-foreground size-4" />
+                      <p className="text-muted-foreground">
+                        IP restriction(s):{' '}
+                        {form
+                          .watch('ips')
+                          ?.split(',')
+                          .map((ip) => ip.trim())
+                          .join(', ')}
+                      </p>
                     </>
                   )}
                 </div>
