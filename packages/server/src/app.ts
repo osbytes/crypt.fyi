@@ -141,56 +141,80 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     method: 'POST',
     url: '/vault',
     schema: {
-      body: z.object({
-        c: z.string().describe('encrypted content'),
-        h: z.string().describe('sha256 hash of the encryption key + optional password'),
-        b: z.boolean().default(true).describe('burn after reading'),
-        ttl: z
-          .number()
-          .min(config.vaultEntryTTLMsMin)
-          .max(config.vaultEntryTTLMsMax)
-          .default(config.vaultEntryTTLMsDefault)
-          .describe('time to live (TTL) in milliseconds'),
-        ips: z
-          .string()
-          .default('')
-          .describe('IP address or CIDR block restrictions')
-          .optional()
-          .superRefine((val, ctx) => {
-            if (!val) return true;
-            const ips = val.split(',');
+      body: z
+        .object({
+          c: z.string().describe('encrypted content'),
+          h: z.string().describe('sha256 hash of the encryption key + optional password'),
+          b: z.boolean().default(true).describe('burn after reading'),
+          ttl: z
+            .number()
+            .min(config.vaultEntryTTLMsMin)
+            .max(config.vaultEntryTTLMsMax)
+            .default(config.vaultEntryTTLMsDefault)
+            .describe('time to live (TTL) in milliseconds'),
+          ips: z
+            .string()
+            .default('')
+            .describe('IP address or CIDR block restrictions')
+            .optional()
+            .superRefine((val, ctx) => {
+              if (!val) return true;
+              const ips = val.split(',');
 
-            if (ips.length > config.maxIpRestrictions) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.too_big,
-                maximum: config.maxIpRestrictions,
-                type: 'array',
-                inclusive: true,
-                message: `Too many IP restrictions (max ${config.maxIpRestrictions})`,
-              });
-              return false;
-            }
-
-            for (const ip of ips) {
-              const trimmed = ip.trim();
-              const isValidIP = z.string().ip().safeParse(trimmed).success;
-              const isValidCIDR = z
-                .string()
-                .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
-                .safeParse(trimmed).success;
-
-              if (!isValidIP && !isValidCIDR) {
+              if (ips.length > config.maxIpRestrictions) {
                 ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
-                  message: `Invalid IP address or CIDR block: ${trimmed}`,
+                  code: z.ZodIssueCode.too_big,
+                  maximum: config.maxIpRestrictions,
+                  type: 'array',
+                  inclusive: true,
+                  message: `Too many IP restrictions (max ${config.maxIpRestrictions})`,
                 });
                 return false;
               }
-            }
 
-            return true;
-          }),
-      }),
+              for (const ip of ips) {
+                const trimmed = ip.trim();
+                const isValidIP = z.string().ip().safeParse(trimmed).success;
+                const isValidCIDR = z
+                  .string()
+                  .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
+                  .safeParse(trimmed).success;
+
+                if (!isValidIP && !isValidCIDR) {
+                  ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: `Invalid IP address or CIDR block: ${trimmed}`,
+                  });
+                  return false;
+                }
+              }
+
+              return true;
+            }),
+          rc: z
+            .number({ coerce: true })
+            .optional()
+            .describe('maximum number of times the secret can be read')
+            .refine((val) => !val || (val >= 2 && val <= config.maxReadCount), {
+              message: `Read count must be between 2 and ${config.maxReadCount}`,
+            }),
+        })
+        .superRefine((data, ctx) => {
+          if (data.c.length === 0) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ['c'],
+              message: 'Content is required',
+            });
+          }
+          if (data.b && data.rc) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ['rc'],
+              message: 'Read count cannot be used with burn after reading',
+            });
+          }
+        }),
       response: {
         201: z.object({
           id: z.string().describe('vault id'),

@@ -102,12 +102,12 @@ const formSchema = z
 
         return true;
       }),
-    mxR: z
+    rc: z
       .number({ coerce: true })
       .optional()
       .describe('maximum number of times the secret can be read')
       .refine((val) => !val || (val >= 2 && val <= 10), {
-        message: 'Maximum reads must be between 2 and 10',
+        message: 'Read count must be between 2 and 10',
       }),
   })
   .superRefine((data, ctx) => {
@@ -118,11 +118,11 @@ const formSchema = z
         message: 'Content is required',
       });
     }
-    if (data.b && data.mxR) {
+    if (data.b && data.rc) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['mxR'],
-        message: 'Maximum reads cannot be used with burn after reading',
+        path: ['rc'],
+        message: 'Read count cannot be used with burn after reading',
       });
     }
   });
@@ -193,7 +193,7 @@ function getInitialValues() {
     b: burn !== null ? burn === 'true' : true,
     ttl,
     ips: '',
-    mxR: undefined,
+    rc: undefined,
   };
 }
 
@@ -224,6 +224,7 @@ export function CreatePage() {
           b: input.b,
           ttl: input.ttl,
           ips: input.ips,
+          rc: input.rc,
         }),
       });
 
@@ -612,10 +613,10 @@ export function CreatePage() {
                               />
                               <FormField
                                 control={form.control}
-                                name="mxR"
+                                name="rc"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Max reads</FormLabel>
+                                    <FormLabel>Read count</FormLabel>
                                     <FormControl>
                                       <Input
                                         type="number"
@@ -759,10 +760,10 @@ export function CreatePage() {
                       </p>
                     </>
                   )}
-                  {form.watch('mxR') && (
+                  {form.watch('rc') && (
                     <>
                       <IconEye className="text-muted-foreground size-4" />
-                      <p className="text-muted-foreground">Maximum reads: {form.watch('mxR')}</p>
+                      <p className="text-muted-foreground">Read count: {form.watch('rc')}</p>
                     </>
                   )}
                 </div>
