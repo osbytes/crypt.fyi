@@ -1,11 +1,6 @@
 import Redis from 'ioredis';
-import {
-  InvalidKeyAndOrPasswordError,
-  Vault,
-  VaultValue,
-  createTokens,
-  vaultValueSchema,
-} from './vault';
+import { createTokens } from './createTokens';
+import { InvalidKeyAndOrPasswordError, Vault, VaultValue, vaultValueSchema } from '@crypt.fyi/core';
 import { isDefined } from '../util';
 import { Config } from '../config';
 import { isIpAllowed } from './ips';
