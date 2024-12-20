@@ -4,13 +4,19 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"docker compose up redis\" \"yarn workspace @crypt.fyi/server dev\" \"yarn workspace @crypt.fyi/web dev\"",
+    "dev": "concurrently \"yarn redis\" \"turbo dev\"",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "redis": "docker compose up redis"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",
-    "prettier": "3.3.3"
+    "prettier": "3.3.3",
+    "turbo": "^2.3.3"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

@@ -42,20 +42,16 @@ jobs:
 
       - name: Lint
         run: |
-          yarn workspace @crypt.fyi/server lint
-          yarn workspace @crypt.fyi/web lint
+          yarn lint
 
       - name: Type check
         run: |
-          yarn workspace @crypt.fyi/server typecheck
-          yarn workspace @crypt.fyi/web typecheck
+          yarn typecheck
 
       - name: Build
         run: |
-          yarn workspace @crypt.fyi/server build
-          yarn workspace @crypt.fyi/web build
+          yarn build
 
       - name: Test
         run: |
-          yarn workspace @crypt.fyi/server test
-          yarn workspace @crypt.fyi/web test
+          yarn test
