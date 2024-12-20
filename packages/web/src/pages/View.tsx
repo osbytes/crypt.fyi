@@ -2,7 +2,7 @@ import { config } from '@/config';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import invariant from 'tiny-invariant';
-import { decrypt } from '@/lib/encryption';
+import { decrypt } from '@crypt.fyi/core';
 import { Card } from '@/components/ui/card';
 import { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
