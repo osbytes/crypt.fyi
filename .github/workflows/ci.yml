@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: |
+          yarn workspace @crypt.fyi/server lint
+          yarn workspace @crypt.fyi/web lint
+
+      - name: Type check
+        run: |
+          yarn workspace @crypt.fyi/server typecheck
+          yarn workspace @crypt.fyi/web typecheck
+
+      - name: Build
+        run: |
+          yarn workspace @crypt.fyi/server build
+          yarn workspace @crypt.fyi/web build
+
+      - name: Test
+        run: |
+          yarn workspace @crypt.fyi/server test
+          yarn workspace @crypt.fyi/web test
