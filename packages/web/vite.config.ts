@@ -12,4 +12,7 @@ export default defineConfig({
       '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
     },
   },
+  worker: {
+    format: 'es',
+  },
 });

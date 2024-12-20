@@ -6,7 +6,6 @@ import {
   CreateVaultRequest,
   CreateVaultResponse,
   DeleteVaultRequest,
-  encrypt,
   generateRandomString,
 } from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -56,6 +55,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { cn } from '@/lib/utils';
 import parseDuration from 'parse-duration';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useEncryptionWorker } from '@/hooks/useEncryptionWorker';
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -208,6 +208,7 @@ export function CreatePage() {
     defaultValues: getInitialValues(),
   });
 
+  const { encrypt } = useEncryptionWorker();
   const createMutation = useMutation({
     mutationFn: async (input: z.infer<typeof formSchema>) => {
       await sleep(500, { enabled: config.IS_DEV });
@@ -460,8 +461,14 @@ export function CreatePage() {
                         <FormMessage />
                         <div className="flex items-center gap-2 text-[0.8rem] text-muted-foreground">
                           <p
-                            className="flex items-center justify-between cursor-pointer"
-                            onClick={() => fileInputRef.current?.click()}
+                            className={cn(
+                              'flex items-center justify-between cursor-pointer',
+                              createMutation.isPending && 'pointer-events-none',
+                            )}
+                            aria-disabled={createMutation.isPending}
+                            onClick={() =>
+                              !createMutation.isPending && fileInputRef.current?.click()
+                            }
                           >
                             {selectedFile ? (
                               <span className="flex items-center gap-2">
@@ -478,6 +485,7 @@ export function CreatePage() {
                               variant="ghost"
                               size="icon"
                               className="h-4 w-4"
+                              disabled={createMutation.isPending || field.disabled}
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -576,7 +584,7 @@ export function CreatePage() {
                     )}
                   />
                   <div className="space-y-2">
-                    <Collapsible>
+                    <Collapsible disabled={createMutation.isPending}>
                       <CollapsibleTrigger className="group flex w-full items-center justify-start gap-2 text-sm text-muted-foreground hover:text-foreground">
                         <IconChevronDown className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         advanced configuration
