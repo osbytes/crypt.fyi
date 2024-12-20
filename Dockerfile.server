@@ -10,7 +10,7 @@ RUN yarn install
 
 COPY . .
 
-RUN yarn build
+RUN yarn build --filter @crypt.fyi/server
 
 FROM node:22-alpine
 

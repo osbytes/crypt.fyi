@@ -20,7 +20,7 @@ RUN yarn install
 COPY . .
 
 # Build the application
-RUN yarn build
+RUN yarn build --filter @crypt.fyi/web
 
 FROM nginx:alpine
 
