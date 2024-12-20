@@ -2,7 +2,13 @@ import { formatDistance } from 'date-fns';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { CreateVaultRequest, CreateVaultResponse, DeleteVaultRequest } from '@crypt.fyi/core';
+import {
+  CreateVaultRequest,
+  CreateVaultResponse,
+  DeleteVaultRequest,
+  encrypt,
+  generateRandomString,
+} from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Form,
@@ -27,7 +33,6 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { config } from '@/config';
-import { encrypt, generateRandomString } from '@/lib/encryption';
 import { Card } from '@/components/ui/card';
 import { sleep } from '@/lib/sleep';
 import {
