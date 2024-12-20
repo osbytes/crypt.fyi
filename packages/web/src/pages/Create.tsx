@@ -2,6 +2,7 @@ import { formatDistance } from 'date-fns';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { CreateVaultRequest, CreateVaultResponse, DeleteVaultRequest } from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Form,
@@ -224,15 +225,12 @@ export function CreatePage() {
           ttl: input.ttl,
           ips: input.ips,
           rc: input.rc,
-        }),
+        } satisfies CreateVaultRequest),
       });
 
       if (!result.ok) throw new Error('something went wrong');
 
-      const data = await (result.json() as Promise<{
-        id: string;
-        dt: string;
-      }>);
+      const data = await (result.json() as Promise<CreateVaultResponse>);
       const searchParams = new URLSearchParams();
       searchParams.set('key', key);
       if (input.p) {
@@ -293,14 +291,14 @@ export function CreatePage() {
   const { reset } = form;
 
   const deleteMutation = useMutation({
-    mutationFn: async (body: { id: string; dt: string }) => {
+    mutationFn: async ({ id, dt }: { id: string; dt: string }) => {
       await sleep(500, { enabled: config.IS_DEV });
-      const result = await fetch(`${config.API_URL}/vault/${body.id}`, {
+      const result = await fetch(`${config.API_URL}/vault/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ dt } satisfies DeleteVaultRequest),
       });
       if (!result.ok) {
         if (result.status === 404) {

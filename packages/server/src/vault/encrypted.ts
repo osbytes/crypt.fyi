@@ -1,6 +1,6 @@
 import { promisify } from 'node:util';
 import { deflate, inflate } from 'node:zlib';
-import { Vault, VaultValue } from './vault';
+import { Vault, VaultValue } from '@crypt.fyi/core';
 import { encrypt, decrypt } from '../encryption';
 
 const deflateAsync = promisify(deflate);

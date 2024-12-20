@@ -15,7 +15,17 @@ import fastifyRateLimit from '@fastify/rate-limit';
 import { metrics } from '@opentelemetry/api';
 import { Config } from './config';
 import { Logger } from './logging';
-import { InvalidKeyAndOrPasswordError, Vault } from './vault/vault';
+import {
+  createVaultResponseSchema,
+  getVaultResponseSchema,
+  InvalidKeyAndOrPasswordError,
+  Vault,
+  createVaultRequestSchema,
+  getVaultQuerySchema,
+  getVaultParamsSchema,
+  deleteVaultParamsSchema,
+  deleteVaultRequestSchema,
+} from '@crypt.fyi/core';
 import { Redis } from 'ioredis';
 import { BASE_OTEL_ATTRIBUTES } from './telemetry';
 
@@ -141,56 +151,14 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     method: 'POST',
     url: '/vault',
     schema: {
-      body: z
-        .object({
-          c: z.string().describe('encrypted content'),
-          h: z.string().describe('sha256 hash of the encryption key + optional password'),
-          b: z.boolean().default(true).describe('burn after reading'),
+      body: createVaultRequestSchema
+        .extend({
           ttl: z
             .number()
             .min(config.vaultEntryTTLMsMin)
             .max(config.vaultEntryTTLMsMax)
             .default(config.vaultEntryTTLMsDefault)
             .describe('time to live (TTL) in milliseconds'),
-          ips: z
-            .string()
-            .default('')
-            .describe('IP address or CIDR block restrictions')
-            .optional()
-            .superRefine((val, ctx) => {
-              if (!val) return true;
-              const ips = val.split(',');
-
-              if (ips.length > config.maxIpRestrictions) {
-                ctx.addIssue({
-                  code: z.ZodIssueCode.too_big,
-                  maximum: config.maxIpRestrictions,
-                  type: 'array',
-                  inclusive: true,
-                  message: `Too many IP restrictions (max ${config.maxIpRestrictions})`,
-                });
-                return false;
-              }
-
-              for (const ip of ips) {
-                const trimmed = ip.trim();
-                const isValidIP = z.string().ip().safeParse(trimmed).success;
-                const isValidCIDR = z
-                  .string()
-                  .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
-                  .safeParse(trimmed).success;
-
-                if (!isValidIP && !isValidCIDR) {
-                  ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: `Invalid IP address or CIDR block: ${trimmed}`,
-                  });
-                  return false;
-                }
-              }
-
-              return true;
-            }),
           rc: z
             .number({ coerce: true })
             .min(2)
@@ -198,15 +166,47 @@ export const initApp = async (config: Config, deps: AppDeps) => {
             .optional()
             .describe('maximum number of times the secret can be read'),
         })
-        .superRefine((data, ctx) => {
-          if (data.c.length === 0) {
+        .superRefine((val, ctx) => {
+          if (val.ips) {
+            const ips = val.ips.split(',');
+
+            if (ips.length > config.maxIpRestrictions) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.too_big,
+                maximum: config.maxIpRestrictions,
+                type: 'array',
+                inclusive: true,
+                message: `Too many IP restrictions (max ${config.maxIpRestrictions})`,
+              });
+              return false;
+            }
+
+            for (const ip of ips) {
+              const trimmed = ip.trim();
+              const isValidIP = z.string().ip().safeParse(trimmed).success;
+              const isValidCIDR = z
+                .string()
+                .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
+                .safeParse(trimmed).success;
+
+              if (!isValidIP && !isValidCIDR) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: `Invalid IP address or CIDR block: ${trimmed}`,
+                });
+                return false;
+              }
+            }
+          }
+
+          if (val.c.length === 0) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               path: ['c'],
               message: 'Content is required',
             });
           }
-          if (data.b && data.rc !== undefined) {
+          if (val.b && val.rc !== undefined) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               path: ['rc'],
@@ -215,10 +215,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
           }
         }),
       response: {
-        201: z.object({
-          id: z.string().describe('vault id'),
-          dt: z.string().describe('delete token'),
-        }),
+        201: createVaultResponseSchema,
       },
     },
     async handler(req, res) {
@@ -232,19 +229,10 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     method: 'GET',
     url: '/vault/:vaultId',
     schema: {
-      params: z.object({
-        vaultId: z.string(),
-      }),
-      querystring: z.object({
-        h: z.string().describe('sha256 hash of the encryption key + optional password'),
-      }),
+      params: getVaultParamsSchema,
+      querystring: getVaultQuerySchema,
       response: {
-        200: z.object({
-          c: z.string().describe('encrypted content'),
-          b: z.boolean().describe('burn after reading'),
-          ttl: z.number().describe('time to live (TTL) in milliseconds'),
-          cd: z.number().describe('created date time'),
-        }),
+        200: getVaultResponseSchema,
         404: z.null(),
         400: z.null(),
       },
@@ -271,12 +259,8 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     method: 'DELETE',
     url: '/vault/:vaultId',
     schema: {
-      params: z.object({
-        vaultId: z.string(),
-      }),
-      body: z.object({
-        dt: z.string(),
-      }),
+      params: deleteVaultParamsSchema,
+      body: deleteVaultRequestSchema,
       response: {
         200: z.null(),
         404: z.null(),
