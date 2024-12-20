@@ -18,6 +18,7 @@ WORKDIR /app
 
 COPY --from=build /app/packages/server/package.json ./
 COPY --from=build /app/packages/server/dist ./dist
+COPY --from=build /app/packages/server/node_modules ./dist/node_modules
 COPY --from=build /app/node_modules ./node_modules
 
 ENV PORT=4321
