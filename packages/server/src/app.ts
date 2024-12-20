@@ -193,11 +193,10 @@ export const initApp = async (config: Config, deps: AppDeps) => {
             }),
           rc: z
             .number({ coerce: true })
+            .min(2)
+            .max(config.maxReadCount)
             .optional()
-            .describe('maximum number of times the secret can be read')
-            .refine((val) => !val || (val >= 2 && val <= config.maxReadCount), {
-              message: `Read count must be between 2 and ${config.maxReadCount}`,
-            }),
+            .describe('maximum number of times the secret can be read'),
         })
         .superRefine((data, ctx) => {
           if (data.c.length === 0) {
@@ -207,7 +206,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
               message: 'Content is required',
             });
           }
-          if (data.b && data.rc) {
+          if (data.b && data.rc !== undefined) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               path: ['rc'],
