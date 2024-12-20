@@ -40,6 +40,10 @@ jobs:
       - name: Check formatting
         run: yarn format:check
 
+      - name: Build
+        run: |
+          yarn build
+
       - name: Lint
         run: |
           yarn lint
@@ -47,10 +51,6 @@ jobs:
       - name: Type check
         run: |
           yarn typecheck
-
-      - name: Build
-        run: |
-          yarn build
 
       - name: Test
         run: |
