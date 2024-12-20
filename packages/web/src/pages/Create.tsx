@@ -104,11 +104,10 @@ const formSchema = z
       }),
     rc: z
       .number({ coerce: true })
+      .min(2)
+      .max(10)
       .optional()
-      .describe('maximum number of times the secret can be read')
-      .refine((val) => !val || (val >= 2 && val <= 10), {
-        message: 'Read count must be between 2 and 10',
-      }),
+      .describe('maximum number of times the secret can be read'),
   })
   .superRefine((data, ctx) => {
     if (data.c.length === 0) {
@@ -118,7 +117,7 @@ const formSchema = z
         message: 'Content is required',
       });
     }
-    if (data.b && data.rc) {
+    if (data.b && data.rc !== undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['rc'],
@@ -624,7 +623,8 @@ export function CreatePage() {
                                         {...field}
                                         onChange={(e) => {
                                           form.setValue('b', !e.target.value);
-                                          field.onChange(e.target.value);
+                                          // empty string is resulting in 0 for `rc` so convert to undefined
+                                          field.onChange(e.target.value || undefined);
                                         }}
                                         disabled={createMutation.isPending || !!field.disabled}
                                         min={2}
