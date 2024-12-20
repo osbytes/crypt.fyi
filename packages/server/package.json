@@ -35,7 +35,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
     "undici": "^6.11.1",
-    "@crypt.fyi/core": "workspace:*"
+    "@crypt.fyi/core": "*"
   },
   "dependencies": {
     "@fastify/compress": "^7.0.0",

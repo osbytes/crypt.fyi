@@ -38,7 +38,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tiny-invariant": "^1.3.3",
     "zod": "^3.23.8",
-    "@crypt.fyi/core": "workspace:*"
+    "@crypt.fyi/core": "*"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
