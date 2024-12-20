@@ -3,23 +3,21 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 COPY package.json yarn.lock ./
-COPY packages/server/package.json ./packages/server/
+COPY packages/ ./packages/
+RUN find packages -type f ! -name "package.json" -delete
 
 RUN yarn install
-RUN cd packages/server && yarn install
 
 COPY . .
 
-RUN cd packages/server && yarn build
+RUN yarn build
 
 FROM node:22-alpine
 
 WORKDIR /app
 
-COPY packages/server/package.json ./
-
+COPY --from=build /app/packages/server/package.json ./
 COPY --from=build /app/packages/server/dist ./dist
-COPY --from=build /app/packages/server/node_modules ./dist/node_modules
 COPY --from=build /app/node_modules ./node_modules
 
 ENV PORT=4321
