@@ -21,4 +21,4 @@ COPY --from=build /app ./
 ENV PORT=4321
 EXPOSE ${PORT}
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "/app/packages/server/dist/index.js"]
