@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef } from 'react';
-import type { EncryptMessage, EncryptMessageResult } from '@/workers/encryption.worker';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import type { Message, MessageResult } from '@/workers/encryption.worker';
 
 export function useEncryptionWorker() {
   const workerRef = useRef<Worker | null>(null);
@@ -21,7 +21,7 @@ export function useEncryptionWorker() {
         return;
       }
 
-      const handleMessage = (e: MessageEvent<EncryptMessageResult>) => {
+      const handleMessage = (e: MessageEvent<MessageResult>) => {
         if (e.data.type === 'success') {
           resolve(e.data.result);
         } else if (e.data.type === 'error') {
@@ -35,9 +35,34 @@ export function useEncryptionWorker() {
         type: 'encrypt',
         content,
         password,
-      } satisfies EncryptMessage);
+      } satisfies Message);
     });
   }, []);
 
-  return { encrypt };
+  const decrypt = useCallback((content: string, password: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!workerRef.current) {
+        reject(new Error('Worker not initialized'));
+        return;
+      }
+
+      const handleMessage = (e: MessageEvent<MessageResult>) => {
+        if (e.data.type === 'success') {
+          resolve(e.data.result);
+        } else if (e.data.type === 'error') {
+          reject(new Error(e.data.error));
+        }
+        workerRef.current?.removeEventListener('message', handleMessage);
+      };
+
+      workerRef.current.addEventListener('message', handleMessage);
+      workerRef.current.postMessage({
+        type: 'decrypt',
+        content,
+        password,
+      } satisfies Message);
+    });
+  }, []);
+
+  return useMemo(() => ({ encrypt, decrypt }), [encrypt, decrypt]);
 }

@@ -2,7 +2,6 @@ import { config } from '@/config';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import invariant from 'tiny-invariant';
-import { decrypt } from '@crypt.fyi/core';
 import { Card } from '@/components/ui/card';
 import { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -23,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { clipboardCopy } from '@/lib/clipboardCopy';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader } from '@/components/ui/loader';
+import { useEncryptionWorker } from '@/hooks/useEncryptionWorker';
 
 export function ViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -34,6 +34,8 @@ export function ViewPage() {
   const [password, setPassword] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
   const [isRevealed, setIsRevealed] = useState(false);
+
+  const { decrypt } = useEncryptionWorker();
 
   const query = useMutation({
     mutationKey: ['view', id, key, password],
