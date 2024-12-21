@@ -364,6 +364,7 @@ export function CreatePage() {
   const [dragState, setDragState] = useState<DragState>('none');
 
   const handleDragEnter = (e: React.DragEvent) => {
+    if (form.formState.isSubmitSuccessful) return;
     e.preventDefault();
     e.stopPropagation();
     if (e.dataTransfer.types.includes('Files')) {
@@ -374,6 +375,7 @@ export function CreatePage() {
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
+    if (form.formState.isSubmitSuccessful) return;
     e.preventDefault();
     e.stopPropagation();
     if (!e.currentTarget.contains(e.relatedTarget as Node)) {
@@ -382,6 +384,7 @@ export function CreatePage() {
   };
 
   const handleDragOver = (e: React.DragEvent) => {
+    if (form.formState.isSubmitSuccessful) return;
     e.preventDefault();
     e.stopPropagation();
     if (e.dataTransfer.types.includes('Files')) {
@@ -392,6 +395,7 @@ export function CreatePage() {
   };
 
   const handleDrop = async (e: React.DragEvent) => {
+    if (form.formState.isSubmitSuccessful) return;
     e.preventDefault();
     e.stopPropagation();
     setDragState('none');
