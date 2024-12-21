@@ -46,6 +46,7 @@ import {
   IconX,
   IconNetwork,
   IconChevronDown,
+  IconBrandGithub,
 } from '@tabler/icons-react';
 import { sha256 } from '@/lib/hash';
 import { useRef, useState } from 'react';
@@ -783,6 +784,17 @@ export function CreatePage() {
                 </div>
               </div>
             </Card>
+            <div className="mt-4 text-center">
+              <a
+                href="https://github.com/osbytes/crypt.fyi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <IconBrandGithub className="size-4" />
+                Star on GitHub
+              </a>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

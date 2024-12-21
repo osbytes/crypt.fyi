@@ -69,7 +69,7 @@ export function LandingPage() {
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
         >
           <IconBrandGithub className="w-5 h-5" />
-          <span>Star us on GitHub</span>
+          <span>Star on GitHub</span>
         </a>
       </motion.div>
     </div>
