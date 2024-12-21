@@ -37,19 +37,19 @@ export function LandingPage() {
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           <div className="text-center">
             <IconLock className="w-12 h-12 mx-auto mb-4 text-primary" />
-            <h3 className="text-lg font-semibold mb-2">1. Encrypt</h3>
+            <h2 className="text-lg font-semibold mb-2">1. Encrypt</h2>
             <p className="text-muted-foreground">
               Your secret is encrypted in your browser before being stored
             </p>
           </div>
           <div className="text-center">
             <IconShare className="w-12 h-12 mx-auto mb-4 text-primary" />
-            <h3 className="text-lg font-semibold mb-2">2. Share</h3>
+            <h2 className="text-lg font-semibold mb-2">2. Share</h2>
             <p className="text-muted-foreground">Send the secure link to your intended recipient</p>
           </div>
           <div className="text-center">
             <IconFlame className="w-12 h-12 mx-auto mb-4 text-primary" />
-            <h3 className="text-lg font-semibold mb-2">3. Auto-Delete</h3>
+            <h2 className="text-lg font-semibold mb-2">3. Auto-Delete</h2>
             <p className="text-muted-foreground">
               Secret is permanently deleted after being viewed
             </p>
