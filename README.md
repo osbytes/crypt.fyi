@@ -2,8 +2,9 @@
 
 A zero-knowledge, end-to-end encrypted secret sharing platform that enables secure transmission of sensitive information.
 
-![CI](https://github.com/osbytes/crypt.fyi/actions/workflows/ci.yml/badge.svg)
-![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade-score/crypt.fyi)
+[![CI](https://github.com/osbytes/crypt.fyi/actions/workflows/ci.yml/badge.svg)](https://github.com/osbytes/crypt.fyi/commits/main/)
+[![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade-score/crypt.fyi)](https://developer.mozilla.org/en-US/observatory/analyze?host=crypt.fyi)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/9850/badge)](https://bestpractices.coreinfrastructure.org/projects/9850)
 [Security Headers](https://securityheaders.com/?q=https://www.crypt.fyi&followRedirects=on)
 
 ## Features
