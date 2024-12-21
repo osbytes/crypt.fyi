@@ -5,6 +5,7 @@ import { CreatePage } from '@/pages/Create';
 import { ViewPage } from '@/pages/View';
 import { About } from '@/pages/About';
 import { Layout } from '@/components/layout';
+import { LandingPage } from './pages/Landing';
 
 const router = createBrowserRouter([
   {
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
+        element: <LandingPage />,
+      },
+      {
+        path: '/new',
         element: <CreatePage />,
       },
       {
