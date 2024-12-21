@@ -50,11 +50,7 @@ export function Layout() {
                 </a>
               </Button>
               <Button variant="ghost" size="icon" asChild title="View source on GitHub">
-                <a
-                  href={config.GITHUB_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={config.GITHUB_URL} target="_blank" rel="noopener noreferrer">
                   <IconBrandGithub />
                 </a>
               </Button>
