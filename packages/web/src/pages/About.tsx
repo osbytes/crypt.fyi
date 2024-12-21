@@ -1,3 +1,4 @@
+import { config } from '@/config';
 import { IconLock, IconShare, IconFlame } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
@@ -158,7 +159,7 @@ export function About() {
           crypt.fyi is open source and auditable. You can review our code, submit issues, and
           contribute on{' '}
           <a
-            href="https://github.com/osbytes/crypt.fyi"
+            href={config.GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"

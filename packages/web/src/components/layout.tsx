@@ -51,7 +51,7 @@ export function Layout() {
               </Button>
               <Button variant="ghost" size="icon" asChild title="View source on GitHub">
                 <a
-                  href="https://github.com/osbytes/crypt.fyi"
+                  href={config.GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -72,7 +72,7 @@ export function Layout() {
                   About
                 </Link>
                 <a
-                  href="https://github.com/osbytes/crypt.fyi"
+                  href={config.GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground"

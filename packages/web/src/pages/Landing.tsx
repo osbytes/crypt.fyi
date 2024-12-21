@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button/button';
 import { IconLock, IconShare, IconFlame, IconBrandGithub } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
+import { config } from '@/config';
 
 export function LandingPage() {
   return (
@@ -63,7 +64,7 @@ export function LandingPage() {
         className="text-center"
       >
         <a
-          href="https://github.com/osbytes/crypt.fyi"
+          href={config.GITHUB_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
