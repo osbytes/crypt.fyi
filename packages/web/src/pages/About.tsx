@@ -1,4 +1,5 @@
 import { IconLock, IconShare, IconFlame } from '@tabler/icons-react';
+import { Link } from 'react-router-dom';
 
 export function About() {
   return (
@@ -7,10 +8,10 @@ export function About() {
 
       <section className="mb-12">
         <p className="text-lg mb-4">
-          crypt.fyi is a secure, ephemeral secret-sharing platform that enables you to share
-          sensitive information safely. Whether it's passwords, API keys, or confidential messages,
-          crypt.fyi ensures your data remains private and automatically disappears after being
-          accessed.
+          crypt.fyi is a secure, open-source, ephemeral secret-sharing platform that enables you to
+          share sensitive information safely. Whether it's passwords, API keys, or confidential
+          messages, crypt.fyi ensures your data remains private and automatically disappears after
+          being accessed.
         </p>
       </section>
 
@@ -153,7 +154,7 @@ export function About() {
 
       <section>
         <h2 className="text-2xl font-semibold mb-4">Open Source</h2>
-        <p className="text-lg">
+        <p className="text-lg mb-8">
           crypt.fyi is open source and auditable. You can review our code, submit issues, and
           contribute on{' '}
           <a
@@ -166,6 +167,15 @@ export function About() {
           </a>
           .
         </p>
+
+        <div className="flex justify-center mt-12 mb-8">
+          <Link
+            to="/new"
+            className="px-8 py-4 bg-primary text-primary-foreground rounded-lg text-lg font-semibold hover:bg-primary/90 transition-colors"
+          >
+            Create a Secret Now
+          </Link>
+        </div>
       </section>
     </div>
   );
