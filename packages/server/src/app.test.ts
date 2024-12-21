@@ -261,6 +261,48 @@ tap.test('app', async (t) => {
     },
   );
 
+  t.test('verifies TTL behavior with read count', async (t) => {
+    const initialTTL = 5000;
+    const readCount = 3;
+    const createResponse = await client.request({
+      method: 'POST',
+      path: '/vault',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        c: 'secret-content',
+        ttl: initialTTL,
+        h: 'abc123',
+        b: false,
+        rc: readCount,
+      }),
+    });
+
+    t.equal(createResponse.statusCode, 201);
+    const { id } = (await createResponse.body.json()) as Record<string, unknown>;
+    t.equal(typeof id, 'string');
+
+    const redis = new Redis();
+    t.teardown(() => redis.quit());
+    const initialRedisTTL = await redis.pttl(`vault:${id}`);
+    t.ok(initialRedisTTL > 4990 && initialRedisTTL <= 5000, 'Initial TTL should be set');
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const getResponse = await client.request({
+      method: 'GET',
+      path: `/vault/${id}?h=abc123`,
+    });
+    t.equal(getResponse.statusCode, 200);
+
+    const ttlAfterRead = await redis.pttl(`vault:${id}`);
+    t.ok(ttlAfterRead >= 3950 && ttlAfterRead <= 4000, 'TTL should be maintained');
+
+    const remainingReads = JSON.parse((await redis.get(`vault:${id}`)) ?? '{}')?.rc;
+    t.equal(remainingReads, 2, 'Read count should be decremented');
+  });
+
   t.test('deletes vault entry', async (t) => {
     const createResponse = await client.request({
       method: 'POST',
