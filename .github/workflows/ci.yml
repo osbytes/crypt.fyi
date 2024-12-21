@@ -7,13 +7,65 @@ on:
     branches: [main]
 
 jobs:
-  ci:
+  setup:
     runs-on: ubuntu-latest
+    outputs:
+      node-modules-hash: ${{ steps.hash.outputs.hash }}
+    steps:
+      - uses: actions/checkout@v4
 
-    strategy:
-      matrix:
-        node-version: [22.x]
+      - name: Generate hash
+        id: hash
+        run: echo "hash=${{ hashFiles('**/yarn.lock') }}" >> $GITHUB_OUTPUT
 
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'yarn'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: node-modules-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ steps.hash.outputs.hash }}
+
+      - name: Install dependencies
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+  format:
+    needs: setup
+    uses: ./.github/workflows/setup-node.yml
+    with:
+      node-modules-hash: ${{ needs.setup.outputs.node-modules-hash }}
+      command: yarn format:check
+
+  build:
+    needs: setup
+    uses: ./.github/workflows/setup-node.yml
+    with:
+      node-modules-hash: ${{ needs.setup.outputs.node-modules-hash }}
+      command: yarn build
+
+  lint:
+    needs: setup
+    uses: ./.github/workflows/setup-node.yml
+    with:
+      node-modules-hash: ${{ needs.setup.outputs.node-modules-hash }}
+      command: yarn lint
+
+  typecheck:
+    needs: setup
+    uses: ./.github/workflows/setup-node.yml
+    with:
+      node-modules-hash: ${{ needs.setup.outputs.node-modules-hash }}
+      command: yarn typecheck
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
     services:
       redis:
         image: redis
@@ -24,34 +76,15 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22.x
           cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Check formatting
-        run: yarn format:check
-
-      - name: Build
-        run: |
-          yarn build
-
-      - name: Lint
-        run: |
-          yarn lint
-
-      - name: Type check
-        run: |
-          yarn typecheck
-
-      - name: Test
-        run: |
-          yarn test
+      - uses: actions/cache/restore@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ needs.setup.outputs.node-modules-hash }}
+          fail-on-cache-miss: true
+      - run: yarn test

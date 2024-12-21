@@ -1,0 +1,27 @@
+name: Setup Node.js environment
+
+on:
+  workflow_call:
+    inputs:
+      node-modules-hash:
+        required: true
+        type: string
+      command:
+        required: true
+        type: string
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'yarn'
+      - uses: actions/cache/restore@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ inputs.node-modules-hash }}
+          fail-on-cache-miss: true
+      - run: ${{ inputs.command }} 
