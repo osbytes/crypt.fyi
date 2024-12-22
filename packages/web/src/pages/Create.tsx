@@ -52,7 +52,7 @@ import {
 import { useRef, useState } from 'react';
 import { clipboardCopy } from '@/lib/clipboardCopy';
 import { QRCodeSVG } from 'qrcode.react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import parseDuration from 'parse-duration';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -61,8 +61,6 @@ import { useEncryptionWorker } from '@/hooks/useEncryptionWorker';
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
 const DAY = HOUR * 24;
-
-const MAX_IP_RESTRICTIONS = 3;
 
 const formSchema = z
   .object({
@@ -79,13 +77,13 @@ const formSchema = z
         if (!val) return true;
         const ips = val.split(',');
 
-        if (ips.length > MAX_IP_RESTRICTIONS) {
+        if (ips.length > config.MAX_IP_RESTRICTIONS) {
           ctx.addIssue({
             code: z.ZodIssueCode.too_big,
-            maximum: MAX_IP_RESTRICTIONS,
+            maximum: config.MAX_IP_RESTRICTIONS,
             type: 'array',
             inclusive: true,
-            message: `Too many IP restrictions (max ${MAX_IP_RESTRICTIONS})`,
+            message: `Too many IP restrictions (max ${config.MAX_IP_RESTRICTIONS})`,
           });
           return false;
         }
@@ -213,7 +211,7 @@ export function CreatePage() {
   const createMutation = useMutation({
     mutationFn: async (input: z.infer<typeof formSchema>) => {
       await sleep(500, { enabled: config.IS_DEV });
-      const key = await generateRandomString(20);
+      const key = await generateRandomString(config.KEY_LENGTH);
       let encrypted = await encrypt(input.c, key);
       if (input.p) {
         encrypted = await encrypt(encrypted, input.p);
@@ -802,6 +800,7 @@ export function CreatePage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Secret URL QR Code</DialogTitle>
+            <DialogDescription>Download and share the secret URL QR Code</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center space-y-4">
             <div className="qr-code p-4">

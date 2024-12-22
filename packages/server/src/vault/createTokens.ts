@@ -1,7 +1,4 @@
-import { randomBytes } from 'node:crypto';
-import { promisify } from 'node:util';
-
-const randomBytesAsync = promisify(randomBytes);
+import { generateRandomString } from '@crypt.fyi/core';
 
 export const createTokens = async ({
   vaultEntryIdentifierLength,
@@ -11,12 +8,8 @@ export const createTokens = async ({
   vaultEntryDeleteTokenLength: number;
 }) => {
   const [id, dt] = await Promise.all([
-    (await randomBytesAsync(vaultEntryIdentifierLength))
-      .toString('base64url')
-      .slice(0, vaultEntryIdentifierLength),
-    (await randomBytesAsync(vaultEntryDeleteTokenLength))
-      .toString('base64url')
-      .slice(0, vaultEntryDeleteTokenLength),
+    await generateRandomString(vaultEntryIdentifierLength),
+    await generateRandomString(vaultEntryDeleteTokenLength),
   ]);
   return { id, dt };
 };

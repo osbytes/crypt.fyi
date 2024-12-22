@@ -63,15 +63,26 @@ export async function generateRandomHexString(length: number): Promise<string> {
     .join('');
 }
 
-const dictionary = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-export async function generateRandomString(length: number): Promise<string> {
+const DEFAULT_DICTIONARY = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+// The following implementation guarantees uniformly distributed cryptographically random
+// string generation for any dictionary input length as described by https://arxiv.org/pdf/1304.1916
+export async function generateRandomString(
+  length: number,
+  dictionary: string = DEFAULT_DICTIONARY,
+): Promise<string> {
   const dictionaryLength = dictionary.length;
-  const bytes = await generateRandomBytes(length);
+  const maxValid = Math.floor(256 / dictionaryLength) * dictionaryLength - 1;
   let result = '';
 
-  for (let i = 0; i < length; i++) {
-    const randomIndex = bytes[i] % dictionaryLength;
-    result += dictionary.charAt(randomIndex);
+  while (result.length < length) {
+    const bytes = await generateRandomBytes(length - result.length);
+
+    for (const byte of bytes) {
+      if (byte > maxValid) continue;
+
+      result += dictionary.charAt(byte % dictionaryLength);
+      if (result.length === length) break;
+    }
   }
 
   return result;
