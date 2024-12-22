@@ -14,7 +14,11 @@ export type VaultValue = z.infer<typeof vaultValueSchema>;
 
 export interface Vault {
   set(value: Omit<VaultValue, 'dt' | 'cd'> & { ttl: number }): Promise<{ id: string; dt: string }>;
-  get(id: string, h: string, ip: string): Promise<Omit<VaultValue, 'dt' | 'h'> | undefined>;
+  get(
+    id: string,
+    h: string,
+    ip: string,
+  ): Promise<Pick<VaultValue, 'c' | 'b' | 'ttl' | 'cd'> | undefined>;
   del(id: string, dt: string): Promise<boolean>;
 }
 
