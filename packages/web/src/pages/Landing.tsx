@@ -30,11 +30,28 @@ export function LandingPage() {
       </div>
 
       <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="text-center mb-16"
+      >
+        <a
+          href={config.GITHUB_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+        >
+          <IconBrandGithub className="w-5 h-5" />
+          <span>Star on GitHub</span>
+        </a>
+      </motion.div>
+
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <div className="grid md:grid-cols-3 gap-8">
           <div className="text-center">
             <IconLock className="w-12 h-12 mx-auto mb-4 text-primary" />
             <h2 className="text-lg font-semibold mb-2">1. Encrypt</h2>
@@ -55,23 +72,6 @@ export function LandingPage() {
             </p>
           </div>
         </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="text-center"
-      >
-        <a
-          href={config.GITHUB_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-        >
-          <IconBrandGithub className="w-5 h-5" />
-          <span>Star on GitHub</span>
-        </a>
       </motion.div>
     </div>
   );

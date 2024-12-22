@@ -48,6 +48,7 @@ import {
   IconNetwork,
   IconChevronDown,
   IconBrandGithub,
+  IconShare,
 } from '@tabler/icons-react';
 import { useRef, useState } from 'react';
 import { clipboardCopy } from '@/lib/clipboardCopy';
@@ -742,14 +743,20 @@ export function CreatePage() {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => {
+                    onClick={async () => {
                       if (createMutation.data?.url) {
-                        clipboardCopy(createMutation.data.url);
-                        toast.info('URL copied to clipboard');
+                        if ('share' in navigator) {
+                          await navigator.share({
+                            url: createMutation.data?.url,
+                          });
+                        } else {
+                          await clipboardCopy(createMutation.data.url);
+                          toast.info('URL copied to clipboard');
+                        }
                       }
                     }}
                   >
-                    <IconCopy />
+                    {'share' in navigator ? <IconShare /> : <IconCopy />}
                   </Button>
                   <Button variant="outline" size="icon" onClick={() => setIsQrDialogOpen(true)}>
                     <IconQrcode />
