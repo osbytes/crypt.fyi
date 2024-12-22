@@ -1,9 +1,13 @@
 import { gcm } from '@noble/ciphers/aes';
 import { pbkdf2Async } from '@noble/hashes/pbkdf2';
-import { sha256 } from '@noble/hashes/sha256';
+import { sha256 as nobleSha256 } from '@noble/hashes/sha256';
 import { randomBytes } from '@noble/hashes/utils';
 import { concatBytes, utf8ToBytes } from '@noble/hashes/utils';
 import { Buffer } from 'buffer';
+
+export { Buffer };
+
+export const sha256 = (input: string): string => Buffer.from(nobleSha256(input)).toString('hex');
 
 const SALT_LENGTH = 16;
 const IV_LENGTH = 12;
@@ -13,11 +17,10 @@ const ITERATIONS = 2 ** 19;
 export async function encrypt(content: string, password: string): Promise<string> {
   try {
     const salt = randomBytes(SALT_LENGTH);
-    const key = await pbkdf2Async(sha256, utf8ToBytes(password), salt, {
+    const key = await pbkdf2Async(nobleSha256, utf8ToBytes(password), salt, {
       c: ITERATIONS,
       dkLen: KEY_LENGTH,
     });
-
     const iv = randomBytes(IV_LENGTH);
     const cipher = gcm(key, iv);
     const encrypted = cipher.encrypt(utf8ToBytes(content));
@@ -36,7 +39,7 @@ export async function decrypt(encryptedContent: string, password: string): Promi
     const iv = data.subarray(SALT_LENGTH, SALT_LENGTH + IV_LENGTH);
     const ciphertext = data.subarray(SALT_LENGTH + IV_LENGTH);
 
-    const key = await pbkdf2Async(sha256, utf8ToBytes(password), salt, {
+    const key = await pbkdf2Async(nobleSha256, utf8ToBytes(password), salt, {
       c: ITERATIONS,
       dkLen: KEY_LENGTH,
     });

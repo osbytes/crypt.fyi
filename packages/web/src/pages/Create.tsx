@@ -7,6 +7,7 @@ import {
   CreateVaultResponse,
   DeleteVaultRequest,
   generateRandomString,
+  sha256,
 } from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -48,7 +49,6 @@ import {
   IconChevronDown,
   IconBrandGithub,
 } from '@tabler/icons-react';
-import { sha256 } from '@/lib/hash';
 import { useRef, useState } from 'react';
 import { clipboardCopy } from '@/lib/clipboardCopy';
 import { QRCodeSVG } from 'qrcode.react';
@@ -218,7 +218,7 @@ export function CreatePage() {
       if (input.p) {
         encrypted = await encrypt(encrypted, input.p);
       }
-      const h = await sha256(key + (input.p ?? ''));
+      const h = sha256(key + (input.p ?? ''));
 
       const result = await fetch(`${config.API_URL}/vault`, {
         method: 'POST',
@@ -352,7 +352,7 @@ export function CreatePage() {
     try {
       const dataUrl = await svgToImage(svg);
       const link = document.createElement('a');
-      const hash = await sha256(createMutation.data?.url ?? '');
+      const hash = sha256(createMutation.data?.url ?? '');
       link.download = `crypt.fyi-qr-${hash.slice(0, 8)}.png`;
       link.href = dataUrl;
       link.click();

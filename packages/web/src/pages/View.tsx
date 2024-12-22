@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button/button';
 import { toast } from 'sonner';
 import { sleep } from '@/lib/sleep';
-import { sha256 } from '@/lib/hash';
 import {
   IconEye,
   IconEyeOff,
@@ -23,6 +22,7 @@ import { clipboardCopy } from '@/lib/clipboardCopy';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader } from '@/components/ui/loader';
 import { useEncryptionWorker } from '@/hooks/useEncryptionWorker';
+import { sha256 } from '@crypt.fyi/core';
 
 export function ViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -40,7 +40,7 @@ export function ViewPage() {
   const query = useMutation({
     mutationKey: ['view', id, key, password],
     mutationFn: async () => {
-      const h = await sha256(key + (isPasswordSet ? password : ''));
+      const h = sha256(key + (isPasswordSet ? password : ''));
       const res = await fetch(`${config.API_URL}/vault/${id}?h=${h}`);
       await sleep(500, { enabled: config.IS_DEV });
 
