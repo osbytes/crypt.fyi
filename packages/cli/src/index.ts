@@ -11,7 +11,7 @@ import {
 } from '@crypt.fyi/core';
 import chalk from 'chalk';
 import ora from 'ora';
-import { getConfig, setConfig } from './config';
+import { config } from './config';
 
 const program = new Command();
 
@@ -19,27 +19,6 @@ const program = new Command();
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'));
 
 program.name('crypt').description('CLI to encrypt and share secrets securely').version(pkg.version);
-
-program
-  .command('config')
-  .description('Configure the CLI')
-  .option('--api-url <url>', 'Set the API URL')
-  .option('--web-url <url>', 'Set the Web URL')
-  .action((options) => {
-    if (options.apiUrl) {
-      setConfig({ apiUrl: options.apiUrl });
-      console.log(chalk.green(`API URL set to ${options.apiUrl}`));
-    }
-
-    if (options.webUrl) {
-      setConfig({ webUrl: options.webUrl });
-      console.log(chalk.green(`Web URL set to ${options.webUrl}`));
-    }
-
-    const config = getConfig();
-    console.log(chalk.blue('Current configuration:'));
-    console.log(chalk.blue(`API URL: ${config.apiUrl}`));
-  });
 
 program
   .command('encrypt')
@@ -51,7 +30,6 @@ program
   .option('--ip <ip>', 'Restrict access to specific IP address')
   .option('-r, --reads <count>', 'Number of times the secret can be read', undefined)
   .action(async (content, options) => {
-    const config = getConfig();
     const spinner = ora('Encrypting content...').start();
     try {
       const key = await generateRandomString(32);
@@ -111,7 +89,6 @@ program
   .argument('<url>', 'Secret URL')
   .option('-p, --password <password>', 'Password (if secret is password protected)')
   .action(async (urlString, options) => {
-    const config = getConfig();
     const spinner = ora('Fetching secret...').start();
 
     try {

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import Conf from 'conf';
 
 const configSchema = z.object({
   apiUrl: z.string().url().default('https://api.crypt.fyi'),
@@ -8,18 +7,7 @@ const configSchema = z.object({
 
 export type Config = z.infer<typeof configSchema>;
 
-const store = new Conf<Config>({
-  projectName: 'crypt.fyi',
-  defaults: {
-    apiUrl: 'https://api.crypt.fyi',
-    webUrl: 'https://crypt.fyi',
-  },
+export const config = configSchema.parse({
+  apiUrl: process.env.CRYPT_FYI_API_URL,
+  webUrl: process.env.CRYPT_FYI_WEB_URL,
 });
-
-export const getConfig = (): Config => {
-  return configSchema.parse(store.store);
-};
-
-export const setConfig = (config: Partial<Config>) => {
-  store.set(configSchema.parse({ ...store.store, ...config }));
-};
