@@ -53,19 +53,15 @@ export function ViewPage() {
             ttl: number;
           }>);
 
-          try {
-            const decrypted = isPasswordSet
-              ? await decrypt(result.c, password).then((d) => decrypt(d, key))
-              : await decrypt(result.c, key);
-            return {
-              value: decrypted,
-              burned: result.b,
-              cd: result.cd,
-              ttl: result.ttl,
-            };
-          } catch (error) {
-            throw new DecryptError(error);
-          }
+          const decrypted = isPasswordSet
+            ? await decrypt(result.c, password).then((d) => decrypt(d, key))
+            : await decrypt(result.c, key);
+          return {
+            value: decrypted,
+            burned: result.b,
+            cd: result.cd,
+            ttl: result.ttl,
+          };
         }
         case 400:
           throw new Error('invalid key and/or password');
@@ -277,13 +273,5 @@ class NotFoundError extends Error {
   constructor() {
     super('not found');
     this.name = 'NotFoundError';
-  }
-}
-class DecryptError extends Error {
-  error: unknown;
-  constructor(error: unknown) {
-    super('decrypt error');
-    this.name = 'DecryptError';
-    this.error = error;
   }
 }

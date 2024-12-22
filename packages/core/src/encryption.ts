@@ -11,34 +11,42 @@ const KEY_LENGTH = 32;
 const ITERATIONS = 2 ** 19;
 
 export async function encrypt(content: string, password: string): Promise<string> {
-  const salt = randomBytes(SALT_LENGTH);
-  const key = await pbkdf2Async(sha256, utf8ToBytes(password), salt, {
-    c: ITERATIONS,
-    dkLen: KEY_LENGTH,
-  });
+  try {
+    const salt = randomBytes(SALT_LENGTH);
+    const key = await pbkdf2Async(sha256, utf8ToBytes(password), salt, {
+      c: ITERATIONS,
+      dkLen: KEY_LENGTH,
+    });
 
-  const iv = randomBytes(IV_LENGTH);
-  const cipher = gcm(key, iv);
-  const encrypted = cipher.encrypt(utf8ToBytes(content));
+    const iv = randomBytes(IV_LENGTH);
+    const cipher = gcm(key, iv);
+    const encrypted = cipher.encrypt(utf8ToBytes(content));
 
-  const result = concatBytes(salt, iv, encrypted);
-  return Buffer.from(result).toString('base64');
+    const result = concatBytes(salt, iv, encrypted);
+    return Buffer.from(result).toString('base64');
+  } catch (error) {
+    throw new EncryptError(error);
+  }
 }
 
 export async function decrypt(encryptedContent: string, password: string): Promise<string> {
-  const data = Buffer.from(encryptedContent, 'base64');
-  const salt = data.subarray(0, SALT_LENGTH);
-  const iv = data.subarray(SALT_LENGTH, SALT_LENGTH + IV_LENGTH);
-  const ciphertext = data.subarray(SALT_LENGTH + IV_LENGTH);
+  try {
+    const data = Buffer.from(encryptedContent, 'base64');
+    const salt = data.subarray(0, SALT_LENGTH);
+    const iv = data.subarray(SALT_LENGTH, SALT_LENGTH + IV_LENGTH);
+    const ciphertext = data.subarray(SALT_LENGTH + IV_LENGTH);
 
-  const key = await pbkdf2Async(sha256, utf8ToBytes(password), salt, {
-    c: ITERATIONS,
-    dkLen: KEY_LENGTH,
-  });
+    const key = await pbkdf2Async(sha256, utf8ToBytes(password), salt, {
+      c: ITERATIONS,
+      dkLen: KEY_LENGTH,
+    });
 
-  const cipher = gcm(key, iv);
-  const decrypted = cipher.decrypt(ciphertext);
-  return new TextDecoder().decode(decrypted);
+    const cipher = gcm(key, iv);
+    const decrypted = cipher.decrypt(ciphertext);
+    return new TextDecoder().decode(decrypted);
+  } catch (error) {
+    throw new DecryptError(error);
+  }
 }
 
 export async function generateRandomBytes(length: number): Promise<Uint8Array> {
@@ -64,4 +72,22 @@ export async function generateRandomString(length: number): Promise<string> {
   }
 
   return result;
+}
+
+export class DecryptError extends Error {
+  error: unknown;
+  constructor(error: unknown) {
+    super('decrypt error');
+    this.name = 'DecryptError';
+    this.error = error;
+  }
+}
+
+export class EncryptError extends Error {
+  error: unknown;
+  constructor(error: unknown) {
+    super('encrypt error');
+    this.name = 'EncryptError';
+    this.error = error;
+  }
 }
