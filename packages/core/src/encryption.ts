@@ -63,12 +63,14 @@ export async function generateRandomHexString(length: number): Promise<string> {
     .join('');
 }
 
-const DEFAULT_DICTIONARY = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+// https://stackoverflow.com/questions/695438/what-are-the-safe-characters-for-making-urls
+export const URL_SAFE_DICTIONARY = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_~`;
+
 // The following implementation guarantees uniformly distributed cryptographically random
 // string generation for any dictionary input length as described by https://arxiv.org/pdf/1304.1916
 export async function generateRandomString(
   length: number,
-  dictionary: string = DEFAULT_DICTIONARY,
+  dictionary: string = URL_SAFE_DICTIONARY,
 ): Promise<string> {
   const dictionaryLength = dictionary.length;
   const maxValid = Math.floor(256 / dictionaryLength) * dictionaryLength - 1;
