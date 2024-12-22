@@ -24,15 +24,21 @@ program
   .command('config')
   .description('Configure the CLI')
   .option('--api-url <url>', 'Set the API URL')
+  .option('--web-url <url>', 'Set the Web URL')
   .action((options) => {
     if (options.apiUrl) {
       setConfig({ apiUrl: options.apiUrl });
       console.log(chalk.green(`API URL set to ${options.apiUrl}`));
-    } else {
-      const config = getConfig();
-      console.log(chalk.blue('Current configuration:'));
-      console.log(chalk.blue(`API URL: ${config.apiUrl}`));
     }
+
+    if (options.webUrl) {
+      setConfig({ webUrl: options.webUrl });
+      console.log(chalk.green(`Web URL set to ${options.webUrl}`));
+    }
+
+    const config = getConfig();
+    console.log(chalk.blue('Current configuration:'));
+    console.log(chalk.blue(`API URL: ${config.apiUrl}`));
   });
 
 program
