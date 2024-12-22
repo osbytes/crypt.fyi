@@ -52,7 +52,13 @@ import {
 import { useRef, useState } from 'react';
 import { clipboardCopy } from '@/lib/clipboardCopy';
 import { QRCodeSVG } from 'qrcode.react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import parseDuration from 'parse-duration';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
