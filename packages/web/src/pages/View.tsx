@@ -109,6 +109,8 @@ export function ViewPage() {
         </Card>
       </div>
     );
+  } else if (query.error) {
+    throw query.error;
   }
 
   let content = null;
