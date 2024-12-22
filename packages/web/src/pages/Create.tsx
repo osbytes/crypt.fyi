@@ -64,6 +64,8 @@ import parseDuration from 'parse-duration';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useEncryptionWorker } from '@/hooks/useEncryptionWorker';
 
+const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
+
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
 const DAY = HOUR * 24;
@@ -206,6 +208,38 @@ function getInitialValues() {
     rc: undefined,
   };
 }
+
+const handleContentDrop = async (
+  dataTransfer: DataTransfer,
+): Promise<{ content: string; filename?: string }> => {
+  if (dataTransfer.files.length > 0) {
+    const file = dataTransfer.files[0];
+    const base64 = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    return {
+      content: JSON.stringify({
+        type: 'file',
+        name: file.name,
+        content: base64,
+      }),
+      filename: file.name,
+    };
+  }
+
+  const uriList = dataTransfer.getData('text/uri-list');
+  if (uriList) {
+    return { content: uriList };
+  }
+
+  const text = dataTransfer.getData('text/plain');
+  return { content: text };
+};
 
 export function CreatePage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -372,11 +406,11 @@ export function CreatePage() {
     if (form.formState.isSubmitSuccessful) return;
     e.preventDefault();
     e.stopPropagation();
-    if (e.dataTransfer.types.includes('Files')) {
-      setDragState('dragging');
-    } else {
-      setDragState('invalid');
-    }
+
+    const types = Array.from(e.dataTransfer.types);
+    const hasValidType = VALID_FILE_TYPES.some((type) => types.includes(type));
+
+    setDragState(hasValidType ? 'dragging' : 'invalid');
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
@@ -388,33 +422,35 @@ export function CreatePage() {
     }
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    if (form.formState.isSubmitSuccessful) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.dataTransfer.types.includes('Files')) {
-      setDragState('dragging');
-    } else {
-      setDragState('invalid');
-    }
-  };
-
   const handleDrop = async (e: React.DragEvent) => {
     if (form.formState.isSubmitSuccessful) return;
     e.preventDefault();
     e.stopPropagation();
     setDragState('none');
 
-    const files = Array.from(e.dataTransfer.files);
-    handleFiles(files);
+    try {
+      const { content, filename } = await handleContentDrop(e.dataTransfer);
+
+      if (filename) {
+        setSelectedFile(new File([content], filename));
+        form.setValue('c', `${filename} (file)`);
+      } else {
+        setSelectedFile(null);
+        form.setValue('c', content);
+      }
+    } catch (error) {
+      toast.error(
+        `Failed to process dropped content${error instanceof Error ? `: ${error.message}` : ''}`,
+      );
+    }
   };
 
   return (
     <div
       className="max-w-xl mx-auto relative"
       onDragEnter={handleDragEnter}
+      onDragOver={handleDragEnter}
       onDragLeave={handleDragLeave}
-      onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
       <AnimatePresence>
