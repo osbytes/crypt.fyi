@@ -3,6 +3,14 @@ export interface TranslationKeys {
     createSecret: string;
     starOnGithub: string;
     learnMore: string;
+    loading: string;
+    create: string;
+    delete: string;
+    copy: string;
+    share: string;
+    download: string;
+    success: string;
+    error: string;
   };
   landing: {
     title: string;
@@ -20,6 +28,71 @@ export interface TranslationKeys {
         title: string;
         description: string;
       };
+    };
+  };
+  create: {
+    form: {
+      content: {
+        label: string;
+        placeholder: string;
+        fileHint: string;
+        fileSelected: string;
+      };
+      password: {
+        label: string;
+        placeholder: string;
+      };
+      ttl: {
+        label: string;
+        placeholder: string;
+      };
+      burn: {
+        label: string;
+        description: string;
+      };
+      advanced: {
+        toggle: string;
+        ip: {
+          label: string;
+          placeholder: string;
+          description: string;
+        };
+        readCount: {
+          label: string;
+          description: string;
+        };
+      };
+    };
+    success: {
+      title: string;
+      description: {
+        main: string;
+        password: string;
+      };
+      urlCopied: string;
+      qrCode: {
+        title: string;
+        description: string;
+      };
+      createAnother: string;
+      deleteSecret: string;
+      info: {
+        expires: string;
+        burnAfterReading: string;
+        passwordProtected: string;
+        ipRestrictions: string;
+        readCount: string;
+      };
+    };
+    errors: {
+      contentRequired: string;
+      readCountWithBurn: string;
+      tooManyIps: string;
+      invalidIp: string;
+      uploadFailed: string;
+      deleteFailed: string;
+      secretNotFound: string;
+      unexpectedStatus: string;
     };
   };
 }

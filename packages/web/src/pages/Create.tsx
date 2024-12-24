@@ -10,6 +10,7 @@ import {
   sha256,
 } from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
 import {
   Form,
   FormControl,
@@ -64,81 +65,13 @@ import { cn } from '@/lib/utils';
 import parseDuration from 'parse-duration';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useEncryptionWorker } from '@/hooks/useEncryptionWorker';
+import { useTranslation } from 'react-i18next';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
 const DAY = HOUR * 24;
-
-const formSchema = z
-  .object({
-    c: z.string().default('').describe('encrypted content'),
-    b: z.boolean().default(true).describe('burn after reading'),
-    p: z.string().default('').describe('password').optional(),
-    ttl: z.number({ coerce: true }).default(HOUR).describe('time to live (TTL) in milliseconds'),
-    ips: z
-      .string()
-      .default('')
-      .describe('IP address or CIDR block restrictions')
-      .optional()
-      .superRefine((val, ctx) => {
-        if (!val) return true;
-        const ips = val.split(',');
-
-        if (ips.length > config.MAX_IP_RESTRICTIONS) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.too_big,
-            maximum: config.MAX_IP_RESTRICTIONS,
-            type: 'array',
-            inclusive: true,
-            message: `Too many IP restrictions (max ${config.MAX_IP_RESTRICTIONS})`,
-          });
-          return false;
-        }
-
-        for (const ip of ips) {
-          const trimmed = ip.trim();
-          const isValidIP = z.string().ip().safeParse(trimmed).success;
-          const isValidCIDR = z
-            .string()
-            .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
-            .safeParse(trimmed).success;
-
-          if (!isValidIP && !isValidCIDR) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Invalid IP address or CIDR block: ${trimmed}`,
-            });
-            return false;
-          }
-        }
-
-        return true;
-      }),
-    rc: z
-      .number({ coerce: true })
-      .min(2)
-      .max(10)
-      .optional()
-      .describe('maximum number of times the secret can be read'),
-  })
-  .superRefine((data, ctx) => {
-    if (data.c.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['c'],
-        message: 'Content is required',
-      });
-    }
-    if (data.b && data.rc !== undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['rc'],
-        message: 'Read count cannot be used with burn after reading',
-      });
-    }
-  });
 
 const ttlOptions = [
   { label: '5 minutes', value: 5 * MINUTE },
@@ -149,8 +82,79 @@ const ttlOptions = [
   { label: '1 day', value: DAY },
   { label: '3 days', value: 3 * DAY },
   { label: '7 days', value: 7 * DAY },
-];
+] as const;
+
 const DEFAULT_TTL = 30 * MINUTE;
+
+const createFormSchema = (t: (key: string, options?: Record<string, unknown>) => string) =>
+  z
+    .object({
+      c: z.string().default('').describe('encrypted content'),
+      b: z.boolean().default(true).describe('burn after reading'),
+      p: z.string().default('').describe('password').optional(),
+      ttl: z.number({ coerce: true }).default(HOUR).describe('time to live (TTL) in milliseconds'),
+      ips: z
+        .string()
+        .default('')
+        .describe('IP address or CIDR block restrictions')
+        .optional()
+        .superRefine((val, ctx) => {
+          if (!val) return true;
+          const ips = val.split(',');
+
+          if (ips.length > config.MAX_IP_RESTRICTIONS) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.too_big,
+              maximum: config.MAX_IP_RESTRICTIONS,
+              type: 'array',
+              inclusive: true,
+              message: t('create.errors.tooManyIps', { max: config.MAX_IP_RESTRICTIONS }),
+            });
+            return false;
+          }
+
+          for (const ip of ips) {
+            const trimmed = ip.trim();
+            const isValidIP = z.string().ip().safeParse(trimmed).success;
+            const isValidCIDR = z
+              .string()
+              .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
+              .safeParse(trimmed).success;
+
+            if (!isValidIP && !isValidCIDR) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('create.errors.invalidIp', { ip: trimmed }),
+              });
+              return false;
+            }
+          }
+
+          return true;
+        }),
+      rc: z
+        .number({ coerce: true })
+        .min(2)
+        .max(10)
+        .optional()
+        .describe('maximum number of times the secret can be read'),
+    })
+    .superRefine((data, ctx) => {
+      if (data.c.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['c'],
+          message: t('create.errors.contentRequired'),
+        });
+      }
+      if (data.b && data.rc !== undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['rc'],
+          message: t('create.errors.readCountWithBurn'),
+        });
+      }
+    });
 
 function findClosestTTL(duration: number): number {
   if (duration <= 0) return DEFAULT_TTL;
@@ -243,6 +247,9 @@ const handleContentDrop = async (
 };
 
 export function CreatePage() {
+  const { t } = useTranslation();
+  const formSchema = React.useMemo(() => createFormSchema(t), [t]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: getInitialValues(),
@@ -274,7 +281,7 @@ export function CreatePage() {
         } satisfies CreateVaultRequest),
       });
 
-      if (!result.ok) throw new Error('something went wrong');
+      if (!result.ok) throw new Error(t('common.error'));
 
       const data = await (result.json() as Promise<CreateVaultResponse>);
       const searchParams = new URLSearchParams();
@@ -284,7 +291,7 @@ export function CreatePage() {
       }
       const url = `${window.location.origin}/${data.id}?${searchParams.toString()}`;
       await clipboardCopy(url);
-      toast.info('URL copied to clipboard');
+      toast.info(t('create.success.urlCopied'));
 
       return {
         ...data,
@@ -496,12 +503,12 @@ export function CreatePage() {
                     name="c"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Secret content</FormLabel>
+                        <FormLabel>{t('create.form.content.label')}</FormLabel>
                         <FormControl>
                           <Textarea
                             {...field}
                             disabled={createMutation.isPending || field.disabled || !!selectedFile}
-                            placeholder="Enter your secret content here..."
+                            placeholder={t('create.form.content.placeholder')}
                           />
                         </FormControl>
                         <FormMessage />
@@ -518,11 +525,13 @@ export function CreatePage() {
                           >
                             {selectedFile ? (
                               <span className="flex items-center gap-2">
-                                File selected: {selectedFile.name} (
-                                {(selectedFile.size / 1024).toFixed(1)} KB)
+                                {t('create.form.content.fileSelected', {
+                                  name: selectedFile.name,
+                                  size: (selectedFile.size / 1024).toFixed(1),
+                                })}
                               </span>
                             ) : (
-                              'add a file by drag-n-drop or clicking here'
+                              t('create.form.content.fileHint')
                             )}
                           </p>
                           {selectedFile && (
@@ -565,11 +574,11 @@ export function CreatePage() {
                     name="p"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>{t('create.form.password.label')}</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
-                            placeholder="Optional (but recommended)"
+                            placeholder={t('create.form.password.placeholder')}
                             {...field}
                             disabled={createMutation.isPending || field.disabled}
                           />
@@ -582,7 +591,7 @@ export function CreatePage() {
                     name="ttl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Time to live</FormLabel>
+                        <FormLabel>{t('create.form.ttl.label')}</FormLabel>
                         <FormControl>
                           <Select
                             onValueChange={(v) => {
@@ -592,7 +601,7 @@ export function CreatePage() {
                             disabled={createMutation.isPending || field.disabled}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select expiration time" />
+                              <SelectValue placeholder={t('create.form.ttl.placeholder')} />
                             </SelectTrigger>
                             <SelectContent>
                               {ttlOptions.map(({ label, value }) => (
@@ -621,10 +630,8 @@ export function CreatePage() {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>Burn after reading</FormLabel>
-                          <FormDescription>
-                            Guarantees only one recipient can access the secret
-                          </FormDescription>
+                          <FormLabel>{t('create.form.burn.label')}</FormLabel>
+                          <FormDescription>{t('create.form.burn.description')}</FormDescription>
                         </div>
                       </FormItem>
                     )}
@@ -633,7 +640,7 @@ export function CreatePage() {
                     <Collapsible disabled={createMutation.isPending}>
                       <CollapsibleTrigger className="group flex w-full items-center justify-start gap-2 text-sm text-muted-foreground hover:text-foreground">
                         <IconChevronDown className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                        advanced configuration
+                        {t('create.form.advanced.toggle')}
                       </CollapsibleTrigger>
                       <AnimatePresence initial={false}>
                         <CollapsibleContent asChild>
@@ -649,19 +656,18 @@ export function CreatePage() {
                                 name="ips"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>IP/CIDR allow-list</FormLabel>
+                                    <FormLabel>{t('create.form.advanced.ip.label')}</FormLabel>
                                     <FormControl>
                                       <Input
                                         type="text"
-                                        placeholder="192.168.1.1, 10.0.0.0/24, etc."
+                                        placeholder={t('create.form.advanced.ip.placeholder')}
                                         {...field}
                                         disabled={createMutation.isPending || field.disabled}
                                       />
                                     </FormControl>
                                     <FormMessage />
                                     <FormDescription>
-                                      Restrict access to specific IP addresses or CIDR blocks (comma
-                                      separated)
+                                      {t('create.form.advanced.ip.description')}
                                     </FormDescription>
                                   </FormItem>
                                 )}
@@ -671,14 +677,15 @@ export function CreatePage() {
                                 name="rc"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Read count</FormLabel>
+                                    <FormLabel>
+                                      {t('create.form.advanced.readCount.label')}
+                                    </FormLabel>
                                     <FormControl>
                                       <Input
                                         type="number"
                                         {...field}
                                         onChange={(e) => {
                                           form.setValue('b', !e.target.value);
-                                          // empty string is resulting in 0 for `rc` so convert to undefined
                                           field.onChange(e.target.value || undefined);
                                         }}
                                         disabled={createMutation.isPending || !!field.disabled}
@@ -688,7 +695,7 @@ export function CreatePage() {
                                     </FormControl>
                                     <FormMessage />
                                     <FormDescription>
-                                      Maximum number of times the secret can be read
+                                      {t('create.form.advanced.readCount.description')}
                                     </FormDescription>
                                   </FormItem>
                                 )}
@@ -702,7 +709,7 @@ export function CreatePage() {
                   <div className="flex justify-end">
                     <Button type="submit" isLoading={createMutation.isPending}>
                       <IconLock />
-                      Create
+                      {t('common.create')}
                     </Button>
                   </div>
                 </form>
@@ -720,12 +727,12 @@ export function CreatePage() {
             <Card className="p-4">
               <div className="space-y-4">
                 <div className="text-center mb-8">
-                  <h2 className="text-xl font-bold mb-2">Secret Created!</h2>
+                  <h2 className="text-xl font-bold mb-2">{t('create.success.title')}</h2>
                   <p className="text-muted-foreground text-sm mb-1">
-                    Your secret has been created and the URL has been copied to your clipboard
+                    {t('create.success.description.main')}
                   </p>
                   <p className="text-muted-foreground text-sm">
-                    Share the URL{form.watch('p') && ` and password`} with the desired recipient
+                    {form.watch('p') && t('create.success.description.password')}
                   </p>
                 </div>
 
@@ -753,7 +760,7 @@ export function CreatePage() {
                           });
                         } else {
                           await clipboardCopy(createMutation.data.url);
-                          toast.info('URL copied to clipboard');
+                          toast.info(t('create.success.urlCopied'));
                         }
                       }
                     }}
@@ -773,7 +780,7 @@ export function CreatePage() {
                       reset();
                     }}
                   >
-                    Create Another
+                    {t('create.success.createAnother')}
                   </Button>
                   {createMutation.data && (
                     <Button
@@ -788,46 +795,53 @@ export function CreatePage() {
                       }}
                       isLoading={deleteMutation.isPending}
                     >
-                      Delete Secret
+                      {t('create.success.deleteSecret')}
                     </Button>
                   )}
                 </div>
                 <div className="grid grid-cols-[auto_1fr] gap-2 text-xs">
                   <IconClock className="text-muted-foreground size-4" />
                   <p className="text-muted-foreground">
-                    Expires in: {formatDistance(form.watch('ttl'), 0)}
+                    {t('create.success.info.expires', {
+                      time: formatDistance(form.watch('ttl'), 0),
+                    })}
                   </p>
                   {form.watch('b') && (
                     <>
                       <IconFlame className="text-muted-foreground size-4" />
                       <p className="text-muted-foreground">
-                        Secret will be deleted after it is viewed
+                        {t('create.success.info.burnAfterReading')}
                       </p>
                     </>
                   )}
                   {form.watch('p') && (
                     <>
                       <IconLock className="text-muted-foreground size-4" />
-                      <p className="text-muted-foreground">Password protected</p>
+                      <p className="text-muted-foreground">
+                        {t('create.success.info.passwordProtected')}
+                      </p>
                     </>
                   )}
                   {form.watch('ips') && (
                     <>
                       <IconNetwork className="text-muted-foreground size-4" />
                       <p className="text-muted-foreground">
-                        IP restriction(s):{' '}
-                        {form
-                          .watch('ips')
-                          ?.split(',')
-                          .map((ip) => ip.trim())
-                          .join(', ')}
+                        {t('create.success.info.ipRestrictions', {
+                          ips: form
+                            .watch('ips')
+                            ?.split(',')
+                            .map((ip) => ip.trim())
+                            .join(', '),
+                        })}
                       </p>
                     </>
                   )}
                   {form.watch('rc') && (
                     <>
                       <IconEye className="text-muted-foreground size-4" />
-                      <p className="text-muted-foreground">Read count: {form.watch('rc')}</p>
+                      <p className="text-muted-foreground">
+                        {t('create.success.info.readCount', { count: form.watch('rc') })}
+                      </p>
                     </>
                   )}
                 </div>
@@ -841,7 +855,7 @@ export function CreatePage() {
                 className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <IconBrandGithub className="size-4" />
-                Star on GitHub
+                {t('common.starOnGithub')}
               </a>
             </div>
           </motion.div>
@@ -850,8 +864,8 @@ export function CreatePage() {
       <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Secret URL QR Code</DialogTitle>
-            <DialogDescription>Download and share the secret URL QR Code</DialogDescription>
+            <DialogTitle>{t('create.success.qrCode.title')}</DialogTitle>
+            <DialogDescription>{t('create.success.qrCode.description')}</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center space-y-4">
             <div className="qr-code p-4">
@@ -866,7 +880,7 @@ export function CreatePage() {
               )}
             </div>
             <div className="flex space-x-2">
-              <Button title="Download QR Code" variant="outline" onClick={handleDownloadQR}>
+              <Button title={t('common.download')} variant="outline" onClick={handleDownloadQR}>
                 <IconDownload className="size-4" />
               </Button>
             </div>
