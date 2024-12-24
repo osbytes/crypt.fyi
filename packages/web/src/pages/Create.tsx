@@ -1,4 +1,3 @@
-import { formatDistance } from 'date-fns';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -824,7 +823,9 @@ export function CreatePage() {
                   <IconClock className="text-muted-foreground size-4" />
                   <p className="text-muted-foreground">
                     {t('create.success.info.expires', {
-                      time: formatDistance(form.watch('ttl'), 0),
+                      time:
+                        ttlOptions.find((option) => option.value === form.watch('ttl'))?.label ??
+                        '',
                     })}
                   </p>
                   {form.watch('b') && (
