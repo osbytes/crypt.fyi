@@ -75,14 +75,32 @@ const DAY = HOUR * 24;
 
 function getTranslatedTtlOptions(t: (key: string, options?: Record<string, unknown>) => string) {
   return [
-    { label: t('common.time.minute', { count: 5, defaultValue_other: '{{count}} minutes' }), value: 5 * MINUTE },
-    { label: t('common.time.minute', { count: 30, defaultValue_other: '{{count}} minutes' }), value: 30 * MINUTE },
+    {
+      label: t('common.time.minute', { count: 5, defaultValue_other: '{{count}} minutes' }),
+      value: 5 * MINUTE,
+    },
+    {
+      label: t('common.time.minute', { count: 30, defaultValue_other: '{{count}} minutes' }),
+      value: 30 * MINUTE,
+    },
     { label: t('common.time.hour', { count: 1, defaultValue_one: '{{count}} hour' }), value: HOUR },
-    { label: t('common.time.hour', { count: 4, defaultValue_other: '{{count}} hours' }), value: 4 * HOUR },
-    { label: t('common.time.hour', { count: 12, defaultValue_other: '{{count}} hours' }), value: 12 * HOUR },
+    {
+      label: t('common.time.hour', { count: 4, defaultValue_other: '{{count}} hours' }),
+      value: 4 * HOUR,
+    },
+    {
+      label: t('common.time.hour', { count: 12, defaultValue_other: '{{count}} hours' }),
+      value: 12 * HOUR,
+    },
     { label: t('common.time.day', { count: 1, defaultValue_one: '{{count}} day' }), value: DAY },
-    { label: t('common.time.day', { count: 3, defaultValue_other: '{{count}} days' }), value: 3 * DAY },
-    { label: t('common.time.day', { count: 7, defaultValue_other: '{{count}} days' }), value: 7 * DAY },
+    {
+      label: t('common.time.day', { count: 3, defaultValue_other: '{{count}} days' }),
+      value: 3 * DAY,
+    },
+    {
+      label: t('common.time.day', { count: 7, defaultValue_other: '{{count}} days' }),
+      value: 7 * DAY,
+    },
   ] as const;
 }
 

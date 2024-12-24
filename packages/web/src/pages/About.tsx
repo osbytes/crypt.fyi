@@ -18,7 +18,9 @@ export function About() {
         <h2 className="text-2xl font-semibold mb-4">{t('about.whyCryptFyi.title')}</h2>
         <div className="space-y-6">
           <div>
-            <h3 className="text-xl font-semibold mb-2">{t('about.whyCryptFyi.commonPractices.title')}</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              {t('about.whyCryptFyi.commonPractices.title')}
+            </h3>
             <p className="text-lg mb-4">{t('about.whyCryptFyi.commonPractices.description')}</p>
             <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
               <li>{t('about.whyCryptFyi.commonPractices.problems.email')}</li>
@@ -29,7 +31,9 @@ export function About() {
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-2">{t('about.whyCryptFyi.existingSolutions.title')}</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              {t('about.whyCryptFyi.existingSolutions.title')}
+            </h3>
             <p className="text-lg mb-4">{t('about.whyCryptFyi.existingSolutions.description')}</p>
             <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
               <li>
@@ -66,12 +70,16 @@ export function About() {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="p-6 border rounded-lg">
             <IconLock className="w-12 h-12 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">{t('about.howItWorks.steps.encrypt.title')}</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              {t('about.howItWorks.steps.encrypt.title')}
+            </h3>
             <p>{t('about.howItWorks.steps.encrypt.description')}</p>
           </div>
           <div className="p-6 border rounded-lg">
             <IconShare className="w-12 h-12 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">{t('about.howItWorks.steps.share.title')}</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              {t('about.howItWorks.steps.share.title')}
+            </h3>
             <p>{t('about.howItWorks.steps.share.description')}</p>
           </div>
           <div className="p-6 border rounded-lg">
@@ -96,7 +104,9 @@ export function About() {
           </div>
 
           <div className="p-6 border rounded-lg">
-            <h3 className="text-xl font-semibold mb-2">{t('about.security.zeroKnowledge.title')}</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              {t('about.security.zeroKnowledge.title')}
+            </h3>
             <p className="mb-2">{t('about.security.zeroKnowledge.description')}</p>
             <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
               <li>{t('about.security.zeroKnowledge.features.clientSide')}</li>
