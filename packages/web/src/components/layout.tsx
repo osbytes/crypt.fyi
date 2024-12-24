@@ -50,7 +50,7 @@ export function Layout() {
                 </a>
               </Button>
               <Button variant="ghost" size="icon" asChild title="View source on GitHub">
-                <a href={config.GITHUB_URL} target="_blank" rel="noopener noreferrer">
+                <a href={config.CRYPT_FYI_GITHUB_URL} target="_blank" rel="noopener noreferrer">
                   <IconBrandGithub />
                 </a>
               </Button>
@@ -68,7 +68,7 @@ export function Layout() {
                   About
                 </Link>
                 <a
-                  href={config.GITHUB_URL}
+                  href={config.CRYPT_FYI_GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground"

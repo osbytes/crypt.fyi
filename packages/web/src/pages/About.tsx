@@ -124,7 +124,7 @@ export function About() {
         <p className="text-lg mb-8">
           {t('about.openSource.description')}{' '}
           <a
-            href={config.GITHUB_URL}
+            href={config.CRYPT_FYI_GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"
