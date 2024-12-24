@@ -4,9 +4,13 @@ import { useTheme } from '@/theme';
 import { Link, Outlet } from 'react-router-dom';
 import { ErrorBoundary } from './error-boundary';
 import { config } from '@/config';
+import { useTranslation, Trans } from 'react-i18next';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { supportedLanguagesOptions } from '@crypt.fyi/core';
 
 export function Layout() {
   const [theme, setTheme] = useTheme();
+  const { t, i18n } = useTranslation();
 
   return (
     <ErrorBoundary>
@@ -17,23 +21,30 @@ export function Layout() {
               <Link to="/">
                 <h1 className="text-xl font-bold">crypt.fyi</h1>
               </Link>
-              <p className="text-xs text-muted-foreground">
-                Ephemeral secret sharing with zero-knowledge{' '}
-                <a
-                  href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"
-                  target="_blank"
-                >
-                  AES-256
-                </a>{' '}
-                <a href="https://en.wikipedia.org/wiki/End-to-end_encryption" target="_blank">
-                  end-to-end encryption
-                </a>
+              <p className="hidden md:block text-xs text-muted-foreground">
+                <Trans
+                  i18nKey="common.header.tagline"
+                  components={{
+                    aesLink: (
+                      <a
+                        href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"
+                        target="_blank"
+                      />
+                    ),
+                    e2eLink: (
+                      <a
+                        href="https://en.wikipedia.org/wiki/End-to-end_encryption"
+                        target="_blank"
+                      />
+                    ),
+                  }}
+                />
               </p>
             </div>
             <div className="flex items-center gap-2">
               <Link to="/about">
                 <Button variant="ghost" size="sm">
-                  About
+                  {t('about.title')}
                 </Button>
               </Link>
               <Button
@@ -50,10 +61,26 @@ export function Layout() {
                 </a>
               </Button>
               <Button variant="ghost" size="icon" asChild title="View source on GitHub">
-                <a href={config.GITHUB_URL} target="_blank" rel="noopener noreferrer">
+                <a href={config.CRYPT_FYI_GITHUB_URL} target="_blank" rel="noopener noreferrer">
                   <IconBrandGithub />
                 </a>
               </Button>
+              <Select
+                name="language"
+                value={i18n.language}
+                onValueChange={(value) => i18n.changeLanguage(value)}
+              >
+                <SelectTrigger aria-label="Language" className="w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {supportedLanguagesOptions.map(({ value, label }) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </header>
@@ -65,25 +92,19 @@ export function Layout() {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="flex items-center gap-4">
                 <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground">
-                  About
+                  {t('about.title')}
                 </Link>
                 <a
-                  href={config.GITHUB_URL}
+                  href={config.CRYPT_FYI_GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground"
                 >
                   GitHub
                 </a>
-                {/* <a 
-                  href="mailto:hi@crypt.fyi"
-                  className="text-sm text-muted-foreground hover:text-foreground"
-                >
-                  Contact
-                </a> */}
               </div>
               <div className="text-sm text-muted-foreground text-center">
-                Built with security and privacy in mind - because ignorance <i>can be</i> bliss
+                {t('common.footer.tagline')}
               </div>
             </div>
           </div>
