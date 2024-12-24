@@ -256,6 +256,23 @@ export const initApp = async (config: Config, deps: AppDeps) => {
   });
 
   app.withTypeProvider<ZodTypeProvider>().route({
+    method: 'GET',
+    url: '/vault/:vaultId/exists',
+    schema: {
+      params: getVaultParamsSchema,
+      response: {
+        200: z.object({
+          exists: z.boolean(),
+        }),
+      },
+    },
+    async handler(req, res) {
+      const exists = await vault.exists(req.params.vaultId);
+      return res.send({ exists });
+    },
+  });
+
+  app.withTypeProvider<ZodTypeProvider>().route({
     method: 'DELETE',
     url: '/vault/:vaultId',
     schema: {

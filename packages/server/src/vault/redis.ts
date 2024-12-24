@@ -135,5 +135,10 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
 
       return delResult === 1;
     },
+    async exists(id) {
+      const key = getKey(id);
+      const result = await redis.exists(key);
+      return result === 1;
+    },
   };
 };
