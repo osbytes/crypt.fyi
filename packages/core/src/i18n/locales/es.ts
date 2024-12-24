@@ -15,7 +15,8 @@ export const es: TranslationKeys = {
     error: 'Error',
     confirm: 'Confirmar',
     footer: {
-      tagline: 'Construido con seguridad y privacidad en mente - porque la ignorancia puede ser una bendición',
+      tagline:
+        'Construido con seguridad y privacidad en mente - porque la ignorancia puede ser una bendición',
     },
     time: {
       minute_one: '{{count}} minuto',
