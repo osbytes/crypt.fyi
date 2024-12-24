@@ -16,7 +16,7 @@ export const fr: TranslationKeys = {
     confirm: 'Confirmer',
     footer: {
       tagline:
-        'Construit avec la sécurité et la confidentialité à l\'esprit - parce que l\'ignorance peut être une bénédiction',
+        "Construit avec la sécurité et la confidentialité à l'esprit - parce que l'ignorance peut être une bénédiction",
     },
     header: {
       tagline:
@@ -38,7 +38,7 @@ export const fr: TranslationKeys = {
     steps: {
       encrypt: {
         title: '1. Chiffrer',
-        description: 'Votre secret est chiffré dans votre navigateur avant d\'être stocké',
+        description: "Votre secret est chiffré dans votre navigateur avant d'être stocké",
       },
       share: {
         title: '2. Partager',
@@ -64,19 +64,19 @@ export const fr: TranslationKeys = {
       },
       ttl: {
         label: 'Durée de vie',
-        placeholder: 'Sélectionnez le délai d\'expiration',
+        placeholder: "Sélectionnez le délai d'expiration",
       },
       burn: {
         label: 'Détruire après lecture',
-        description: 'Garantit qu\'un seul destinataire peut accéder au secret',
+        description: "Garantit qu'un seul destinataire peut accéder au secret",
       },
       advanced: {
         toggle: 'paramètres avancés',
         ip: {
-          label: 'Liste d\'IP/CIDR autorisées',
+          label: "Liste d'IP/CIDR autorisées",
           placeholder: '192.168.1.1, 10.0.0.0/24, etc.',
           description:
-            'Restreindre l\'accès à des adresses IP spécifiques ou des blocs CIDR (séparés par des virgules)',
+            "Restreindre l'accès à des adresses IP spécifiques ou des blocs CIDR (séparés par des virgules)",
         },
         readCount: {
           label: 'Nombre de lectures',
@@ -87,13 +87,13 @@ export const fr: TranslationKeys = {
     success: {
       title: 'Secret Créé !',
       description: {
-        main: 'Votre secret a été créé et l\'URL a été copiée dans le presse-papiers',
-        password: 'Partagez l\'URL et le mot de passe avec le destinataire souhaité',
+        main: "Votre secret a été créé et l'URL a été copiée dans le presse-papiers",
+        password: "Partagez l'URL et le mot de passe avec le destinataire souhaité",
       },
       urlCopied: 'URL copiée dans le presse-papiers',
       qrCode: {
-        title: 'Code QR de l\'URL du Secret',
-        description: 'Téléchargez et partagez le code QR de l\'URL du secret',
+        title: "Code QR de l'URL du Secret",
+        description: "Téléchargez et partagez le code QR de l'URL du secret",
       },
       createAnother: 'Créer un Autre',
       deleteSecret: 'Supprimer le Secret',
@@ -107,7 +107,8 @@ export const fr: TranslationKeys = {
     },
     errors: {
       contentRequired: 'Le contenu est requis',
-      readCountWithBurn: 'Le nombre de lectures ne peut pas être utilisé avec la destruction après lecture',
+      readCountWithBurn:
+        'Le nombre de lectures ne peut pas être utilisé avec la destruction après lecture',
       tooManyIps: 'Trop de restrictions IP (maximum {{max}})',
       invalidIp: 'Adresse IP ou bloc CIDR invalide : {{ip}}',
       uploadFailed: 'Erreur lors du traitement du contenu téléchargé : {{error}}',
@@ -125,7 +126,7 @@ export const fr: TranslationKeys = {
     password: {
       title: 'Saisir le Mot de Passe',
       placeholder: 'Saisissez le mot de passe',
-      description: 'Ce secret est protégé par un mot de passe - demandez-le à l\'expéditeur',
+      description: "Ce secret est protégé par un mot de passe - demandez-le à l'expéditeur",
       error: 'Mot de passe incorrect',
     },
     content: {
@@ -135,7 +136,7 @@ export const fr: TranslationKeys = {
       showContent: 'Afficher le contenu',
       copyToClipboard: 'Copier dans le presse-papiers',
       copiedToClipboard: 'Secret copié dans le presse-papiers',
-      clickToReveal: 'Cliquez sur l\'icône œil ci-dessus pour révéler le secret',
+      clickToReveal: "Cliquez sur l'icône œil ci-dessus pour révéler le secret",
       passwordProtected:
         'Ce secret est protégé par un mot de passe. Cliquez pour saisir le mot de passe.',
       clickToEnterPassword: 'Cliquez pour saisir le mot de passe',
@@ -156,7 +157,7 @@ export const fr: TranslationKeys = {
   about: {
     title: 'À Propos',
     intro:
-      'crypt.fyi est une plateforme sécurisée, open source et éphémère de partage de secrets qui vous permet de partager des informations sensibles en toute sécurité. Qu\'il s\'agisse de mots de passe, de clés API ou de messages confidentiels, crypt.fyi garantit que vos données restent privées et disparaissent automatiquement après avoir été consultées.',
+      "crypt.fyi est une plateforme sécurisée, open source et éphémère de partage de secrets qui vous permet de partager des informations sensibles en toute sécurité. Qu'il s'agisse de mots de passe, de clés API ou de messages confidentiels, crypt.fyi garantit que vos données restent privées et disparaissent automatiquement après avoir été consultées.",
     whyCryptFyi: {
       title: 'Pourquoi crypt.fyi ?',
       commonPractices: {
@@ -164,22 +165,21 @@ export const fr: TranslationKeys = {
         description:
           'Chaque jour, des informations sensibles comme des mots de passe, des clés API et des données privées sont partagées via des canaux non sécurisés :',
         problems: {
-          email:
-            'Email - peut être intercepté, stocké indéfiniment et transféré sans contrôle',
+          email: 'Email - peut être intercepté, stocké indéfiniment et transféré sans contrôle',
           slack:
-            'Messages Slack/Teams - restent dans l\'historique des discussions et les journaux d\'entreprise',
-          sms: 'SMS/Messages texte - stockés sur plusieurs appareils et serveurs d\'opérateurs',
+            "Messages Slack/Teams - restent dans l'historique des discussions et les journaux d'entreprise",
+          sms: "SMS/Messages texte - stockés sur plusieurs appareils et serveurs d'opérateurs",
           messaging:
             'Messagerie instantanée - manque souvent de chiffrement adéquat et de suppression des données',
         },
       },
       existingSolutions: {
         title: 'Solutions Existantes et Leurs Limites',
-        description:
-          'Bien qu\'il existe d\'autres outils dans ce domaine, chacun a ses limites :',
+        description: "Bien qu'il existe d'autres outils dans ce domaine, chacun a ses limites :",
         limitations: {
           onePassword: '1Password - excellent pour la gestion des mots de passe en équipe, mais',
-          onePasswordLink: 'ne prend pas en charge le partage externe avec des utilisateurs non enregistrés',
+          onePasswordLink:
+            'ne prend pas en charge le partage externe avec des utilisateurs non enregistrés',
           otherTools:
             'PrivateBin/PwPush/OneTimeSecret - fonctionnalité de base similaire, mais interfaces utilisateur dépassées et piles technologiques anciennes, plus certaines',
           otherToolsConfigLink: 'configurations',
@@ -187,7 +187,7 @@ export const fr: TranslationKeys = {
         },
       },
       approach: {
-        title: 'L\'Approche de crypt.fyi',
+        title: "L'Approche de crypt.fyi",
         description:
           'crypt.fyi a été construit pour répondre à ces défis tout en adoptant les technologies web modernes. Il combine les principes de sécurité des solutions existantes avec une interface propre et intuitive et une pile technologique moderne. Le résultat est un outil à la fois hautement sécurisé et agréable à utiliser.',
       },
@@ -219,9 +219,9 @@ export const fr: TranslationKeys = {
         description:
           'Tous les secrets sont chiffrés en utilisant le chiffrement AES-256-GCM dans votre navigateur avant la transmission. La clé de chiffrement ne quitte jamais votre appareil, assurant un véritable chiffrement de bout en bout.',
         features: {
-          key: 'La clé de chiffrement est dérivée d\'une génération aléatoire cryptographiquement sûre',
+          key: "La clé de chiffrement est dérivée d'une génération aléatoire cryptographiquement sûre",
           derivation: 'La dérivation des clés utilise PBKDF2 avec SHA-256',
-          vector: 'Chaque secret a un vecteur d\'initialisation (IV) unique',
+          vector: "Chaque secret a un vecteur d'initialisation (IV) unique",
         },
       },
       zeroKnowledge: {
@@ -231,7 +231,7 @@ export const fr: TranslationKeys = {
         features: {
           clientSide: 'Tout le chiffrement/déchiffrement se fait côté client',
           storage: 'Les serveurs ne stockent que des données chiffrées',
-          keys: 'Les clés de chiffrement sont transmises via des fragments d\'URL, qui n\'atteignent jamais le serveur API backend',
+          keys: "Les clés de chiffrement sont transmises via des fragments d'URL, qui n'atteignent jamais le serveur API backend",
         },
       },
       protection: {
@@ -253,4 +253,4 @@ export const fr: TranslationKeys = {
       cta: 'Créer un Secret Maintenant',
     },
   },
-}; 
+};
