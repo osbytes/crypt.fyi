@@ -658,11 +658,11 @@ export function CreatePage() {
                                         disabled={createMutation.isPending || field.disabled}
                                       />
                                     </FormControl>
+                                    <FormMessage />
                                     <FormDescription>
                                       Restrict access to specific IP addresses or CIDR blocks (comma
                                       separated)
                                     </FormDescription>
-                                    <FormMessage />
                                   </FormItem>
                                 )}
                               />
@@ -675,7 +675,6 @@ export function CreatePage() {
                                     <FormControl>
                                       <Input
                                         type="number"
-                                        placeholder="Maximum number of times the secret can be read"
                                         {...field}
                                         onChange={(e) => {
                                           form.setValue('b', !e.target.value);
@@ -688,6 +687,9 @@ export function CreatePage() {
                                       />
                                     </FormControl>
                                     <FormMessage />
+                                    <FormDescription>
+                                      Maximum number of times the secret can be read
+                                    </FormDescription>
                                   </FormItem>
                                 )}
                               />
