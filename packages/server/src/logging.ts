@@ -1,6 +1,17 @@
 import pino from 'pino';
 import { Config } from './config';
 
+// Strip query parameters from URLs to prevent logging sensitive data
+const stripQueryParams = (url: string) => {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.pathname;
+  } catch {
+    // If URL parsing fails, just remove everything after '?'
+    return url.split('?')[0];
+  }
+};
+
 export const initLogging = async (config: Config): Promise<pino.Logger> => {
   return pino({
     level: config.logLevel,
@@ -8,6 +19,18 @@ export const initLogging = async (config: Config): Promise<pino.Logger> => {
       env: config.env,
       service: config.serviceName,
       version: config.serviceVersion,
+    },
+    serializers: {
+      // https://fastify.dev/docs/v2.15.x/Documentation/Logging/#log-redaction
+      req(request) {
+        return {
+          method: request.method,
+          url: stripQueryParams(request.url),
+          hostname: request.hostname,
+          remoteAddress: request.ip,
+          remotePort: request.socket.remotePort,
+        };
+      },
     },
   });
 };
