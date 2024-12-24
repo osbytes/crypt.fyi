@@ -1,9 +1,9 @@
 import { config } from '@/config';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import invariant from 'tiny-invariant';
 import { Card } from '@/components/ui/card';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button/button';
@@ -22,7 +22,7 @@ import { clipboardCopy } from '@/lib/clipboardCopy';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader } from '@/components/ui/loader';
 import { useEncryptionWorker } from '@/hooks/useEncryptionWorker';
-import { sha256 } from '@crypt.fyi/core';
+import { InvalidKeyAndOrPasswordError, sha256 } from '@crypt.fyi/core';
 
 export function ViewPage() {
   const { id } = useParams<{ id: string }>();
@@ -34,11 +34,26 @@ export function ViewPage() {
   const [password, setPassword] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [hasUserConfirmed, setHasUserConfirmed] = useState(false);
 
   const { decrypt } = useEncryptionWorker();
 
-  const query = useMutation({
-    mutationKey: ['view', id, key, password],
+  const existsQuery = useQuery({
+    queryKey: [id, 'exists'],
+    queryFn: async () => {
+      const res = await fetch(`${config.API_URL}/vault/${id}/exists`);
+      await sleep(500, { enabled: config.IS_DEV });
+      if (!res.ok) {
+        throw new Error(`unexpected status code ${res.status}`);
+      }
+      return res.json() as Promise<{ exists: boolean }>;
+    },
+    retry: () => false,
+    enabled: isPasswordSet,
+  });
+
+  const decryptMutation = useMutation({
+    mutationKey: [id, key, password],
     mutationFn: async () => {
       const h = sha256(key + (isPasswordSet ? password : ''));
       const res = await fetch(`${config.API_URL}/vault/${id}?h=${h}`);
@@ -64,7 +79,7 @@ export function ViewPage() {
           };
         }
         case 400:
-          throw new Error('invalid key and/or password');
+          throw new InvalidKeyAndOrPasswordError();
         case 404:
           setIsDialogOpen(false);
           throw new NotFoundError();
@@ -81,17 +96,14 @@ export function ViewPage() {
     },
   });
 
-  const sentRequest = useRef(false);
-  useEffect(() => {
-    if (sentRequest.current || isPasswordSet) {
-      return;
-    }
-    sentRequest.current = true;
+  if (existsQuery.isLoading) {
+    return <Loader />;
+  }
 
-    query.mutate();
-  }, [query, isPasswordSet]);
-
-  if (query.error instanceof NotFoundError) {
+  if (
+    decryptMutation.error instanceof NotFoundError ||
+    (isPasswordSet && !existsQuery.data?.exists)
+  ) {
     return (
       <div className="max-w-3xl mx-auto mt-8 text-center">
         <Card className="p-8">
@@ -100,18 +112,35 @@ export function ViewPage() {
             This secret may have expired or been deleted.
           </p>
           <Button asChild>
-            <Link to="/">Create New Secret</Link>
+            <Link to="/new">Create New Secret</Link>
           </Button>
         </Card>
       </div>
     );
-  } else if (query.error) {
-    throw query.error;
+  } else if (decryptMutation.error) {
+    throw decryptMutation.error;
+  }
+
+  // Show initial confirmation screen to require user input before fetching the secret
+  if (!hasUserConfirmed && !isPasswordSet) {
+    return (
+      <div className="max-w-3xl mx-auto mt-8 flex flex-col items-center justify-center">
+        <Button
+          onClick={() => {
+            setHasUserConfirmed(true);
+            decryptMutation.mutate();
+          }}
+          size="lg"
+        >
+          View Secret
+        </Button>
+      </div>
+    );
   }
 
   let content = null;
-  if (query.data) {
-    const decryptedContent = query.data.value;
+  if (decryptMutation.data) {
+    const decryptedContent = decryptMutation.data.value;
     let fileData: { type: 'file'; name: string; content: string } | null = null;
 
     try {
@@ -141,7 +170,7 @@ export function ViewPage() {
                 variant="outline"
                 size="icon"
                 onClick={() => {
-                  clipboardCopy(query.data.value);
+                  clipboardCopy(decryptMutation.data.value);
                   toast.success('Secret copied to clipboard');
                 }}
                 title="Copy to clipboard"
@@ -152,9 +181,9 @@ export function ViewPage() {
             </>
           )}
         </div>
-        {query.data && (
+        {decryptMutation.data && (
           <div className="flex justify-center">
-            {query.data.burned ? (
+            {decryptMutation.data.burned ? (
               <div className="grid grid-cols-[auto_1fr] items-center gap-2 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-lg p-2 mb-2">
                 <IconFlame className="h-4 w-4" />
                 <p className="text-xs">
@@ -167,9 +196,12 @@ export function ViewPage() {
                 <IconClock className="h-4 w-4" />
                 <p className="text-xs">
                   Expires{' '}
-                  {formatDistanceToNow(new Date(query.data.cd + query.data.ttl), {
-                    addSuffix: true,
-                  })}
+                  {formatDistanceToNow(
+                    new Date(decryptMutation.data.cd + decryptMutation.data.ttl),
+                    {
+                      addSuffix: true,
+                    },
+                  )}
                 </p>
               </div>
             )}
@@ -223,7 +255,7 @@ export function ViewPage() {
         </p>
       </Card>
     );
-  } else if (query.isPending) {
+  } else if (decryptMutation.isPending) {
     content = <Loader />;
   }
 
@@ -240,7 +272,7 @@ export function ViewPage() {
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              query.mutate();
+              decryptMutation.mutate();
             }}
           >
             <div className="space-y-2">
@@ -252,13 +284,14 @@ export function ViewPage() {
                 required
                 autoFocus
                 className="text-lg"
+                disabled={decryptMutation.isPending}
               />
               <p className="text-sm text-muted-foreground">
                 This secret is protected with a password - request from the sender
               </p>
             </div>
             <div className="flex justify-end gap-3">
-              <Button type="submit" isLoading={query.isPending}>
+              <Button type="submit" isLoading={decryptMutation.isPending}>
                 Confirm
               </Button>
             </div>

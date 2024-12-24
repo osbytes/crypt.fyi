@@ -20,6 +20,7 @@ export interface Vault {
     ip: string,
   ): Promise<Pick<VaultValue, 'c' | 'b' | 'ttl' | 'cd'> | undefined>;
   del(id: string, dt: string): Promise<boolean>;
+  exists(id: string): Promise<boolean>;
 }
 
 export class InvalidKeyAndOrPasswordError extends Error {

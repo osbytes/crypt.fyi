@@ -39,4 +39,8 @@ export class EncryptedVault implements Vault {
   async del(id: string, dt: string): Promise<boolean> {
     return this.vault.del(id, dt);
   }
+
+  async exists(id: string): Promise<boolean> {
+    return this.vault.exists(id);
+  }
 }
