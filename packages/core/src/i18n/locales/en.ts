@@ -13,6 +13,14 @@ export const en: TranslationKeys = {
     download: 'Download',
     success: 'Success!',
     error: 'Error',
+    time: {
+      minute_one: '{{count}} minute',
+      minute_other: '{{count}} minutes',
+      hour_one: '{{count}} hour',
+      hour_other: '{{count}} hours',
+      day_one: '{{count}} day',
+      day_other: '{{count}} days',
+    },
   },
   landing: {
     title: 'Share Secrets Securely',

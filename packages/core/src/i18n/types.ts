@@ -11,6 +11,14 @@ export interface TranslationKeys {
     download: string;
     success: string;
     error: string;
+    time: {
+      minute_one: string;
+      minute_other: string;
+      hour_one: string;
+      hour_other: string;
+      day_one: string;
+      day_other: string;
+    };
   };
   landing: {
     title: string;

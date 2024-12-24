@@ -73,16 +73,18 @@ const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
 const DAY = HOUR * 24;
 
-const ttlOptions = [
-  { label: '5 minutes', value: 5 * MINUTE },
-  { label: '30 minutes', value: 30 * MINUTE },
-  { label: '1 hour', value: HOUR },
-  { label: '4 hours', value: 4 * HOUR },
-  { label: '12 hours', value: 12 * HOUR },
-  { label: '1 day', value: DAY },
-  { label: '3 days', value: 3 * DAY },
-  { label: '7 days', value: 7 * DAY },
-] as const;
+function getTranslatedTtlOptions(t: (key: string, options?: Record<string, unknown>) => string) {
+  return [
+    { label: t('common.time.minute', { count: 5, defaultValue_other: '{{count}} minutes' }), value: 5 * MINUTE },
+    { label: t('common.time.minute', { count: 30, defaultValue_other: '{{count}} minutes' }), value: 30 * MINUTE },
+    { label: t('common.time.hour', { count: 1, defaultValue_one: '{{count}} hour' }), value: HOUR },
+    { label: t('common.time.hour', { count: 4, defaultValue_other: '{{count}} hours' }), value: 4 * HOUR },
+    { label: t('common.time.hour', { count: 12, defaultValue_other: '{{count}} hours' }), value: 12 * HOUR },
+    { label: t('common.time.day', { count: 1, defaultValue_one: '{{count}} day' }), value: DAY },
+    { label: t('common.time.day', { count: 3, defaultValue_other: '{{count}} days' }), value: 3 * DAY },
+    { label: t('common.time.day', { count: 7, defaultValue_other: '{{count}} days' }), value: 7 * DAY },
+  ] as const;
+}
 
 const DEFAULT_TTL = 30 * MINUTE;
 
@@ -156,10 +158,10 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
       }
     });
 
-function findClosestTTL(duration: number): number {
+function findClosestTTL(duration: number, options: ReadonlyArray<{ value: number }>): number {
   if (duration <= 0) return DEFAULT_TTL;
 
-  return ttlOptions.reduce((prev, curr) => {
+  return options.reduce((prev, curr) => {
     const prevDiff = Math.abs(prev - duration);
     const currDiff = Math.abs(curr.value - duration);
     return currDiff < prevDiff ? curr.value : prev;
@@ -191,7 +193,7 @@ function svgToImage(svg: SVGElement): Promise<string> {
 
 type DragState = 'none' | 'dragging' | 'invalid';
 
-function getInitialValues() {
+function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
   const params = new URLSearchParams(window.location.search);
   const ttlParam = params.get('ttl');
   const burn = params.get('burn');
@@ -200,7 +202,7 @@ function getInitialValues() {
   if (ttlParam) {
     const parsed = parseDuration(ttlParam);
     if (parsed) {
-      ttl = findClosestTTL(parsed);
+      ttl = findClosestTTL(parsed, ttlOptions);
     }
   }
 
@@ -249,10 +251,11 @@ const handleContentDrop = async (
 export function CreatePage() {
   const { t } = useTranslation();
   const formSchema = React.useMemo(() => createFormSchema(t), [t]);
+  const ttlOptions = React.useMemo(() => getTranslatedTtlOptions(t), [t]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(),
+    defaultValues: React.useMemo(() => getInitialValues(ttlOptions), [ttlOptions]),
   });
 
   const { encrypt } = useEncryptionWorker();
