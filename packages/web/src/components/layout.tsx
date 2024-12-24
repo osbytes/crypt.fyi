@@ -21,7 +21,7 @@ export function Layout() {
               <Link to="/">
                 <h1 className="text-xl font-bold">crypt.fyi</h1>
               </Link>
-              <p className="text-xs text-muted-foreground">
+              <p className="hidden md:block text-xs text-muted-foreground">
                 Ephemeral secret sharing with zero-knowledge{' '}
                 <a
                   href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"

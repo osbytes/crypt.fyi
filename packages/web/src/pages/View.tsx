@@ -273,7 +273,7 @@ export function ViewPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className="max-w-3xl mx-auto p-4 py-8">
       {content}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

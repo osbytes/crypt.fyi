@@ -476,7 +476,7 @@ export function CreatePage() {
 
   return (
     <div
-      className="max-w-xl mx-auto relative"
+      className="max-w-xl mx-auto py-8 relative"
       onDragEnter={handleDragEnter}
       onDragOver={handleDragEnter}
       onDragLeave={handleDragLeave}
