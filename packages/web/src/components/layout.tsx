@@ -58,7 +58,11 @@ export function Layout() {
                   <IconBrandGithub />
                 </a>
               </Button>
-              <Select name="language" value={i18n.language} onValueChange={(value) => i18n.changeLanguage(value)}>
+              <Select
+                name="language"
+                value={i18n.language}
+                onValueChange={(value) => i18n.changeLanguage(value)}
+              >
                 <SelectTrigger aria-label="Language" className="w-[100px]">
                   <SelectValue />
                 </SelectTrigger>
