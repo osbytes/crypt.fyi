@@ -142,4 +142,90 @@ export const en: TranslationKeys = {
       viewSecret: 'View Secret',
     },
   },
+  about: {
+    title: 'About',
+    intro: 'crypt.fyi is a secure, open-source, ephemeral secret-sharing platform that enables you to share sensitive information safely. Whether it\'s passwords, API keys, or confidential messages, crypt.fyi ensures your data remains private and automatically disappears after being accessed.',
+    whyCryptFyi: {
+      title: 'Why crypt.fyi?',
+      commonPractices: {
+        title: 'The Problem with Common Practices',
+        description: 'Every day, sensitive information like passwords, API keys, and private data is shared through insecure channels:',
+        problems: {
+          email: 'Email - can be intercepted, stored indefinitely, and forwarded without control',
+          slack: 'Slack/Teams messages - remain in chat history and company logs',
+          sms: 'SMS/Text messages - stored on multiple devices and carrier servers',
+          messaging: 'Instant messaging - often lacks proper encryption and data deletion',
+        },
+      },
+      existingSolutions: {
+        title: 'Existing Solutions and Their Limitations',
+        description: 'While there are other tools in this space, each has its limitations:',
+        limitations: {
+          onePassword: '1Password - excellent for team password management, but',
+          onePasswordLink: 'doesn\'t support external non-users sharing internally',
+          otherTools: 'PrivateBin/PwPush/OneTimeSecret - similar core functionality, but dated user interfaces and technology stacks as well as some missing',
+          otherToolsConfigLink: 'configurability',
+          otherToolsSecurityLink: 'security features',
+        },
+      },
+      approach: {
+        title: 'The crypt.fyi Approach',
+        description: 'crypt.fyi was built to address these challenges while embracing modern web technologies. It combines the security principles of existing solutions with a clean, intuitive interface and a modern tech stack. The result is a tool that\'s both highly secure and pleasant to use.',
+      },
+    },
+    howItWorks: {
+      title: 'How It Works',
+      steps: {
+        encrypt: {
+          title: '1. Encrypt',
+          description: 'Your secret is encrypted right in your browser before it ever leaves your device. Only people with the special link, that you\'ve explicitly shared, can decrypt it.',
+        },
+        share: {
+          title: '2. Share',
+          description: 'Share the secure link with your intended recipient. The link contains everything needed to decrypt the message, unless a password is specified.',
+        },
+        burn: {
+          title: '3. Burn after read',
+          description: 'Once accessed, if \'burn after read\' is checked, the secret is permanently deleted from our servers. No traces left behind.',
+        },
+      },
+    },
+    security: {
+      title: 'Security Implementation',
+      encryption: {
+        title: 'End-to-End Encryption',
+        description: 'All secrets are encrypted using AES-256-GCM encryption in your browser before transmission. The encryption key never leaves your device, ensuring true end-to-end encryption.',
+        features: {
+          key: 'Encryption key is derived from a cryptographically secure random generation',
+          derivation: 'Key derivation uses PBKDF2 with SHA-256',
+          vector: 'Each secret has a unique initialization vector (IV)',
+        },
+      },
+      zeroKnowledge: {
+        title: 'Zero-Knowledge Architecture',
+        description: 'Our servers never see your unencrypted data. We employ a zero-knowledge architecture where:',
+        features: {
+          clientSide: 'All encryption/decryption happens client-side',
+          storage: 'Servers only store encrypted data',
+          keys: 'Encryption keys are transmitted via URL fragments, which never reach the backend api server',
+        },
+      },
+      protection: {
+        title: 'Data Protection',
+        description: 'Multiple layers of security ensure your data remains protected:',
+        features: {
+          encryption: 'Client-side encryption/decryption',
+          tls: 'TLS encryption for all API communications',
+          destruction: 'Automatic secret destruction after access',
+          logging: 'No server-side logging of sensitive data',
+          password: 'Optional password protection for additional security',
+        },
+      },
+    },
+    openSource: {
+      title: 'Open Source',
+      description: 'crypt.fyi is open source and auditable. You can review our code, submit issues, and contribute on',
+      cta: 'Create a Secret Now',
+    },
+  },
 };

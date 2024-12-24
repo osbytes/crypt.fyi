@@ -139,6 +139,92 @@ export interface TranslationKeys {
       viewSecret: string;
     };
   };
+  about: {
+    title: string;
+    intro: string;
+    whyCryptFyi: {
+      title: string;
+      commonPractices: {
+        title: string;
+        description: string;
+        problems: {
+          email: string;
+          slack: string;
+          sms: string;
+          messaging: string;
+        };
+      };
+      existingSolutions: {
+        title: string;
+        description: string;
+        limitations: {
+          onePassword: string;
+          onePasswordLink: string;
+          otherTools: string;
+          otherToolsConfigLink: string;
+          otherToolsSecurityLink: string;
+        };
+      };
+      approach: {
+        title: string;
+        description: string;
+      };
+    };
+    howItWorks: {
+      title: string;
+      steps: {
+        encrypt: {
+          title: string;
+          description: string;
+        };
+        share: {
+          title: string;
+          description: string;
+        };
+        burn: {
+          title: string;
+          description: string;
+        };
+      };
+    };
+    security: {
+      title: string;
+      encryption: {
+        title: string;
+        description: string;
+        features: {
+          key: string;
+          derivation: string;
+          vector: string;
+        };
+      };
+      zeroKnowledge: {
+        title: string;
+        description: string;
+        features: {
+          clientSide: string;
+          storage: string;
+          keys: string;
+        };
+      };
+      protection: {
+        title: string;
+        description: string;
+        features: {
+          encryption: string;
+          tls: string;
+          destruction: string;
+          logging: string;
+          password: string;
+        };
+      };
+    };
+    openSource: {
+      title: string;
+      description: string;
+      cta: string;
+    };
+  };
 }
 
 export type TranslationNamespace = keyof TranslationKeys;
