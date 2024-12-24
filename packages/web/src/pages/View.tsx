@@ -49,6 +49,7 @@ export function ViewPage() {
       return res.json() as Promise<{ exists: boolean }>;
     },
     retry: () => false,
+    enabled: isPasswordSet,
   });
 
   const decryptMutation = useMutation({
@@ -99,7 +100,10 @@ export function ViewPage() {
     return <Loader />;
   }
 
-  if (decryptMutation.error instanceof NotFoundError || !existsQuery.data?.exists) {
+  if (
+    decryptMutation.error instanceof NotFoundError ||
+    (isPasswordSet && !existsQuery.data?.exists)
+  ) {
     return (
       <div className="max-w-3xl mx-auto mt-8 text-center">
         <Card className="p-8">
