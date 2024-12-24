@@ -67,7 +67,7 @@ export function Layout() {
               </Button>
               <Select
                 name="language"
-                value={i18n.language}
+                value={i18n.resolvedLanguage}
                 onValueChange={(value) => i18n.changeLanguage(value)}
               >
                 <SelectTrigger aria-label="Language" className="w-[100px]">
