@@ -35,16 +35,6 @@ export function Layout() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Select value={i18n.language} onValueChange={(value) => i18n.changeLanguage(value)}>
-                <SelectTrigger className="w-[130px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {supportedLanguagesOptions.map(({ value, label }) => (
-                    <SelectItem value={value}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <Link to="/about">
                 <Button variant="ghost" size="sm">
                   {t('about.title')}
@@ -68,6 +58,16 @@ export function Layout() {
                   <IconBrandGithub />
                 </a>
               </Button>
+              <Select value={i18n.language} onValueChange={(value) => i18n.changeLanguage(value)}>
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {supportedLanguagesOptions.map(({ value, label }) => (
+                    <SelectItem value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </header>
