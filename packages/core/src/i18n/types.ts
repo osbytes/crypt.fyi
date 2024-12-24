@@ -15,6 +15,9 @@ export interface TranslationKeys {
     footer: {
       tagline: string;
     };
+    header: {
+      tagline: string;
+    };
     time: {
       minute_one: string;
       minute_other: string;

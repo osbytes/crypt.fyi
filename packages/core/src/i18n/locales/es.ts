@@ -18,6 +18,10 @@ export const es: TranslationKeys = {
       tagline:
         'Construido con seguridad y privacidad en mente - porque la ignorancia puede ser una bendición',
     },
+    header: {
+      tagline:
+        'Compartir secretos efímeros con cifrado <aesLink>AES-256</aesLink> de <e2eLink>extremo a extremo</e2eLink> de conocimiento cero',
+    },
     time: {
       minute_one: '{{count}} minuto',
       minute_other: '{{count}} minutos',

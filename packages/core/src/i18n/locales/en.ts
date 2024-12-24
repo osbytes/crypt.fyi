@@ -17,6 +17,10 @@ export const en: TranslationKeys = {
     footer: {
       tagline: 'Built with security and privacy in mind - because ignorance can be bliss',
     },
+    header: {
+      tagline:
+        'Ephemeral secret sharing with zero-knowledge <aesLink>AES-256</aesLink> <e2eLink>end-to-end encryption</e2eLink>',
+    },
     time: {
       minute_one: '{{count}} minute',
       minute_other: '{{count}} minutes',

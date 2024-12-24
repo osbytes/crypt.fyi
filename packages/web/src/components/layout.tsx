@@ -4,7 +4,7 @@ import { useTheme } from '@/theme';
 import { Link, Outlet } from 'react-router-dom';
 import { ErrorBoundary } from './error-boundary';
 import { config } from '@/config';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { supportedLanguagesOptions } from '@crypt.fyi/core';
 
@@ -22,16 +22,23 @@ export function Layout() {
                 <h1 className="text-xl font-bold">crypt.fyi</h1>
               </Link>
               <p className="hidden md:block text-xs text-muted-foreground">
-                Ephemeral secret sharing with zero-knowledge{' '}
-                <a
-                  href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"
-                  target="_blank"
-                >
-                  AES-256
-                </a>{' '}
-                <a href="https://en.wikipedia.org/wiki/End-to-end_encryption" target="_blank">
-                  end-to-end encryption
-                </a>
+                <Trans
+                  i18nKey="common.header.tagline"
+                  components={{
+                    aesLink: (
+                      <a
+                        href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"
+                        target="_blank"
+                      />
+                    ),
+                    e2eLink: (
+                      <a
+                        href="https://en.wikipedia.org/wiki/End-to-end_encryption"
+                        target="_blank"
+                      />
+                    ),
+                  }}
+                />
               </p>
             </div>
             <div className="flex items-center gap-2">
