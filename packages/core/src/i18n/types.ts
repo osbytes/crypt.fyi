@@ -11,6 +11,7 @@ export interface TranslationKeys {
     download: string;
     success: string;
     error: string;
+    confirm: string;
     time: {
       minute_one: string;
       minute_other: string;
@@ -101,6 +102,41 @@ export interface TranslationKeys {
       deleteFailed: string;
       secretNotFound: string;
       unexpectedStatus: string;
+    };
+  };
+  view: {
+    notFound: {
+      title: string;
+      description: string;
+      createNew: string;
+    };
+    password: {
+      title: string;
+      placeholder: string;
+      description: string;
+      error: string;
+    };
+    content: {
+      fileShared: string;
+      downloadFile: string;
+      hideContent: string;
+      showContent: string;
+      copyToClipboard: string;
+      copiedToClipboard: string;
+      clickToReveal: string;
+      passwordProtected: string;
+      clickToEnterPassword: string;
+    };
+    info: {
+      burnedAfterReading: string;
+      expiresIn: string;
+    };
+    errors: {
+      notFound: string;
+      unexpectedStatus: string;
+    };
+    actions: {
+      viewSecret: string;
     };
   };
 }

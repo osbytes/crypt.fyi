@@ -13,6 +13,7 @@ export const en: TranslationKeys = {
     download: 'Download',
     success: 'Success!',
     error: 'Error',
+    confirm: 'Confirm',
     time: {
       minute_one: '{{count}} minute',
       minute_other: '{{count}} minutes',
@@ -104,6 +105,41 @@ export const en: TranslationKeys = {
       deleteFailed: 'Failed to delete secret: {{error}}',
       secretNotFound: 'secret not found',
       unexpectedStatus: 'unexpected status code {{code}}',
+    },
+  },
+  view: {
+    notFound: {
+      title: 'Secret Not Found',
+      description: 'This secret may have expired or been deleted.',
+      createNew: 'Create New Secret',
+    },
+    password: {
+      title: 'Enter Password',
+      placeholder: 'Enter the password',
+      description: 'This secret is protected with a password - request from the sender',
+      error: 'Incorrect password',
+    },
+    content: {
+      fileShared: 'A file has been shared with you',
+      downloadFile: 'Download File',
+      hideContent: 'Hide content',
+      showContent: 'Show content',
+      copyToClipboard: 'Copy to clipboard',
+      copiedToClipboard: 'Secret copied to clipboard',
+      clickToReveal: 'Click the eye icon above to reveal the secret',
+      passwordProtected: 'This secret is password protected. Click to enter password.',
+      clickToEnterPassword: 'Click to enter password',
+    },
+    info: {
+      burnedAfterReading: 'This secret was deleted after your viewing and is no longer available after leaving the page.',
+      expiresIn: 'Expires {{time}}',
+    },
+    errors: {
+      notFound: 'not found',
+      unexpectedStatus: 'unexpected status code {{code}}',
+    },
+    actions: {
+      viewSecret: 'View Secret',
     },
   },
 };
