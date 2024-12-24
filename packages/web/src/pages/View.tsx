@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import invariant from 'tiny-invariant';
 import { Card } from '@/components/ui/card';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button/button';
@@ -35,6 +35,8 @@ export function ViewPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
   const [isRevealed, setIsRevealed] = useState(false);
   const [hasUserConfirmed, setHasUserConfirmed] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
   const { decrypt } = useEncryptionWorker();
 
@@ -90,9 +92,17 @@ export function ViewPage() {
     retry: () => false,
     onSuccess() {
       setIsDialogOpen(false);
+      setPasswordError(null);
     },
     onError(error) {
-      toast.error(error.message);
+      if (error instanceof InvalidKeyAndOrPasswordError) {
+        setPasswordError('Incorrect password');
+        setTimeout(() => {
+          passwordInputRef.current?.focus();
+        }, 100);
+      } else {
+        toast.error(error.message);
+      }
     },
   });
 
@@ -117,7 +127,10 @@ export function ViewPage() {
         </Card>
       </div>
     );
-  } else if (decryptMutation.error) {
+  } else if (
+    decryptMutation.error &&
+    !(decryptMutation.error instanceof InvalidKeyAndOrPasswordError)
+  ) {
     throw decryptMutation.error;
   }
 
@@ -277,15 +290,23 @@ export function ViewPage() {
           >
             <div className="space-y-2">
               <Input
+                ref={passwordInputRef}
                 type="password"
                 placeholder="Enter the password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError(null);
+                }}
                 required
                 autoFocus
-                className="text-lg"
+                className={cn(
+                  'text-lg',
+                  passwordError && 'border-destructive focus-visible:ring-destructive',
+                )}
                 disabled={decryptMutation.isPending}
               />
+              {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
               <p className="text-sm text-muted-foreground">
                 This secret is protected with a password - request from the sender
               </p>
