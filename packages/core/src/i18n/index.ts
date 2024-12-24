@@ -13,3 +13,12 @@ export const resources = {
     translation: es,
   },
 } as const;
+
+export const supportedLanguages: Record<keyof typeof resources, string> = {
+  en: 'English',
+  es: 'Español',
+};
+export const supportedLanguagesOptions = Object.entries(supportedLanguages).map(([key, value]) => ({
+  value: key,
+  label: value,
+}));

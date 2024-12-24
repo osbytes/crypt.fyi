@@ -4,9 +4,13 @@ import { useTheme } from '@/theme';
 import { Link, Outlet } from 'react-router-dom';
 import { ErrorBoundary } from './error-boundary';
 import { config } from '@/config';
+import { useTranslation } from 'react-i18next';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { supportedLanguagesOptions } from '@crypt.fyi/core';
 
 export function Layout() {
   const [theme, setTheme] = useTheme();
+  const { t, i18n } = useTranslation();
 
   return (
     <ErrorBoundary>
@@ -31,9 +35,19 @@ export function Layout() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              <Select value={i18n.language} onValueChange={(value) => i18n.changeLanguage(value)}>
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {supportedLanguagesOptions.map(({ value, label }) => (
+                    <SelectItem value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Link to="/about">
                 <Button variant="ghost" size="sm">
-                  About
+                  {t('about.title')}
                 </Button>
               </Link>
               <Button
@@ -65,7 +79,7 @@ export function Layout() {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="flex items-center gap-4">
                 <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground">
-                  About
+                  {t('about.title')}
                 </Link>
                 <a
                   href={config.CRYPT_FYI_GITHUB_URL}
@@ -75,15 +89,9 @@ export function Layout() {
                 >
                   GitHub
                 </a>
-                {/* <a 
-                  href="mailto:hi@crypt.fyi"
-                  className="text-sm text-muted-foreground hover:text-foreground"
-                >
-                  Contact
-                </a> */}
               </div>
               <div className="text-sm text-muted-foreground text-center">
-                Built with security and privacy in mind - because ignorance <i>can be</i> bliss
+                {t('common.footer.tagline')}
               </div>
             </div>
           </div>

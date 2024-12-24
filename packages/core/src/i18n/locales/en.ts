@@ -14,6 +14,9 @@ export const en: TranslationKeys = {
     success: 'Success!',
     error: 'Error',
     confirm: 'Confirm',
+    footer: {
+      tagline: 'Built with security and privacy in mind - because ignorance can be bliss',
+    },
     time: {
       minute_one: '{{count}} minute',
       minute_other: '{{count}} minutes',

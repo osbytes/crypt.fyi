@@ -12,6 +12,9 @@ export interface TranslationKeys {
     success: string;
     error: string;
     confirm: string;
+    footer: {
+      tagline: string;
+    };
     time: {
       minute_one: string;
       minute_other: string;
