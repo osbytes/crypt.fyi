@@ -149,7 +149,8 @@ export const zh: TranslationKeys = {
   },
   about: {
     title: '关于',
-    intro: 'crypt.fyi 是一个安全、开源、临时的密文分享平台，使您能够安全地分享敏感信息。无论是密码、API 密钥还是机密消息，crypt.fyi 都能确保您的数据保持私密，并在被访问后自动消失。',
+    intro:
+      'crypt.fyi 是一个安全、开源、临时的密文分享平台，使您能够安全地分享敏感信息。无论是密码、API 密钥还是机密消息，crypt.fyi 都能确保您的数据保持私密，并在被访问后自动消失。',
     whyCryptFyi: {
       title: '为什么选择 crypt.fyi？',
       commonPractices: {
@@ -168,14 +169,16 @@ export const zh: TranslationKeys = {
         limitations: {
           onePassword: '1Password - 出色的团队密码管理工具，但',
           onePasswordLink: '不支持与外部非用户共享',
-          otherTools: 'PrivateBin/PwPush/OneTimeSecret - 核心功能相似，但用户界面和技术栈较旧，且缺少一些',
+          otherTools:
+            'PrivateBin/PwPush/OneTimeSecret - 核心功能相似，但用户界面和技术栈较旧，且缺少一些',
           otherToolsConfigLink: '可配置性',
           otherToolsSecurityLink: '安全功能',
         },
       },
       approach: {
         title: 'crypt.fyi 的方法',
-        description: 'crypt.fyi 在拥抱现代网络技术的同时解决这些挑战。它将现有解决方案的安全原则与清晰、直观的界面和现代技术栈相结合。结果是一个既高度安全又易于使用的工具。',
+        description:
+          'crypt.fyi 在拥抱现代网络技术的同时解决这些挑战。它将现有解决方案的安全原则与清晰、直观的界面和现代技术栈相结合。结果是一个既高度安全又易于使用的工具。',
       },
     },
     howItWorks: {
@@ -183,7 +186,8 @@ export const zh: TranslationKeys = {
       steps: {
         encrypt: {
           title: '1. 加密',
-          description: '您的密文在离开设备之前就在浏览器中加密。只有拥有您明确共享的特殊链接的人才能解密。',
+          description:
+            '您的密文在离开设备之前就在浏览器中加密。只有拥有您明确共享的特殊链接的人才能解密。',
         },
         share: {
           title: '2. 分享',
@@ -191,7 +195,8 @@ export const zh: TranslationKeys = {
         },
         burn: {
           title: '3. 阅后即焚',
-          description: '一旦被访问，如果选中了"阅后即焚"，密文将从我们的服务器上永久删除。不留任何痕迹。',
+          description:
+            '一旦被访问，如果选中了"阅后即焚"，密文将从我们的服务器上永久删除。不留任何痕迹。',
         },
       },
     },
@@ -199,7 +204,8 @@ export const zh: TranslationKeys = {
       title: '安全实现',
       encryption: {
         title: '端到端加密',
-        description: '所有密文在传输前都使用 AES-256-GCM 加密在您的浏览器中进行加密。加密密钥永远不会离开您的设备，确保真正的端到端加密。',
+        description:
+          '所有密文在传输前都使用 AES-256-GCM 加密在您的浏览器中进行加密。加密密钥永远不会离开您的设备，确保真正的端到端加密。',
         features: {
           key: '加密密钥来自密码学安全的随机生成',
           derivation: '密钥派生使用 PBKDF2 和 SHA-256',
@@ -233,4 +239,4 @@ export const zh: TranslationKeys = {
       cta: '立即创建密文',
     },
   },
-}; 
+};
