@@ -9,6 +9,7 @@ export default defineConfig({
   },
   plugins: [
     webExtension({
+      disableAutoLaunch: true,
       manifest: () => ({
         manifest_version: 3,
         name: 'crypt.fyi',
