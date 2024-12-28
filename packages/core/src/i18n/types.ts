@@ -84,6 +84,9 @@ export interface TranslationKeys {
           burn: string;
           failureToReadPK: string;
           failureToReadIP: string;
+          nameLabel: string;
+          namePlaceholder: string;
+          nameDescription: string;
         };
       };
     };

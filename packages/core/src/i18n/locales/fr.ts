@@ -91,6 +91,9 @@ export const fr: TranslationKeys = {
           burn: 'Destruction',
           failureToReadPK: 'Échec (mot de passe ou clé)',
           failureToReadIP: 'Échec (IP ou CIDR)',
+          nameLabel: 'Nom',
+          namePlaceholder: 'Entrez un nom pour ce webhook',
+          nameDescription: 'Un nom pour identifier ce webhook dans les notifications',
         },
       },
     },
@@ -125,7 +128,8 @@ export const fr: TranslationKeys = {
       deleteFailed: 'Erreur lors de la suppression du secret : {{error}}',
       secretNotFound: 'secret non trouvé',
       unexpectedStatus: 'code de statut inattendu {{code}}',
-      webhookConfigInvalid: 'La configuration du webhook est invalide - au moins un webhook est requis',
+      webhookConfigInvalid:
+        'La configuration du webhook est invalide - au moins un webhook est requis',
     },
   },
   view: {

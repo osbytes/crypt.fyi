@@ -324,14 +324,16 @@ export function CreatePage() {
           ttl: input.ttl,
           ips: input.ips,
           rc: input.rc,
-          wh: input.whu ? {
-            u: input.whu,
-            n: input.whn,
-            r: input.whr,
-            fpk: input.whfpk,
-            fip: input.whfip,
-            b: input.whb,
-          } : undefined,
+          wh: input.whu
+            ? {
+                u: input.whu,
+                n: input.whn,
+                r: input.whr,
+                fpk: input.whfpk,
+                fip: input.whfip,
+                b: input.whb,
+              }
+            : undefined,
         } satisfies CreateVaultRequest),
       });
 
@@ -776,83 +778,109 @@ export function CreatePage() {
                                 )}
                               />
                               {form.watch('whu') && (
-                                <div className="flex flex-wrap items-center gap-2 px-4">
+                                <div className="px-4 flex flex-col gap-4">
                                   <FormField
                                     control={form.control}
-                                    name="whr"
-                                    render={({ field: { value, onChange, ...rest } }) => (
-                                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                    name="whn"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>
+                                          {t('create.form.advanced.webhook.nameLabel')}
+                                        </FormLabel>
                                         <FormControl>
-                                          <Checkbox
-                                            {...rest}
-                                            checked={value}
-                                            onCheckedChange={onChange}
-                                            disabled={createMutation.isPending || rest.disabled}
+                                          <Input
+                                            type="text"
+                                            placeholder={t(
+                                              'create.form.advanced.webhook.namePlaceholder',
+                                            )}
+                                            {...field}
+                                            disabled={createMutation.isPending || field.disabled}
                                           />
                                         </FormControl>
-                                        <FormLabel>
-                                          {t('create.form.advanced.webhook.read')}
-                                        </FormLabel>
+                                        <FormDescription>
+                                          {t('create.form.advanced.webhook.nameDescription')}
+                                        </FormDescription>
                                       </FormItem>
                                     )}
                                   />
-                                  <FormField
-                                    control={form.control}
-                                    name="whfpk"
-                                    render={({ field: { value, onChange, ...rest } }) => (
-                                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                        <FormControl>
-                                          <Checkbox
-                                            {...rest}
-                                            checked={value}
-                                            onCheckedChange={onChange}
-                                            disabled={createMutation.isPending || rest.disabled}
-                                          />
-                                        </FormControl>
-                                        <FormLabel>
-                                          {t('create.form.advanced.webhook.failureToReadPK')}
-                                        </FormLabel>
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={form.control}
-                                    name="whfip"
-                                    render={({ field: { value, onChange, ...rest } }) => (
-                                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                        <FormControl>
-                                          <Checkbox
-                                            {...rest}
-                                            checked={value}
-                                            onCheckedChange={onChange}
-                                            disabled={createMutation.isPending || rest.disabled}
-                                          />
-                                        </FormControl>
-                                        <FormLabel>
-                                          {t('create.form.advanced.webhook.failureToReadIP')}
-                                        </FormLabel>
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={form.control}
-                                    name="whb"
-                                    render={({ field: { value, onChange, ...rest } }) => (
-                                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                        <FormControl>
-                                          <Checkbox
-                                            {...rest}
-                                            checked={value}
-                                            onCheckedChange={onChange}
-                                            disabled={createMutation.isPending || rest.disabled}
-                                          />
-                                        </FormControl>
-                                        <FormLabel>
-                                          {t('create.form.advanced.webhook.burn')}
-                                        </FormLabel>
-                                      </FormItem>
-                                    )}
-                                  />
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <FormField
+                                      control={form.control}
+                                      name="whr"
+                                      render={({ field: { value, onChange, ...rest } }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                          <FormControl>
+                                            <Checkbox
+                                              {...rest}
+                                              checked={value}
+                                              onCheckedChange={onChange}
+                                              disabled={createMutation.isPending || rest.disabled}
+                                            />
+                                          </FormControl>
+                                          <FormLabel>
+                                            {t('create.form.advanced.webhook.read')}
+                                          </FormLabel>
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="whfpk"
+                                      render={({ field: { value, onChange, ...rest } }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                          <FormControl>
+                                            <Checkbox
+                                              {...rest}
+                                              checked={value}
+                                              onCheckedChange={onChange}
+                                              disabled={createMutation.isPending || rest.disabled}
+                                            />
+                                          </FormControl>
+                                          <FormLabel>
+                                            {t('create.form.advanced.webhook.failureToReadPK')}
+                                          </FormLabel>
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="whfip"
+                                      render={({ field: { value, onChange, ...rest } }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                          <FormControl>
+                                            <Checkbox
+                                              {...rest}
+                                              checked={value}
+                                              onCheckedChange={onChange}
+                                              disabled={createMutation.isPending || rest.disabled}
+                                            />
+                                          </FormControl>
+                                          <FormLabel>
+                                            {t('create.form.advanced.webhook.failureToReadIP')}
+                                          </FormLabel>
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="whb"
+                                      render={({ field: { value, onChange, ...rest } }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                          <FormControl>
+                                            <Checkbox
+                                              {...rest}
+                                              checked={value}
+                                              onCheckedChange={onChange}
+                                              disabled={createMutation.isPending || rest.disabled}
+                                            />
+                                          </FormControl>
+                                          <FormLabel>
+                                            {t('create.form.advanced.webhook.burn')}
+                                          </FormLabel>
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
                                 </div>
                               )}
                             </div>

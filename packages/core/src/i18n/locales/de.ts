@@ -90,6 +90,9 @@ export const de: TranslationKeys = {
           burn: 'Löschen',
           failureToReadPK: 'Fehler (Passwort oder Schlüssel)',
           failureToReadIP: 'Fehler (IP oder CIDR)',
+          nameLabel: 'Name',
+          namePlaceholder: 'Geben Sie einen Namen für diesen Webhook ein',
+          nameDescription: 'Ein Name zur Identifizierung dieses Webhooks in Benachrichtigungen',
         },
       },
     },
@@ -123,7 +126,8 @@ export const de: TranslationKeys = {
       deleteFailed: 'Löschen des Geheimnisses fehlgeschlagen: {{error}}',
       secretNotFound: 'Geheimnis nicht gefunden',
       unexpectedStatus: 'Unerwarteter Statuscode {{code}}',
-      webhookConfigInvalid: 'Webhook-Konfiguration ist ungültig - mindestens ein Webhook erforderlich',
+      webhookConfigInvalid:
+        'Webhook-Konfiguration ist ungültig - mindestens ein Webhook erforderlich',
     },
   },
   view: {

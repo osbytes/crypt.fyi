@@ -91,6 +91,9 @@ export const es: TranslationKeys = {
           burn: 'Destrucción',
           failureToReadPK: 'Fallo (contraseña o clave)',
           failureToReadIP: 'Fallo (IP o CIDR)',
+          nameLabel: 'Nombre',
+          namePlaceholder: 'Ingrese un nombre para este webhook',
+          nameDescription: 'Un nombre para identificar este webhook en las notificaciones',
         },
       },
     },
@@ -124,7 +127,8 @@ export const es: TranslationKeys = {
       deleteFailed: 'Error al eliminar el secreto: {{error}}',
       secretNotFound: 'secreto no encontrado',
       unexpectedStatus: 'código de estado inesperado {{code}}',
-      webhookConfigInvalid: 'La configuración del webhook no es válida - se requiere al menos un webhook',
+      webhookConfigInvalid:
+        'La configuración del webhook no es válida - se requiere al menos un webhook',
     },
   },
   view: {
