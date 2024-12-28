@@ -1,12 +1,9 @@
 import { z } from 'zod';
+import { vaultValueSchema } from './vault';
 
-export const createVaultRequestSchema = z.object({
-  c: z.string().describe('encrypted content'),
-  h: z.string().describe('sha256 hash of the encryption key + optional password'),
-  b: z.boolean().default(true).describe('burn after reading'),
-  ttl: z.number().describe('time to live (TTL) in milliseconds'),
-  ips: z.string().default('').optional().describe('IP address or CIDR block restrictions'),
-  rc: z.number().optional().describe('maximum number of times the secret can be read'),
+export const createVaultRequestSchema = vaultValueSchema.omit({
+  cd: true,
+  dt: true,
 });
 export type CreateVaultRequest = z.infer<typeof createVaultRequestSchema>;
 

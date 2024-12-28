@@ -8,7 +8,7 @@ import {
   validatorCompiler,
   ZodTypeProvider,
 } from 'fastify-type-provider-zod';
-import z from 'zod';
+import { z } from 'zod';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import fastifyRateLimit from '@fastify/rate-limit';
@@ -252,6 +252,15 @@ export const initApp = async (config: Config, deps: AppDeps) => {
 
         throw error;
       }
+    },
+  });
+
+  app.route({
+    method: 'POST',
+    url: '/webhook',
+    async handler(req, res) {
+      logger.info(req.body, 'webhook received');
+      return res.send();
     },
   });
 

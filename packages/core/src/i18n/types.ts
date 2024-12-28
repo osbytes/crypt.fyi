@@ -76,6 +76,18 @@ export interface TranslationKeys {
           label: string;
           description: string;
         };
+        webhook: {
+          label: string;
+          placeholder: string;
+          description: string;
+          read: string;
+          burn: string;
+          failureToReadPK: string;
+          failureToReadIP: string;
+          nameLabel: string;
+          namePlaceholder: string;
+          nameDescription: string;
+        };
       };
     };
     success: {
@@ -108,6 +120,7 @@ export interface TranslationKeys {
       deleteFailed: string;
       secretNotFound: string;
       unexpectedStatus: string;
+      webhookConfigInvalid: string;
     };
   };
   view: {

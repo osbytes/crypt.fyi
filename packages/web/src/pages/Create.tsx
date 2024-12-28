@@ -157,6 +157,23 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
         .max(10)
         .optional()
         .describe('maximum number of times the secret can be read'),
+      whu: z.string().describe('webhook: url of the webhook').optional(),
+      whn: z.string().max(50).describe('webhook: name of the secret').optional(),
+      whr: z.boolean().default(false).describe('webhook: should the webhook be called on read'),
+      whfpk: z
+        .boolean()
+        .default(false)
+        .describe(
+          'webhook: should the webhook be called for failure to read based on password or key',
+        ),
+      whfip: z
+        .boolean()
+        .default(false)
+        .describe('webhook: should the webhook be called for failure to read based on ip address'),
+      whb: z
+        .boolean()
+        .default(false)
+        .describe('webhook: should the webhook be called for secret burn'),
     })
     .superRefine((data, ctx) => {
       if (data.c.length === 0) {
@@ -171,6 +188,13 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
           code: z.ZodIssueCode.custom,
           path: ['rc'],
           message: t('create.errors.readCountWithBurn'),
+        });
+      }
+      if (data.whu && !(data.whr || data.whfpk || data.whfip || data.whb)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['whu'],
+          message: t('create.errors.webhookConfigInvalid'),
         });
       }
     });
@@ -230,6 +254,8 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
     ttl,
     ips: '',
     rc: undefined,
+    whu: '',
+    whn: '',
   };
 }
 
@@ -298,6 +324,16 @@ export function CreatePage() {
           ttl: input.ttl,
           ips: input.ips,
           rc: input.rc,
+          wh: input.whu
+            ? {
+                u: input.whu,
+                n: input.whn,
+                r: input.whr,
+                fpk: input.whfpk,
+                fip: input.whfip,
+                b: input.whb,
+              }
+            : undefined,
         } satisfies CreateVaultRequest),
       });
 
@@ -720,6 +756,133 @@ export function CreatePage() {
                                   </FormItem>
                                 )}
                               />
+                              <FormField
+                                control={form.control}
+                                name="whu"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>{t('create.form.advanced.webhook.label')}</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        type="url"
+                                        placeholder={t('create.form.advanced.webhook.placeholder')}
+                                        {...field}
+                                        disabled={createMutation.isPending || field.disabled}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                    <FormDescription>
+                                      {t('create.form.advanced.webhook.description')}
+                                    </FormDescription>
+                                  </FormItem>
+                                )}
+                              />
+                              {form.watch('whu') && (
+                                <div className="px-4 flex flex-col gap-4">
+                                  <FormField
+                                    control={form.control}
+                                    name="whn"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>
+                                          {t('create.form.advanced.webhook.nameLabel')}
+                                        </FormLabel>
+                                        <FormControl>
+                                          <Input
+                                            type="text"
+                                            placeholder={t(
+                                              'create.form.advanced.webhook.namePlaceholder',
+                                            )}
+                                            {...field}
+                                            disabled={createMutation.isPending || field.disabled}
+                                          />
+                                        </FormControl>
+                                        <FormDescription>
+                                          {t('create.form.advanced.webhook.nameDescription')}
+                                        </FormDescription>
+                                      </FormItem>
+                                    )}
+                                  />
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <FormField
+                                      control={form.control}
+                                      name="whr"
+                                      render={({ field: { value, onChange, ...rest } }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                          <FormControl>
+                                            <Checkbox
+                                              {...rest}
+                                              checked={value}
+                                              onCheckedChange={onChange}
+                                              disabled={createMutation.isPending || rest.disabled}
+                                            />
+                                          </FormControl>
+                                          <FormLabel>
+                                            {t('create.form.advanced.webhook.read')}
+                                          </FormLabel>
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="whfpk"
+                                      render={({ field: { value, onChange, ...rest } }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                          <FormControl>
+                                            <Checkbox
+                                              {...rest}
+                                              checked={value}
+                                              onCheckedChange={onChange}
+                                              disabled={createMutation.isPending || rest.disabled}
+                                            />
+                                          </FormControl>
+                                          <FormLabel>
+                                            {t('create.form.advanced.webhook.failureToReadPK')}
+                                          </FormLabel>
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="whfip"
+                                      render={({ field: { value, onChange, ...rest } }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                          <FormControl>
+                                            <Checkbox
+                                              {...rest}
+                                              checked={value}
+                                              onCheckedChange={onChange}
+                                              disabled={createMutation.isPending || rest.disabled}
+                                            />
+                                          </FormControl>
+                                          <FormLabel>
+                                            {t('create.form.advanced.webhook.failureToReadIP')}
+                                          </FormLabel>
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="whb"
+                                      render={({ field: { value, onChange, ...rest } }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                          <FormControl>
+                                            <Checkbox
+                                              {...rest}
+                                              checked={value}
+                                              onCheckedChange={onChange}
+                                              disabled={createMutation.isPending || rest.disabled}
+                                            />
+                                          </FormControl>
+                                          <FormLabel>
+                                            {t('create.form.advanced.webhook.burn')}
+                                          </FormLabel>
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </motion.div>
                         </CollapsibleContent>

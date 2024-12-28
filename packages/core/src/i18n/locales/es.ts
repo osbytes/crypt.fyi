@@ -82,6 +82,19 @@ export const es: TranslationKeys = {
           label: 'Contador de lecturas',
           description: 'Número máximo de veces que se puede leer el secreto',
         },
+        webhook: {
+          label: 'Webhook',
+          placeholder: 'https://example.com/webhook',
+          description:
+            'URL del webhook a llamar cuando el secreto es leído, destruido o falla al leer (configurable, si se establece)',
+          read: 'Lectura',
+          burn: 'Destrucción',
+          failureToReadPK: 'Fallo (contraseña o clave)',
+          failureToReadIP: 'Fallo (IP o CIDR)',
+          nameLabel: 'Nombre',
+          namePlaceholder: 'Ingrese un nombre para este webhook',
+          nameDescription: 'Un nombre para identificar este webhook en las notificaciones',
+        },
       },
     },
     success: {
@@ -114,6 +127,8 @@ export const es: TranslationKeys = {
       deleteFailed: 'Error al eliminar el secreto: {{error}}',
       secretNotFound: 'secreto no encontrado',
       unexpectedStatus: 'código de estado inesperado {{code}}',
+      webhookConfigInvalid:
+        'La configuración del webhook no es válida - se requiere al menos un webhook',
     },
   },
   view: {
