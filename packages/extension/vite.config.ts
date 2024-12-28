@@ -23,7 +23,6 @@ export default defineConfig({
           'scripting',
           'notifications',
         ],
-        optional_permissions: ['notifications'],
         background: {
           service_worker: 'src/background.ts',
           type: 'module',
