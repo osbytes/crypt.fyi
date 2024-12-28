@@ -695,7 +695,7 @@ export function CreatePage() {
                     )}
                   />
                   <div className="space-y-2">
-                    <Collapsible disabled={createMutation.isPending}>
+                    <Collapsible>
                       <CollapsibleTrigger className="group flex w-full items-center justify-start gap-2 text-sm text-muted-foreground hover:text-foreground">
                         <IconChevronDown className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         {t('create.form.advanced.toggle')}
@@ -883,6 +883,14 @@ export function CreatePage() {
                                       )}
                                     />
                                   </div>
+                                  <pre className="text-xs text-wrap bg-card text-card-foreground">
+                                    {getWebhookSchemaString({
+                                      read: form.watch('whr'),
+                                      burn: form.watch('whb'),
+                                      failureKeyPassword: form.watch('whfpk'),
+                                      failureIpAddress: form.watch('whfip'),
+                                    })}
+                                  </pre>
                                 </div>
                               )}
                             </div>
@@ -1077,3 +1085,21 @@ export function CreatePage() {
     </div>
   );
 }
+
+const getWebhookSchemaString = ({
+  read,
+  burn,
+  failureKeyPassword,
+  failureIpAddress,
+}: {
+  read: boolean;
+  burn: boolean;
+  failureKeyPassword: boolean;
+  failureIpAddress: boolean;
+}) => `{
+  name?: string,
+  event: ${[read && 'READ', burn && 'BURN', failureKeyPassword && 'FAILURE_KEY_PASSWORD', failureIpAddress && 'FAILURE_IP_ADDRESS'].filter(Boolean).join(' | ') || 'never'},
+  id: string,
+  dt: string,
+  ts: number,
+}`;

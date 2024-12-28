@@ -47,14 +47,6 @@ export function Layout() {
                   {t('about.title')}
                 </Button>
               </Link>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-              >
-                {theme === 'dark' ? <IconSun /> : <IconMoon />}
-              </Button>
               <Button variant="ghost" size="icon" asChild title="OpenAPI specification">
                 <a href={`${config.API_URL}/docs`} target="_blank" rel="noopener noreferrer">
                   <IconApi />
@@ -64,6 +56,14 @@ export function Layout() {
                 <a href={config.CRYPT_FYI_GITHUB_URL} target="_blank" rel="noopener noreferrer">
                   <IconBrandGithub />
                 </a>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              >
+                {theme === 'dark' ? <IconSun /> : <IconMoon />}
               </Button>
               <Select
                 name="language"

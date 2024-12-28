@@ -15,7 +15,8 @@ export interface WebhookSender {
   send(message: Message): Promise<void>;
 }
 
-const DEFAULT_TIMEOUT_MS = 3000;
+const DEFAULT_REQUEST_TIMEOUT_MS = 3000;
+
 export const createHTTPJSONWebhookSender = (
   logger: Logger,
   fetchFn: typeof fetch = fetch,
@@ -23,7 +24,7 @@ export const createHTTPJSONWebhookSender = (
   return {
     send: async (message) => {
       const ac = new AbortController();
-      setTimeout(() => ac.abort(), DEFAULT_TIMEOUT_MS);
+      setTimeout(() => ac.abort(), DEFAULT_REQUEST_TIMEOUT_MS);
       try {
         const response = await fetchFn(message.url, {
           method: 'POST',
