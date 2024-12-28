@@ -157,9 +157,9 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
         .max(10)
         .optional()
         .describe('maximum number of times the secret can be read'),
-      whu: z.string().url().describe('webhook: url of the webhook').optional(),
-      whn: z.string().min(1).max(50).describe('webhook: name of the secret').optional(),
-      whr: z.boolean().default(true).describe('webhook: should the webhook be called on read'),
+      whu: z.string().describe('webhook: url of the webhook').optional(),
+      whn: z.string().max(50).describe('webhook: name of the secret').optional(),
+      whr: z.boolean().default(false).describe('webhook: should the webhook be called on read'),
       whfpk: z
         .boolean()
         .default(false)
@@ -172,7 +172,7 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
         .describe('webhook: should the webhook be called for failure to read based on ip address'),
       whb: z
         .boolean()
-        .default(true)
+        .default(false)
         .describe('webhook: should the webhook be called for secret burn'),
     })
     .superRefine((data, ctx) => {
@@ -190,7 +190,7 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
           message: t('create.errors.readCountWithBurn'),
         });
       }
-      if (data.whu && (!data.whr || !data.whfpk || !data.whfip || !data.whb)) {
+      if (data.whu && !(data.whr || data.whfpk || data.whfip || data.whb)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['whu'],
@@ -254,6 +254,8 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
     ttl,
     ips: '',
     rc: undefined,
+    whu: '',
+    whn: '',
   };
 }
 
@@ -322,14 +324,14 @@ export function CreatePage() {
           ttl: input.ttl,
           ips: input.ips,
           rc: input.rc,
-          wh: {
-            u: 'http://localhost:4321/webhook',
-            n: 'test',
-            r: true,
-            fpk: true,
-            fip: true,
-            b: true,
-          },
+          wh: input.whu ? {
+            u: input.whu,
+            n: input.whn,
+            r: input.whr,
+            fpk: input.whfpk,
+            fip: input.whfip,
+            b: input.whb,
+          } : undefined,
         } satisfies CreateVaultRequest),
       });
 

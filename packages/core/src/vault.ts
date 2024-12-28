@@ -12,7 +12,7 @@ export const vaultValueSchema = z.object({
   wh: z
     .object({
       u: z.string().url().describe('url of the webhook'),
-      n: z.string().min(1).max(50).describe('name of the secret').optional(),
+      n: z.string().max(50).describe('name of the secret').optional(),
       r: z.boolean().default(true).describe('should the webhook be called on read'),
       fpk: z
         .boolean()
