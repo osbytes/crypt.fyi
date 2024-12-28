@@ -6,12 +6,21 @@ import gracefulShutdown from 'http-graceful-shutdown';
 import Redis from 'ioredis';
 import { createRedisVault } from './vault/redis';
 import { EncryptedVault } from './vault/encrypted';
+import { createTokenGenerator } from './vault/tokens';
+import { createHTTPJSONWebhookSender } from './webhook';
 
 const main = async () => {
   const logger = await initLogging(config);
   const redis = new Redis(config.redisUrl);
   await redis.ping();
-  const vault = new EncryptedVault(createRedisVault(redis, config), config.encryptionKey);
+  const tokenGenerator = createTokenGenerator({
+    vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
+    vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
+  });
+  const vault = new EncryptedVault(
+    createRedisVault(redis, tokenGenerator, createHTTPJSONWebhookSender(logger)),
+    config.encryptionKey,
+  );
 
   const app = await initApp(config, {
     logger,

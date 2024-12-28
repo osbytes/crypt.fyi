@@ -7,6 +7,8 @@ import { Client } from 'undici';
 import { AddressInfo } from 'node:net';
 import Redis from 'ioredis';
 import { createRedisVault } from './vault/redis';
+import { createTokenGenerator } from './vault/tokens';
+import { createNopWebhookSender } from './webhook';
 
 const initAppTest = async (t: Test) => {
   const config = {
@@ -17,7 +19,11 @@ const initAppTest = async (t: Test) => {
   } satisfies Config;
   const logger = pino({ enabled: false });
   const redis = new Redis();
-  const vault = createRedisVault(redis, config);
+  const tokenGenerator = createTokenGenerator({
+    vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
+    vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
+  });
+  const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender());
   const app = await initApp(config, {
     logger,
     vault,
@@ -114,7 +120,11 @@ tap.test('app', async (t) => {
     } satisfies Config;
     const logger = pino({ enabled: false });
     const redis = new Redis();
-    const vault = createRedisVault(redis, config);
+    const tokenGenerator = createTokenGenerator({
+      vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
+      vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
+    });
+    const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender());
     const app = await initApp(config, {
       logger,
       vault,
@@ -202,7 +212,11 @@ tap.test('app', async (t) => {
       } satisfies Config;
       const logger = pino({ enabled: false });
       const redis = new Redis();
-      const vault = createRedisVault(redis, config);
+      const tokenGenerator = createTokenGenerator({
+        vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
+        vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
+      });
+      const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender());
       const app = await initApp(config, {
         logger,
         vault,

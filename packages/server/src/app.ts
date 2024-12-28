@@ -255,6 +255,15 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     },
   });
 
+  app.route({
+    method: 'POST',
+    url: '/webhook',
+    async handler(req, res) {
+      logger.info(req.body, 'webhook received');
+      return res.send();
+    },
+  });
+
   app.withTypeProvider<ZodTypeProvider>().route({
     method: 'GET',
     url: '/vault/:vaultId/exists',

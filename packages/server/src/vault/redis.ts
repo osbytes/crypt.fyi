@@ -1,17 +1,21 @@
 import Redis from 'ioredis';
-import { createTokens } from './createTokens';
+import { TokenGenerator } from './tokens';
 import { InvalidKeyAndOrPasswordError, Vault, VaultValue, vaultValueSchema } from '@crypt.fyi/core';
 import { isDefined } from '../util';
-import { Config } from '../config';
 import { isIpAllowed } from './ips';
+import { WebhookSender } from '../webhook';
 
-export const createRedisVault = (redis: Redis, config: Config): Vault => {
+export const createRedisVault = (
+  redis: Redis,
+  tokenGenerator: TokenGenerator,
+  webhookSender: WebhookSender,
+): Vault => {
   const getKey = (id: string) => `vault:${id}`;
 
   return {
     async set(value) {
-      const { c, h, b, ttl, ips, rc } = value;
-      const { id, dt } = await createTokens(config);
+      const { c, h, b, ttl, ips, rc, wh } = value;
+      const { id, dt } = await tokenGenerator.generate();
 
       const key = getKey(id);
 
@@ -27,6 +31,7 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
           cd: Date.now(),
           ips,
           rc,
+          wh,
         } satisfies VaultValue),
       );
       tx.pexpire(key, ttl);
@@ -55,8 +60,17 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
         return undefined;
       }
 
-      const { ips, c, b, ttl, cd } = vaultValueSchema.parse(JSON.parse(result));
+      const { ips, c, b, ttl, cd, dt, wh } = vaultValueSchema.parse(JSON.parse(result));
       if (!isIpAllowed(ip, ips)) {
+        if (wh?.fip) {
+          void webhookSender.send({
+            url: wh.u,
+            event: 'FAILURE_IP_ADDRESS',
+            id,
+            dt,
+            ts: Date.now(),
+          });
+        }
         return undefined;
       }
 
@@ -71,14 +85,18 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
 
   local data = cjson.decode(value)
   if data.h ~= ARGV[1] then
-    return 0
+    return cjson.encode({ status = "invalid_hash" })
   end
 
+  local burned = false
+  local reason = nil
   -- Handle read count logic
   if data.rc then
     data.rc = data.rc - 1
     if data.rc <= 0 then
       redis.call('del', KEYS[1])
+      burned = true
+      reason = "read_count_zero"
     else
       -- Get the remaining TTL before updating
       local remainingTTL = redis.call('pttl', KEYS[1])
@@ -90,26 +108,69 @@ export const createRedisVault = (redis: Redis, config: Config): Vault => {
       else
         -- If TTL has expired or is invalid, delete the key
         redis.call('del', KEYS[1])
+        burned = true
+        reason = "ttl_expired"
       end
     end
-    return 1
+    return cjson.encode({ status = "success", burned = burned, reason = reason })
   end
 
   if data.b == true then
     redis.call('del', KEYS[1])
+    burned = true
+    reason = "burned"
   end
 
-  return 1
+  return cjson.encode({ status = "success", burned = burned, reason = reason })
 `,
         1,
         key,
         h,
-      )) as null | 0 | 1;
+      )) as string | null;
       if (!outcome) {
-        if (outcome === 0) {
-          throw new InvalidKeyAndOrPasswordError();
-        }
         return undefined;
+      }
+
+      const redisOutcome = JSON.parse(outcome) as {
+        status: 'invalid_hash' | 'success';
+        burned?: boolean;
+        reason?: 'read_count_zero' | 'burned' | 'ttl_expired';
+      };
+      if (redisOutcome.status === 'invalid_hash') {
+        if (wh?.fpk) {
+          void webhookSender.send({
+            url: wh.u,
+            event: 'FAILURE_KEY_PASSWORD',
+            id,
+            dt,
+            ts: Date.now(),
+          });
+        }
+        throw new InvalidKeyAndOrPasswordError();
+      }
+
+      const ts = Date.now();
+
+      if (redisOutcome.status === 'success') {
+        if (wh?.r) {
+          void webhookSender.send({
+            url: wh.u,
+            event: 'READ',
+            id,
+            dt,
+            ts,
+          });
+        }
+      }
+
+      if (redisOutcome.burned && wh?.b) {
+        void webhookSender.send({
+          url: wh.u,
+          event: 'BURN',
+          id,
+          dt,
+          ts,
+        });
       }
 
       return {
