@@ -15,10 +15,14 @@ import { config } from './config';
 
 const program = new Command();
 
-// Read package.json
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'));
 
-program.name('crypt').description('CLI to encrypt and share secrets securely').version(pkg.version);
+const xClient = `@crypt.fyi/cli:${pkg.version}`;
+
+program
+  .name('cryptfyi')
+  .description('CLI to encrypt and share secrets securely via the https://crypt.fyi API')
+  .version(pkg.version);
 
 program
   .command('encrypt')
@@ -46,7 +50,7 @@ program
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Client': `@crypt.fyi/cli:0.0.1`,
+          'X-Client': xClient,
         },
         body: JSON.stringify({
           c: encrypted,
@@ -105,7 +109,7 @@ program
 
       const response = await fetch(`${config.apiUrl}/vault/${id}?h=${hash}`, {
         headers: {
-          'X-Client': `@crypt.fyi/cli:0.0.1`,
+          'X-Client': xClient,
         },
       });
 

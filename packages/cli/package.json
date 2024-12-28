@@ -1,15 +1,20 @@
 {
   "name": "@crypt.fyi/cli",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "bin": {
-    "crypt": "./dist/index.js"
+    "cryptfyi": "./dist/index.js"
   },
   "files": [
     "dist",
     "package.json",
     "README.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/osbytes/crypt.fyi.git"
+  },
+  "license": "Apache-2.0",
   "scripts": {
     "build": "ncc build src/index.ts -o dist",
     "lint": "eslint \"src/**/*.ts\"",
