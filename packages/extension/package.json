@@ -7,7 +7,7 @@
     "dev": "VITE_API_URL=http://localhost:4321 VITE_WEB_URL=http://localhost:5173 vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint src --ext ts,tsx",
+    "lint": "eslint src",
     "test": "jest"
   },
   "dependencies": {
@@ -20,8 +20,8 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.0",
-    "eslint": "^8.0.0",
-    "typescript": "^5.0.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3",
     "vite": "^5.0.0",
     "vite-plugin-web-extension": "^4.0.0"
   }
