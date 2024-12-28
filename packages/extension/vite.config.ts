@@ -23,7 +23,6 @@ export default defineConfig({
           'notifications',
         ],
         optional_permissions: ['notifications'],
-        host_permissions: ['http://*/*', 'https://*/*'],
         background: {
           service_worker: 'src/background.ts',
           type: 'module',
