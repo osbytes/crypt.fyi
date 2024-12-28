@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 
 export const vaultValueSchema = z.object({
   c: z.string().describe('encrypted content'),

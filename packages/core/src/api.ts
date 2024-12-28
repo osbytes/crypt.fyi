@@ -1,29 +1,9 @@
 import { z } from 'zod';
+import { vaultValueSchema } from './vault';
 
-export const createVaultRequestSchema = z.object({
-  c: z.string().describe('encrypted content'),
-  h: z.string().describe('sha256 hash of the encryption key + optional password'),
-  b: z.boolean().default(true).describe('burn after reading'),
-  ttl: z.number().describe('time to live (TTL) in milliseconds'),
-  ips: z.string().default('').optional().describe('IP address or CIDR block restrictions'),
-  rc: z.number().optional().describe('maximum number of times the secret can be read'),
-  wh: z
-    .object({
-      u: z.string().url().describe('url of the webhook'),
-      n: z.string().describe('name of the secret').optional(),
-      r: z.boolean().default(true).describe('should the webhook be called on read'),
-      fpk: z
-        .boolean()
-        .default(false)
-        .describe('should the webhook be called for failure to read based on password or key'),
-      fip: z
-        .boolean()
-        .default(false)
-        .describe('should the webhook be called for failure to read based on ip address'),
-      b: z.boolean().default(false).describe('should the webhook be called for secret burn'),
-    })
-    .describe('webhook configuration')
-    .optional(),
+export const createVaultRequestSchema = vaultValueSchema.omit({
+  cd: true,
+  dt: true,
 });
 export type CreateVaultRequest = z.infer<typeof createVaultRequestSchema>;
 
