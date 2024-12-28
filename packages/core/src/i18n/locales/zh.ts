@@ -78,6 +78,15 @@ export const zh: TranslationKeys = {
           label: '阅读次数',
           description: '密文可被阅读的最大次数',
         },
+        webhook: {
+          label: 'Webhook',
+          placeholder: 'https://example.com/webhook',
+          description: '当密文被读取、销毁或读取失败时调用的 Webhook URL（如果设置，可配置）',
+          read: '读取',
+          burn: '销毁',
+          failureToReadPK: '失败（密码或密钥）',
+          failureToReadIP: '失败（IP 或 CIDR）',
+        },
       },
     },
     success: {
@@ -110,6 +119,7 @@ export const zh: TranslationKeys = {
       deleteFailed: '删除密文失败：{{error}}',
       secretNotFound: '未找到密文',
       unexpectedStatus: '意外的状态码 {{code}}',
+      webhookConfigInvalid: 'Webhook 配置无效 - 至少需要一个 webhook',
     },
   },
   view: {

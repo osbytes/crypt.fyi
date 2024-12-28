@@ -81,6 +81,16 @@ export const de: TranslationKeys = {
           label: 'Lesezähler',
           description: 'Maximale Anzahl der Abrufe des Geheimnisses',
         },
+        webhook: {
+          label: 'Webhook',
+          placeholder: 'https://example.com/webhook',
+          description:
+            'Webhook-URL, die aufgerufen wird, wenn das Geheimnis gelesen, gelöscht oder nicht gelesen werden kann (konfigurierbar, falls gesetzt)',
+          read: 'Lesen',
+          burn: 'Löschen',
+          failureToReadPK: 'Fehler (Passwort oder Schlüssel)',
+          failureToReadIP: 'Fehler (IP oder CIDR)',
+        },
       },
     },
     success: {
@@ -113,6 +123,7 @@ export const de: TranslationKeys = {
       deleteFailed: 'Löschen des Geheimnisses fehlgeschlagen: {{error}}',
       secretNotFound: 'Geheimnis nicht gefunden',
       unexpectedStatus: 'Unerwarteter Statuscode {{code}}',
+      webhookConfigInvalid: 'Webhook-Konfiguration ist ungültig - mindestens ein Webhook erforderlich',
     },
   },
   view: {

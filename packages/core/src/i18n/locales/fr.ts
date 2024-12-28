@@ -82,6 +82,16 @@ export const fr: TranslationKeys = {
           label: 'Nombre de lectures',
           description: 'Nombre maximum de fois que le secret peut être lu',
         },
+        webhook: {
+          label: 'Webhook',
+          placeholder: 'https://example.com/webhook',
+          description:
+            'URL du webhook à appeler lorsque le secret est lu, détruit ou échoue à être lu (configurable, si défini)',
+          read: 'Lecture',
+          burn: 'Destruction',
+          failureToReadPK: 'Échec (mot de passe ou clé)',
+          failureToReadIP: 'Échec (IP ou CIDR)',
+        },
       },
     },
     success: {
@@ -115,6 +125,7 @@ export const fr: TranslationKeys = {
       deleteFailed: 'Erreur lors de la suppression du secret : {{error}}',
       secretNotFound: 'secret non trouvé',
       unexpectedStatus: 'code de statut inattendu {{code}}',
+      webhookConfigInvalid: 'La configuration du webhook est invalide - au moins un webhook est requis',
     },
   },
   view: {
