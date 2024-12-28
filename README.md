@@ -15,6 +15,7 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 - ⏰ Automatic expiration (Time-To-Live)
 - 🔑 Password protection
 - 📁 File sharing support w/ drag and drop
+- 🪝 Webhook notifications for read success, read failure, and burn events
 - 🌐 IP/CIDR allow-listing
 - 🔢 Read count limits
 - 📱 QR code generation
