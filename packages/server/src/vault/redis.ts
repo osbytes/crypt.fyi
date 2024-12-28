@@ -65,6 +65,7 @@ export const createRedisVault = (
         if (wh?.fip) {
           void webhookSender.send({
             url: wh.u,
+            name: wh.n,
             event: 'FAILURE_IP_ADDRESS',
             id,
             dt,
@@ -140,6 +141,7 @@ export const createRedisVault = (
         if (wh?.fpk) {
           void webhookSender.send({
             url: wh.u,
+            name: wh.n,
             event: 'FAILURE_KEY_PASSWORD',
             id,
             dt,
@@ -155,6 +157,7 @@ export const createRedisVault = (
         if (wh?.r) {
           void webhookSender.send({
             url: wh.u,
+            name: wh.n,
             event: 'READ',
             id,
             dt,
@@ -166,6 +169,7 @@ export const createRedisVault = (
       if (redisOutcome.burned && wh?.b) {
         void webhookSender.send({
           url: wh.u,
+          name: wh.n,
           event: 'BURN',
           id,
           dt,
