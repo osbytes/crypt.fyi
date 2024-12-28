@@ -46,6 +46,7 @@ program
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Client': `@crypt.fyi/cli:0.0.1`,
         },
         body: JSON.stringify({
           c: encrypted,
@@ -102,7 +103,11 @@ program
       const password = options.password || '';
       const hash = sha256(key + password);
 
-      const response = await fetch(`${config.apiUrl}/vault/${id}?h=${hash}`);
+      const response = await fetch(`${config.apiUrl}/vault/${id}?h=${hash}`, {
+        headers: {
+          'X-Client': `@crypt.fyi/cli:0.0.1`,
+        },
+      });
 
       if (!response.ok) {
         if (response.status === 404) {
