@@ -1,14 +1,17 @@
 {
   "name": "@crypt.fyi/cli",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.3",
   "type": "module",
   "bin": {
     "crypt": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts",
-    "dev": "tsup src/index.ts --format esm --dts --watch",
+    "build": "ncc build src/index.ts -o dist",
     "lint": "eslint \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
@@ -24,8 +27,8 @@
     "@types/node": "^20.10.5",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
+    "@vercel/ncc": "^0.38.1",
     "eslint": "^8.56.0",
-    "tsup": "^8.0.1",
     "typescript": "^5.3.3"
   }
 }

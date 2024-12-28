@@ -19,6 +19,7 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 - 🌐 IP/CIDR allow-listing
 - 🔢 Read count limits
 - 📱 QR code generation
+- 📚 [CLI](https://www.npmjs.com/package/@crypt.fyi/cli) for interacting with the API
 
 ## How It Works
 
