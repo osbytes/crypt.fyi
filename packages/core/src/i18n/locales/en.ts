@@ -53,7 +53,7 @@ export const en: TranslationKeys = {
     form: {
       content: {
         label: 'Secret content',
-        placeholder: 'Enter your secret content here...',
+        placeholder: 'Enter your secret content or file here...',
         fileHint: 'add a file by drag-n-drop or clicking here',
         fileSelected: 'File selected: {{name}} ({{size}} KB)',
       },

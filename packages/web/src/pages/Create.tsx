@@ -49,6 +49,7 @@ import {
   IconChevronDown,
   IconBrandGithub,
   IconShare,
+  IconFile,
 } from '@tabler/icons-react';
 import { useRef, useState } from 'react';
 import { clipboardCopy } from '@/lib/clipboardCopy';
@@ -579,6 +580,7 @@ export function CreatePage() {
                               !createMutation.isPending && fileInputRef.current?.click()
                             }
                           >
+                            <IconFile size={18} className="mr-1" />
                             {selectedFile ? (
                               <span className="flex items-center gap-2">
                                 {t('create.form.content.fileSelected', {
