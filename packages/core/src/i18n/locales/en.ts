@@ -125,7 +125,8 @@ export const en: TranslationKeys = {
       deleteFailed: 'Failed to delete secret: {{error}}',
       secretNotFound: 'secret not found',
       unexpectedStatus: 'unexpected status code {{code}}',
-      webhookConfigInvalid: 'Webhook configuration is invalid - at least one webhook event type is required',
+      webhookConfigInvalid:
+        'Webhook configuration is invalid - at least one webhook event type is required',
     },
   },
   view: {
