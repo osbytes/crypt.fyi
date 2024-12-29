@@ -76,11 +76,11 @@ const configSchema = z.object({
   corsOrigin: z.string().describe('allowed CORS origins (comma-separated)'),
   corsMethods: z
     .string()
-    .default('GET,POST,DELETE,OPTIONS')
+    .default('GET,HEAD,POST,DELETE,OPTIONS')
     .describe('allowed CORS methods (comma-separated)'),
   corsHeaders: z
     .string()
-    .default('Content-Type')
+    .default('Content-Type,X-Client')
     .describe('allowed CORS headers (comma-separated)'),
   encryptionKey: z.string().describe('encryption key'),
   otelEnabled: z.boolean({ coerce: true }).default(false).describe('enable OpenTelemetry tracing'),

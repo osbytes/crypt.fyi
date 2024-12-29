@@ -35,6 +35,13 @@ declare module 'fastify' {
   }
 }
 
+declare module '@fastify/swagger' {
+  interface FastifyDynamicSwaggerOptions {
+    // https://github.com/fastify/fastify-swagger/issues/811
+    exposeHeadRoutes?: boolean;
+  }
+}
+
 export type AppDeps = {
   logger: Logger;
   vault: Vault;
@@ -63,6 +70,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       servers: [],
     },
     transform: jsonSchemaTransform,
+    exposeHeadRoutes: true,
   });
   app.register(fastifySwaggerUI, {
     routePrefix: config.swaggerUIPath,
