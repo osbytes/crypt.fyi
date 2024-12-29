@@ -21,16 +21,9 @@ import { cn } from '@/lib/utils';
 import { clipboardCopy } from '@/lib/clipboardCopy';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader } from '@/components/ui/loader';
-import { useEncryptionWorker } from '@/hooks/useEncryptionWorker';
-import { InvalidKeyAndOrPasswordError, sha256 } from '@crypt.fyi/core';
+import { ErrorInvalidKeyAndOrPassword, ErrorNotFound } from '@crypt.fyi/core';
 import { useTranslation } from 'react-i18next';
-
-class NotFoundError extends Error {
-  constructor() {
-    super('not found');
-    this.name = 'NotFoundError';
-  }
-}
+import { useClient } from '@/context/client';
 
 export function ViewPage() {
   const { t } = useTranslation();
@@ -48,17 +41,14 @@ export function ViewPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
 
-  const { decrypt } = useEncryptionWorker();
+  const { client } = useClient();
 
   const existsQuery = useQuery({
     queryKey: [id, 'exists'],
     queryFn: async () => {
-      const res = await fetch(`${config.API_URL}/vault/${id}/exists`);
       await sleep(500, { enabled: config.IS_DEV });
-      if (!res.ok) {
-        throw new Error(t('view.errors.unexpectedStatus', { code: res.status }));
-      }
-      return res.json() as Promise<{ exists: boolean }>;
+      const exists = await client.exists(id);
+      return exists;
     },
     retry: () => false,
     enabled: isPasswordSet,
@@ -67,37 +57,8 @@ export function ViewPage() {
   const decryptMutation = useMutation({
     mutationKey: [id, key, password],
     mutationFn: async () => {
-      const h = sha256(key + (isPasswordSet ? password : ''));
-      const res = await fetch(`${config.API_URL}/vault/${id}?h=${h}`);
-      await sleep(500, { enabled: config.IS_DEV });
-
-      switch (res.status) {
-        case 200: {
-          const result = await (res.json() as Promise<{
-            c: string;
-            b: boolean;
-            cd: number;
-            ttl: number;
-          }>);
-
-          const decrypted = isPasswordSet
-            ? await decrypt(result.c, password).then((d) => decrypt(d, key))
-            : await decrypt(result.c, key);
-          return {
-            value: decrypted,
-            burned: result.b,
-            cd: result.cd,
-            ttl: result.ttl,
-          };
-        }
-        case 400:
-          throw new InvalidKeyAndOrPasswordError();
-        case 404:
-          setIsDialogOpen(false);
-          throw new NotFoundError();
-        default:
-          throw new Error(t('view.errors.unexpectedStatus', { code: res.status }));
-      }
+      const result = await client.read(id, key, password);
+      return result;
     },
     retry: () => false,
     onSuccess() {
@@ -105,11 +66,13 @@ export function ViewPage() {
       setPasswordError(null);
     },
     onError(error) {
-      if (error instanceof InvalidKeyAndOrPasswordError) {
+      if (error instanceof ErrorInvalidKeyAndOrPassword) {
         setPasswordError(t('view.password.error'));
         setTimeout(() => {
           passwordInputRef.current?.focus();
         }, 100);
+      } else if (error instanceof ErrorNotFound) {
+        setIsDialogOpen(false);
       } else {
         toast.error(error.message);
       }
@@ -120,10 +83,7 @@ export function ViewPage() {
     return <Loader />;
   }
 
-  if (
-    decryptMutation.error instanceof NotFoundError ||
-    (isPasswordSet && !existsQuery.data?.exists)
-  ) {
+  if (decryptMutation.error instanceof ErrorNotFound || (isPasswordSet && !existsQuery.data)) {
     return (
       <div className="max-w-3xl mx-auto mt-8 text-center">
         <Card className="p-8">
@@ -137,7 +97,7 @@ export function ViewPage() {
     );
   } else if (
     decryptMutation.error &&
-    !(decryptMutation.error instanceof InvalidKeyAndOrPasswordError)
+    !(decryptMutation.error instanceof ErrorInvalidKeyAndOrPassword)
   ) {
     throw decryptMutation.error;
   }
