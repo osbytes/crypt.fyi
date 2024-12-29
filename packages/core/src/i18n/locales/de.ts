@@ -15,6 +15,7 @@ export const de: TranslationKeys = {
     success: 'Erfolg!',
     error: 'Fehler',
     confirm: 'Bestätigen',
+    requestNewLanguage: 'Neue Sprache anfordern oder Übersetzungen korrigieren',
     footer: {
       tagline: 'Mit Sicherheit und Privatsphäre im Fokus - weil Unwissenheit ein Segen sein kann',
     },

@@ -15,6 +15,7 @@ export const es: TranslationKeys = {
     success: '¡Éxito!',
     error: 'Error',
     confirm: 'Confirmar',
+    requestNewLanguage: 'Solicitar nuevo o corregir traducciones',
     footer: {
       tagline:
         'Construido con seguridad y privacidad en mente - porque la ignorancia puede ser una bendición',

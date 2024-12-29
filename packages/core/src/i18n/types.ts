@@ -13,6 +13,7 @@ export interface TranslationKeys {
     success: string;
     error: string;
     confirm: string;
+    requestNewLanguage: string;
     footer: {
       tagline: string;
     };

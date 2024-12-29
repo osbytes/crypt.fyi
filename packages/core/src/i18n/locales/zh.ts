@@ -15,6 +15,7 @@ export const zh: TranslationKeys = {
     success: '成功！',
     error: '错误',
     confirm: '确认',
+    requestNewLanguage: '请求新语言或修正翻译',
     footer: {
       tagline: '以安全和隐私为设计理念 - 因为无知也是一种幸福',
     },

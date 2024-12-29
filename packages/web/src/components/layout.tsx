@@ -1,4 +1,4 @@
-import { IconApi, IconBrandGithub, IconMoon, IconSun } from '@tabler/icons-react';
+import { IconApi, IconBrandGithub, IconMoon, IconPlus, IconSun } from '@tabler/icons-react';
 import { Button } from './ui/button';
 import { useTheme } from '@/theme';
 import { Link, Outlet } from 'react-router-dom';
@@ -68,7 +68,16 @@ export function Layout() {
               <Select
                 name="language"
                 value={i18n.resolvedLanguage}
-                onValueChange={(value) => i18n.changeLanguage(value)}
+                onValueChange={(value) => {
+                  if (value === 'lang-request-new-or-fix') {
+                    window.open(
+                      `${config.CRYPT_FYI_GITHUB_URL}/issues/new?title=Language%20Request%20%2F%20Translation%20Fix&labels=enhancement,i18n&body=Please%20select%20one%3A%0A-%20%5B%20%5D%20Request%20new%20language%0A-%20%5B%20%5D%20Fix%20existing%20translations%0A%0AIf%20requesting%20new%20language%3A%0A-%20Language%20name%3A%20%0A-%20Language%20code%20%28e.g.%20en%2C%20es%2C%20fr%29%3A%20%0A%0AIf%20fixing%20translations%3A%0A-%20Language%3A%20%0A-%20Issues%20to%20fix%3A%0A%20%20-%20%0A%20%20-%20%0A`,
+                      '_blank',
+                    );
+                  } else {
+                    i18n.changeLanguage(value);
+                  }
+                }}
               >
                 <SelectTrigger aria-label="Language" className="w-[100px]">
                   <SelectValue />
@@ -79,6 +88,14 @@ export function Layout() {
                       {label}
                     </SelectItem>
                   ))}
+                  <SelectItem
+                    key="lang-request-new-or-fix"
+                    value="lang-request-new-or-fix"
+                    className="border-t flex items-center gap-1"
+                  >
+                    <IconPlus className="w-4 h-4 inline" />{' '}
+                    {t('common.requestNewLanguage', 'Request new or fix translations')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
