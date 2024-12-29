@@ -13,22 +13,36 @@ export class Client {
   private readonly keyLength: number;
   private readonly encrypt: typeof defaultEncrypt;
   private readonly decrypt: typeof defaultDecrypt;
+  private readonly xClient: string | undefined;
 
   constructor({
     apiUrl,
-    keyLength,
+    keyLength = 32,
     encrypt = defaultEncrypt,
     decrypt = defaultDecrypt,
+    xClient = undefined,
   }: {
     apiUrl: string;
-    keyLength: number;
+    keyLength?: number;
     encrypt?: typeof defaultEncrypt;
     decrypt?: typeof defaultDecrypt;
+    xClient?: string;
   }) {
     this.apiUrl = apiUrl;
     this.keyLength = keyLength;
     this.encrypt = encrypt;
     this.decrypt = decrypt;
+    this.xClient = xClient;
+  }
+
+  private getHeaders() {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (this.xClient) {
+      headers['X-Client'] = this.xClient;
+    }
+    return headers;
   }
 
   async create(
@@ -43,9 +57,7 @@ export class Client {
 
     const response = await fetch(`${this.apiUrl}/vault`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: this.getHeaders(),
       body: JSON.stringify({
         c: encrypted,
         h: hash,
@@ -79,7 +91,9 @@ export class Client {
 
   async read(id: string, key: string, password?: string) {
     const h = sha256(key + (password ?? ''));
-    const res = await fetch(`${this.apiUrl}/vault/${id}?h=${h}`);
+    const res = await fetch(`${this.apiUrl}/vault/${id}?h=${h}`, {
+      headers: this.getHeaders(),
+    });
     if (!res.ok) {
       if (res.status === 400) {
         throw new ErrorInvalidKeyAndOrPassword();
@@ -105,9 +119,7 @@ export class Client {
   async delete(id: string, dt: string) {
     const response = await fetch(`${this.apiUrl}/vault/${id}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: this.getHeaders(),
       body: JSON.stringify({ dt } satisfies DeleteVaultRequest),
     });
     if (!response.ok) {
@@ -121,6 +133,7 @@ export class Client {
   async exists(id: string): Promise<boolean> {
     const response = await fetch(`${this.apiUrl}/vault/${id}`, {
       method: 'HEAD',
+      headers: this.getHeaders(),
     });
     if (!response.ok) {
       if (response.status === 404) {
