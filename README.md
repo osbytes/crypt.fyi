@@ -23,6 +23,7 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 - 📱 QR code generation
 - ⌨️ [CLI](https://www.npmjs.com/package/@crypt.fyi/cli) for interacting with the API
 - 🐳 Docker images for the api server and web client
+- 🌐 Localization with a handful of supported languages (more to come - help wanted!)
 
 ## How It Works
 
