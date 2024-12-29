@@ -17,17 +17,37 @@ This document outlines the system architecture, security measures, and interacti
 crypt.fyi follows a client-server architecture with the following main components:
 
 - Web Client (Browser-based interface)
+- Web Server (Static file server)
 - API Server
 - Data Store (Ephemeral storage)
 
 ### 2.2 Component Interaction Flow
 
 ```
+[Web Client] <--> [Web Server] // Serves static files only
 [Web Client] <--> [API Server] <--> [Data Store]
      ^
      |
 [Client-side Encryption/Decryption]
 ```
+
+### 2.3 Server Separation
+
+The system deliberately separates the web server (serving static files) from the API server for enhanced security:
+
+1. **Web Server**
+   - Serves only static files (HTML, CSS, JS)
+   - Configured to strip URL query parameters and fragments from request logging
+   - Configured with strict Content Security Policy (CSP)
+   - Ideally runs on a separate server / hosting platform from API server
+
+2. **API Server**
+   - Handles only encrypted data operations
+   - Never receives or processes URLs containing decryption keys
+   - Only receives hashed keys for verification
+   - Operates independently from web server
+
+This separation ensures that even if the web server logs are compromised, the decryption keys (which are part of the URL fragment) remain secure as they are never sent to the API server. The API server only receives the necessary hashed values for verification, maintaining the zero-knowledge architecture.
 
 ## 3. API Endpoints
 
