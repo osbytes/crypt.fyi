@@ -52,57 +52,7 @@ This separation ensures that even if the web server logs are compromised, the de
 
 ## 3. API Endpoints
 
-### 3.1 Secret Management Endpoints
-
-#### POST /vault
-
-- Purpose: Store a new encrypted secret
-- Request Body:
-  ```typescript
-  {
-    c: string; // encrypted content
-    h: string; // sha256 hash of encryption key + optional password
-    b: boolean; // burn after reading flag
-    ttl: number; // time-to-live in milliseconds
-  }
-  ```
-- Response (201):
-  ```typescript
-  {
-    id: string; // vault identifier
-    dt: string; // delete token
-  }
-  ```
-
-#### GET /vault/:vaultId
-
-- Purpose: Retrieve an encrypted secret
-- Query Parameters:
-  - h: string (sha256 hash of encryption key + optional password)
-- Response (200):
-  ```typescript
-  {
-    c: string; // encrypted content
-    b: boolean; // burn after reading flag
-    ttl: number; // time-to-live in milliseconds
-    cd: number; // created date time (unix timestamp)
-  }
-  ```
-- Error Responses:
-  - 400: Invalid key/password hash
-  - 404: Secret not found or already burned
-  - 429: Rate limit exceeded
-  - 500: Server error
-
-#### DELETE /vault/:vaultId
-
-- Purpose: Delete a secret
-- Request Body:
-  ```typescript
-  {
-    dt: string; // delete token
-  }
-  ```
+[Open API Specification](https://api.crypt.fyi/docs)
 
 ## 4. Security Measures
 
