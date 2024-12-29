@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 import { TokenGenerator } from './tokens';
-import { InvalidKeyAndOrPasswordError, Vault, VaultValue, vaultValueSchema } from '@crypt.fyi/core';
+import { ErrorInvalidKeyAndOrPassword, Vault, VaultValue, vaultValueSchema } from '@crypt.fyi/core';
 import { isDefined } from '../util';
 import { isIpAllowed } from './ips';
 import { WebhookSender } from '../webhook';
@@ -148,7 +148,7 @@ export const createRedisVault = (
             ts: Date.now(),
           });
         }
-        throw new InvalidKeyAndOrPasswordError();
+        throw new ErrorInvalidKeyAndOrPassword();
       }
 
       const ts = Date.now();

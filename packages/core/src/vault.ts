@@ -39,9 +39,3 @@ export interface Vault {
   del(id: string, dt: string): Promise<boolean>;
   exists(id: string): Promise<boolean>;
 }
-
-export class InvalidKeyAndOrPasswordError extends Error {
-  constructor() {
-    super('invalid key and/or password');
-  }
-}

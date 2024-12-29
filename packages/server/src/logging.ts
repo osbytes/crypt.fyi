@@ -29,6 +29,8 @@ export const initLogging = async (config: Config): Promise<pino.Logger> => {
           hostname: request.hostname,
           remoteAddress: request.ip,
           remotePort: request.socket.remotePort,
+          xClient: request.headers['x-client'],
+          userAgent: request.headers['user-agent'],
         };
       },
     },

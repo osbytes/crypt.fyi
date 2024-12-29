@@ -17,12 +17,12 @@ import { Config } from './config';
 import { Logger } from './logging';
 import {
   createVaultResponseSchema,
-  getVaultResponseSchema,
-  InvalidKeyAndOrPasswordError,
+  readVaultResponseSchema,
+  ErrorInvalidKeyAndOrPassword,
   Vault,
   createVaultRequestSchema,
-  getVaultQuerySchema,
-  getVaultParamsSchema,
+  readVaultQuerySchema,
+  readVaultParamsSchema,
   deleteVaultParamsSchema,
   deleteVaultRequestSchema,
 } from '@crypt.fyi/core';
@@ -32,6 +32,13 @@ import { BASE_OTEL_ATTRIBUTES } from './telemetry';
 declare module 'fastify' {
   interface FastifyRequest {
     abortSignal: AbortSignal;
+  }
+}
+
+declare module '@fastify/swagger' {
+  interface FastifyDynamicSwaggerOptions {
+    // https://github.com/fastify/fastify-swagger/issues/811
+    exposeHeadRoutes?: boolean;
   }
 }
 
@@ -63,6 +70,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       servers: [],
     },
     transform: jsonSchemaTransform,
+    exposeHeadRoutes: true,
   });
   app.register(fastifySwaggerUI, {
     routePrefix: config.swaggerUIPath,
@@ -229,10 +237,10 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     method: 'GET',
     url: '/vault/:vaultId',
     schema: {
-      params: getVaultParamsSchema,
-      querystring: getVaultQuerySchema,
+      params: readVaultParamsSchema,
+      querystring: readVaultQuerySchema,
       response: {
-        200: getVaultResponseSchema,
+        200: readVaultResponseSchema,
         404: z.null(),
         400: z.null(),
       },
@@ -246,7 +254,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
 
         return res.send(result);
       } catch (error) {
-        if (error instanceof InvalidKeyAndOrPasswordError) {
+        if (error instanceof ErrorInvalidKeyAndOrPassword) {
           return res.status(400).send();
         }
 
@@ -256,19 +264,22 @@ export const initApp = async (config: Config, deps: AppDeps) => {
   });
 
   app.withTypeProvider<ZodTypeProvider>().route({
-    method: 'GET',
-    url: '/vault/:vaultId/exists',
+    method: 'HEAD',
+    url: '/vault/:vaultId',
     schema: {
-      params: getVaultParamsSchema,
+      params: readVaultParamsSchema,
       response: {
-        200: z.object({
-          exists: z.boolean(),
-        }),
+        200: z.null(),
+        404: z.null(),
       },
     },
     async handler(req, res) {
       const exists = await vault.exists(req.params.vaultId);
-      return res.send({ exists });
+      if (!exists) {
+        return res.status(404).send();
+      }
+
+      return res.status(200).send();
     },
   });
 

@@ -1,13 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import {
-  CreateVaultRequest,
-  CreateVaultResponse,
-  DeleteVaultRequest,
-  generateRandomString,
-  sha256,
-} from '@crypt.fyi/core';
+import { sha256, ErrorNotFound } from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import React from 'react';
 import {
@@ -64,8 +58,8 @@ import {
 import { cn } from '@/lib/utils';
 import parseDuration from 'parse-duration';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useEncryptionWorker } from '@/hooks/useEncryptionWorker';
 import { useTranslation } from 'react-i18next';
+import { useClient } from '@/context/client';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
 
@@ -302,58 +296,38 @@ export function CreatePage() {
     defaultValues: React.useMemo(() => getInitialValues(ttlOptions), [ttlOptions]),
   });
 
-  const { encrypt } = useEncryptionWorker();
+  const { client } = useClient();
+
   const createMutation = useMutation({
     mutationFn: async (input: z.infer<typeof formSchema>) => {
       await sleep(500, { enabled: config.IS_DEV });
-      const key = await generateRandomString(config.KEY_LENGTH);
-      let encrypted = await encrypt(input.c, key);
-      if (input.p) {
-        encrypted = await encrypt(encrypted, input.p);
-      }
-      const h = sha256(key + (input.p ?? ''));
-
-      const result = await fetch(`${config.API_URL}/vault`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          c: encrypted,
-          h,
-          b: input.b,
-          ttl: input.ttl,
-          ips: input.ips,
-          rc: input.rc,
-          wh: input.whu
-            ? {
-                u: input.whu,
-                n: input.whn,
-                r: input.whr,
-                fpk: input.whfpk,
-                fip: input.whfip,
-                b: input.whb,
-              }
-            : undefined,
-        } satisfies CreateVaultRequest),
+      const result = await client.create({
+        ...input,
+        p: input.p,
+        wh: input.whu
+          ? {
+              u: input.whu,
+              n: input.whn,
+              r: input.whr,
+              fpk: input.whfpk,
+              fip: input.whfip,
+              b: input.whb,
+            }
+          : undefined,
       });
 
-      if (!result.ok) throw new Error(t('common.error'));
-
-      const data = await (result.json() as Promise<CreateVaultResponse>);
       const searchParams = new URLSearchParams();
-      searchParams.set('key', key);
+      searchParams.set('key', result.key);
       if (input.p) {
         searchParams.set('p', 'true');
       }
-      const url = `${window.location.origin}/${data.id}?${searchParams.toString()}`;
+      const url = `${window.location.origin}/${result.id}?${searchParams.toString()}`;
       await clipboardCopy(url);
       toast.info(t('create.success.urlCopied'));
 
       return {
-        ...data,
+        ...result,
         url,
-        key,
       };
     },
     onError(error) {
@@ -403,20 +377,14 @@ export function CreatePage() {
   const deleteMutation = useMutation({
     mutationFn: async ({ id, dt }: { id: string; dt: string }) => {
       await sleep(500, { enabled: config.IS_DEV });
-      const result = await fetch(`${config.API_URL}/vault/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ dt } satisfies DeleteVaultRequest),
-      });
-      if (!result.ok) {
-        if (result.status === 404) {
+      try {
+        await client.delete(id, dt);
+      } catch (error) {
+        if (error instanceof ErrorNotFound) {
           setIsUrlMasked(true);
           reset();
-          throw new Error('secret not found');
         }
-        throw new Error(`unexpected status code ${result.status}`);
+        throw error;
       }
     },
     onError(error) {

@@ -1,12 +1,14 @@
 import browser, { Menus } from 'webextension-polyfill';
-import {
-  CreateVaultResponse,
-  encrypt,
-  generateRandomString,
-  sha256,
-  type CreateVaultRequest,
-} from '@crypt.fyi/core';
+import { Client } from '@crypt.fyi/core';
 import { config } from './config';
+
+const manifest = chrome.runtime.getManifest();
+
+const client = new Client({
+  apiUrl: config.apiUrl,
+  keyLength: config.keyLength,
+  xClient: `@crypt.fyi/extension:${manifest.version}`,
+});
 
 const contextMenuId = '@crypt.fyi/encrypt-selection';
 
@@ -34,31 +36,12 @@ browser.contextMenus.onClicked.addListener(async (info: Menus.OnClickData, tab) 
   // TODO: add an inline popover form w/ content script to capture relevant inputs
 
   try {
-    const key = await generateRandomString(config.keyLength);
-    const encrypted = await encrypt(info.selectionText, key);
-    const hash = sha256(key);
-
-    const manifest = chrome.runtime.getManifest();
-    const response = await fetch(`${config.apiUrl}/vault`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Client': `@crypt.fyi/extension:${manifest.version}`,
-      },
-      body: JSON.stringify({
-        c: encrypted,
-        h: hash,
-        b: true,
-        ttl: config.defaultTtl,
-      } satisfies CreateVaultRequest),
+    const result = await client.create({
+      c: info.selectionText,
+      b: true,
+      ttl: config.defaultTtl,
     });
-
-    if (!response.ok) {
-      throw new Error(`Failed to create vault: ${response.statusText}`);
-    }
-
-    const { id } = (await response.json()) as CreateVaultResponse;
-    const url = `${config.webUrl}/${id}?key=${key}`;
+    const url = `${config.webUrl}/${result.id}?key=${result.key}`;
 
     await chrome.scripting.executeScript({
       target: { tabId },

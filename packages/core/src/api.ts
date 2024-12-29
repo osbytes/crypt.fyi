@@ -13,23 +13,23 @@ export const createVaultResponseSchema = z.object({
 });
 export type CreateVaultResponse = z.infer<typeof createVaultResponseSchema>;
 
-export const getVaultParamsSchema = z.object({
+export const readVaultParamsSchema = z.object({
   vaultId: z.string(),
 });
-export type GetVaultParams = z.infer<typeof getVaultParamsSchema>;
+export type ReadVaultParams = z.infer<typeof readVaultParamsSchema>;
 
-export const getVaultQuerySchema = z.object({
+export const readVaultQuerySchema = z.object({
   h: z.string().describe('sha256 hash of the encryption key + optional password'),
 });
-export type GetVaultQuery = z.infer<typeof getVaultQuerySchema>;
+export type ReadVaultQuery = z.infer<typeof readVaultQuerySchema>;
 
-export const getVaultResponseSchema = z.object({
+export const readVaultResponseSchema = z.object({
   c: z.string().describe('encrypted content'),
   b: z.boolean().describe('burn after reading'),
   ttl: z.number().describe('time to live (TTL) in milliseconds'),
   cd: z.number().describe('created date time'),
 });
-export type GetVaultResponse = z.infer<typeof getVaultResponseSchema>;
+export type ReadVaultResponse = z.infer<typeof readVaultResponseSchema>;
 
 export const deleteVaultParamsSchema = z.object({
   vaultId: z.string(),
