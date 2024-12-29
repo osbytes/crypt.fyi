@@ -4,6 +4,7 @@ export const fr: TranslationKeys = {
   common: {
     createSecret: 'Créer un Secret',
     starOnGithub: 'Star sur GitHub',
+    features: 'Fonctionnalités',
     learnMore: 'En savoir plus',
     loading: 'Chargement...',
     create: 'Créer',
@@ -35,6 +36,70 @@ export const fr: TranslationKeys = {
     title: 'Partagez des Secrets en Toute Sécurité',
     subtitle:
       'Envoyez des mots de passe et des informations sensibles avec un chiffrement de bout en bout à connaissance nulle et une suppression automatique',
+    features: {
+      encryption: {
+        title: 'Chiffrement de Bout en Bout',
+        description:
+          "Sécurisez vos données avec le chiffrement AES-256-GCM avant qu'elles ne quittent votre navigateur",
+      },
+      security: {
+        title: 'Sécurité Renforcée',
+        description:
+          'Politique de sécurité du contenu (CSP) stricte et limites de débit pour atténuer les attaques XSS et par force brute',
+      },
+      zeroKnowledge: {
+        title: 'Connaissance Nulle',
+        description:
+          'Nos serveurs ne voient jamais vos données non chiffrées - seuls vous et votre destinataire y ont accès',
+      },
+      burn: {
+        title: 'Destruction Après Lecture',
+        description:
+          'Détruisez automatiquement les secrets après leur consultation pour une sécurité maximale',
+      },
+      expiration: {
+        title: 'Auto-Expiration',
+        description:
+          "Définissez des délais d'expiration personnalisés pour que les secrets ne persistent pas plus longtemps que nécessaire",
+      },
+      password: {
+        title: 'Protection par Mot de Passe',
+        description:
+          'Ajoutez une couche de sécurité supplémentaire avec une protection optionnelle par mot de passe',
+      },
+      files: {
+        title: 'Partage de Fichiers',
+        description:
+          'Partagez des fichiers en toute sécurité avec une fonctionnalité simple de glisser-déposer',
+      },
+      webhooks: {
+        title: 'Webhooks',
+        description:
+          'Soyez notifié lorsque vos secrets sont consultés, détruits ou échouent à être lus',
+      },
+      ipControl: {
+        title: 'Restrictions IP',
+        description:
+          "Contrôlez l'accès en limitant quelles adresses IP ou plages CIDR peuvent voir vos secrets",
+      },
+      readLimits: {
+        title: 'Limites de Lecture',
+        description:
+          "Définissez le nombre maximum de consultations pour restreindre l'accès à vos secrets",
+      },
+      qrCode: {
+        title: 'Codes QR',
+        description: 'Générez des codes QR pour un partage facile de vos URLs secrètes sur mobile',
+      },
+      cli: {
+        title: 'Outil CLI',
+        description: 'Automatisez le partage de secrets avec notre interface en ligne de commande',
+      },
+      docker: {
+        title: 'Support Docker',
+        description: 'Déployez votre propre instance en utilisant nos images Docker officielles',
+      },
+    },
     steps: {
       encrypt: {
         title: '1. Chiffrer',

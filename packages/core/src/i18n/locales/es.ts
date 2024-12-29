@@ -4,6 +4,7 @@ export const es: TranslationKeys = {
   common: {
     createSecret: 'Crear Secreto',
     starOnGithub: 'Estrella en GitHub',
+    features: 'Características',
     learnMore: 'Más Información',
     loading: 'Cargando...',
     create: 'Crear',
@@ -35,6 +36,69 @@ export const es: TranslationKeys = {
     title: 'Comparte Secretos de Forma Segura',
     subtitle:
       'Envía contraseñas e información sensible con cifrado de extremo a extremo de conocimiento cero y eliminación automática',
+    features: {
+      encryption: {
+        title: 'Cifrado de Extremo a Extremo',
+        description:
+          'Asegura tus datos con cifrado AES-256-GCM antes de que salgan de tu navegador',
+      },
+      security: {
+        title: 'Seguridad Mejorada',
+        description:
+          'Política de seguridad de contenido (CSP) estricta y límites de velocidad para mitigar ataques XSS y de fuerza bruta',
+      },
+      zeroKnowledge: {
+        title: 'Conocimiento Cero',
+        description:
+          'Nuestros servidores nunca ven tus datos sin cifrar - solo tú y tu destinatario tienen acceso',
+      },
+      burn: {
+        title: 'Destruir al Leer',
+        description:
+          'Destruye automáticamente los secretos después de ser accedidos para máxima seguridad',
+      },
+      expiration: {
+        title: 'Auto-Expiración',
+        description:
+          'Establece tiempos de expiración personalizados para asegurar que los secretos no persistan más de lo necesario',
+      },
+      password: {
+        title: 'Protección con Contraseña',
+        description: 'Añade una capa extra de seguridad con protección opcional por contraseña',
+      },
+      files: {
+        title: 'Compartir Archivos',
+        description:
+          'Comparte archivos de forma segura con funcionalidad simple de arrastrar y soltar',
+      },
+      webhooks: {
+        title: 'Webhooks',
+        description:
+          'Recibe notificaciones cuando tus secretos son accedidos, destruidos o fallan al ser leídos',
+      },
+      ipControl: {
+        title: 'Restricciones IP',
+        description:
+          'Controla el acceso limitando qué direcciones IP o rangos CIDR pueden ver tus secretos',
+      },
+      readLimits: {
+        title: 'Límites de Lectura',
+        description:
+          'Establece conteos máximos de vistas para restringir cuántas veces se puede acceder a un secreto',
+      },
+      qrCode: {
+        title: 'Códigos QR',
+        description: 'Genera códigos QR para compartir fácilmente tus URLs secretas en móviles',
+      },
+      cli: {
+        title: 'Herramienta CLI',
+        description: 'Automatiza el compartir secretos con nuestra interfaz de línea de comandos',
+      },
+      docker: {
+        title: 'Soporte Docker',
+        description: 'Despliega tu propia instancia usando nuestras imágenes Docker oficiales',
+      },
+    },
     steps: {
       encrypt: {
         title: '1. Cifrar',

@@ -4,6 +4,7 @@ export const en: TranslationKeys = {
   common: {
     createSecret: 'Create Secret',
     starOnGithub: 'Star on GitHub',
+    features: 'Features',
     learnMore: 'Learn More',
     loading: 'Loading...',
     create: 'Create',
@@ -34,6 +35,64 @@ export const en: TranslationKeys = {
     title: 'Share Secrets Securely',
     subtitle:
       'Send passwords and sensitive information with zero-knowledge end-to-end encryption and automatic deletion',
+    features: {
+      encryption: {
+        title: 'End-to-end Encryption',
+        description: 'Secure your data with AES-256-GCM encryption before it leaves your browser',
+      },
+      security: {
+        title: 'Enhanced Security',
+        description:
+          'Strict Content Security Policy (CSP) and rate limits to mitigate XSS and brute-force attacks',
+      },
+      zeroKnowledge: {
+        title: 'Zero-knowledge',
+        description:
+          'Our servers never see your unencrypted data - only you and your recipient have access',
+      },
+      burn: {
+        title: 'Burn After Reading',
+        description: 'Automatically destroy secrets after they are accessed for maximum security',
+      },
+      expiration: {
+        title: 'Auto-Expiration',
+        description:
+          "Set custom expiration times to ensure secrets don't persist longer than needed",
+      },
+      password: {
+        title: 'Password Protection',
+        description: 'Add an extra layer of security with optional password protection',
+      },
+      files: {
+        title: 'File Sharing',
+        description: 'Securely share files with simple drag and drop functionality',
+      },
+      webhooks: {
+        title: 'Webhooks',
+        description: 'Get notified when your secrets are accessed, burned, or fail to be read',
+      },
+      ipControl: {
+        title: 'IP Restrictions',
+        description:
+          'Control access by limiting which IP addresses or CIDR ranges can view your secrets',
+      },
+      readLimits: {
+        title: 'Read Limits',
+        description: 'Set maximum view counts to restrict how many times a secret can be accessed',
+      },
+      qrCode: {
+        title: 'QR Codes',
+        description: 'Generate QR codes for easy mobile sharing of your secret URLs',
+      },
+      cli: {
+        title: 'CLI Tool',
+        description: 'Automate secret sharing with our command-line interface',
+      },
+      docker: {
+        title: 'Docker Support',
+        description: 'Deploy your own instance using our official Docker images',
+      },
+    },
     steps: {
       encrypt: {
         title: '1. Encrypt',

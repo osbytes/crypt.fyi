@@ -2,6 +2,7 @@ export interface TranslationKeys {
   common: {
     createSecret: string;
     starOnGithub: string;
+    features: string;
     learnMore: string;
     loading: string;
     create: string;
@@ -30,6 +31,60 @@ export interface TranslationKeys {
   landing: {
     title: string;
     subtitle: string;
+    features: {
+      encryption: {
+        title: string;
+        description: string;
+      };
+      security: {
+        title: string;
+        description: string;
+      };
+      zeroKnowledge: {
+        title: string;
+        description: string;
+      };
+      burn: {
+        title: string;
+        description: string;
+      };
+      expiration: {
+        title: string;
+        description: string;
+      };
+      password: {
+        title: string;
+        description: string;
+      };
+      files: {
+        title: string;
+        description: string;
+      };
+      webhooks: {
+        title: string;
+        description: string;
+      };
+      ipControl: {
+        title: string;
+        description: string;
+      };
+      readLimits: {
+        title: string;
+        description: string;
+      };
+      qrCode: {
+        title: string;
+        description: string;
+      };
+      cli: {
+        title: string;
+        description: string;
+      };
+      docker: {
+        title: string;
+        description: string;
+      };
+    };
     steps: {
       encrypt: {
         title: string;

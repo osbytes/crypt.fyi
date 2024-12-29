@@ -4,6 +4,7 @@ export const de: TranslationKeys = {
   common: {
     createSecret: 'Geheimnis erstellen',
     starOnGithub: 'Auf GitHub markieren',
+    features: 'Funktionen',
     learnMore: 'Mehr erfahren',
     loading: 'Lädt...',
     create: 'Erstellen',
@@ -33,7 +34,72 @@ export const de: TranslationKeys = {
   landing: {
     title: 'Geheimnisse sicher teilen',
     subtitle:
-      'Senden Sie Passwörter und sensible Informationen mit Zero-Knowledge Ende-zu-Ende-Verschlüsselung und automatischer Löschung',
+      'Senden Sie Passwörter und sensible Informationen mit Zero-Knowledge-Ende-zu-Ende-Verschlüsselung und automatischer Löschung',
+    features: {
+      encryption: {
+        title: 'Ende-zu-Ende-Verschlüsselung',
+        description:
+          'Sichern Sie Ihre Daten mit AES-256-GCM-Verschlüsselung, bevor sie Ihren Browser verlassen',
+      },
+      security: {
+        title: 'Erweiterte Sicherheit',
+        description:
+          'Strikte Content Security Policy (CSP) und Ratenbegrenzungen zum Schutz vor XSS- und Brute-Force-Angriffen',
+      },
+      zeroKnowledge: {
+        title: 'Zero-Knowledge',
+        description:
+          'Unsere Server sehen nie Ihre unverschlüsselten Daten - nur Sie und Ihr Empfänger haben Zugriff',
+      },
+      burn: {
+        title: 'Einmal-Lesen',
+        description:
+          'Geheimnisse werden nach dem Lesen automatisch gelöscht für maximale Sicherheit',
+      },
+      expiration: {
+        title: 'Auto-Ablauf',
+        description:
+          'Legen Sie benutzerdefinierte Ablaufzeiten fest, damit Geheimnisse nicht länger als nötig bestehen',
+      },
+      password: {
+        title: 'Passwortschutz',
+        description:
+          'Fügen Sie eine zusätzliche Sicherheitsebene mit optionalem Passwortschutz hinzu',
+      },
+      files: {
+        title: 'Datei-Sharing',
+        description: 'Teilen Sie Dateien sicher mit einfacher Drag-and-Drop-Funktionalität',
+      },
+      webhooks: {
+        title: 'Webhooks',
+        description:
+          'Erhalten Sie Benachrichtigungen, wenn Ihre Geheimnisse gelesen, gelöscht oder nicht gelesen werden können',
+      },
+      ipControl: {
+        title: 'IP-Beschränkungen',
+        description:
+          'Steuern Sie den Zugriff durch Einschränkung der IP-Adressen oder CIDR-Bereiche',
+      },
+      readLimits: {
+        title: 'Lesebeschränkungen',
+        description:
+          'Legen Sie maximale Ansichtszahlen fest, um zu begrenzen, wie oft ein Geheimnis abgerufen werden kann',
+      },
+      qrCode: {
+        title: 'QR-Codes',
+        description:
+          'Generieren Sie QR-Codes für einfaches Teilen Ihrer geheimen URLs auf Mobilgeräten',
+      },
+      cli: {
+        title: 'CLI-Tool',
+        description:
+          'Automatisieren Sie das Teilen von Geheimnissen mit unserer Kommandozeilen-Schnittstelle',
+      },
+      docker: {
+        title: 'Docker-Support',
+        description: 'Stellen Sie Ihre eigene Instanz mit unseren offiziellen Docker-Images bereit',
+      },
+    },
     steps: {
       encrypt: {
         title: '1. Verschlüsseln',

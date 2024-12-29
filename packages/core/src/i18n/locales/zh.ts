@@ -3,7 +3,8 @@ import type { TranslationKeys } from '../types';
 export const zh: TranslationKeys = {
   common: {
     createSecret: '创建密文',
-    starOnGithub: '在 GitHub 上点赞',
+    starOnGithub: '在 GitHub 上标星',
+    features: '功能特点',
     learnMore: '了解更多',
     loading: '加载中...',
     create: '创建',
@@ -30,8 +31,62 @@ export const zh: TranslationKeys = {
     },
   },
   landing: {
-    title: '安全分享密文',
+    title: '安全共享密文',
     subtitle: '使用零知识端到端加密和自动删除功能发送密码和敏感信息',
+    features: {
+      encryption: {
+        title: '端到端加密',
+        description: '在数据离开浏览器之前使用 AES-256-GCM 加密确保安全',
+      },
+      security: {
+        title: '增强安全性',
+        description: '严格的内容安全策略（CSP）和速率限制，以减轻 XSS 和暴力攻击',
+      },
+      zeroKnowledge: {
+        title: '零知识架构',
+        description: '我们的服务器永远不会看到您的未加密数据 - 只有您和接收者可以访问',
+      },
+      burn: {
+        title: '阅后即焚',
+        description: '访问后自动销毁密文以确保最大安全性',
+      },
+      expiration: {
+        title: '自动过期',
+        description: '设置自定义过期时间，确保密文不会持续超过所需时间',
+      },
+      password: {
+        title: '密码保护',
+        description: '通过可选的密码保护添加额外的安全层',
+      },
+      files: {
+        title: '文件共享',
+        description: '使用简单的拖放功能安全地共享文件',
+      },
+      webhooks: {
+        title: 'Webhook 通知',
+        description: '当您的密文被访问、销毁或无法读取时获得通知',
+      },
+      ipControl: {
+        title: 'IP 限制',
+        description: '通过限制可以查看密文的 IP 地址或 CIDR 范围来控制访问',
+      },
+      readLimits: {
+        title: '阅读限制',
+        description: '设置最大查看次数以限制密文可被访问的次数',
+      },
+      qrCode: {
+        title: '二维码',
+        description: '生成二维码以便在移动设备上轻松共享您的密文 URL',
+      },
+      cli: {
+        title: 'CLI 工具',
+        description: '使用我们的命令行界面自动化密文共享',
+      },
+      docker: {
+        title: 'Docker 支持',
+        description: '使用我们的官方 Docker 镜像部署您自己的实例',
+      },
+    },
     steps: {
       encrypt: {
         title: '1. 加密',
