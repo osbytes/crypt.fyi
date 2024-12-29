@@ -36,6 +36,7 @@ crypt.fyi follows a client-server architecture with the following main component
 The system deliberately separates the web server (serving static files) from the API server for enhanced security:
 
 1. **Web Server**
+
    - Serves only static files (HTML, CSS, JS)
    - Configured to strip URL query parameters and fragments from request logging
    - Configured with strict Content Security Policy (CSP)
