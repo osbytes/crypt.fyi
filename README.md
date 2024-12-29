@@ -14,7 +14,7 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 - 🔒 Strict Content Security Policy (CSP) to prevent XSS attacks and unauthorized resource loading
 - 🔒 Strict rate limits to mitigate brute-force attacks
 - 🤫 Zero-knowledge architecture - server never sees unencrypted data or decryption keys
-- 🔥 Burn after reading
+- 🔥 Burn after reading w/ provisions to prevent erroneous burns from bots or url introspection
 - ⏰ Automatic expiration (Time-To-Live)
 - 🔑 Password protection
 - 📁 File sharing support w/ drag and drop
