@@ -92,12 +92,11 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       .split(',')
       .map((o) => o.trim())
       .filter(Boolean);
-    const requestOrigin = req.headers.origin;
 
-    if (origins.length > 0) {
-      if (requestOrigin && (origins.includes('*') || origins.includes(requestOrigin))) {
-        res.header('Access-Control-Allow-Origin', requestOrigin);
-      }
+    if (origins.length > 0 && !origins.includes('*')) {
+      res.header('Access-Control-Allow-Origin', origins.join(','));
+    } else {
+      res.header('Access-Control-Allow-Origin', '*');
     }
 
     if (req.method === 'OPTIONS') {

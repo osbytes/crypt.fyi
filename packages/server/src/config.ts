@@ -73,15 +73,23 @@ const configSchema = z.object({
     .default(1024 * 1024)
     .describe('body limit in bytes'),
   swaggerUIPath: z.string().default('/docs').describe('swagger UI path'),
-  corsOrigin: z.string().describe('allowed CORS origins (comma-separated)'),
+  corsOrigin: z
+    .string()
+    .describe(
+      'allowed CORS origins (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin',
+    ),
   corsMethods: z
     .string()
     .default('GET,HEAD,POST,DELETE,OPTIONS')
-    .describe('allowed CORS methods (comma-separated)'),
+    .describe(
+      'allowed CORS methods (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods',
+    ),
   corsHeaders: z
     .string()
     .default('Content-Type,X-Client')
-    .describe('allowed CORS headers (comma-separated)'),
+    .describe(
+      'allowed CORS headers (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers',
+    ),
   encryptionKey: z.string().describe('encryption key'),
   otelEnabled: z.boolean({ coerce: true }).default(false).describe('enable OpenTelemetry tracing'),
   otelExporterOtlpEndpoint: z.string().describe('OpenTelemetry collector endpoint').optional(),
