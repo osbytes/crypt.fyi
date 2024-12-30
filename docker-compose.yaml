@@ -1,2 +1,33 @@
-include:
-  - packages/server/docker-compose.yaml
+services:
+  redis:
+    image: redis:latest
+    volumes:
+      - redis_data:/data
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - PORT=${SERVER_PORT:-4321}
+    ports:
+      - '${SERVER_PORT:-4321}:${SERVER_PORT:-4321}'
+    depends_on:
+      - redis
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        - VITE_API_URL=${API_URL:-http://localhost:${SERVER_PORT:-4321}}
+    environment:
+      - API_URL=${API_URL:-http://localhost:${SERVER_PORT:-4321}}
+    ports:
+      - '${WEB_PORT:-80}:80'
+    depends_on:
+      - server
+
+volumes:
+  redis_data:
