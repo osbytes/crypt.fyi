@@ -75,18 +75,19 @@ const configSchema = z.object({
   swaggerUIPath: z.string().default('/docs').describe('swagger UI path'),
   corsOrigin: z
     .string()
+    .default('*')
     .describe(
       'allowed CORS origins (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin',
     ),
   corsMethods: z
     .string()
-    .default('GET,HEAD,POST,DELETE,OPTIONS')
+    .default('*')
     .describe(
       'allowed CORS methods (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods',
     ),
   corsHeaders: z
     .string()
-    .default('Content-Type,X-Client')
+    .default('*')
     .describe(
       'allowed CORS headers (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers',
     ),
@@ -112,11 +113,6 @@ const configSchema = z.object({
 export type Config = z.infer<typeof configSchema>;
 
 export const config = (() => {
-  let corsOrigin: string | undefined = process.env.CORS_ORIGIN;
-  if (!corsOrigin && env !== Environment.Prod) {
-    corsOrigin = '*';
-  }
-
   let encryptionKey = process.env.ENCRYPTION_KEY;
   if (!encryptionKey && env !== Environment.Prod) {
     encryptionKey = 'foobar';
@@ -141,7 +137,7 @@ export const config = (() => {
     vaultEntryDeleteTokenLength: process.env.VAULT_ENTRY_DELETE_TOKEN_LENGTH,
     bodyLimit: parseBytes(process.env.BODY_LIMIT_BYTES ?? '100KB'),
     swaggerUIPath: process.env.SWAGGER_UI_PATH,
-    corsOrigin,
+    corsOrigin: process.env.CORS_ORIGIN,
     corsMethods: process.env.CORS_METHODS,
     corsHeaders: process.env.CORS_HEADERS,
     encryptionKey,

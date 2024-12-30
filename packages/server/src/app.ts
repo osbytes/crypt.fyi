@@ -98,10 +98,10 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     } else {
       res.header('Access-Control-Allow-Origin', '*');
     }
+    res.header('Access-Control-Allow-Methods', config.corsMethods);
+    res.header('Access-Control-Allow-Headers', config.corsHeaders);
 
     if (req.method === 'OPTIONS') {
-      res.header('Access-Control-Allow-Methods', config.corsMethods);
-      res.header('Access-Control-Allow-Headers', config.corsHeaders);
       return res.send();
     }
 
