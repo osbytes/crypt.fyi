@@ -15,14 +15,7 @@ export default defineConfig({
         name: 'crypt.fyi',
         version: '0.0.1',
         description: 'Securely share encrypted text via crypt.fyi',
-        permissions: [
-          'contextMenus',
-          'storage',
-          'clipboardWrite',
-          'activeTab',
-          'scripting',
-          'notifications',
-        ],
+        permissions: ['contextMenus', 'clipboardWrite', 'activeTab', 'scripting', 'notifications'],
         background: {
           service_worker: 'src/background.ts',
           type: 'module',
