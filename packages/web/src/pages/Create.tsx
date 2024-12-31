@@ -44,6 +44,7 @@ import {
   IconBrandGithub,
   IconShare,
   IconFile,
+  IconWebhook,
 } from '@tabler/icons-react';
 import { useRef, useState } from 'react';
 import { clipboardCopy } from '@/lib/clipboardCopy';
@@ -1094,6 +1095,24 @@ export function CreatePage() {
                       <IconEye className="text-muted-foreground size-4" />
                       <p className="text-muted-foreground">
                         {t('create.success.info.readCount', { count: form.watch('rc') })}
+                      </p>
+                    </>
+                  )}
+                  {form.watch('whu') && (
+                    <>
+                      <IconWebhook className="text-muted-foreground size-4" />
+                      <p className="text-muted-foreground">
+                        {t('create.success.info.webhook', {
+                          url: form.watch('whu'),
+                          events: [
+                            form.watch('whr') && 'read',
+                            form.watch('whb') && 'burn',
+                            form.watch('whfpk') && 'failure (key/password)',
+                            form.watch('whfip') && 'failure (IP)',
+                          ]
+                            .filter(Boolean)
+                            .join(', '),
+                        })}
                       </p>
                     </>
                   )}

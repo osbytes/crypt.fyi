@@ -174,6 +174,7 @@ export const en: TranslationKeys = {
         passwordProtected: 'Password protected',
         ipRestrictions: 'IP restriction(s): {{ips}}',
         readCount: 'Read count: {{count}}',
+        webhook: 'Webhook configured for: {{events}} ({{url}})',
       },
     },
     errors: {

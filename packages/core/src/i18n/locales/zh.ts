@@ -163,10 +163,11 @@ export const zh: TranslationKeys = {
       deleteSecret: '删除密文',
       info: {
         expires: '过期时间：{{time}}',
-        burnAfterReading: '密文在查看后将被删除',
+        burnAfterReading: '查看后密文将被删除',
         passwordProtected: '密码保护',
-        ipRestrictions: 'IP 限制：{{ips}}',
+        ipRestrictions: 'IP限制：{{ips}}',
         readCount: '阅读次数：{{count}}',
+        webhook: 'Webhook已配置：{{events}} ({{url}})',
       },
     },
     errors: {

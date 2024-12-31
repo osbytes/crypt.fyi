@@ -165,6 +165,7 @@ export interface TranslationKeys {
         passwordProtected: string;
         ipRestrictions: string;
         readCount: string;
+        webhook: string;
       };
     };
     errors: {

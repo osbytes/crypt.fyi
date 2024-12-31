@@ -178,10 +178,11 @@ export const fr: TranslationKeys = {
       deleteSecret: 'Supprimer le Secret',
       info: {
         expires: 'Expire dans : {{time}}',
-        burnAfterReading: 'Le secret sera supprimé après avoir été consulté',
+        burnAfterReading: 'Le secret sera supprimé après sa consultation',
         passwordProtected: 'Protégé par mot de passe',
         ipRestrictions: 'Restriction(s) IP : {{ips}}',
         readCount: 'Nombre de lectures : {{count}}',
+        webhook: 'Webhook configuré pour : {{events}} ({{url}})',
       },
     },
     errors: {
