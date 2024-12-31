@@ -14,6 +14,7 @@ export const ClientProvider = ({ children }: { children: ReactNode }) => {
         keyLength: 32,
         encrypt,
         decrypt,
+        xClient: `@crypt.fyi/web:${config.GIT_HASH?.substring(0, 8) || config.VERSION || 'unknown'}`,
       }),
     [encrypt, decrypt],
   );

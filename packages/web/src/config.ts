@@ -5,4 +5,6 @@ export const config = Object.freeze({
   CRYPT_FYI_GITHUB_URL: 'https://github.com/osbytes/crypt.fyi',
   MAX_IP_RESTRICTIONS: 3,
   KEY_LENGTH: 32,
+  VERSION: __APP_VERSION__,
+  GIT_HASH: __GIT_HASH__,
 } as const);
