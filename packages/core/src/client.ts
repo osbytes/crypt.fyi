@@ -61,21 +61,17 @@ export class Client {
     return headers;
   }
 
-  private createMetadata(): ContentMetadata {
-    return {
-      compression: {
-        algorithm: 'zlib:pako',
-      },
-      encryption: {
-        algorithm: 'aes-256-gcm',
-      },
-    };
-  }
-
   private compressContent(content: string): string {
     const compressed = deflate(new TextEncoder().encode(content));
     const result: EncodedContent = {
-      metadata: this.createMetadata(),
+      metadata: {
+        compression: {
+          algorithm: 'zlib:pako',
+        },
+        encryption: {
+          algorithm: 'aes-256-gcm',
+        },
+      },
       data: Buffer.from(compressed).toString('base64'),
     };
     return JSON.stringify(result);
