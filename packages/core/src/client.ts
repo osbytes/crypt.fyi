@@ -160,13 +160,10 @@ export class Client {
     }
 
     const data = await (res.json() as Promise<ReadVaultResponse>);
-
-    // Decrypt (handles both single and double encryption)
     const decrypted = password
       ? await this.decrypt(data.c, password).then((d) => this.decrypt(d, key))
       : await this.decrypt(data.c, key);
 
-    // Decompress if needed
     const decompressed = this.decompressContent(decrypted);
 
     return {
