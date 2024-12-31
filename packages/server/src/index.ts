@@ -5,7 +5,6 @@ import { initLogging } from './logging';
 import gracefulShutdown from 'http-graceful-shutdown';
 import Redis from 'ioredis';
 import { createRedisVault } from './vault/redis';
-import { EncryptedVault } from './vault/encrypted';
 import { createTokenGenerator } from './vault/tokens';
 import { createHTTPJSONWebhookSender } from './webhook';
 
@@ -17,8 +16,10 @@ const main = async () => {
     vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
     vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
   });
-  const vault = new EncryptedVault(
-    createRedisVault(redis, tokenGenerator, createHTTPJSONWebhookSender(logger)),
+  const vault = createRedisVault(
+    redis,
+    tokenGenerator,
+    createHTTPJSONWebhookSender(logger),
     config.encryptionKey,
   );
 

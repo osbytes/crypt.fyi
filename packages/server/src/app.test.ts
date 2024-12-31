@@ -23,7 +23,7 @@ const initAppTest = async (t: Test) => {
     vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
     vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
   });
-  const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender());
+  const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender(), 'foobar');
   const app = await initApp(config, {
     logger,
     vault,
@@ -124,7 +124,7 @@ tap.test('app', async (t) => {
       vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
       vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
     });
-    const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender());
+    const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender(), 'foobar');
     const app = await initApp(config, {
       logger,
       vault,
@@ -216,7 +216,7 @@ tap.test('app', async (t) => {
         vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
         vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
       });
-      const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender());
+      const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender(), 'foobar');
       const app = await initApp(config, {
         logger,
         vault,

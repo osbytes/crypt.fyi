@@ -1,6 +1,13 @@
 import Redis from 'ioredis';
 import { TokenGenerator } from './tokens';
-import { ErrorInvalidKeyAndOrPassword, Vault, VaultValue, vaultValueSchema } from '@crypt.fyi/core';
+import {
+  ErrorInvalidKeyAndOrPassword,
+  Vault,
+  VaultValue,
+  vaultValueSchema,
+  encrypt,
+  decrypt,
+} from '@crypt.fyi/core';
 import { isDefined } from '../util';
 import { isIpAllowed } from './ips';
 import { WebhookSender } from '../webhook';
@@ -9,6 +16,7 @@ export const createRedisVault = (
   redis: Redis,
   tokenGenerator: TokenGenerator,
   webhookSender: WebhookSender,
+  encryptionKey: string,
 ): Vault => {
   const getKey = (id: string) => `vault:${id}`;
 
@@ -31,7 +39,12 @@ export const createRedisVault = (
           cd: Date.now(),
           ips,
           rc,
-          wh,
+          wh: wh
+            ? {
+                ...wh,
+                u: await encrypt(wh.u, encryptionKey),
+              }
+            : undefined,
         } satisfies VaultValue),
       );
       tx.pexpire(key, ttl);
@@ -60,7 +73,11 @@ export const createRedisVault = (
         return undefined;
       }
 
-      const { ips, c, b, ttl, cd, dt, wh } = vaultValueSchema.parse(JSON.parse(result));
+      const jsonParsed = JSON.parse(result);
+      if ('wh' in jsonParsed && jsonParsed.wh.u) {
+        jsonParsed.wh.u = await decrypt(jsonParsed.wh.u, encryptionKey);
+      }
+      const { ips, c, b, ttl, cd, dt, wh } = vaultValueSchema.parse(jsonParsed);
       if (!isIpAllowed(ip, ips)) {
         if (wh?.fip) {
           void webhookSender.send({
