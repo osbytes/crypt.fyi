@@ -1,3 +1,5 @@
+import { inflate, deflate } from 'pako';
+import { Buffer } from 'buffer';
 import {
   CreateVaultRequest,
   CreateVaultResponse,
@@ -7,6 +9,20 @@ import {
 import { generateRandomString } from './encryption';
 import { encrypt as defaultEncrypt, decrypt as defaultDecrypt } from './encryption';
 import { sha256 } from './encryption';
+
+interface ContentMetadata {
+  compression?: {
+    algorithm: 'zlib:pako';
+  };
+  encryption: {
+    algorithm: 'aes-256-gcm';
+  };
+}
+
+interface EncodedContent {
+  metadata: ContentMetadata;
+  data: string;
+}
 
 export class Client {
   private readonly apiUrl: string;
@@ -45,11 +61,55 @@ export class Client {
     return headers;
   }
 
+  private createMetadata(): ContentMetadata {
+    return {
+      compression: {
+        algorithm: 'zlib:pako',
+      },
+      encryption: {
+        algorithm: 'aes-256-gcm',
+      },
+    };
+  }
+
+  private compressContent(content: string): string {
+    const compressed = deflate(new TextEncoder().encode(content));
+    const result: EncodedContent = {
+      metadata: this.createMetadata(),
+      data: Buffer.from(compressed).toString('base64'),
+    };
+    return JSON.stringify(result);
+  }
+
+  private decompressContent(content: string): string {
+    try {
+      const parsed = JSON.parse(content) as EncodedContent;
+
+      if (parsed.metadata) {
+        let processedContent = Buffer.from(parsed.data, 'base64');
+
+        if (parsed.metadata.compression?.algorithm === 'zlib:pako') {
+          const decompressed = inflate(processedContent);
+          processedContent = Buffer.from(decompressed);
+        }
+        // other future compression versions
+
+        return new TextDecoder().decode(processedContent);
+      }
+    } catch {
+      // If parsing fails, assume unencoded content
+    }
+    return content;
+  }
+
   async create(
     input: Omit<CreateVaultRequest, 'h'> & { p?: string },
   ): Promise<CreateVaultResponse & { key: string; hash: string }> {
     const key = await generateRandomString(this.keyLength);
-    let encrypted = await this.encrypt(input.c, key);
+
+    const compressed = this.compressContent(input.c);
+
+    let encrypted = await this.encrypt(compressed, key);
     if (input.p) {
       encrypted = await this.encrypt(encrypted, input.p);
     }
@@ -104,12 +164,17 @@ export class Client {
     }
 
     const data = await (res.json() as Promise<ReadVaultResponse>);
+
+    // Decrypt (handles both single and double encryption)
     const decrypted = password
       ? await this.decrypt(data.c, password).then((d) => this.decrypt(d, key))
       : await this.decrypt(data.c, key);
 
+    // Decompress if needed
+    const decompressed = this.decompressContent(decrypted);
+
     return {
-      value: decrypted,
+      value: decompressed,
       burned: data.b,
       cd: data.cd,
       ttl: data.ttl,
