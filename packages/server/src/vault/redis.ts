@@ -12,6 +12,14 @@ import { isDefined } from '../util';
 import { isIpAllowed } from './ips';
 import { WebhookSender } from '../webhook';
 
+const parseResult = async (result: string, encryptionKey: string) => {
+  const jsonParsed = JSON.parse(result);
+  if ('wh' in jsonParsed && jsonParsed.wh.u) {
+    jsonParsed.wh.u = await decrypt(jsonParsed.wh.u, encryptionKey);
+  }
+  return vaultValueSchema.parse(jsonParsed);
+};
+
 export const createRedisVault = (
   redis: Redis,
   tokenGenerator: TokenGenerator,
@@ -73,11 +81,7 @@ export const createRedisVault = (
         return undefined;
       }
 
-      const jsonParsed = JSON.parse(result);
-      if ('wh' in jsonParsed && jsonParsed.wh.u) {
-        jsonParsed.wh.u = await decrypt(jsonParsed.wh.u, encryptionKey);
-      }
-      const { ips, c, b, ttl, cd, dt, wh } = vaultValueSchema.parse(jsonParsed);
+      const { ips, c, b, ttl, cd, dt, wh } = await parseResult(result, encryptionKey);
       if (!isIpAllowed(ip, ips)) {
         if (wh?.fip) {
           void webhookSender.send({
@@ -208,7 +212,7 @@ export const createRedisVault = (
         return false;
       }
 
-      const { dt: actualDt } = vaultValueSchema.parse(JSON.parse(result));
+      const { dt: actualDt } = await parseResult(result, encryptionKey);
       if (dt !== actualDt) {
         return false;
       }
