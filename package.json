@@ -11,7 +11,7 @@
     "typecheck": "turbo typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "redis": "docker compose up redis"
+    "redis": "docker compose run --publish 6379:6379 redis"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",
