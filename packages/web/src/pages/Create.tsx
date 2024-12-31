@@ -231,8 +231,17 @@ type DragState = 'none' | 'dragging' | 'invalid';
 
 function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
   const params = new URLSearchParams(window.location.search);
+
   const ttlParam = params.get('ttl');
   const burn = params.get('burn');
+  const ips = params.get('ips');
+  const readCount = params.get('readCount');
+  const webhookUrl = params.get('webhookUrl');
+  const webhookName = params.get('webhookName');
+  const webhookRead = params.get('webhookRead') === 'true';
+  const webhookBurn = params.get('webhookBurn') === 'true';
+  const webhookFailPk = params.get('webhookFailPk') === 'true';
+  const webhookFailIp = params.get('webhookFailIp') === 'true';
 
   let ttl = DEFAULT_TTL;
   if (ttlParam) {
@@ -242,16 +251,64 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
     }
   }
 
+  let rc: number | undefined;
+  if (readCount) {
+    const parsed = parseInt(readCount, 10);
+    if (!isNaN(parsed)) {
+      rc = parsed;
+    }
+  }
+
   return {
     c: '',
     p: '',
     b: burn !== null ? burn === 'true' : true,
     ttl,
-    ips: '',
-    rc: undefined,
-    whu: '',
-    whn: '',
+    ips: ips || '',
+    rc,
+    whu: webhookUrl || '',
+    whn: webhookName || '',
+    whr: webhookRead,
+    whb: webhookBurn,
+    whfpk: webhookFailPk,
+    whfip: webhookFailIp,
   };
+}
+
+type FormSchema = ReturnType<typeof createFormSchema>;
+type FormData = z.infer<FormSchema>;
+type FormDataWithoutContent = Omit<FormData, 'c'>;
+
+function updateUrlWithFormState(formData: FormDataWithoutContent) {
+  const params = new URLSearchParams();
+
+  if (formData.ttl !== DEFAULT_TTL) {
+    params.set('ttl', `${formData.ttl}ms`);
+  }
+
+  if (formData.b !== true) {
+    params.set('burn', formData.b.toString());
+  }
+
+  if (formData.ips) {
+    params.set('ips', formData.ips);
+  }
+
+  if (formData.rc !== undefined) {
+    params.set('readCount', formData.rc.toString());
+  }
+
+  if (formData.whu) {
+    params.set('webhookUrl', formData.whu);
+    if (formData.whn) params.set('webhookName', formData.whn);
+    if (formData.whr) params.set('webhookRead', 'true');
+    if (formData.whb) params.set('webhookBurn', 'true');
+    if (formData.whfpk) params.set('webhookFailPk', 'true');
+    if (formData.whfip) params.set('webhookFailIp', 'true');
+  }
+
+  const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+  window.history.replaceState({}, '', newUrl);
 }
 
 const handleContentDrop = async (
@@ -291,10 +348,40 @@ export function CreatePage() {
   const formSchema = React.useMemo(() => createFormSchema(t), [t]);
   const ttlOptions = React.useMemo(() => getTranslatedTtlOptions(t), [t]);
 
+  const [isAdvancedConfigurationOpen, setIsAdvancedConfigurationOpen] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return !!(params.get('ips') || params.get('readCount') || params.get('webhookUrl'));
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: React.useMemo(() => getInitialValues(ttlOptions), [ttlOptions]),
   });
+  const { watch } = form;
+
+  React.useEffect(() => {
+    const subscription = watch((value) => {
+      if (!value) return;
+
+      const formState: FormDataWithoutContent = {
+        b: value.b ?? true,
+        ttl: value.ttl ?? DEFAULT_TTL,
+        whr: value.whr ?? false,
+        whfpk: value.whfpk ?? false,
+        whfip: value.whfip ?? false,
+        whb: value.whb ?? false,
+      };
+
+      if (value.p !== undefined) formState.p = value.p;
+      if (value.ips) formState.ips = value.ips;
+      if (value.rc !== undefined) formState.rc = value.rc;
+      if (value.whu) formState.whu = value.whu;
+      if (value.whn) formState.whn = value.whn;
+
+      updateUrlWithFormState(formState);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const { client } = useClient();
 
@@ -663,7 +750,10 @@ export function CreatePage() {
                     )}
                   />
                   <div className="space-y-2">
-                    <Collapsible>
+                    <Collapsible
+                      open={isAdvancedConfigurationOpen}
+                      onOpenChange={setIsAdvancedConfigurationOpen}
+                    >
                       <CollapsibleTrigger className="group flex w-full items-center justify-start gap-2 text-sm text-muted-foreground hover:text-foreground">
                         <IconChevronDown className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         {t('create.form.advanced.toggle')}
