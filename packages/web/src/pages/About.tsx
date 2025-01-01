@@ -1,163 +1,140 @@
+import { config } from '@/config';
 import { IconLock, IconShare, IconFlame } from '@tabler/icons-react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export function About() {
+  const { t } = useTranslation();
+
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8">About</h1>
+      <h1 className="text-3xl font-bold mb-8">{t('about.title')}</h1>
 
       <section className="mb-12">
-        <p className="text-lg mb-4">
-          crypt.fyi is a secure, ephemeral secret-sharing platform that enables you to share
-          sensitive information safely. Whether it's passwords, API keys, or confidential messages,
-          crypt.fyi ensures your data remains private and automatically disappears after being
-          accessed.
-        </p>
+        <p className="text-lg mb-4">{t('about.intro')}</p>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Why crypt.fyi?</h2>
+        <h2 className="text-2xl font-semibold mb-4">{t('about.whyCryptFyi.title')}</h2>
         <div className="space-y-6">
           <div>
-            <h3 className="text-xl font-semibold mb-2">The Problem with Common Practices</h3>
-            <p className="text-lg mb-4">
-              Every day, sensitive information like passwords, API keys, and private data is shared
-              through insecure channels:
-            </p>
+            <h3 className="text-xl font-semibold mb-2">
+              {t('about.whyCryptFyi.commonPractices.title')}
+            </h3>
+            <p className="text-lg mb-4">{t('about.whyCryptFyi.commonPractices.description')}</p>
             <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
-              <li>
-                Email - can be intercepted, stored indefinitely, and forwarded without control
-              </li>
-              <li>Slack/Teams messages - remain in chat history and company logs</li>
-              <li>SMS/Text messages - stored on multiple devices and carrier servers</li>
-              <li>Instant messaging - often lacks proper encryption and data deletion</li>
+              <li>{t('about.whyCryptFyi.commonPractices.problems.email')}</li>
+              <li>{t('about.whyCryptFyi.commonPractices.problems.slack')}</li>
+              <li>{t('about.whyCryptFyi.commonPractices.problems.sms')}</li>
+              <li>{t('about.whyCryptFyi.commonPractices.problems.messaging')}</li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-2">Existing Solutions and Their Limitations</h3>
-            <p className="text-lg mb-4">
-              While there are other tools in this space, each has its limitations:
-            </p>
+            <h3 className="text-xl font-semibold mb-2">
+              {t('about.whyCryptFyi.existingSolutions.title')}
+            </h3>
+            <p className="text-lg mb-4">{t('about.whyCryptFyi.existingSolutions.description')}</p>
             <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
               <li>
-                1Password - excellent for team password management, but{' '}
+                {t('about.whyCryptFyi.existingSolutions.limitations.onePassword')}{' '}
                 <a
                   href="https://1password.community/discussion/148998/feature-request-share-sensitive-data-from-non-1password-user-to-1password-user"
                   target="_blank"
                 >
-                  doesn't support external non-users sharing internally
+                  {t('about.whyCryptFyi.existingSolutions.limitations.onePasswordLink')}
                 </a>
               </li>
               <li>
-                PrivateBin/OneTimeSecret - similar core functionality, but dated user interfaces and
-                technology stacks as well as some missing{' '}
+                {t('about.whyCryptFyi.existingSolutions.limitations.otherTools')}{' '}
                 <a href="https://github.com/PrivateBin/PrivateBin/issues/1453" target="_blank">
-                  configurability
+                  {t('about.whyCryptFyi.existingSolutions.limitations.otherToolsConfigLink')}
                 </a>{' '}
                 and{' '}
                 <a href="https://github.com/onetimesecret/onetimesecret/issues/859" target="_blank">
-                  security features
+                  {t('about.whyCryptFyi.existingSolutions.limitations.otherToolsSecurityLink')}
                 </a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-2">The crypt.fyi Approach</h3>
-            <p className="text-lg">
-              crypt.fyi was built to address these challenges while embracing modern web
-              technologies. It combines the security principles of existing solutions with a clean,
-              intuitive interface and a modern tech stack. The result is a tool that's both highly
-              secure and pleasant to use.
-            </p>
+            <h3 className="text-xl font-semibold mb-2">{t('about.whyCryptFyi.approach.title')}</h3>
+            <p className="text-lg">{t('about.whyCryptFyi.approach.description')}</p>
           </div>
         </div>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">How It Works</h2>
+        <h2 className="text-2xl font-semibold mb-4">{t('about.howItWorks.title')}</h2>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="p-6 border rounded-lg">
             <IconLock className="w-12 h-12 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">1. Encrypt</h3>
-            <p>
-              Your secret is encrypted right in your browser before it ever leaves your device. Only
-              people with the special link, that you've explicitly shared, can decrypt it.
-            </p>
+            <h3 className="text-xl font-semibold mb-2">
+              {t('about.howItWorks.steps.encrypt.title')}
+            </h3>
+            <p>{t('about.howItWorks.steps.encrypt.description')}</p>
           </div>
           <div className="p-6 border rounded-lg">
             <IconShare className="w-12 h-12 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">2. Share</h3>
-            <p>
-              Share the secure link with your intended recipient. The link contains everything
-              needed to decrypt the message, unless a password is specified.
-            </p>
+            <h3 className="text-xl font-semibold mb-2">
+              {t('about.howItWorks.steps.share.title')}
+            </h3>
+            <p>{t('about.howItWorks.steps.share.description')}</p>
           </div>
           <div className="p-6 border rounded-lg">
             <IconFlame className="w-12 h-12 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">3. Burn after read</h3>
-            <p>
-              Once accessed, if 'burn after read' is checked, the secret is permanently deleted from
-              our servers. No traces left behind.
-            </p>
+            <h3 className="text-xl font-semibold mb-2">{t('about.howItWorks.steps.burn.title')}</h3>
+            <p>{t('about.howItWorks.steps.burn.description')}</p>
           </div>
         </div>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Security Implementation</h2>
+        <h2 className="text-2xl font-semibold mb-4">{t('about.security.title')}</h2>
         <div className="space-y-6">
           <div className="p-6 border rounded-lg">
-            <h3 className="text-xl font-semibold mb-2">End-to-End Encryption</h3>
-            <p className="mb-2">
-              All secrets are encrypted using AES-256-GCM encryption in your browser before
-              transmission. The encryption key never leaves your device, ensuring true end-to-end
-              encryption.
-            </p>
+            <h3 className="text-xl font-semibold mb-2">{t('about.security.encryption.title')}</h3>
+            <p className="mb-2">{t('about.security.encryption.description')}</p>
             <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-              <li>Encryption key is derived from a cryptographically secure random generation</li>
-              <li>Key derivation uses PBKDF2 with SHA-256</li>
-              <li>Each secret has a unique initialization vector (IV)</li>
+              <li>{t('about.security.encryption.features.key')}</li>
+              <li>{t('about.security.encryption.features.derivation')}</li>
+              <li>{t('about.security.encryption.features.vector')}</li>
             </ul>
           </div>
 
           <div className="p-6 border rounded-lg">
-            <h3 className="text-xl font-semibold mb-2">Zero-Knowledge Architecture</h3>
-            <p className="mb-2">
-              Our servers never see your unencrypted data. We employ a zero-knowledge architecture
-              where:
-            </p>
+            <h3 className="text-xl font-semibold mb-2">
+              {t('about.security.zeroKnowledge.title')}
+            </h3>
+            <p className="mb-2">{t('about.security.zeroKnowledge.description')}</p>
             <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-              <li>All encryption/decryption happens client-side</li>
-              <li>Servers only store encrypted data</li>
-              <li>
-                Encryption keys are transmitted via URL fragments, which never reach the backend api
-                server
-              </li>
+              <li>{t('about.security.zeroKnowledge.features.clientSide')}</li>
+              <li>{t('about.security.zeroKnowledge.features.storage')}</li>
+              <li>{t('about.security.zeroKnowledge.features.keys')}</li>
             </ul>
           </div>
 
           <div className="p-6 border rounded-lg">
-            <h3 className="text-xl font-semibold mb-2">Data Protection</h3>
-            <p className="mb-2">Multiple layers of security ensure your data remains protected:</p>
+            <h3 className="text-xl font-semibold mb-2">{t('about.security.protection.title')}</h3>
+            <p className="mb-2">{t('about.security.protection.description')}</p>
             <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-              <li>Client-side encryption/decryption</li>
-              <li>TLS encryption for all API communications</li>
-              <li>Automatic secret destruction after access</li>
-              <li>No server-side logging of sensitive data</li>
-              <li>Optional password protection for additional security</li>
+              <li>{t('about.security.protection.features.encryption')}</li>
+              <li>{t('about.security.protection.features.tls')}</li>
+              <li>{t('about.security.protection.features.destruction')}</li>
+              <li>{t('about.security.protection.features.logging')}</li>
+              <li>{t('about.security.protection.features.password')}</li>
             </ul>
           </div>
         </div>
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold mb-4">Open Source</h2>
-        <p className="text-lg">
-          crypt.fyi is open source and auditable. You can review our code, submit issues, and
-          contribute on{' '}
+        <h2 className="text-2xl font-semibold mb-4">{t('about.openSource.title')}</h2>
+        <p className="text-lg mb-8">
+          {t('about.openSource.description')}{' '}
           <a
-            href="https://github.com/osbytes/crypt.fyi"
+            href={config.CRYPT_FYI_GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"
@@ -166,6 +143,15 @@ export function About() {
           </a>
           .
         </p>
+
+        <div className="flex justify-center mt-12 mb-8">
+          <Link
+            to="/new"
+            className="px-8 py-4 bg-primary text-primary-foreground rounded-lg text-lg font-semibold hover:bg-primary/90 transition-colors"
+          >
+            {t('about.openSource.cta')}
+          </Link>
+        </div>
       </section>
     </div>
   );

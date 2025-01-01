@@ -5,6 +5,8 @@ import { CreatePage } from '@/pages/Create';
 import { ViewPage } from '@/pages/View';
 import { About } from '@/pages/About';
 import { Layout } from '@/components/layout';
+import { LandingPage } from './pages/Landing';
+import { ClientProvider } from './context/client';
 
 const router = createBrowserRouter([
   {
@@ -13,6 +15,10 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
+        element: <LandingPage />,
+      },
+      {
+        path: '/new',
         element: <CreatePage />,
       },
       {
@@ -37,20 +43,22 @@ const queryClient = new QueryClient();
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <Toaster
-        toastOptions={{
-          classNames: {
-            toast: 'bg-background p-2 rounded-lg outline-accent border-accent',
-            title: 'text-foreground',
-            description: 'text-muted-foreground',
-            closeButton: 'text-foreground',
-            actionButton: 'text-foreground',
-            cancelButton: 'text-foreground',
-            icon: 'text-foreground',
-          },
-        }}
-      />
+      <ClientProvider>
+        <RouterProvider router={router} />
+        <Toaster
+          toastOptions={{
+            classNames: {
+              toast: 'bg-background p-2 rounded-lg outline-accent border-accent',
+              title: 'text-foreground',
+              description: 'text-muted-foreground',
+              closeButton: 'text-foreground',
+              actionButton: 'text-foreground',
+              cancelButton: 'text-foreground',
+              icon: 'text-foreground',
+            },
+          }}
+        />
+      </ClientProvider>
     </QueryClientProvider>
   );
 }

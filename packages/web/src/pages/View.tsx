@@ -1,16 +1,14 @@
 import { config } from '@/config';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import invariant from 'tiny-invariant';
-import { decrypt } from '@/lib/encryption';
 import { Card } from '@/components/ui/card';
-import { useEffect, useRef, useState } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button/button';
 import { toast } from 'sonner';
 import { sleep } from '@/lib/sleep';
-import { sha256 } from '@/lib/hash';
 import {
   IconEye,
   IconEyeOff,
@@ -22,8 +20,14 @@ import {
 import { cn } from '@/lib/utils';
 import { clipboardCopy } from '@/lib/clipboardCopy';
 import { formatDistanceToNow } from 'date-fns';
+import { Loader } from '@/components/ui/loader';
+import { ErrorInvalidKeyAndOrPassword, ErrorNotFound } from '@crypt.fyi/core';
+import { useTranslation } from 'react-i18next';
+import { useClient } from '@/context/client';
 
 export function ViewPage() {
+  const { t } = useTranslation();
+
   const { id } = useParams<{ id: string }>();
   invariant(id, '`id` is required in URL');
   const [searchParams] = useSearchParams();
@@ -33,84 +37,91 @@ export function ViewPage() {
   const [password, setPassword] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [hasUserConfirmed, setHasUserConfirmed] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
-  const query = useMutation({
-    mutationKey: ['view', id, key, password],
-    mutationFn: async () => {
-      const h = await sha256(key + (isPasswordSet ? password : ''));
-      const res = await fetch(`${config.API_URL}/vault/${id}?h=${h}`);
+  const { client } = useClient();
+
+  const existsQuery = useQuery({
+    queryKey: [id, 'exists'],
+    queryFn: async () => {
       await sleep(500, { enabled: config.IS_DEV });
+      const exists = await client.exists(id);
+      return exists;
+    },
+    retry: () => false,
+    enabled: isPasswordSet,
+  });
 
-      switch (res.status) {
-        case 200: {
-          const result = await (res.json() as Promise<{
-            c: string;
-            b: boolean;
-            cd: number;
-            ttl: number;
-          }>);
-
-          try {
-            const decrypted = isPasswordSet
-              ? await decrypt(result.c, password).then((d) => decrypt(d, key))
-              : await decrypt(result.c, key);
-            return {
-              value: decrypted,
-              burned: result.b,
-              cd: result.cd,
-              ttl: result.ttl,
-            };
-          } catch (error) {
-            throw new DecryptError(error);
-          }
-        }
-        case 400:
-          throw new Error('invalid key and/or password');
-        case 404:
-          setIsDialogOpen(false);
-          throw new NotFoundError();
-        default:
-          throw new Error(`unexpected status code ${res.status}`);
-      }
+  const decryptMutation = useMutation({
+    mutationKey: [id, key, password],
+    mutationFn: async () => {
+      const result = await client.read(id, key, password);
+      return result;
     },
     retry: () => false,
     onSuccess() {
       setIsDialogOpen(false);
+      setPasswordError(null);
     },
     onError(error) {
-      toast.error(error.message);
+      if (error instanceof ErrorInvalidKeyAndOrPassword) {
+        setPasswordError(t('view.password.error'));
+        setTimeout(() => {
+          passwordInputRef.current?.focus();
+        }, 100);
+      } else if (error instanceof ErrorNotFound) {
+        setIsDialogOpen(false);
+      } else {
+        toast.error(error.message);
+      }
     },
   });
 
-  const sentRequest = useRef(false);
-  useEffect(() => {
-    if (sentRequest.current || isPasswordSet) {
-      return;
-    }
-    sentRequest.current = true;
+  if (existsQuery.isLoading) {
+    return <Loader />;
+  }
 
-    query.mutate();
-  }, [query, isPasswordSet]);
-
-  if (query.error instanceof NotFoundError) {
+  if (decryptMutation.error instanceof ErrorNotFound || (isPasswordSet && !existsQuery.data)) {
     return (
       <div className="max-w-3xl mx-auto mt-8 text-center">
         <Card className="p-8">
-          <h1 className="text-2xl font-semibold mb-4">Secret Not Found</h1>
-          <p className="text-muted-foreground mb-6">
-            This secret may have expired or been deleted.
-          </p>
+          <h1 className="text-2xl font-semibold mb-4">{t('view.notFound.title')}</h1>
+          <p className="text-muted-foreground mb-6">{t('view.notFound.description')}</p>
           <Button asChild>
-            <Link to="/">Create New Secret</Link>
+            <Link to="/new">{t('view.notFound.createNew')}</Link>
           </Button>
         </Card>
+      </div>
+    );
+  } else if (
+    decryptMutation.error &&
+    !(decryptMutation.error instanceof ErrorInvalidKeyAndOrPassword)
+  ) {
+    throw decryptMutation.error;
+  }
+
+  // Show initial confirmation screen to require user input before fetching the secret
+  if (!hasUserConfirmed && !isPasswordSet) {
+    return (
+      <div className="max-w-3xl mx-auto mt-8 flex flex-col items-center justify-center">
+        <Button
+          onClick={() => {
+            setHasUserConfirmed(true);
+            decryptMutation.mutate();
+          }}
+          size="lg"
+        >
+          {t('view.actions.viewSecret')}
+        </Button>
       </div>
     );
   }
 
   let content = null;
-  if (query.data) {
-    const decryptedContent = query.data.value;
+  if (decryptMutation.data) {
+    const decryptedContent = decryptMutation.data.value;
     let fileData: { type: 'file'; name: string; content: string } | null = null;
 
     try {
@@ -131,7 +142,7 @@ export function ViewPage() {
                 variant="outline"
                 size="icon"
                 onClick={() => setIsRevealed(!isRevealed)}
-                title={isRevealed ? 'Hide content' : 'Show content'}
+                title={isRevealed ? t('view.content.hideContent') : t('view.content.showContent')}
                 className="hover:bg-muted"
               >
                 {isRevealed ? <IconEyeOff className="h-5 w-5" /> : <IconEye className="h-5 w-5" />}
@@ -140,10 +151,10 @@ export function ViewPage() {
                 variant="outline"
                 size="icon"
                 onClick={() => {
-                  clipboardCopy(query.data.value);
-                  toast.success('Secret copied to clipboard');
+                  clipboardCopy(decryptMutation.data.value);
+                  toast.success(t('view.content.copiedToClipboard'));
                 }}
-                title="Copy to clipboard"
+                title={t('view.content.copyToClipboard')}
                 className="hover:bg-muted"
               >
                 <IconCopy className="h-5 w-5" />
@@ -151,23 +162,22 @@ export function ViewPage() {
             </>
           )}
         </div>
-        {query.data && (
+        {decryptMutation.data && (
           <div className="flex justify-center">
-            {query.data.burned ? (
+            {decryptMutation.data.burned ? (
               <div className="grid grid-cols-[auto_1fr] items-center gap-2 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-lg p-2 mb-2">
                 <IconFlame className="h-4 w-4" />
-                <p className="text-xs">
-                  This secret was deleted after your viewing and is no longer available after
-                  leaving the page.
-                </p>
+                <p className="text-xs">{t('view.info.burnedAfterReading')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-[auto_1fr] items-center gap-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg p-2 mb-2">
                 <IconClock className="h-4 w-4" />
                 <p className="text-xs">
-                  Expires{' '}
-                  {formatDistanceToNow(new Date(query.data.cd + query.data.ttl), {
-                    addSuffix: true,
+                  {t('view.info.expiresIn', {
+                    time: formatDistanceToNow(
+                      new Date(decryptMutation.data.cd + decryptMutation.data.ttl),
+                      { addSuffix: true },
+                    ),
                   })}
                 </p>
               </div>
@@ -177,7 +187,7 @@ export function ViewPage() {
         <Card className="p-6 relative">
           {fileData ? (
             <div className="text-center space-y-4">
-              <p className="text-muted-foreground">A file has been shared with you</p>
+              <p className="text-muted-foreground">{t('view.content.fileShared')}</p>
               <Button
                 onClick={() => {
                   const link = document.createElement('a');
@@ -187,7 +197,7 @@ export function ViewPage() {
                 }}
               >
                 <IconDownload className="h-5 w-5 mr-2" />
-                Download File
+                {t('view.content.downloadFile')}
               </Button>
             </div>
           ) : (
@@ -204,9 +214,7 @@ export function ViewPage() {
               </pre>
               {!isRevealed && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <p className="text-muted-foreground">
-                    Click the eye icon above to reveal the secret
-                  </p>
+                  <p className="text-muted-foreground">{t('view.content.clickToReveal')}</p>
                 </div>
               )}
             </>
@@ -217,46 +225,53 @@ export function ViewPage() {
   } else if (isPasswordSet) {
     content = (
       <Card className="p-6 text-center cursor-pointer" onClick={() => setIsDialogOpen(true)}>
-        <p className="text-muted-foreground">
-          This secret is password protected. Click to enter password.
-        </p>
+        <p className="text-muted-foreground">{t('view.content.passwordProtected')}</p>
       </Card>
     );
+  } else if (decryptMutation.isPending) {
+    content = <Loader />;
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className="max-w-3xl mx-auto p-4 py-8">
       {content}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Enter Password</DialogTitle>
+            <DialogTitle>{t('view.password.title')}</DialogTitle>
           </DialogHeader>
           <form
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              query.mutate();
+              decryptMutation.mutate();
             }}
           >
             <div className="space-y-2">
               <Input
+                ref={passwordInputRef}
                 type="password"
-                placeholder="Enter the password"
+                placeholder={t('view.password.placeholder')}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError(null);
+                }}
                 required
                 autoFocus
-                className="text-lg"
+                className={cn(
+                  'text-lg',
+                  passwordError && 'border-destructive focus-visible:ring-destructive',
+                )}
+                disabled={decryptMutation.isPending}
               />
-              <p className="text-sm text-muted-foreground">
-                This secret is protected with a password - request from the sender
-              </p>
+              {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
+              <p className="text-sm text-muted-foreground">{t('view.password.description')}</p>
             </div>
             <div className="flex justify-end gap-3">
-              <Button type="submit" isLoading={query.isPending}>
-                Confirm
+              <Button type="submit" isLoading={decryptMutation.isPending}>
+                {t('common.confirm')}
               </Button>
             </div>
           </form>
@@ -264,19 +279,4 @@ export function ViewPage() {
       </Dialog>
     </div>
   );
-}
-
-class NotFoundError extends Error {
-  constructor() {
-    super('not found');
-    this.name = 'NotFoundError';
-  }
-}
-class DecryptError extends Error {
-  error: unknown;
-  constructor(error: unknown) {
-    super('decrypt error');
-    this.name = 'DecryptError';
-    this.error = error;
-  }
 }

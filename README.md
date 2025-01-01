@@ -1,16 +1,30 @@
-# crypt.fyi
+# [crypt.fyi](https://crypt.fyi)
 
 A zero-knowledge, end-to-end encrypted secret sharing platform that enables secure transmission of sensitive information.
+
+[![CI](https://github.com/osbytes/crypt.fyi/actions/workflows/ci.yml/badge.svg)](https://github.com/osbytes/crypt.fyi/actions/workflows/ci.yml)
+[![Security Headers](https://img.shields.io/badge/Security%20Headers-A-brightgreen)](https://securityheaders.com/?q=https://www.crypt.fyi&followRedirects=on)
+[![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade-score/crypt.fyi)](https://developer.mozilla.org/en-US/observatory/analyze?host=crypt.fyi)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/9850/badge)](https://bestpractices.coreinfrastructure.org/projects/9850)
+[![i18n ✓](https://img.shields.io/badge/i18n-✓-blue?logo=translate)](https://github.com/osbytes/crypt.fyi/tree/main/packages/core/src/i18n/locales)
 
 ## Features
 
 - 🔒 End-to-end encryption using AES-256-GCM
+- 🔒 Strict Content Security Policy (CSP) to prevent XSS attacks and unauthorized resource loading
+- 🔒 Strict rate limits to mitigate brute-force attacks
 - 🤫 Zero-knowledge architecture - server never sees unencrypted data or decryption keys
-- 🔥 Burn after reading option
+- 🔥 Burn after reading w/ provisions to prevent erroneous burns from bots or url introspection
 - ⏰ Automatic expiration (Time-To-Live)
-- 🔑 Optional password protection
+- 🔑 Password protection
 - 📁 File sharing support w/ drag and drop
+- 🪝 Webhook notifications for read success, read failure, and burn events
+- 🌐 IP/CIDR allow-listing
+- 🔢 Read count limits
 - 📱 QR code generation
+- ⌨️ [CLI](https://www.npmjs.com/package/@crypt.fyi/cli) for interacting with the API
+- 🐳 Docker images for the api server and web client
+- 🌐 Localization with a handful of supported languages (more to come - help wanted!)
 
 ## How It Works
 
@@ -23,19 +37,6 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 1. When accessed, only when the decryption key and password match via server-side verification of the hashes, the encrypted secret is shared and decrypted in the recipient's browser
 1. Optionally, the secret is automatically destroyed after being read in an atomic read & delete operation guaranteeing only one person can access the secret
 1. If retrieval doesn't happen within the TTL, the secret is automatically destroyed
-
-## Security Features
-
-- Client-side encryption/decryption only
-- Cryptographically secure and unique encryption key per secret
-- Optional password protection (layered encryption)
-  - Password is not embedded in the URL and is ideally shared/transmitted separately from the URL
-- No server-side logging of sensitive data
-- Automatic data expiration
-- TLS transport encryption
-- CORS protection and rate limiting
-- Strict Content Security Policy (CSP) to prevent XSS attacks and unauthorized resource loading
-- Rate limits to mitigate brute-force attacks
 
 [RFC](./SPECIFICATION.md)
 

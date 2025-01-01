@@ -73,15 +73,24 @@ const configSchema = z.object({
     .default(1024 * 1024)
     .describe('body limit in bytes'),
   swaggerUIPath: z.string().default('/docs').describe('swagger UI path'),
-  corsOrigin: z.string().describe('allowed CORS origins (comma-separated)'),
+  corsOrigin: z
+    .string()
+    .default('*')
+    .describe(
+      'allowed CORS origins (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin',
+    ),
   corsMethods: z
     .string()
-    .default('GET,POST,DELETE,OPTIONS')
-    .describe('allowed CORS methods (comma-separated)'),
+    .default('*')
+    .describe(
+      'allowed CORS methods (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods',
+    ),
   corsHeaders: z
     .string()
-    .default('Content-Type')
-    .describe('allowed CORS headers (comma-separated)'),
+    .default('*')
+    .describe(
+      'allowed CORS headers (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers',
+    ),
   encryptionKey: z.string().describe('encryption key'),
   otelEnabled: z.boolean({ coerce: true }).default(false).describe('enable OpenTelemetry tracing'),
   otelExporterOtlpEndpoint: z.string().describe('OpenTelemetry collector endpoint').optional(),
@@ -97,16 +106,13 @@ const configSchema = z.object({
     .string()
     .default(packageJson.description)
     .describe('service description from package.json or env'),
+  maxIpRestrictions: z.number({ coerce: true }).default(3).describe('max IP restrictions'),
+  maxReadCount: z.number({ coerce: true }).default(10).describe('max read count'),
 });
 
 export type Config = z.infer<typeof configSchema>;
 
 export const config = (() => {
-  let corsOrigin: string | undefined = process.env.CORS_ORIGIN;
-  if (!corsOrigin && env !== Environment.Prod) {
-    corsOrigin = '*';
-  }
-
   let encryptionKey = process.env.ENCRYPTION_KEY;
   if (!encryptionKey && env !== Environment.Prod) {
     encryptionKey = 'foobar';
@@ -131,7 +137,7 @@ export const config = (() => {
     vaultEntryDeleteTokenLength: process.env.VAULT_ENTRY_DELETE_TOKEN_LENGTH,
     bodyLimit: parseBytes(process.env.BODY_LIMIT_BYTES ?? '100KB'),
     swaggerUIPath: process.env.SWAGGER_UI_PATH,
-    corsOrigin,
+    corsOrigin: process.env.CORS_ORIGIN,
     corsMethods: process.env.CORS_METHODS,
     corsHeaders: process.env.CORS_HEADERS,
     encryptionKey,
@@ -140,5 +146,7 @@ export const config = (() => {
     serviceName: process.env.SERVICE_NAME,
     serviceVersion: process.env.SERVICE_VERSION,
     serviceDescription: process.env.SERVICE_DESCRIPTION,
+    maxIpRestrictions: process.env.MAX_IP_RESTRICTIONS,
+    maxReadCount: process.env.MAX_READ_COUNT,
   });
 })();

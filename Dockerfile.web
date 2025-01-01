@@ -5,19 +5,22 @@ ENV VITE_API_URL=${VITE_API_URL}
 
 WORKDIR /app
 
-# Copy package files first
+# Copy root workspace files
 COPY package.json yarn.lock ./
-COPY packages/web/package.json ./packages/web/
+
+# Copy package directories structure first
+COPY packages/ ./packages/
+# Remove everything except package.json files
+RUN find packages -type f ! -name "package.json" -delete
 
 # Install dependencies
 RUN yarn install
-RUN cd packages/web && yarn install
 
-# Then copy source files
+# Then copy all source files
 COPY . .
 
 # Build the application
-RUN cd packages/web && yarn build
+RUN yarn build --filter @crypt.fyi/web
 
 FROM nginx:alpine
 

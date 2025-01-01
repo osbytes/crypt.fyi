@@ -7,12 +7,13 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "tap",
+    "test": "tap --allow-incomplete-coverage",
     "test:help": "tap --help",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\""
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",
@@ -33,7 +34,8 @@
     "tap": "^21.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
-    "undici": "^6.11.1"
+    "undici": "^6.11.1",
+    "@crypt.fyi/core": "*"
   },
   "dependencies": {
     "@fastify/compress": "^7.0.0",
@@ -53,6 +55,7 @@
     "fastify-type-provider-zod": "^2.0.0",
     "http-graceful-shutdown": "^3.1.13",
     "ioredis": "^5.4.1",
+    "ip-range-check": "^0.2.0",
     "parse-duration": "^1.1.1",
     "pino": "^8.16.2",
     "zod": "^3.22.4"

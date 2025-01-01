@@ -8,20 +8,37 @@ import {
   validatorCompiler,
   ZodTypeProvider,
 } from 'fastify-type-provider-zod';
-import z from 'zod';
+import { z } from 'zod';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import fastifyRateLimit from '@fastify/rate-limit';
 import { metrics } from '@opentelemetry/api';
 import { Config } from './config';
 import { Logger } from './logging';
-import { InvalidKeyAndOrPasswordError, Vault } from './vault/vault';
+import {
+  createVaultResponseSchema,
+  readVaultResponseSchema,
+  ErrorInvalidKeyAndOrPassword,
+  Vault,
+  createVaultRequestSchema,
+  readVaultQuerySchema,
+  readVaultParamsSchema,
+  deleteVaultParamsSchema,
+  deleteVaultRequestSchema,
+} from '@crypt.fyi/core';
 import { Redis } from 'ioredis';
 import { BASE_OTEL_ATTRIBUTES } from './telemetry';
 
 declare module 'fastify' {
   interface FastifyRequest {
     abortSignal: AbortSignal;
+  }
+}
+
+declare module '@fastify/swagger' {
+  interface FastifyDynamicSwaggerOptions {
+    // https://github.com/fastify/fastify-swagger/issues/811
+    exposeHeadRoutes?: boolean;
   }
 }
 
@@ -53,6 +70,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       servers: [],
     },
     transform: jsonSchemaTransform,
+    exposeHeadRoutes: true,
   });
   app.register(fastifySwaggerUI, {
     routePrefix: config.swaggerUIPath,
@@ -74,17 +92,16 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       .split(',')
       .map((o) => o.trim())
       .filter(Boolean);
-    const requestOrigin = req.headers.origin;
 
-    if (origins.length > 0) {
-      if (requestOrigin && (origins.includes('*') || origins.includes(requestOrigin))) {
-        res.header('Access-Control-Allow-Origin', requestOrigin);
-      }
+    if (origins.length > 0 && !origins.includes('*')) {
+      res.header('Access-Control-Allow-Origin', origins.join(','));
+    } else {
+      res.header('Access-Control-Allow-Origin', '*');
     }
+    res.header('Access-Control-Allow-Methods', config.corsMethods);
+    res.header('Access-Control-Allow-Headers', config.corsHeaders);
 
     if (req.method === 'OPTIONS') {
-      res.header('Access-Control-Allow-Methods', config.corsMethods);
-      res.header('Access-Control-Allow-Headers', config.corsHeaders);
       return res.send();
     }
 
@@ -141,22 +158,71 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     method: 'POST',
     url: '/vault',
     schema: {
-      body: z.object({
-        c: z.string().describe('encrypted content'),
-        h: z.string().describe('sha256 hash of the encryption key + optional password'),
-        b: z.boolean().default(true).describe('burn after reading'),
-        ttl: z
-          .number()
-          .min(config.vaultEntryTTLMsMin)
-          .max(config.vaultEntryTTLMsMax)
-          .default(config.vaultEntryTTLMsDefault)
-          .describe('time to live (TTL) in milliseconds'),
-      }),
-      response: {
-        201: z.object({
-          id: z.string().describe('vault id'),
-          dt: z.string().describe('delete token'),
+      body: createVaultRequestSchema
+        .extend({
+          ttl: z
+            .number()
+            .min(config.vaultEntryTTLMsMin)
+            .max(config.vaultEntryTTLMsMax)
+            .default(config.vaultEntryTTLMsDefault)
+            .describe('time to live (TTL) in milliseconds'),
+          rc: z
+            .number({ coerce: true })
+            .min(2)
+            .max(config.maxReadCount)
+            .optional()
+            .describe('maximum number of times the secret can be read'),
+        })
+        .superRefine((val, ctx) => {
+          if (val.ips) {
+            const ips = val.ips.split(',');
+
+            if (ips.length > config.maxIpRestrictions) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.too_big,
+                maximum: config.maxIpRestrictions,
+                type: 'array',
+                inclusive: true,
+                message: `Too many IP restrictions (max ${config.maxIpRestrictions})`,
+              });
+              return false;
+            }
+
+            for (const ip of ips) {
+              const trimmed = ip.trim();
+              const isValidIP = z.string().ip().safeParse(trimmed).success;
+              const isValidCIDR = z
+                .string()
+                .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
+                .safeParse(trimmed).success;
+
+              if (!isValidIP && !isValidCIDR) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: `Invalid IP address or CIDR block: ${trimmed}`,
+                });
+                return false;
+              }
+            }
+          }
+
+          if (val.c.length === 0) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ['c'],
+              message: 'Content is required',
+            });
+          }
+          if (val.b && val.rc !== undefined) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ['rc'],
+              message: 'Read count cannot be used with burn after reading',
+            });
+          }
         }),
+      response: {
+        201: createVaultResponseSchema,
       },
     },
     async handler(req, res) {
@@ -170,33 +236,24 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     method: 'GET',
     url: '/vault/:vaultId',
     schema: {
-      params: z.object({
-        vaultId: z.string(),
-      }),
-      querystring: z.object({
-        h: z.string().describe('sha256 hash of the encryption key + optional password'),
-      }),
+      params: readVaultParamsSchema,
+      querystring: readVaultQuerySchema,
       response: {
-        200: z.object({
-          c: z.string().describe('encrypted content'),
-          b: z.boolean().describe('burn after reading'),
-          ttl: z.number().describe('time to live (TTL) in milliseconds'),
-          cd: z.number().describe('created date time'),
-        }),
+        200: readVaultResponseSchema,
         404: z.null(),
         400: z.null(),
       },
     },
     async handler(req, res) {
       try {
-        const result = await vault.get(req.params.vaultId, req.query.h);
+        const result = await vault.get(req.params.vaultId, req.query.h, req.ip);
         if (!result) {
           return res.status(404).send();
         }
 
         return res.send(result);
       } catch (error) {
-        if (error instanceof InvalidKeyAndOrPasswordError) {
+        if (error instanceof ErrorInvalidKeyAndOrPassword) {
           return res.status(400).send();
         }
 
@@ -206,15 +263,31 @@ export const initApp = async (config: Config, deps: AppDeps) => {
   });
 
   app.withTypeProvider<ZodTypeProvider>().route({
+    method: 'HEAD',
+    url: '/vault/:vaultId',
+    schema: {
+      params: readVaultParamsSchema,
+      response: {
+        200: z.null(),
+        404: z.null(),
+      },
+    },
+    async handler(req, res) {
+      const exists = await vault.exists(req.params.vaultId);
+      if (!exists) {
+        return res.status(404).send();
+      }
+
+      return res.status(200).send();
+    },
+  });
+
+  app.withTypeProvider<ZodTypeProvider>().route({
     method: 'DELETE',
     url: '/vault/:vaultId',
     schema: {
-      params: z.object({
-        vaultId: z.string(),
-      }),
-      body: z.object({
-        dt: z.string(),
-      }),
+      params: deleteVaultParamsSchema,
+      body: deleteVaultRequestSchema,
       response: {
         200: z.null(),
         404: z.null(),
