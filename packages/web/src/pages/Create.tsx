@@ -17,6 +17,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { config } from '@/config';
@@ -700,13 +707,9 @@ export function CreatePage() {
                       <FormItem>
                         <FormLabel>{t('create.form.ttl.label')}</FormLabel>
                         <FormControl>
-                          <SmartDatetimeInput
+                          <Select
                             onValueChange={(v) => {
-                              const now = Date.now();
-                              const selectedTime = v.getTime();
-                              const milliseconds = selectedTime - now;
-
-                              field.onChange(milliseconds);
+                              field.onChange(Number(v));
                             }}
                             defaultValue={field.value?.toString()}
                             disabled={createMutation.isPending || field.disabled}
