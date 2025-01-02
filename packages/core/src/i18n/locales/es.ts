@@ -95,6 +95,11 @@ export const es: TranslationKeys = {
         title: 'Herramienta CLI',
         description: 'Automatiza el compartir secretos con nuestra interfaz de línea de comandos',
       },
+      chromeExtension: {
+        title: 'Extensión de Chrome',
+        description:
+          'Comparte secretos directamente desde tu navegador con nuestra extensión de Chrome',
+      },
       docker: {
         title: 'Soporte Docker',
         description: 'Despliega tu propia instancia usando nuestras imágenes Docker oficiales',

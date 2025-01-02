@@ -81,6 +81,10 @@ export interface TranslationKeys {
         title: string;
         description: string;
       };
+      chromeExtension: {
+        title: string;
+        description: string;
+      };
       docker: {
         title: string;
         description: string;

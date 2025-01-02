@@ -10,19 +10,20 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 
 ## Features
 
-- 🔒 End-to-end encryption using AES-256-GCM
-- 🔒 Strict Content Security Policy (CSP) to prevent XSS attacks and unauthorized resource loading
-- 🔒 Strict rate limits to mitigate brute-force attacks
+- 🔐 End-to-end encryption using AES-256-GCM
+- 🛡️ Strict Content Security Policy (CSP) to prevent XSS attacks and unauthorized resource loading
+- 🛡️ Strict rate limits to mitigate brute-force attacks
 - 🤫 Zero-knowledge architecture - server never sees unencrypted data or decryption keys
 - 🔥 Burn after reading w/ provisions to prevent erroneous burns from bots or url introspection
 - ⏰ Automatic expiration (Time-To-Live)
-- 🔑 Password protection
+- 🗝️ Password protection
 - 📁 File sharing support w/ drag and drop
 - 🪝 Webhook notifications for read success, read failure, and burn events
 - 🌐 IP/CIDR allow-listing
 - 🔢 Read count limits
 - 📱 QR code generation
 - ⌨️ [CLI](https://www.npmjs.com/package/@crypt.fyi/cli) for interacting with the API
+- 🧩 [Chrome Extension](https://chromewebstore.google.com/detail/cryptfyi/hkmbmkjfjfdbpohlllleaacjkacfhald)
 - 🐳 Docker images for the api server and web client
 - 🌐 Localization with a handful of supported languages (more to come - help wanted!)
 

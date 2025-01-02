@@ -16,6 +16,7 @@ import {
   IconQrcode,
   IconTerminal2,
   IconBrandDocker,
+  IconBrandChrome,
 } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import { config } from '@/config';
@@ -196,9 +197,30 @@ export function LandingPage() {
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
               <IconTerminal2 className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
-              {t('landing.features.cli.title')}
+              <a
+                href="https://www.npmjs.com/package/@crypt.fyi/cli"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('landing.features.cli.title')}
+              </a>
             </h3>
             <p className="text-sm text-muted-foreground">{t('landing.features.cli.description')}</p>
+          </div>
+          <div className="p-4 rounded-lg border bg-card">
+            <h3 className="font-semibold mb-2">
+              <IconBrandChrome className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <a
+                href="https://chromewebstore.google.com/detail/cryptfyi/hkmbmkjfjfdbpohlllleaacjkacfhald"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('landing.features.chromeExtension.title')}
+              </a>
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {t('landing.features.chromeExtension.description')}
+            </p>
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">

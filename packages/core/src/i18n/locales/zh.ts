@@ -83,6 +83,10 @@ export const zh: TranslationKeys = {
         title: 'CLI 工具',
         description: '使用我们的命令行界面自动化密文共享',
       },
+      chromeExtension: {
+        title: 'Chrome 扩展',
+        description: '使用我们的 Chrome 扩展直接从浏览器共享密文',
+      },
       docker: {
         title: 'Docker 支持',
         description: '使用我们的官方 Docker 镜像部署您自己的实例',

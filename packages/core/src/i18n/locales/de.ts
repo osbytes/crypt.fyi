@@ -96,6 +96,11 @@ export const de: TranslationKeys = {
         description:
           'Automatisieren Sie das Teilen von Geheimnissen mit unserer Kommandozeilen-Schnittstelle',
       },
+      chromeExtension: {
+        title: 'Chrome-Erweiterung',
+        description:
+          'Teilen Sie Geheimnisse direkt aus Ihrem Browser mit unserer Chrome-Erweiterung',
+      },
       docker: {
         title: 'Docker-Support',
         description: 'Stellen Sie Ihre eigene Instanz mit unseren offiziellen Docker-Images bereit',
