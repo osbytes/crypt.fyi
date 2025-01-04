@@ -1922,10 +1922,22 @@
   resolved "https://registry.npmjs.org/@noble/ciphers/-/ciphers-1.1.3.tgz"
   integrity sha512-Ygv6WnWJHLLiW4fnNDC1z+i13bud+enXOFRBlpxI+NJliPWx5wdR+oWlTjLuBPTqjUjtHXtjkU6w3kuuH6upZA==
 
+"@noble/hashes@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.7.0.tgz#5d9e33af2c7d04fee35de1519b80c958b2e35e39"
+  integrity sha512-HXydb0DgzTpDPwbVeDGCG1gIu7X6+AuU6Zl6av/E/KG8LMsvPntvq+w17CHRpKBmN6Ybdrt1eP3k4cj8DJa78w==
+
 "@noble/hashes@^1.6.1":
   version "1.6.1"
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.6.1.tgz"
   integrity sha512-pq5D8h10hHBjyqX+cfBm0i8JUXJ0UhczFc4r74zbuT9XgewFo2E3J1cOaGtdZynILNmQ685YWGzGE1Zv6io50w==
+
+"@noble/post-quantum@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@noble/post-quantum/-/post-quantum-0.3.0.tgz#cbc765a736d17f3ea17f2ee601ed91e52fe2cf51"
+  integrity sha512-RrwI6QqgToSwhyN9E9p+xwKi39k9pDxLy5A60u+murRupwUiKRrIrHMhKEuaZQ20+aAITU3Z/ZHtZ0hC6EKT/w==
+  dependencies:
+    "@noble/hashes" "1.7.0"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

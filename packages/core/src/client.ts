@@ -1,14 +1,14 @@
 import { inflate, deflate } from 'pako';
-import { Buffer } from 'buffer';
+import { Buffer } from './buffer';
 import {
   CreateVaultRequest,
   CreateVaultResponse,
   DeleteVaultRequest,
   ReadVaultResponse,
 } from './api';
-import { generateRandomString } from './encryption';
-import { encrypt as defaultEncrypt, decrypt as defaultDecrypt } from './encryption';
-import { sha256 } from './encryption';
+import { generateRandomString } from './random';
+import { Decrypt, Encrypt, gcm } from './encryption';
+import { sha256 } from './hash';
 
 interface ContentMetadata {
   compression?: {
@@ -27,21 +27,21 @@ interface EncodedContent {
 export class Client {
   private readonly apiUrl: string;
   private readonly keyLength: number;
-  private readonly encrypt: typeof defaultEncrypt;
-  private readonly decrypt: typeof defaultDecrypt;
+  private readonly encrypt: Encrypt;
+  private readonly decrypt: Decrypt;
   private readonly xClient: string | undefined;
 
   constructor({
     apiUrl,
     keyLength = 32,
-    encrypt = defaultEncrypt,
-    decrypt = defaultDecrypt,
+    encrypt = gcm.encrypt,
+    decrypt = gcm.decrypt,
     xClient = undefined,
   }: {
     apiUrl: string;
     keyLength?: number;
-    encrypt?: typeof defaultEncrypt;
-    decrypt?: typeof defaultDecrypt;
+    encrypt?: Encrypt;
+    decrypt?: Decrypt;
     xClient?: string;
   }) {
     this.apiUrl = apiUrl;

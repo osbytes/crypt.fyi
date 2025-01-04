@@ -1,4 +1,4 @@
-import { encrypt, decrypt } from '@crypt.fyi/core';
+import { gcm } from '@crypt.fyi/core';
 
 export type Message = {
   type: 'encrypt' | 'decrypt';
@@ -20,7 +20,7 @@ self.onmessage = async (e: MessageEvent<Message>) => {
   if (e.data.type === 'encrypt') {
     try {
       const { content, password } = e.data;
-      const result = await encrypt(content, password);
+      const result = await gcm.encrypt(content, password);
       self.postMessage({
         type: 'success',
         result,
@@ -34,7 +34,7 @@ self.onmessage = async (e: MessageEvent<Message>) => {
   } else if (e.data.type === 'decrypt') {
     try {
       const { content, password } = e.data;
-      const result = await decrypt(content, password);
+      const result = await gcm.decrypt(content, password);
       self.postMessage({
         type: 'success',
         result,

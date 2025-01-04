@@ -5,8 +5,7 @@ import {
   Vault,
   VaultValue,
   vaultValueSchema,
-  encrypt,
-  decrypt,
+  gcm,
 } from '@crypt.fyi/core';
 import { isDefined } from '../util';
 import { isIpAllowed } from './ips';
@@ -15,7 +14,7 @@ import { WebhookSender } from '../webhook';
 const parseResult = async (result: string, encryptionKey: string) => {
   const jsonParsed = JSON.parse(result);
   if ('wh' in jsonParsed && jsonParsed.wh.u) {
-    jsonParsed.wh.u = await decrypt(jsonParsed.wh.u, encryptionKey);
+    jsonParsed.wh.u = await gcm.decrypt(jsonParsed.wh.u, encryptionKey);
   }
   return vaultValueSchema.parse(jsonParsed);
 };
@@ -50,7 +49,7 @@ export const createRedisVault = (
           wh: wh
             ? {
                 ...wh,
-                u: await encrypt(wh.u, encryptionKey),
+                u: await gcm.encrypt(wh.u, encryptionKey),
               }
             : undefined,
         } satisfies VaultValue),
