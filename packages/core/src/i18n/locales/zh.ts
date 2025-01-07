@@ -313,4 +313,82 @@ export const zh: TranslationKeys = {
       cta: '立即创建密文',
     },
   },
+  privacy: {
+    title: '隐私政策',
+    intro:
+      '在 crypt.fyi，我们严肃对待您的隐私。本隐私政策说明了当您使用我们的零知识、端到端加密的秘密共享平台时，我们如何处理您的信息。',
+    doNotCollect: {
+      title: '我们不收集的信息',
+      description: '由于我们的零知识架构，我们在技术上无法访问：',
+      items: {
+        secrets: '您的未加密秘密或文件',
+        keys: '加密密钥或密码',
+        urls: '包含解密信息的 URL 片段',
+        content: '您的加密数据的内容',
+        recipients: '您的秘密接收者的信息',
+      },
+    },
+    collect: {
+      title: '我们收集的信息',
+      description: '我们仅收集和存储最少必需的信息：',
+      items: {
+        encrypted: '加密数据（我们无法解密）',
+        hashes: '密钥验证哈希（用于验证访问权限而无需知道实际密钥）',
+        metadata: '基本请求元数据（IP 地址、时间戳）用于速率限制和滥用预防',
+        webhooks: '如果提供了 webhook URL（用于秘密访问和删除通知）',
+      },
+      note: '所有存储的数据在过期后或访问时自动删除（如果启用了阅后即焚）。',
+    },
+    usage: {
+      title: '我们如何使用信息',
+      description: '我们仅将收集的信息用于：',
+      items: {
+        transmission: '促进您的加密秘密的安全传输',
+        rateLimits: '实施速率限制以防止滥用',
+        ipControl: '在配置时实施 IP/CIDR 白名单',
+        notifications: '在启用时发送 webhook 通知',
+        security: '维护系统安全并防止未授权访问',
+      },
+    },
+    security: {
+      title: '数据存储和安全',
+      description: '我们的安全措施包括：',
+      items: {
+        encryption: '所有加密/解密都在您的浏览器中使用 AES-256-GCM 进行',
+        csp: '严格的内容安全策略 (CSP) 以防止 XSS 攻击',
+        tls: '所有 API 通信都使用 TLS 加密',
+        expiration: '具有可配置生存时间 (TTL) 的自动数据过期',
+        deletion: '访问或过期后安全删除数据',
+        storage: '不持久存储敏感信息',
+      },
+    },
+    thirdParty: {
+      title: '第三方服务',
+      description: '除以下情况外，我们不与第三方共享信息：',
+      items: {
+        webhooks: '当您启用 webhooks 时，我们向您提供的 URL 发送有关秘密访问和删除的通知',
+        infrastructure: '托管我们服务的基础设施提供商（他们只能看到无法解密的加密数据）',
+      },
+    },
+    rights: {
+      title: '您的权利和选择',
+      description: '您可以控制您的数据：',
+      items: {
+        expiration: '为您的秘密选择自定义过期时间',
+        burn: '启用阅后即焚以在访问后立即删除',
+        password: '添加密码保护以增加安全性',
+        ip: '配置 IP 限制以控制访问',
+        readLimits: '设置阅读限制',
+      },
+    },
+    changes: {
+      title: '本政策的变更',
+      description:
+        '我们可能会不时更新本隐私政策。我们会通过在此页面上发布新的隐私政策来通知用户重大变更。我们建议您定期查看本隐私政策以了解任何变更。',
+    },
+    contact: {
+      title: '联系我们',
+      description: '如果您对本隐私政策有任何问题，您可以通过我们的',
+    },
+  },
 };

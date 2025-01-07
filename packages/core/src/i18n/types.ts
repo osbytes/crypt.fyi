@@ -305,6 +305,82 @@ export interface TranslationKeys {
       cta: string;
     };
   };
+  privacy: {
+    title: string;
+    intro: string;
+    doNotCollect: {
+      title: string;
+      description: string;
+      items: {
+        secrets: string;
+        keys: string;
+        urls: string;
+        content: string;
+        recipients: string;
+      };
+    };
+    collect: {
+      title: string;
+      description: string;
+      items: {
+        encrypted: string;
+        hashes: string;
+        metadata: string;
+        webhooks: string;
+      };
+      note: string;
+    };
+    usage: {
+      title: string;
+      description: string;
+      items: {
+        transmission: string;
+        rateLimits: string;
+        ipControl: string;
+        notifications: string;
+        security: string;
+      };
+    };
+    security: {
+      title: string;
+      description: string;
+      items: {
+        encryption: string;
+        csp: string;
+        tls: string;
+        expiration: string;
+        deletion: string;
+        storage: string;
+      };
+    };
+    thirdParty: {
+      title: string;
+      description: string;
+      items: {
+        webhooks: string;
+        infrastructure: string;
+      };
+    };
+    rights: {
+      title: string;
+      description: string;
+      items: {
+        expiration: string;
+        burn: string;
+        password: string;
+        ip: string;
+        readLimits: string;
+      };
+    };
+    changes: {
+      title: string;
+      description: string;
+    };
+    contact: {
+      title: string;
+      description: string;
+    };
+  };
 }
 
 export type TranslationNamespace = keyof TranslationKeys;

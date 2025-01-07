@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { CreatePage } from '@/pages/Create';
 import { ViewPage } from '@/pages/View';
 import { About } from '@/pages/About';
+import { Privacy } from '@/pages/Privacy';
 import { Layout } from '@/components/layout';
 import { LandingPage } from './pages/Landing';
 import { ClientProvider } from './context/client';
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: '/about',
         element: <About />,
+      },
+      {
+        path: '/privacy',
+        element: <Privacy />,
       },
       {
         path: '/:id',

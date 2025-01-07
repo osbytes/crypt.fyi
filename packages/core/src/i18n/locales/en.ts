@@ -327,4 +327,89 @@ export const en: TranslationKeys = {
       cta: 'Create a Secret Now',
     },
   },
+  privacy: {
+    title: 'Privacy Policy',
+    intro:
+      'At crypt.fyi, we take your privacy seriously. This Privacy Policy explains how we handle your information when you use our zero-knowledge, end-to-end encrypted secret sharing platform.',
+    doNotCollect: {
+      title: "Information We Don't Collect",
+      description: 'Due to our zero-knowledge architecture, we are technically unable to access:',
+      items: {
+        secrets: 'Your unencrypted secrets or files',
+        keys: 'Encryption keys or passwords',
+        urls: 'URL fragments containing decryption information',
+        content: 'The content of your encrypted data',
+        recipients: 'Information about the recipients of your secrets',
+      },
+    },
+    collect: {
+      title: 'Information We Do Collect',
+      description: 'We collect and store only the minimum required information:',
+      items: {
+        encrypted: 'Encrypted data (which we cannot decrypt)',
+        hashes:
+          'Key verification hashes (used to verify access rights without knowing the actual keys)',
+        metadata:
+          'Basic request metadata (IP addresses, timestamps) for rate limiting and abuse prevention',
+        webhooks:
+          'Optional webhook URLs if provided (for notifications about secret access and deletion)',
+      },
+      note: 'All stored data is automatically deleted after expiration or when accessed (if burn after reading is enabled).',
+    },
+    usage: {
+      title: 'How We Use Information',
+      description: 'We use the collected information solely for:',
+      items: {
+        transmission: 'Facilitating the secure transmission of your encrypted secrets',
+        rateLimits: 'Enforcing rate limits to prevent abuse',
+        ipControl: 'Implementing IP/CIDR allow-listing when configured',
+        notifications: 'Sending webhook notifications when enabled',
+        security: 'Maintaining system security and preventing unauthorized access',
+      },
+    },
+    security: {
+      title: 'Data Storage and Security',
+      description: 'Our security measures include:',
+      items: {
+        encryption: 'All encryption/decryption occurs in your browser using AES-256-GCM',
+        csp: 'Strict Content Security Policy (CSP) to prevent XSS attacks',
+        tls: 'TLS encryption for all API communications',
+        expiration: 'Automatic data expiration with configurable Time-To-Live (TTL)',
+        deletion: 'Secure deletion of data after access or expiration',
+        storage: 'No persistent storage of sensitive information',
+      },
+    },
+    thirdParty: {
+      title: 'Third-Party Services',
+      description:
+        'We do not share any information with third parties except in the following cases:',
+      items: {
+        webhooks:
+          'When you enable webhooks, we send notifications to the URLs you provide about secret access and deletion',
+        infrastructure:
+          'Infrastructure providers that host our services (who only see encrypted data they cannot decrypt)',
+      },
+    },
+    rights: {
+      title: 'Your Rights and Choices',
+      description: 'You have control over your data:',
+      items: {
+        expiration: 'Choose custom expiration times for your secrets',
+        burn: 'Enable burn after reading for immediate deletion after access',
+        password: 'Add password protection for additional security',
+        ip: 'Configure IP restrictions to control access',
+        readLimits: 'Set read count limits',
+      },
+    },
+    changes: {
+      title: 'Changes to This Policy',
+      description:
+        'We may update this Privacy Policy from time to time. We will notify users of any material changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.',
+    },
+    contact: {
+      title: 'Contact Us',
+      description:
+        'If you have any questions about this Privacy Policy, you can contact us through our',
+    },
+  },
 };

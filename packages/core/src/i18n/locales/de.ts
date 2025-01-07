@@ -338,4 +338,90 @@ export const de: TranslationKeys = {
       cta: 'Jetzt ein Geheimnis erstellen',
     },
   },
+  privacy: {
+    title: 'Datenschutzerklärung',
+    intro:
+      'Bei crypt.fyi nehmen wir Ihre Privatsphäre ernst. Diese Datenschutzerklärung erläutert, wie wir mit Ihren Informationen umgehen, wenn Sie unsere Zero-Knowledge, Ende-zu-Ende-verschlüsselte Plattform für den Austausch von Geheimnissen nutzen.',
+    doNotCollect: {
+      title: 'Informationen, die wir nicht sammeln',
+      description:
+        'Aufgrund unserer Zero-Knowledge-Architektur sind wir technisch nicht in der Lage, auf Folgendes zuzugreifen:',
+      items: {
+        secrets: 'Ihre unverschlüsselten Geheimnisse oder Dateien',
+        keys: 'Verschlüsselungsschlüssel oder Passwörter',
+        urls: 'URL-Fragmente mit Entschlüsselungsinformationen',
+        content: 'Den Inhalt Ihrer verschlüsselten Daten',
+        recipients: 'Informationen über die Empfänger Ihrer Geheimnisse',
+      },
+    },
+    collect: {
+      title: 'Informationen, die wir sammeln',
+      description: 'Wir sammeln und speichern nur die minimal erforderlichen Informationen:',
+      items: {
+        encrypted: 'Verschlüsselte Daten (die wir nicht entschlüsseln können)',
+        hashes:
+          'Schlüssel-Verifizierungs-Hashes (verwendet zur Überprüfung der Zugriffsrechte ohne die tatsächlichen Schlüssel zu kennen)',
+        metadata:
+          'Grundlegende Anfrage-Metadaten (IP-Adressen, Zeitstempel) für Ratenbegrenzung und Missbrauchsprävention',
+        webhooks:
+          'Webhook-URLs, falls angegeben (für Benachrichtigungen über Zugriff und Löschung von Geheimnissen)',
+      },
+      note: 'Alle gespeicherten Daten werden nach Ablauf oder beim Zugriff automatisch gelöscht (wenn "Nach dem Lesen löschen" aktiviert ist).',
+    },
+    usage: {
+      title: 'Wie wir Informationen verwenden',
+      description: 'Wir verwenden die gesammelten Informationen nur für:',
+      items: {
+        transmission: 'Ermöglichung der sicheren Übertragung Ihrer verschlüsselten Geheimnisse',
+        rateLimits: 'Durchsetzung von Ratenbegrenzungen zur Verhinderung von Missbrauch',
+        ipControl: 'Implementierung von IP/CIDR-Whitelisting, wenn konfiguriert',
+        notifications: 'Senden von Webhook-Benachrichtigungen, wenn aktiviert',
+        security: 'Aufrechterhaltung der Systemsicherheit und Verhinderung unbefugter Zugriffe',
+      },
+    },
+    security: {
+      title: 'Datenspeicherung und Sicherheit',
+      description: 'Unsere Sicherheitsmaßnahmen umfassen:',
+      items: {
+        encryption:
+          'Alle Ver- und Entschlüsselung erfolgt in Ihrem Browser unter Verwendung von AES-256-GCM',
+        csp: 'Strikte Content Security Policy (CSP) zur Verhinderung von XSS-Angriffen',
+        tls: 'TLS-Verschlüsselung für alle API-Kommunikation',
+        expiration: 'Automatischer Datenablauf mit konfigurierbarer Lebensdauer (TTL)',
+        deletion: 'Sichere Datenlöschung nach Zugriff oder Ablauf',
+        storage: 'Keine dauerhafte Speicherung sensibler Informationen',
+      },
+    },
+    thirdParty: {
+      title: 'Drittanbieterdienste',
+      description: 'Wir teilen keine Informationen mit Dritten, außer in den folgenden Fällen:',
+      items: {
+        webhooks:
+          'Wenn Sie Webhooks aktivieren, senden wir Benachrichtigungen an die von Ihnen angegebenen URLs über Zugriff und Löschung von Geheimnissen',
+        infrastructure:
+          'Infrastrukturanbieter, die unsere Dienste hosten (die nur verschlüsselte Daten sehen, die sie nicht entschlüsseln können)',
+      },
+    },
+    rights: {
+      title: 'Ihre Rechte und Wahlmöglichkeiten',
+      description: 'Sie haben die Kontrolle über Ihre Daten:',
+      items: {
+        expiration: 'Wählen Sie benutzerdefinierte Ablauffristen für Ihre Geheimnisse',
+        burn: 'Aktivieren Sie "Nach dem Lesen löschen" für sofortige Löschung nach dem Zugriff',
+        password: 'Fügen Sie Passwortschutz für zusätzliche Sicherheit hinzu',
+        ip: 'Konfigurieren Sie IP-Beschränkungen zur Zugriffskontrolle',
+        readLimits: 'Legen Sie Lesebeschränkungen fest',
+      },
+    },
+    changes: {
+      title: 'Änderungen dieser Richtlinie',
+      description:
+        'Wir können diese Datenschutzerklärung von Zeit zu Zeit aktualisieren. Wir werden die Benutzer über wesentliche Änderungen informieren, indem wir die neue Datenschutzerklärung auf dieser Seite veröffentlichen. Wir empfehlen Ihnen, diese Datenschutzerklärung regelmäßig auf Änderungen zu überprüfen.',
+    },
+    contact: {
+      title: 'Kontakt',
+      description:
+        'Wenn Sie Fragen zu dieser Datenschutzerklärung haben, können Sie uns über unsere',
+    },
+  },
 };

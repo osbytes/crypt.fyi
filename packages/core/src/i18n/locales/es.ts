@@ -339,4 +339,89 @@ export const es: TranslationKeys = {
       cta: 'Crear un Secreto Ahora',
     },
   },
+  privacy: {
+    title: 'Política de Privacidad',
+    intro:
+      'En crypt.fyi, nos tomamos en serio tu privacidad. Esta Política de Privacidad explica cómo manejamos tu información cuando utilizas nuestra plataforma de intercambio de secretos con conocimiento cero y cifrado de extremo a extremo.',
+    doNotCollect: {
+      title: 'Información que No Recopilamos',
+      description:
+        'Debido a nuestra arquitectura de conocimiento cero, somos técnicamente incapaces de acceder a:',
+      items: {
+        secrets: 'Tus secretos o archivos sin cifrar',
+        keys: 'Claves de cifrado o contraseñas',
+        urls: 'Fragmentos de URL que contienen información de descifrado',
+        content: 'El contenido de tus datos cifrados',
+        recipients: 'Información sobre los destinatarios de tus secretos',
+      },
+    },
+    collect: {
+      title: 'Información que Recopilamos',
+      description: 'Solo recopilamos y almacenamos la información mínima necesaria:',
+      items: {
+        encrypted: 'Datos cifrados (que no podemos descifrar)',
+        hashes:
+          'Hashes de verificación de claves (utilizados para verificar derechos de acceso sin conocer las claves reales)',
+        metadata:
+          'Metadatos básicos de solicitudes (direcciones IP, marcas de tiempo) para límites de tasa y prevención de abusos',
+        webhooks:
+          'URLs de webhook si se proporcionan (para notificaciones de acceso y eliminación de secretos)',
+      },
+      note: 'Todos los datos almacenados se eliminan automáticamente después de su vencimiento o al acceder (si está activada la destrucción después de lectura).',
+    },
+    usage: {
+      title: 'Cómo Utilizamos la Información',
+      description: 'Utilizamos la información recopilada únicamente para:',
+      items: {
+        transmission: 'Facilitar la transmisión segura de tus secretos cifrados',
+        rateLimits: 'Aplicar límites de tasa para prevenir abusos',
+        ipControl: 'Implementar lista blanca de IP/CIDR cuando está configurada',
+        notifications: 'Enviar notificaciones webhook cuando están activadas',
+        security: 'Mantener la seguridad del sistema y prevenir accesos no autorizados',
+      },
+    },
+    security: {
+      title: 'Almacenamiento y Seguridad de Datos',
+      description: 'Nuestras medidas de seguridad incluyen:',
+      items: {
+        encryption: 'Todo el cifrado/descifrado ocurre en tu navegador usando AES-256-GCM',
+        csp: 'Política de Seguridad de Contenido (CSP) estricta para prevenir ataques XSS',
+        tls: 'Cifrado TLS para todas las comunicaciones API',
+        expiration: 'Vencimiento automático de datos con tiempo de vida configurable (TTL)',
+        deletion: 'Eliminación segura de datos después del acceso o vencimiento',
+        storage: 'Sin almacenamiento persistente de información sensible',
+      },
+    },
+    thirdParty: {
+      title: 'Servicios de Terceros',
+      description: 'No compartimos información con terceros excepto en los siguientes casos:',
+      items: {
+        webhooks:
+          'Cuando activas los webhooks, enviamos notificaciones a las URLs que proporcionas sobre el acceso y eliminación de secretos',
+        infrastructure:
+          'Proveedores de infraestructura que alojan nuestros servicios (que solo ven datos cifrados que no pueden descifrar)',
+      },
+    },
+    rights: {
+      title: 'Tus Derechos y Opciones',
+      description: 'Tienes control sobre tus datos:',
+      items: {
+        expiration: 'Elegir tiempos de vencimiento personalizados para tus secretos',
+        burn: 'Activar destrucción después de lectura para eliminación inmediata después del acceso',
+        password: 'Agregar protección con contraseña para seguridad adicional',
+        ip: 'Configurar restricciones de IP para controlar el acceso',
+        readLimits: 'Establecer límites de lectura',
+      },
+    },
+    changes: {
+      title: 'Cambios en esta Política',
+      description:
+        'Podemos actualizar esta Política de Privacidad de vez en cuando. Informaremos a los usuarios sobre cambios significativos publicando la nueva Política de Privacidad en esta página. Te recomendamos revisar periódicamente esta Política de Privacidad para cualquier cambio.',
+    },
+    contact: {
+      title: 'Contáctanos',
+      description:
+        'Si tienes preguntas sobre esta Política de Privacidad, puedes contactarnos a través de nuestra',
+    },
+  },
 };

@@ -340,4 +340,91 @@ export const fr: TranslationKeys = {
       cta: 'Créer un Secret Maintenant',
     },
   },
+  privacy: {
+    title: 'Politique de Confidentialité',
+    intro:
+      'Chez crypt.fyi, nous prenons votre confidentialité au sérieux. Cette Politique de Confidentialité explique comment nous gérons vos informations lorsque vous utilisez notre plateforme de partage de secrets à connaissance nulle et chiffrement de bout en bout.',
+    doNotCollect: {
+      title: 'Informations que Nous ne Collectons pas',
+      description:
+        "En raison de notre architecture à connaissance nulle, nous sommes techniquement incapables d'accéder à :",
+      items: {
+        secrets: 'Vos secrets ou fichiers non chiffrés',
+        keys: 'Clés de chiffrement ou mots de passe',
+        urls: "Fragments d'URL contenant des informations de déchiffrement",
+        content: 'Le contenu de vos données chiffrées',
+        recipients: 'Informations sur les destinataires de vos secrets',
+      },
+    },
+    collect: {
+      title: 'Informations que Nous Collectons',
+      description: 'Nous collectons et stockons uniquement les informations minimales requises :',
+      items: {
+        encrypted: 'Données chiffrées (que nous ne pouvons pas déchiffrer)',
+        hashes:
+          "Hachages de vérification des clés (utilisés pour vérifier les droits d'accès sans connaître les clés réelles)",
+        metadata:
+          'Métadonnées de base des requêtes (adresses IP, horodatages) pour la limitation des taux et la prévention des abus',
+        webhooks:
+          "URLs de webhook si fournies (pour les notifications d'accès et de suppression des secrets)",
+      },
+      note: "Toutes les données stockées sont automatiquement supprimées après expiration ou lors de l'accès (si la destruction après lecture est activée).",
+    },
+    usage: {
+      title: 'Comment Nous Utilisons les Informations',
+      description: 'Nous utilisons les informations collectées uniquement pour :',
+      items: {
+        transmission: 'Faciliter la transmission sécurisée de vos secrets chiffrés',
+        rateLimits: 'Appliquer des limites de taux pour prévenir les abus',
+        ipControl: 'Mettre en œuvre la liste blanche IP/CIDR lorsque configurée',
+        notifications: "Envoyer des notifications webhook lorsqu'activées",
+        security: 'Maintenir la sécurité du système et prévenir les accès non autorisés',
+      },
+    },
+    security: {
+      title: 'Stockage et Sécurité des Données',
+      description: 'Nos mesures de sécurité incluent :',
+      items: {
+        encryption:
+          'Tout le chiffrement/déchiffrement se fait dans votre navigateur en utilisant AES-256-GCM',
+        csp: 'Politique de sécurité du contenu (CSP) stricte pour prévenir les attaques XSS',
+        tls: 'Chiffrement TLS pour toutes les communications API',
+        expiration: 'Expiration automatique des données avec durée de vie configurable (TTL)',
+        deletion: 'Suppression sécurisée des données après accès ou expiration',
+        storage: "Pas de stockage persistant d'informations sensibles",
+      },
+    },
+    thirdParty: {
+      title: 'Services Tiers',
+      description:
+        'Nous ne partageons aucune information avec des tiers sauf dans les cas suivants :',
+      items: {
+        webhooks:
+          "Lorsque vous activez les webhooks, nous envoyons des notifications aux URLs que vous fournissez concernant l'accès et la suppression des secrets",
+        infrastructure:
+          "Fournisseurs d'infrastructure qui hébergent nos services (qui ne voient que des données chiffrées qu'ils ne peuvent pas déchiffrer)",
+      },
+    },
+    rights: {
+      title: 'Vos Droits et Choix',
+      description: 'Vous avez le contrôle sur vos données :',
+      items: {
+        expiration: "Choisir des délais d'expiration personnalisés pour vos secrets",
+        burn: "Activer la destruction après lecture pour une suppression immédiate après l'accès",
+        password: 'Ajouter une protection par mot de passe pour une sécurité supplémentaire',
+        ip: "Configurer des restrictions IP pour contrôler l'accès",
+        readLimits: 'Définir des limites de lecture',
+      },
+    },
+    changes: {
+      title: 'Modifications de cette Politique',
+      description:
+        'Nous pouvons mettre à jour cette Politique de Confidentialité de temps en temps. Nous informerons les utilisateurs de tout changement important en publiant la nouvelle Politique de Confidentialité sur cette page. Nous vous conseillons de consulter régulièrement cette Politique de Confidentialité pour tout changement.',
+    },
+    contact: {
+      title: 'Nous Contacter',
+      description:
+        'Si vous avez des questions concernant cette Politique de Confidentialité, vous pouvez nous contacter via notre',
+    },
+  },
 };

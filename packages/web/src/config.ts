@@ -3,6 +3,7 @@ export const config = Object.freeze({
   IS_DEV: import.meta.env.DEV,
   IS_PROD: import.meta.env.PROD,
   CRYPT_FYI_GITHUB_URL: 'https://github.com/osbytes/crypt.fyi',
+  CRYPT_FYI_API_DOCS_URL: 'https://api.crypt.fyi/docs',
   MAX_IP_RESTRICTIONS: 3,
   KEY_LENGTH: 32,
   VERSION: __APP_VERSION__,

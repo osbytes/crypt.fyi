@@ -104,25 +104,32 @@ export function Layout() {
         <main className="container mx-auto py-8 px-4 flex-1">
           <Outlet />
         </main>
-        <footer className="border-t mt-auto">
-          <div className="container mx-auto py-6 px-4">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="flex items-center gap-4">
-                <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground">
-                  {t('about.title')}
-                </Link>
-                <a
-                  href={config.CRYPT_FYI_GITHUB_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-muted-foreground hover:text-foreground"
-                >
-                  GitHub
-                </a>
-              </div>
-              <div className="text-sm text-muted-foreground text-center">
-                {t('common.footer.tagline')}
-              </div>
+        <footer className="border-t p-4">
+          <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Link
+                to="/about"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {t('about.title')}
+              </Link>
+              <Link
+                to="/privacy"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {t('privacy.title')}
+              </Link>
+              <a
+                href={config.CRYPT_FYI_GITHUB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Github
+              </a>
+            </div>
+            <div className="text-sm text-muted-foreground text-center">
+              {t('common.footer.tagline')}
             </div>
           </div>
         </footer>
