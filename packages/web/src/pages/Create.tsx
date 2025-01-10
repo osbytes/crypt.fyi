@@ -942,6 +942,7 @@ export function CreatePage() {
                                   </div>
                                   <pre className="text-xs text-wrap bg-card text-card-foreground">
                                     {getWebhookSchemaString({
+                                      name: form.watch('whn'),
                                       read: form.watch('whr'),
                                       burn: form.watch('whb'),
                                       failureKeyPassword: form.watch('whfpk'),
@@ -1162,17 +1163,19 @@ export function CreatePage() {
 }
 
 const getWebhookSchemaString = ({
+  name,
   read,
   burn,
   failureKeyPassword,
   failureIpAddress,
 }: {
+  name?: string;
   read: boolean;
   burn: boolean;
   failureKeyPassword: boolean;
   failureIpAddress: boolean;
 }) => `{
-  name?: string,
+  name: ${name ? `"${name}"` : 'never'},
   event: ${[read && 'READ', burn && 'BURN', failureKeyPassword && 'FAILURE_KEY_PASSWORD', failureIpAddress && 'FAILURE_IP_ADDRESS'].filter(Boolean).join(' | ') || 'never'},
   id: string,
   dt: string,
