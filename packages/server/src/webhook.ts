@@ -33,6 +33,8 @@ type BullMQWebhookSenderOptions = {
   backoffDelayMs?: number;
   removeOnComplete?: boolean;
   removeOnFail?: boolean;
+  concurrency?: number;
+  drainDelayMs?: number;
 };
 
 export const createBullMQWebhookSender = ({
@@ -45,6 +47,8 @@ export const createBullMQWebhookSender = ({
   backoffDelayMs = 1000,
   removeOnComplete = true,
   removeOnFail = true,
+  concurrency = 50,
+  drainDelayMs = 15_000,
 }: BullMQWebhookSenderOptions): { webhookSender: WebhookSender; cleanup: () => Promise<void> } => {
   const QUEUE_NAME = 'webhooks';
   const JOB_NAME = 'webhook';
@@ -99,7 +103,7 @@ export const createBullMQWebhookSender = ({
         throw error;
       }
     },
-    { connection: redis },
+    { connection: redis, concurrency, drainDelay: Math.round(drainDelayMs / 1000) },
   );
 
   worker.on('failed', (job, error) => {
