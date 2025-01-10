@@ -21,6 +21,8 @@ export const initLogging = async (config: Config): Promise<pino.Logger> => {
       version: config.serviceVersion,
     },
     serializers: {
+      err: pino.stdSerializers.err,
+      error: pino.stdSerializers.err,
       // https://fastify.dev/docs/v2.15.x/Documentation/Logging/#log-redaction
       req(request) {
         return {
