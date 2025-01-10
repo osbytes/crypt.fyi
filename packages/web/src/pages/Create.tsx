@@ -155,7 +155,7 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
         .describe('maximum number of times the secret can be read'),
       whu: z.string().describe('webhook: url of the webhook').optional(),
       whn: z.string().max(50).describe('webhook: name of the secret').optional(),
-      whr: z.boolean().default(false).describe('webhook: should the webhook be called on read'),
+      whr: z.boolean().default(true).describe('webhook: should the webhook be called on read'),
       whfpk: z
         .boolean()
         .default(false)
@@ -239,7 +239,6 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
   const readCount = params.get('readCount');
   const webhookUrl = params.get('webhookUrl');
   const webhookName = params.get('webhookName');
-  const webhookRead = params.get('webhookRead') === 'true';
   const webhookBurn = params.get('webhookBurn') === 'true';
   const webhookFailPk = params.get('webhookFailPk') === 'true';
   const webhookFailIp = params.get('webhookFailIp') === 'true';
@@ -269,7 +268,7 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
     rc,
     whu: webhookUrl || '',
     whn: webhookName || '',
-    whr: webhookRead,
+    whr: true,
     whb: webhookBurn,
     whfpk: webhookFailPk,
     whfip: webhookFailIp,
@@ -302,7 +301,6 @@ function updateUrlWithFormState(formData: FormDataWithoutContent) {
   if (formData.whu) {
     params.set('webhookUrl', formData.whu);
     if (formData.whn) params.set('webhookName', formData.whn);
-    if (formData.whr) params.set('webhookRead', 'true');
     if (formData.whb) params.set('webhookBurn', 'true');
     if (formData.whfpk) params.set('webhookFailPk', 'true');
     if (formData.whfip) params.set('webhookFailIp', 'true');
