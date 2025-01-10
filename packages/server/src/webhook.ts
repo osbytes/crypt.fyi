@@ -1,4 +1,6 @@
+import { Queue, Worker } from 'bullmq';
 import { Logger } from './logging';
+import Redis from 'ioredis';
 
 export type WebhookEvent = 'READ' | 'BURN' | 'FAILURE_KEY_PASSWORD' | 'FAILURE_IP_ADDRESS';
 
@@ -15,16 +17,61 @@ export interface WebhookSender {
   send(message: Message): Promise<void>;
 }
 
-const DEFAULT_REQUEST_TIMEOUT_MS = 3000;
-
-export const createHTTPJSONWebhookSender = (
-  logger: Logger,
-  fetchFn: typeof fetch = fetch,
-): WebhookSender => {
+export const createNopWebhookSender = (): WebhookSender => {
   return {
-    send: async (message) => {
+    send: async () => {},
+  };
+};
+
+type BullMQWebhookSenderOptions = {
+  logger: Logger;
+  redis: Redis;
+  fetchFn?: typeof fetch;
+  requestTimeoutMs?: number;
+  maxAttempts?: number;
+  backoffType?: 'fixed' | 'exponential';
+  backoffDelayMs?: number;
+  removeOnComplete?: boolean;
+  removeOnFail?: boolean;
+};
+
+export const createBullMQWebhookSender = ({
+  logger,
+  redis,
+  fetchFn = fetch,
+  requestTimeoutMs = 3000,
+  maxAttempts = 5,
+  backoffType = 'exponential',
+  backoffDelayMs = 1000,
+  removeOnComplete = true,
+  removeOnFail = true,
+}: BullMQWebhookSenderOptions): { webhookSender: WebhookSender; cleanup: () => Promise<void> } => {
+  const QUEUE_NAME = 'webhooks';
+  const JOB_NAME = 'webhook';
+  const queue = new Queue<Message>(QUEUE_NAME, {
+    connection: redis,
+    defaultJobOptions: {
+      attempts: maxAttempts,
+      removeOnComplete,
+      removeOnFail,
+      backoff: {
+        type: backoffType,
+        delay: backoffDelayMs,
+      },
+    },
+  });
+  const worker = new Worker<Message>(
+    QUEUE_NAME,
+    async (job) => {
+      if (job.name !== JOB_NAME) {
+        logger.warn({ job: job.name }, 'skipping unexpected job');
+        return;
+      }
+
+      const { data: message } = job;
+
       const ac = new AbortController();
-      setTimeout(() => ac.abort(), DEFAULT_REQUEST_TIMEOUT_MS);
+      setTimeout(() => ac.abort(), requestTimeoutMs);
       try {
         const response = await fetchFn(message.url, {
           method: 'POST',
@@ -35,32 +82,49 @@ export const createHTTPJSONWebhookSender = (
           signal: ac.signal,
         });
         if (!response.ok) {
-          logger.error(
-            {
-              event: message.event,
-              id: message.id,
-              status: response.status,
-              statusText: response.statusText,
-            },
-            'Failed to send webhook',
-          );
+          throw new Error(`Unexpected status code: ${response.status}`);
         }
+
+        logger.info({ jobId: job.id, event: message.event, id: message.id }, 'Webhook sent');
       } catch (error) {
-        logger.error(
+        logger.info(
           {
+            jobId: job.id,
             event: message.event,
             id: message.id,
             error,
           },
           'Failed to send webhook',
         );
+        throw error;
       }
     },
-  };
-};
+    { connection: redis },
+  );
 
-export const createNopWebhookSender = (): WebhookSender => {
+  worker.on('failed', (job, error) => {
+    if (job && job.attemptsMade >= maxAttempts) {
+      logger.info(
+        {
+          jobId: job.id,
+          id: job.data.id,
+          event: job.data.event,
+          error,
+          attempts: job.attemptsMade,
+        },
+        'Webhook failed permanently after all retry attempts',
+      );
+    }
+  });
+
   return {
-    send: async () => {},
+    webhookSender: {
+      send: async (message) => {
+        await queue.add(JOB_NAME, message);
+      },
+    },
+    cleanup: async () => {
+      await Promise.all([queue.close(), worker.close()]);
+    },
   };
 };
