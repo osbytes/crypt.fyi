@@ -1174,10 +1174,9 @@ const getWebhookSchemaString = ({
   burn: boolean;
   failureKeyPassword: boolean;
   failureIpAddress: boolean;
-}) => `{
-  name: ${name ? `"${name}"` : 'never'},
-  event: ${[read && 'READ', burn && 'BURN', failureKeyPassword && 'FAILURE_KEY_PASSWORD', failureIpAddress && 'FAILURE_IP_ADDRESS'].filter(Boolean).join(' | ') || 'never'},
-  id: string,
-  dt: string,
-  ts: number,
+}) => `{${name ? `\n\t"name": "${name}",` : ''}
+\t"event": ${[read && '"READ"', burn && '"BURN"', failureKeyPassword && '"FAILURE_KEY_PASSWORD"', failureIpAddress && '"FAILURE_IP_ADDRESS"'].filter(Boolean).join(' | ') || 'never'},
+\t"id": string,
+\t"dt": string,
+\t"ts": number
 }`;
