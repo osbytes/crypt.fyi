@@ -35,6 +35,7 @@ type BullMQWebhookSenderOptions = {
   removeOnFail?: boolean;
   concurrency?: number;
   drainDelayMs?: number;
+  streamEventsMaxLength?: number;
 };
 
 export const createBullMQWebhookSender = ({
@@ -49,11 +50,17 @@ export const createBullMQWebhookSender = ({
   removeOnFail = true,
   concurrency = 50,
   drainDelayMs = 15_000,
+  streamEventsMaxLength = 100,
 }: BullMQWebhookSenderOptions): { webhookSender: WebhookSender; cleanup: () => Promise<void> } => {
   const QUEUE_NAME = 'webhooks';
   const JOB_NAME = 'webhook';
   const queue = new Queue<Message>(QUEUE_NAME, {
     connection: redis,
+    streams: {
+      events: {
+        maxLen: streamEventsMaxLength,
+      },
+    },
     defaultJobOptions: {
       attempts: maxAttempts,
       removeOnComplete,
