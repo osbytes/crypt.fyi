@@ -31,32 +31,32 @@ type BullMQWebhookSenderOptions = {
   logger: Logger;
   redis: Redis;
   encryptionKey: string;
+  requestTimeoutMs: number;
+  maxAttempts: number;
+  backoffType: 'fixed' | 'exponential';
+  backoffDelayMs: number;
+  removeOnComplete: boolean;
+  removeOnFail: boolean;
+  concurrency: number;
+  drainDelayMs: number;
+  streamEventsMaxLength: number;
   fetchFn?: typeof fetch;
-  requestTimeoutMs?: number;
-  maxAttempts?: number;
-  backoffType?: 'fixed' | 'exponential';
-  backoffDelayMs?: number;
-  removeOnComplete?: boolean;
-  removeOnFail?: boolean;
-  concurrency?: number;
-  drainDelayMs?: number;
-  streamEventsMaxLength?: number;
 };
 
 export const createBullMQWebhookSender = ({
   logger,
   redis,
   encryptionKey,
+  requestTimeoutMs,
+  maxAttempts,
+  backoffType,
+  backoffDelayMs,
+  removeOnComplete,
+  removeOnFail,
+  concurrency,
+  drainDelayMs,
+  streamEventsMaxLength,
   fetchFn = fetch,
-  requestTimeoutMs = 3000,
-  maxAttempts = 5,
-  backoffType = 'exponential',
-  backoffDelayMs = 5_000,
-  removeOnComplete = true,
-  removeOnFail = true,
-  concurrency = 50,
-  drainDelayMs = 15_000,
-  streamEventsMaxLength = 100,
 }: BullMQWebhookSenderOptions): { webhookSender: WebhookSender; cleanup: () => Promise<void> } => {
   const QUEUE_NAME = 'webhooks';
   const JOB_NAME = 'webhook';

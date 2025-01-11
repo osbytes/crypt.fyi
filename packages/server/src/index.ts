@@ -21,6 +21,15 @@ const main = async () => {
     logger,
     redis: bullmqRedis,
     encryptionKey: config.encryptionKey,
+    requestTimeoutMs: config.webhookRequestTimeoutMs,
+    maxAttempts: config.webhookMaxAttempts,
+    backoffType: config.webhookBackoffType,
+    backoffDelayMs: config.webhookBackoffDelayMs,
+    removeOnComplete: config.webhookRemoveOnComplete,
+    removeOnFail: config.webhookRemoveOnFail,
+    concurrency: config.webhookConcurrency,
+    drainDelayMs: config.webhookDrainDelayMs,
+    streamEventsMaxLength: config.webhookStreamEventsMaxLength,
   });
   const vault = createRedisVault(redis, tokenGenerator, webhookSender, config.encryptionKey);
 

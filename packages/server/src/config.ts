@@ -108,6 +108,42 @@ const configSchema = z.object({
     .describe('service description from package.json or env'),
   maxIpRestrictions: z.number({ coerce: true }).default(3).describe('max IP restrictions'),
   maxReadCount: z.number({ coerce: true }).default(10).describe('max read count'),
+  webhookRequestTimeoutMs: z
+    .number({ coerce: true })
+    .default(3_000)
+    .describe('webhook request timeout in milliseconds'),
+  webhookMaxAttempts: z
+    .number({ coerce: true })
+    .default(5)
+    .describe('maximum number of webhook delivery attempts'),
+  webhookBackoffType: z
+    .enum(['fixed', 'exponential'])
+    .default('exponential')
+    .describe('webhook retry backoff strategy type'),
+  webhookBackoffDelayMs: z
+    .number({ coerce: true })
+    .default(5_000)
+    .describe('webhook retry backoff delay in milliseconds'),
+  webhookRemoveOnComplete: z
+    .boolean({ coerce: true })
+    .default(true)
+    .describe('remove webhook jobs from queue when complete'),
+  webhookRemoveOnFail: z
+    .boolean({ coerce: true })
+    .default(true)
+    .describe('remove webhook jobs from queue when failed'),
+  webhookConcurrency: z
+    .number({ coerce: true })
+    .default(50)
+    .describe('number of concurrent webhook jobs'),
+  webhookDrainDelayMs: z
+    .number({ coerce: true })
+    .default(15_000)
+    .describe('number of milliseconds to long poll for jobs when the queue is empty.'),
+  webhookStreamEventsMaxLength: z
+    .number({ coerce: true })
+    .default(100)
+    .describe('maximum length of webhook events stream'),
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -148,5 +184,14 @@ export const config = (() => {
     serviceDescription: process.env.SERVICE_DESCRIPTION,
     maxIpRestrictions: process.env.MAX_IP_RESTRICTIONS,
     maxReadCount: process.env.MAX_READ_COUNT,
+    webhookRequestTimeoutMs: process.env.WEBHOOK_REQUEST_TIMEOUT_MS,
+    webhookMaxAttempts: process.env.WEBHOOK_MAX_ATTEMPTS,
+    webhookBackoffType: process.env.WEBHOOK_BACKOFF_TYPE,
+    webhookBackoffDelayMs: process.env.WEBHOOK_BACKOFF_DELAY_MS,
+    webhookRemoveOnComplete: process.env.WEBHOOK_REMOVE_ON_COMPLETE,
+    webhookRemoveOnFail: process.env.WEBHOOK_REMOVE_ON_FAIL,
+    webhookConcurrency: process.env.WEBHOOK_CONCURRENCY,
+    webhookDrainDelayMs: process.env.WEBHOOK_DRAIN_DELAY_MS,
+    webhookStreamEventsMaxLength: process.env.WEBHOOK_STREAM_EVENTS_MAX_LENGTH,
   });
 })();
