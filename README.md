@@ -27,6 +27,8 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 - 🐳 Docker images for the api server and web client
 - 🌐 Localization with a handful of supported languages (more to come - help wanted!)
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/Pmkrsc?referralCode=ToZEjF)
+
 ## How It Works
 
 1. Encryption key is generated on the client
