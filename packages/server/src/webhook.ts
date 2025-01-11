@@ -1,17 +1,21 @@
 import { Queue, Worker } from 'bullmq';
+import { gcm } from '@crypt.fyi/core';
 import { Logger } from './logging';
 import Redis from 'ioredis';
+import { z } from 'zod';
 
-export type WebhookEvent = 'READ' | 'BURN' | 'FAILURE_KEY_PASSWORD' | 'FAILURE_IP_ADDRESS';
+const webhookEventSchema = z.enum(['READ', 'BURN', 'FAILURE_KEY_PASSWORD', 'FAILURE_IP_ADDRESS']);
 
-export type Message = {
-  url: string;
-  event: WebhookEvent;
-  id: string;
-  dt: string;
-  ts: number;
-  name?: string;
-};
+const messageSchema = z.object({
+  url: z.string(),
+  event: webhookEventSchema,
+  id: z.string(),
+  dt: z.string(),
+  ts: z.number(),
+  name: z.string().optional(),
+});
+
+export type Message = z.infer<typeof messageSchema>;
 
 export interface WebhookSender {
   send(message: Message): Promise<void>;
@@ -26,6 +30,7 @@ export const createNopWebhookSender = (): WebhookSender => {
 type BullMQWebhookSenderOptions = {
   logger: Logger;
   redis: Redis;
+  encryptionKey: string;
   fetchFn?: typeof fetch;
   requestTimeoutMs?: number;
   maxAttempts?: number;
@@ -41,6 +46,7 @@ type BullMQWebhookSenderOptions = {
 export const createBullMQWebhookSender = ({
   logger,
   redis,
+  encryptionKey,
   fetchFn = fetch,
   requestTimeoutMs = 3000,
   maxAttempts = 5,
@@ -54,7 +60,7 @@ export const createBullMQWebhookSender = ({
 }: BullMQWebhookSenderOptions): { webhookSender: WebhookSender; cleanup: () => Promise<void> } => {
   const QUEUE_NAME = 'webhooks';
   const JOB_NAME = 'webhook';
-  const queue = new Queue<Message>(QUEUE_NAME, {
+  const queue = new Queue<string>(QUEUE_NAME, {
     connection: redis,
     streams: {
       events: {
@@ -71,7 +77,7 @@ export const createBullMQWebhookSender = ({
       },
     },
   });
-  const worker = new Worker<Message>(
+  const worker = new Worker<string>(
     QUEUE_NAME,
     async (job) => {
       if (job.name !== JOB_NAME) {
@@ -79,7 +85,8 @@ export const createBullMQWebhookSender = ({
         return;
       }
 
-      const { data: message } = job;
+      const dataString = await gcm.decrypt(job.data, encryptionKey);
+      const message = messageSchema.parse(JSON.parse(dataString));
 
       const ac = new AbortController();
       setTimeout(() => ac.abort(), requestTimeoutMs);
@@ -113,13 +120,15 @@ export const createBullMQWebhookSender = ({
     { connection: redis, concurrency, drainDelay: Math.round(drainDelayMs / 1000) },
   );
 
-  worker.on('failed', (job, error) => {
+  worker.on('failed', async (job, error) => {
     if (job && job.attemptsMade >= maxAttempts) {
+      const dataString = await gcm.decrypt(job.data, encryptionKey);
+      const message = messageSchema.parse(JSON.parse(dataString));
       logger.info(
         {
           jobId: job.id,
-          id: job.data.id,
-          event: job.data.event,
+          id: message.id,
+          event: message.event,
           error,
           attempts: job.attemptsMade,
         },
@@ -131,7 +140,7 @@ export const createBullMQWebhookSender = ({
   return {
     webhookSender: {
       send: async (message) => {
-        await queue.add(JOB_NAME, message);
+        await queue.add(JOB_NAME, await gcm.encrypt(JSON.stringify(message), encryptionKey));
       },
     },
     cleanup: async () => {

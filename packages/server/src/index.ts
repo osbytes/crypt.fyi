@@ -20,6 +20,7 @@ const main = async () => {
   const { webhookSender, cleanup: cleanupWebhookSender } = createBullMQWebhookSender({
     logger,
     redis: bullmqRedis,
+    encryptionKey: config.encryptionKey,
   });
   const vault = createRedisVault(redis, tokenGenerator, webhookSender, config.encryptionKey);
 
