@@ -6,31 +6,49 @@ import gracefulShutdown from 'http-graceful-shutdown';
 import Redis from 'ioredis';
 import { createRedisVault } from './vault/redis';
 import { createTokenGenerator } from './vault/tokens';
-import { createBullMQWebhookSender } from './webhook';
+import { createBullMQWebhookSender, createHTTPWebhookSender, WebhookSender } from './webhook';
 
 const main = async () => {
   const logger = await initLogging(config);
   const redis = new Redis(config.redisUrl);
   await redis.ping();
-  const bullmqRedis = new Redis(config.redisUrl, { maxRetriesPerRequest: null });
   const tokenGenerator = createTokenGenerator({
     vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
     vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
   });
-  const { webhookSender, cleanup: cleanupWebhookSender } = createBullMQWebhookSender({
-    logger,
-    redis: bullmqRedis,
-    encryptionKey: config.encryptionKey,
-    requestTimeoutMs: config.webhookRequestTimeoutMs,
-    maxAttempts: config.webhookMaxAttempts,
-    backoffType: config.webhookBackoffType,
-    backoffDelayMs: config.webhookBackoffDelayMs,
-    removeOnComplete: config.webhookRemoveOnComplete,
-    removeOnFail: config.webhookRemoveOnFail,
-    concurrency: config.webhookConcurrency,
-    drainDelayMs: config.webhookDrainDelayMs,
-    streamEventsMaxLength: config.webhookStreamEventsMaxLength,
-  });
+  let cleanupFns: (() => Promise<void>)[] = [];
+  let webhookSender: WebhookSender;
+  if (config.webhookSender === 'bullmq') {
+    const bullmqRedis = new Redis(config.redisUrl, { maxRetriesPerRequest: null });
+    const { webhookSender: bullmqWebhookSender, cleanup: cleanupWebhookSender } =
+      createBullMQWebhookSender({
+        logger,
+        redis: bullmqRedis,
+        encryptionKey: config.encryptionKey,
+        requestTimeoutMs: config.webhookRequestTimeoutMs,
+        maxAttempts: config.webhookMaxAttempts,
+        backoffType: config.webhookBackoffType,
+        backoffDelayMs: config.webhookBackoffDelayMs,
+        removeOnComplete: config.webhookRemoveOnComplete,
+        removeOnFail: config.webhookRemoveOnFail,
+        concurrency: config.webhookConcurrency,
+        drainDelayMs: config.webhookDrainDelayMs,
+        streamEventsMaxLength: config.webhookStreamEventsMaxLength,
+      });
+    cleanupFns.push(cleanupWebhookSender, async () => {
+      await bullmqRedis.quit();
+    });
+    webhookSender = bullmqWebhookSender;
+  } else if (config.webhookSender === 'http') {
+    const httpWebhookSender = createHTTPWebhookSender({
+      logger,
+      requestTimeoutMs: config.webhookRequestTimeoutMs,
+    });
+    webhookSender = httpWebhookSender;
+  } else {
+    throw new Error(`Invalid webhook sender: ${config.webhookSender}`);
+  }
+
   const vault = createRedisVault(redis, tokenGenerator, webhookSender, config.encryptionKey);
 
   const app = await initApp(config, {
@@ -52,8 +70,7 @@ const main = async () => {
     },
     onShutdown: async () => {
       await app.shutdown();
-      await cleanupWebhookSender();
-      await bullmqRedis.quit();
+      await Promise.all(cleanupFns.map((fn) => fn()));
       await redis.quit();
       await otlpShutdown();
     },

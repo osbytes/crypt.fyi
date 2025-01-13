@@ -27,11 +27,15 @@ export const createNopWebhookSender = (): WebhookSender => {
   };
 };
 
-type BullMQWebhookSenderOptions = {
+interface BaseWebhookSenderOptions {
   logger: Logger;
+  fetchFn?: typeof fetch;
+  requestTimeoutMs: number;
+}
+
+type BullMQWebhookSenderOptions = BaseWebhookSenderOptions & {
   redis: Redis;
   encryptionKey: string;
-  requestTimeoutMs: number;
   maxAttempts: number;
   backoffType: 'fixed' | 'exponential';
   backoffDelayMs: number;
@@ -40,7 +44,6 @@ type BullMQWebhookSenderOptions = {
   concurrency: number;
   drainDelayMs: number;
   streamEventsMaxLength: number;
-  fetchFn?: typeof fetch;
 };
 
 export const createBullMQWebhookSender = ({
@@ -145,6 +148,46 @@ export const createBullMQWebhookSender = ({
     },
     cleanup: async () => {
       await Promise.all([queue.close(), worker.close()]);
+    },
+  };
+};
+
+export const createHTTPWebhookSender = ({
+  logger,
+  fetchFn = fetch,
+  requestTimeoutMs,
+}: BaseWebhookSenderOptions): WebhookSender => {
+  return {
+    send: async (message) => {
+      const ac = new AbortController();
+      const timeoutId = setTimeout(() => ac.abort(), requestTimeoutMs);
+
+      // TODO: add some basic retry logic
+
+      try {
+        const response = await fetchFn(message.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(message),
+          signal: ac.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`Unexpected status code: ${response.status}`);
+        }
+      } catch (error) {
+        logger.info(
+          {
+            event: message.event,
+            id: message.id,
+            error,
+          },
+          'Failed to send webhook',
+        );
+      } finally {
+        clearTimeout(timeoutId);
+      }
     },
   };
 };
