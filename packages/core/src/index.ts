@@ -5,3 +5,4 @@ export * from './client';
 export * from './hash';
 export * from './random';
 export * from './encryption';
+export * from './sleep';

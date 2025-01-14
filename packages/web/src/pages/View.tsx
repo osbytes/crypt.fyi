@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button/button';
 import { toast } from 'sonner';
-import { sleep } from '@/lib/sleep';
 import {
   IconEye,
   IconEyeOff,
@@ -21,7 +20,7 @@ import { cn } from '@/lib/utils';
 import { clipboardCopy } from '@/lib/clipboardCopy';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader } from '@/components/ui/loader';
-import { ErrorInvalidKeyAndOrPassword, ErrorNotFound } from '@crypt.fyi/core';
+import { ErrorInvalidKeyAndOrPassword, ErrorNotFound, sleep } from '@crypt.fyi/core';
 import { useTranslation } from 'react-i18next';
 import { useClient } from '@/context/client';
 

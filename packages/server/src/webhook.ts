@@ -3,6 +3,7 @@ import { gcm } from '@crypt.fyi/core';
 import { Logger } from './logging';
 import Redis from 'ioredis';
 import { z } from 'zod';
+import { isRetryableFetchError } from './fetchRetry';
 
 const webhookEventSchema = z.enum(['READ', 'BURN', 'FAILURE_KEY_PASSWORD', 'FAILURE_IP_ADDRESS']);
 
@@ -31,6 +32,7 @@ interface BaseWebhookSenderOptions {
   logger: Logger;
   fetchFn?: typeof fetch;
   requestTimeoutMs: number;
+  shouldRetry?: (error: unknown) => boolean;
 }
 
 type BullMQWebhookSenderOptions = BaseWebhookSenderOptions & {
@@ -60,6 +62,7 @@ export const createBullMQWebhookSender = ({
   drainDelayMs,
   streamEventsMaxLength,
   fetchFn = fetch,
+  shouldRetry = isRetryableFetchError,
 }: BullMQWebhookSenderOptions): { webhookSender: WebhookSender; cleanup: () => Promise<void> } => {
   const QUEUE_NAME = 'webhooks';
   const JOB_NAME = 'webhook';
@@ -92,7 +95,7 @@ export const createBullMQWebhookSender = ({
       const message = messageSchema.parse(JSON.parse(dataString));
 
       const ac = new AbortController();
-      setTimeout(() => ac.abort(), requestTimeoutMs);
+      const timeoutId = setTimeout(() => ac.abort(), requestTimeoutMs);
       try {
         const response = await fetchFn(message.url, {
           method: 'POST',
@@ -108,6 +111,19 @@ export const createBullMQWebhookSender = ({
 
         logger.info({ jobId: job.id, event: message.event, id: message.id }, 'Webhook sent');
       } catch (error) {
+        if (!shouldRetry(error)) {
+          logger.info(
+            {
+              jobId: job.id,
+              event: message.event,
+              id: message.id,
+              error,
+            },
+            'Failed to send webhook',
+          );
+          return;
+        }
+
         logger.info(
           {
             jobId: job.id,
@@ -118,6 +134,8 @@ export const createBullMQWebhookSender = ({
           'Failed to send webhook',
         );
         throw error;
+      } finally {
+        clearTimeout(timeoutId);
       }
     },
     { connection: redis, concurrency, drainDelay: Math.round(drainDelayMs / 1000) },
@@ -161,8 +179,6 @@ export const createHTTPWebhookSender = ({
     send: async (message) => {
       const ac = new AbortController();
       const timeoutId = setTimeout(() => ac.abort(), requestTimeoutMs);
-
-      // TODO: add some basic retry logic
 
       try {
         const response = await fetchFn(message.url, {
