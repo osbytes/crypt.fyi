@@ -23,7 +23,7 @@ export const createFetchRetryClient = ({
       const signals = [options?.signal];
       let timeoutId: ReturnType<typeof setTimeout> | undefined;
       if (requestTimeoutMs > 0) {
-        // We intentionally don't use AbortSignal.timeout because we want to control the abort reason without our sentinel TimeoutError
+        // We intentionally don't use AbortSignal.timeout because we want to control the abort reason with our sentinel TimeoutError
         // Maybe monkey patch AbortSignal.timeout to allow an optional sentinel error or create a helper function for this pattern
         const ab = new AbortController();
         timeoutId = setTimeout(() => ab.abort(new TimeoutError()), requestTimeoutMs);
