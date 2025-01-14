@@ -11,5 +11,5 @@ npm install -g @crypt.fyi/cli
 ## Usage
 
 ```bash
-cryptfyi --help
+cfyi --help
 ```

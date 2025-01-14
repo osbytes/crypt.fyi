@@ -1,9 +1,9 @@
 {
   "name": "@crypt.fyi/cli",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "bin": {
-    "cryptfyi": "./dist/index.js"
+    "cfyi": "./dist/index.js"
   },
   "files": [
     "dist",

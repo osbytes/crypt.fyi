@@ -1,6 +1,6 @@
 {
   "name": "@crypt.fyi/core",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "private": true,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

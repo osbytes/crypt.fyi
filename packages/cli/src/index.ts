@@ -18,7 +18,7 @@ const client = new Client({
 });
 
 program
-  .name('cryptfyi')
+  .name('cfyi')
   .description('CLI to encrypt and share secrets securely via the https://crypt.fyi API')
   .version(pkg.version);
 
