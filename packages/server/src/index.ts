@@ -11,7 +11,7 @@ import { createFetchRetryClient } from './fetchRetry';
 
 const main = async () => {
   const logger = await initLogging(config);
-  const redis = new Redis(config.redisUrl);
+  const redis = new Redis(config.redisUrl, { family: 0 });
   await redis.ping();
   const tokenGenerator = createTokenGenerator({
     vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
@@ -24,7 +24,7 @@ const main = async () => {
     backoffDelayMs: config.webhookBackoffDelayMs,
   });
   if (config.webhookSender === 'bullmq') {
-    const bullmqRedis = new Redis(config.redisUrl, { maxRetriesPerRequest: null });
+    const bullmqRedis = new Redis(config.redisUrl, { maxRetriesPerRequest: null, family: 0 });
     const { webhookSender: bullmqWebhookSender, cleanup: cleanupWebhookSender } =
       createBullMQWebhookSender({
         logger,
