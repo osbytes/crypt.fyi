@@ -27,8 +27,6 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 - 🐳 Docker images for the api server and web client
 - 🌐 Localization with a handful of supported languages (more to come - help wanted!)
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/Pmkrsc?referralCode=ToZEjF)
-
 ## How It Works
 
 1. Encryption key is generated on the client
@@ -47,14 +45,20 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
 
 [OpenAPI Specification](https://api.crypt.fyi/docs)
 
-## Technical Stack
+## Deployment
 
-- React SPA
-- [shadcn/ui](https://ui.shadcn.com/docs)
-- Node.js with [Fastify](https://fastify.dev/)
-- [Redis](https://redis.io/)
-- [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API)
-- [OpenTelemetry](https://opentelemetry.io/)
+### Docker
+
+```bash
+API_URL=https://{your-domain-here} docker compose up --build
+```
+
+> [!IMPORTANT]
+> `--build` is required if `API_URL` is changed to ensure nginx and the web client are rebuilt with the correct configuration.
+
+### Railway
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/Pmkrsc?referralCode=ToZEjF)
 
 ## Development
 
@@ -68,6 +72,16 @@ A zero-knowledge, end-to-end encrypted secret sharing platform that enables secu
    ```bash
    yarn run dev
    ```
+
+## Technical Stack
+
+- [Noble cryptography](https://paulmillr.com/noble/)
+- [React](https://react.dev/)
+- [shadcn/ui](https://ui.shadcn.com/docs)
+- [Node.js](https://nodejs.org/en)
+- [Fastify](https://fastify.dev/)
+- [Redis](https://redis.io/)
+- [OpenTelemetry](https://opentelemetry.io/)
 
 ## Known Issues & Development Considerations
 
