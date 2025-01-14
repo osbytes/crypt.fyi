@@ -457,7 +457,21 @@ export function CreatePage() {
   }
 
   const { isSubmitSuccessful } = form.formState;
-  const { reset } = form;
+  const resetForNewSecret = () => {
+    const currentValues = form.getValues();
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.files = null;
+    }
+
+    form.reset();
+
+    const { c: _, ...valuesToKeep } = currentValues;
+    Object.entries(valuesToKeep).forEach(([field, value]) => {
+      form.setValue(field as keyof FormData, value);
+    });
+  };
 
   const deleteMutation = useMutation({
     mutationFn: async ({ id, dt }: { id: string; dt: string }) => {
@@ -467,7 +481,7 @@ export function CreatePage() {
       } catch (error) {
         if (error instanceof ErrorNotFound) {
           setIsUrlMasked(true);
-          reset();
+          resetForNewSecret();
         }
         throw error;
       }
@@ -478,7 +492,7 @@ export function CreatePage() {
     onSuccess() {
       toast.success('Secret deleted');
       setIsUrlMasked(true);
-      reset();
+      resetForNewSecret();
     },
   });
 
@@ -1027,7 +1041,7 @@ export function CreatePage() {
                     variant="outline"
                     onClick={() => {
                       setIsUrlMasked(true);
-                      reset();
+                      resetForNewSecret();
                     }}
                   >
                     {t('create.success.createAnother')}
