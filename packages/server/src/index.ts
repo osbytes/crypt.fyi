@@ -7,6 +7,7 @@ import Redis from 'ioredis';
 import { createRedisVault } from './vault/redis';
 import { createTokenGenerator } from './vault/tokens';
 import { createBullMQWebhookSender, createHTTPWebhookSender, WebhookSender } from './webhook';
+import { createFetchRetryClient } from './fetchRetry';
 
 const main = async () => {
   const logger = await initLogging(config);
@@ -18,6 +19,10 @@ const main = async () => {
   });
   let cleanupFns: (() => Promise<void>)[] = [];
   let webhookSender: WebhookSender;
+  const webhookSenderFetch = createFetchRetryClient({
+    maxAttempts: config.webhookMaxAttempts,
+    backoffDelayMs: config.webhookBackoffDelayMs,
+  });
   if (config.webhookSender === 'bullmq') {
     const bullmqRedis = new Redis(config.redisUrl, { maxRetriesPerRequest: null });
     const { webhookSender: bullmqWebhookSender, cleanup: cleanupWebhookSender } =
@@ -34,6 +39,7 @@ const main = async () => {
         concurrency: config.webhookConcurrency,
         drainDelayMs: config.webhookDrainDelayMs,
         streamEventsMaxLength: config.webhookStreamEventsMaxLength,
+        fetchFn: webhookSenderFetch,
       });
     cleanupFns.push(cleanupWebhookSender, async () => {
       await bullmqRedis.quit();
@@ -43,6 +49,7 @@ const main = async () => {
     const httpWebhookSender = createHTTPWebhookSender({
       logger,
       requestTimeoutMs: config.webhookRequestTimeoutMs,
+      fetchFn: webhookSenderFetch,
     });
     webhookSender = httpWebhookSender;
   } else {

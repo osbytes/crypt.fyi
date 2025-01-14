@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { sha256, ErrorNotFound } from '@crypt.fyi/core';
+import { sha256, ErrorNotFound, sleep } from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import React from 'react';
 import {
@@ -28,7 +28,6 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { config } from '@/config';
 import { Card } from '@/components/ui/card';
-import { sleep } from '@/lib/sleep';
 import {
   IconLock,
   IconCopy,
