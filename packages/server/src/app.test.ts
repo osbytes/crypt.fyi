@@ -9,6 +9,7 @@ import Redis from 'ioredis';
 import { createRedisVault } from './vault/redis';
 import { createTokenGenerator } from './vault/tokens';
 import { createNopWebhookSender } from './webhook';
+import { gcm } from '@crypt.fyi/core';
 
 const initAppTest = async (t: Test) => {
   const config = {
@@ -315,6 +316,65 @@ tap.test('app', async (t) => {
 
     const remainingReads = JSON.parse((await redis.get(`vault:${id}`)) ?? '{}')?.rc;
     t.equal(remainingReads, 2, 'Read count should be decremented');
+  });
+
+  t.test('verifies IPs and webhook URLs are encrypted at rest', async (t) => {
+    const createResponse = await client.request({
+      method: 'POST',
+      path: '/vault',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        c: 'secret-content',
+        b: false,
+        h: 'abc123',
+        ips: '192.168.1.1,10.0.0.0/24',
+        wh: {
+          u: 'https://example.com/webhook',
+          n: 'test-webhook',
+          r: true,
+          b: true,
+          fpk: true,
+          fip: true,
+        },
+      }),
+    });
+
+    t.equal(createResponse.statusCode, 201);
+    const { id } = (await createResponse.body.json()) as Record<string, unknown>;
+    t.equal(typeof id, 'string');
+
+    const redis = new Redis();
+    t.teardown(() => redis.quit());
+
+    const rawValue = await redis.get(`vault:${id}`);
+    t.ok(rawValue, 'Value should exist in Redis');
+
+    const parsedValue = JSON.parse(rawValue!) as {
+      ips: string;
+      wh: { u: string; n: string };
+    };
+
+    // Verify IPs are encrypted
+    t.not(parsedValue.ips, '192.168.1.1,10.0.0.0/24', 'IPs should be encrypted');
+    t.ok(parsedValue.ips.length > 0, 'Encrypted IPs should not be empty');
+
+    // Verify webhook URL is encrypted
+    t.not(parsedValue.wh.u, 'https://example.com/webhook', 'Webhook URL should be encrypted');
+    t.ok(parsedValue.wh.u.length > 0, 'Encrypted webhook URL should not be empty');
+
+    const [decryptedIps, decryptedWhU] = await Promise.all([
+      gcm.decrypt(parsedValue.ips, config.encryptionKey),
+      gcm.decrypt(parsedValue.wh.u, config.encryptionKey),
+    ]);
+
+    t.equal(decryptedIps, '192.168.1.1,10.0.0.0/24', 'Decrypted IPs should match original');
+    t.equal(
+      decryptedWhU,
+      'https://example.com/webhook',
+      'Decrypted webhook URL should match original',
+    );
   });
 
   t.test('deletes vault entry', async (t) => {
