@@ -21,7 +21,7 @@ export const de: TranslationKeys = {
     },
     header: {
       tagline:
-        'Kurzlebiger Geheimnisaustausch mit Zero-Knowledge <aesLink>AES-256</aesLink> <e2eLink>Ende-zu-Ende-Verschlüsselung</e2eLink>',
+        'Kurzlebiger Datenaustausch mit Zero-Knowledge <aesLink>AES-256</aesLink> <e2eLink>Ende-zu-Ende-Verschlüsselung</e2eLink>',
     },
     time: {
       minute_one: '{{count}} Minute',
@@ -33,9 +33,9 @@ export const de: TranslationKeys = {
     },
   },
   landing: {
-    title: 'Geheimnisse sicher teilen',
+    title: 'Sicherer Austausch sensibler Daten',
     subtitle:
-      'Senden Sie Passwörter und sensible Informationen mit Zero-Knowledge-Ende-zu-Ende-Verschlüsselung und automatischer Löschung',
+      'Sicherer und privater Datenaustausch für Passwörter, API-Schlüssel, Dateien und mehr mit Zero-Knowledge-Ende-zu-Ende-Verschlüsselung und automatischer Löschung',
     features: {
       encryption: {
         title: 'Ende-zu-Ende-Verschlüsselung',
@@ -243,7 +243,7 @@ export const de: TranslationKeys = {
   about: {
     title: 'Über uns',
     intro:
-      'crypt.fyi ist eine sichere, quelloffene Plattform für kurzlebigen Geheimnisaustausch, die es Ihnen ermöglicht, sensible Informationen sicher zu teilen. Ob Passwörter, API-Schlüssel oder vertrauliche Nachrichten - crypt.fyi stellt sicher, dass Ihre Daten privat bleiben und nach dem Zugriff automatisch verschwinden.',
+      'crypt.fyi ist eine sichere, quelloffene Plattform für kurzlebigen Datenaustausch, die es Ihnen ermöglicht, sensible Informationen sicher zu teilen. Ob Passwörter, API-Schlüssel oder vertrauliche Nachrichten - crypt.fyi stellt sicher, dass Ihre Daten privat bleiben und nach dem Zugriff automatisch verschwinden.',
     whyCryptFyi: {
       title: 'Warum crypt.fyi?',
       commonPractices: {

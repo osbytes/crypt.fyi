@@ -22,7 +22,7 @@ export const fr: TranslationKeys = {
     },
     header: {
       tagline:
-        'Partagez des secrets éphémères avec un chiffrement <aesLink>AES-256</aesLink> <e2eLink>de bout en bout</e2eLink> à connaissance nulle',
+        'Partagez des données éphémères avec un chiffrement <aesLink>AES-256</aesLink> <e2eLink>de bout en bout</e2eLink> à connaissance nulle',
     },
     time: {
       minute_one: '{{count}} minute',
@@ -34,9 +34,9 @@ export const fr: TranslationKeys = {
     },
   },
   landing: {
-    title: 'Partagez des Secrets en Toute Sécurité',
+    title: 'Partagez des Données Sensibles en Toute Sécurité',
     subtitle:
-      'Envoyez des mots de passe et des informations sensibles avec un chiffrement de bout en bout à connaissance nulle et une suppression automatique',
+      'Partage de données sécurisé et privé pour les mots de passe, clés API, fichiers et plus avec un chiffrement de bout en bout à connaissance nulle et une suppression automatique',
     features: {
       encryption: {
         title: 'Chiffrement de Bout en Bout',
@@ -244,7 +244,7 @@ export const fr: TranslationKeys = {
   about: {
     title: 'À Propos',
     intro:
-      "crypt.fyi est une plateforme sécurisée, open source et éphémère de partage de secrets qui vous permet de partager des informations sensibles en toute sécurité. Qu'il s'agisse de mots de passe, de clés API ou de messages confidentiels, crypt.fyi garantit que vos données restent privées et disparaissent automatiquement après avoir été consultées.",
+      "crypt.fyi est une plateforme sécurisée, open source et éphémère de partage de données qui vous permet de partager des informations sensibles en toute sécurité. Qu'il s'agisse de mots de passe, de clés API ou de messages confidentiels, crypt.fyi garantit que vos données restent privées et disparaissent automatiquement après avoir été consultées.",
     whyCryptFyi: {
       title: 'Pourquoi crypt.fyi ?',
       commonPractices: {

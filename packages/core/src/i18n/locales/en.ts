@@ -21,7 +21,7 @@ export const en: TranslationKeys = {
     },
     header: {
       tagline:
-        'Ephemeral secret sharing with zero-knowledge <aesLink>AES-256</aesLink> <e2eLink>end-to-end encryption</e2eLink>',
+        'Ephemeral data sharing with zero-knowledge <aesLink>AES-256</aesLink> <e2eLink>end-to-end encryption</e2eLink>',
     },
     time: {
       minute_one: '{{count}} minute',
@@ -33,9 +33,9 @@ export const en: TranslationKeys = {
     },
   },
   landing: {
-    title: 'Share Secrets Securely',
+    title: 'Secure Sensitive Data Sharing',
     subtitle:
-      'Send passwords and sensitive information with zero-knowledge end-to-end encryption and automatic deletion',
+      'Secure and private data sharing for passwords, API keys, files, and more with zero-knowledge end-to-end encryption and automatic deletion',
     features: {
       encryption: {
         title: 'End-to-end Encryption',
@@ -234,7 +234,7 @@ export const en: TranslationKeys = {
   about: {
     title: 'About',
     intro:
-      "crypt.fyi is a secure, open-source, ephemeral secret-sharing platform that enables you to share sensitive information safely. Whether it's passwords, API keys, or confidential messages, crypt.fyi ensures your data remains private and automatically disappears after being accessed.",
+      "crypt.fyi is a secure, open-source, ephemeral data-sharing platform that enables you to share sensitive information safely. Whether it's passwords, API keys, or confidential messages, crypt.fyi ensures your data remains private and automatically disappears after being accessed.",
     whyCryptFyi: {
       title: 'Why crypt.fyi?',
       commonPractices: {
