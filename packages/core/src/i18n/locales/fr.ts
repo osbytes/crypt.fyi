@@ -337,7 +337,6 @@ export const fr: TranslationKeys = {
       title: 'Open Source',
       description:
         'crypt.fyi est open source et auditable. Vous pouvez examiner notre code, signaler des problèmes et contribuer sur',
-      cta: 'Créer un Secret Maintenant',
     },
   },
   privacy: {

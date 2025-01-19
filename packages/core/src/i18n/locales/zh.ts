@@ -310,7 +310,6 @@ export const zh: TranslationKeys = {
     openSource: {
       title: '开源',
       description: 'crypt.fyi 是开源且可审计的。您可以在以下位置查看我们的代码、提交问题和贡献',
-      cta: '立即创建密文',
     },
   },
   privacy: {

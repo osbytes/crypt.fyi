@@ -149,7 +149,7 @@ export function About() {
             to="/new"
             className="px-8 py-4 bg-primary text-primary-foreground rounded-lg text-lg font-semibold hover:bg-primary/90 transition-colors"
           >
-            {t('about.openSource.cta')}
+            {t('common.createSecret')}
           </Link>
         </div>
       </section>

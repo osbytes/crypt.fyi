@@ -335,7 +335,6 @@ export const de: TranslationKeys = {
       title: 'Open Source',
       description:
         'crypt.fyi ist quelloffen und überprüfbar. Sie können unseren Code einsehen, Probleme melden und auf GitHub beitragen',
-      cta: 'Jetzt ein Geheimnis erstellen',
     },
   },
   privacy: {
