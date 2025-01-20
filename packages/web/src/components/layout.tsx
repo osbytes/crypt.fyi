@@ -20,7 +20,7 @@ export function Layout() {
           <div className="container flex items-center justify-between mx-auto">
             <div>
               <Link to="/">
-                <Logo className="w-16 py-2" />
+                <Logo className="w-12 py-2" />
               </Link>
             </div>
             <div className="flex items-center gap-2">

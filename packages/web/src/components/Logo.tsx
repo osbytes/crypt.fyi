@@ -3,12 +3,9 @@ import LogoDark from '../../public/logo-dark.svg?react';
 import { useTheme } from '@/theme';
 import { cn } from '@/lib/utils';
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, animate = true }: { className?: string; animate?: boolean }) {
   const [theme] = useTheme();
+  const Logo = theme === 'dark' ? LogoLight : LogoDark;
 
-  return theme === 'dark' ? (
-    <LogoLight className={cn('h-fit', className)} />
-  ) : (
-    <LogoDark className={cn('h-fit', className)} />
-  );
+  return <Logo className={cn('h-fit', animate && 'logo-animate', className)} />;
 }

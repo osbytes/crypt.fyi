@@ -68,3 +68,34 @@
 ::placeholder {
   @apply text-xs text-muted-foreground/80;
 }
+
+@keyframes draw-stroke {
+  from {
+    stroke-dashoffset: 1500;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fill-in {
+  0%,
+  60% {
+    fill-opacity: 0;
+  }
+  100% {
+    fill-opacity: 1;
+  }
+}
+
+.logo-animate path {
+  stroke-dasharray: 1500;
+  stroke-dashoffset: 1500;
+  stroke-width: 2;
+  fill-opacity: 0;
+  stroke: hsl(var(--foreground));
+  fill: hsl(var(--foreground));
+  animation:
+    draw-stroke 2.5s ease forwards,
+    fill-in 4s ease forwards;
+}
