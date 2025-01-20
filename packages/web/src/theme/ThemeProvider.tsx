@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
-import { z } from 'zod';
+import { useEffect, useState, ReactNode } from 'react';
+import { Theme, ThemeContext } from './theme';
+import { themeSchema } from './theme';
 
-const themeSchema = z.enum(['dark', 'light']);
-type Theme = z.infer<typeof themeSchema>;
-
-export function useTheme() {
+export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     const savedThemeResult = themeSchema.safeParse(localStorage.getItem('theme'));
     return savedThemeResult.success ? savedThemeResult.data : 'dark';
@@ -31,7 +29,8 @@ export function useTheme() {
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [setTheme]);
+  }, []);
 
-  return [theme, setTheme] as const;
+  const value = { theme, setTheme };
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

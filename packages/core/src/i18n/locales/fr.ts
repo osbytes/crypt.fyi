@@ -36,7 +36,7 @@ export const fr: TranslationKeys = {
   landing: {
     title: 'Partagez des Données Sensibles en Toute Sécurité',
     subtitle:
-      'Partage de données sécurisé et privé pour les mots de passe, clés API, fichiers et plus avec un chiffrement de bout en bout à connaissance nulle et une suppression automatique',
+      'crypt.fyi permet le partage de données sensibles avec chiffrement de bout en bout à connaissance nulle et suppression automatique',
     features: {
       encryption: {
         title: 'Chiffrement de Bout en Bout',

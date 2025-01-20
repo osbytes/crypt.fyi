@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import svgr from 'vite-plugin-svgr';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -21,7 +22,7 @@ const pkg = JSON.parse(fs.readFileSync(new URL('package.json', import.meta.url),
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), svgr()],
   server: {
     port: 5173,
   },

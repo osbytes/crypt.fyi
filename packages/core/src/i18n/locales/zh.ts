@@ -33,7 +33,7 @@ export const zh: TranslationKeys = {
   },
   landing: {
     title: '安全共享敏感数据',
-    subtitle: '使用零知识端到端加密和自动删除功能安全私密地共享密码、API密钥、文件等数据',
+    subtitle: 'crypt.fyi 支持零知识端到端加密的敏感数据共享，并提供自动删除功能',
     features: {
       encryption: {
         title: '端到端加密',

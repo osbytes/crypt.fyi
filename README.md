@@ -1,6 +1,8 @@
-# [crypt.fyi](https://crypt.fyi)
+<a href="https://crypt.fyi" target="_blank">
+  <img src="https://crypt.fyi/logo-light.svg" style="width: 100px;" alt="logo" />
+</a>
 
-A zero-knowledge, end-to-end encrypted secret sharing platform that enables secure transmission of sensitive information.
+[crypt.fyi](https://crypt.fyi) - A zero-knowledge, end-to-end encrypted secret sharing platform that enables secure transmission of sensitive data.
 
 [![CI](https://github.com/osbytes/crypt.fyi/actions/workflows/ci.yml/badge.svg)](https://github.com/osbytes/crypt.fyi/actions/workflows/ci.yml)
 [![Security Headers](https://img.shields.io/badge/Security%20Headers-A-brightgreen)](https://securityheaders.com/?q=https://www.crypt.fyi&followRedirects=on)

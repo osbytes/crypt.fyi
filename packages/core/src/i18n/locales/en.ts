@@ -35,7 +35,7 @@ export const en: TranslationKeys = {
   landing: {
     title: 'Secure Sensitive Data Sharing',
     subtitle:
-      'Secure and private data sharing for passwords, API keys, files, and more with zero-knowledge end-to-end encryption and automatic deletion',
+      'crypt.fyi enables zero-knowledge end-to-end encrypted sensitive data sharing with automatic deletion',
     features: {
       encryption: {
         title: 'End-to-end Encryption',

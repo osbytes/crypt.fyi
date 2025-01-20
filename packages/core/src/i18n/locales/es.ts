@@ -36,7 +36,7 @@ export const es: TranslationKeys = {
   landing: {
     title: 'Compartir Datos Sensibles de Forma Segura',
     subtitle:
-      'Compartir datos de forma segura y privada para contraseñas, claves API, archivos y más con cifrado de extremo a extremo de conocimiento cero y eliminación automática',
+      'crypt.fyi permite el intercambio de datos sensibles cifrados de extremo a extremo con conocimiento cero y eliminación automática',
     features: {
       encryption: {
         title: 'Cifrado de Extremo a Extremo',

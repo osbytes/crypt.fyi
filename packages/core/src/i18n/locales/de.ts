@@ -35,7 +35,7 @@ export const de: TranslationKeys = {
   landing: {
     title: 'Sicherer Austausch sensibler Daten',
     subtitle:
-      'Sicherer und privater Datenaustausch für Passwörter, API-Schlüssel, Dateien und mehr mit Zero-Knowledge-Ende-zu-Ende-Verschlüsselung und automatischer Löschung',
+      'crypt.fyi ermöglicht Zero-Knowledge Ende-zu-Ende verschlüsseltes Teilen sensibler Daten mit automatischer Löschung',
     features: {
       encryption: {
         title: 'Ende-zu-Ende-Verschlüsselung',
