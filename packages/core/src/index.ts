@@ -6,3 +6,4 @@ export * from './hash';
 export * from './random';
 export * from './encryption';
 export * from './sleep';
+export * from './fetchRetry';
