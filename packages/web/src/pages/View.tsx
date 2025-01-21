@@ -120,7 +120,7 @@ export function ViewPage() {
 
   let content = null;
   if (decryptMutation.data) {
-    const decryptedContent = decryptMutation.data.value;
+    const decryptedContent = decryptMutation.data.c;
     let fileData: { type: 'file'; name: string; content: string } | null = null;
 
     try {
@@ -150,7 +150,7 @@ export function ViewPage() {
                 variant="outline"
                 size="icon"
                 onClick={() => {
-                  clipboardCopy(decryptMutation.data.value);
+                  clipboardCopy(decryptMutation.data.c);
                   toast.success(t('view.content.copiedToClipboard'));
                 }}
                 title={t('view.content.copyToClipboard')}
