@@ -76,7 +76,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     routePrefix: config.swaggerUIPath,
   });
   app.register(fastifyRateLimit, {
-    redis,
+    redis: config.rateLimiter === 'redis' ? redis : undefined,
     nameSpace: config.rateLimitNameSpace,
     max: config.rateLimitMax,
     timeWindow: config.rateLimitWindowMs,
