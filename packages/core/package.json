@@ -1,7 +1,7 @@
 {
   "name": "@crypt.fyi/core",
   "version": "0.0.5",
-  "private": true,
+  "license": "Apache-2.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -10,6 +10,10 @@
     "package.json",
     "README.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/osbytes/crypt.fyi.git"
+  },
   "sideEffects": false,
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
