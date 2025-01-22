@@ -55,25 +55,16 @@ if [ -z "$commit_log" ]; then
 fi
 
 # Generate the changelog using llm
-echo "$commit_log" | llm "Transform these git commits into a structured changelog. Follow this exact format:
-
-# Changelog
-
-## 🚀 Features
-- [hash] Description starting with verb in present tense
-
-## 🐛 Bug Fixes  
-- [hash] Description starting with verb in present tense
-
-## 🔧 Other Changes
-- [hash] Description starting with verb in present tense
+echo "$commit_log" | llm -m gpt-4o "Transform these git commits into a structured changelog.
 
 Rules:
 - Keep original commit hash in square brackets
 - Start each entry with a present tense verb
 - One line per change
-- No additional commentary or sections
+- Summarize the commit message into a single line that is a concise description of the change
 - Categorize based on commit message content
 - If a section has no entries, omit it entirely
+- Omit changes that are not relevant to the changelog such as copy changes, linting, formatting, minor version updates, etc.
+- Group related commits together and comma separate the hashes in the brackets
 
 Input commits:"
