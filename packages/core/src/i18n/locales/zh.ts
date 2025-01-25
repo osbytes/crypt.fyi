@@ -20,7 +20,7 @@ export const zh: TranslationKeys = {
       tagline: '以安全和隐私为设计理念 - 因为无知也是一种幸福',
     },
     header: {
-      tagline: '使用零知识<aesLink>AES-256</aesLink><e2eLink>端到端加密</e2eLink>的临时密文分享',
+      tagline: '使用零知识<aesLink>AES-256</aesLink><e2eLink>端到端加密</e2eLink>的临时数据分享',
     },
     time: {
       minute_one: '{{count}} 分钟',
@@ -32,8 +32,8 @@ export const zh: TranslationKeys = {
     },
   },
   landing: {
-    title: '安全共享密文',
-    subtitle: '使用零知识端到端加密和自动删除功能发送密码和敏感信息',
+    title: '安全共享敏感数据',
+    subtitle: 'crypt.fyi 支持零知识端到端加密的敏感数据共享，并提供自动删除功能',
     features: {
       encryption: {
         title: '端到端加密',
@@ -224,7 +224,7 @@ export const zh: TranslationKeys = {
   about: {
     title: '关于',
     intro:
-      'crypt.fyi 是一个安全、开源、临时的密文分享平台，使您能够安全地分享敏感信息。无论是密码、API 密钥还是机密消息，crypt.fyi 都能确保您的数据保持私密，并在被访问后自动消失。',
+      'crypt.fyi 是一个安全、开源、临时的数据分享平台，使您能够安全地分享敏感信息。无论是密码、API 密钥还是机密消息，crypt.fyi 都能确保您的数据保持私密，并在被访问后自动消失。',
     whyCryptFyi: {
       title: '为什么选择 crypt.fyi？',
       commonPractices: {
@@ -310,7 +310,6 @@ export const zh: TranslationKeys = {
     openSource: {
       title: '开源',
       description: 'crypt.fyi 是开源且可审计的。您可以在以下位置查看我们的代码、提交问题和贡献',
-      cta: '立即创建密文',
     },
   },
   privacy: {

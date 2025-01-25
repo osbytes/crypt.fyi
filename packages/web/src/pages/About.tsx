@@ -1,6 +1,6 @@
 import { config } from '@/config';
 import { IconLock, IconShare, IconFlame } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 export function About() {
@@ -149,7 +149,7 @@ export function About() {
             to="/new"
             className="px-8 py-4 bg-primary text-primary-foreground rounded-lg text-lg font-semibold hover:bg-primary/90 transition-colors"
           >
-            {t('about.openSource.cta')}
+            {t('common.createSecret')}
           </Link>
         </div>
       </section>

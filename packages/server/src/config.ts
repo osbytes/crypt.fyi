@@ -145,6 +145,7 @@ const configSchema = z.object({
     .default(100)
     .describe('maximum length of webhook events stream'),
   webhookSender: z.enum(['bullmq', 'http']).default('bullmq').describe('webhook sender type'),
+  rateLimiter: z.enum(['redis', 'memory']).default('redis').describe('rate limiter type'),
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -195,5 +196,6 @@ export const config = (() => {
     webhookDrainDelayMs: process.env.WEBHOOK_DRAIN_DELAY_MS,
     webhookStreamEventsMaxLength: process.env.WEBHOOK_STREAM_EVENTS_MAX_LENGTH,
     webhookSender: process.env.WEBHOOK_SENDER,
+    rateLimiter: process.env.RATE_LIMITER,
   });
 })();

@@ -92,19 +92,19 @@ program
 
       // Check if content is a file
       try {
-        const parsed = JSON.parse(result.value);
+        const parsed = JSON.parse(result.c);
         if (parsed.type === 'file') {
           console.log('\nFile detected:');
           console.log(chalk.blue('File name:'), parsed.name);
           console.log(chalk.yellow('File content (base64):'), parsed.content);
         } else {
           console.log('\nDecrypted content:');
-          console.log(result.value);
+          console.log(result.c);
         }
       } catch {
         // Not JSON, print as regular text
         console.log('\nDecrypted content:');
-        console.log(result.value);
+        console.log(result.c);
       }
 
       if (result.burned) {

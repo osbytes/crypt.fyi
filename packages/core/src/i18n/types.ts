@@ -302,7 +302,6 @@ export interface TranslationKeys {
     openSource: {
       title: string;
       description: string;
-      cta: string;
     };
   };
   privacy: {

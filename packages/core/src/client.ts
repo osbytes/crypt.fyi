@@ -167,7 +167,7 @@ export class Client {
     const decompressed = this.decompressContent(decrypted);
 
     return {
-      value: decompressed,
+      c: decompressed,
       burned: data.b,
       cd: data.cd,
       ttl: data.ttl,

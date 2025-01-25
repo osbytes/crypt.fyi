@@ -1,14 +1,19 @@
 import { IconApi, IconBrandGithub, IconMoon, IconPlus, IconSun } from '@tabler/icons-react';
 import { Button } from './ui/button';
+import { Logo } from './Logo';
 import { useTheme } from '@/theme';
-import { Link, Outlet } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { ErrorBoundary } from './error-boundary';
 import { config } from '@/config';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { supportedLanguagesOptions } from '@crypt.fyi/core';
 
-export function Layout() {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+export function Layout({ children }: LayoutProps) {
   const [theme, setTheme] = useTheme();
   const { t, i18n } = useTranslation();
 
@@ -19,27 +24,8 @@ export function Layout() {
           <div className="container flex items-center justify-between mx-auto">
             <div>
               <Link to="/">
-                <h1 className="text-xl font-bold">crypt.fyi</h1>
+                <Logo className="w-12 py-2" />
               </Link>
-              <p className="hidden md:block text-xs text-muted-foreground">
-                <Trans
-                  i18nKey="common.header.tagline"
-                  components={{
-                    aesLink: (
-                      <a
-                        href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"
-                        target="_blank"
-                      />
-                    ),
-                    e2eLink: (
-                      <a
-                        href="https://en.wikipedia.org/wiki/End-to-end_encryption"
-                        target="_blank"
-                      />
-                    ),
-                  }}
-                />
-              </p>
             </div>
             <div className="flex items-center gap-2">
               <Link to="/about">
@@ -101,9 +87,7 @@ export function Layout() {
             </div>
           </div>
         </header>
-        <main className="container mx-auto py-8 px-4 flex-1">
-          <Outlet />
-        </main>
+        <main className="container mx-auto py-8 px-4 flex-1">{children}</main>
         <footer className="border-t p-4">
           <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">

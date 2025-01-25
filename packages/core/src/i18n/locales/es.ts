@@ -22,7 +22,7 @@ export const es: TranslationKeys = {
     },
     header: {
       tagline:
-        'Compartir secretos efímeros con cifrado <aesLink>AES-256</aesLink> de <e2eLink>extremo a extremo</e2eLink> de conocimiento cero',
+        'Compartir datos efímeros con cifrado <aesLink>AES-256</aesLink> de <e2eLink>extremo a extremo</e2eLink> de conocimiento cero',
     },
     time: {
       minute_one: '{{count}} minuto',
@@ -34,9 +34,9 @@ export const es: TranslationKeys = {
     },
   },
   landing: {
-    title: 'Comparte Secretos de Forma Segura',
+    title: 'Compartir Datos Sensibles de Forma Segura',
     subtitle:
-      'Envía contraseñas e información sensible con cifrado de extremo a extremo de conocimiento cero y eliminación automática',
+      'crypt.fyi permite el intercambio de datos sensibles cifrados de extremo a extremo con conocimiento cero y eliminación automática',
     features: {
       encryption: {
         title: 'Cifrado de Extremo a Extremo',
@@ -242,7 +242,7 @@ export const es: TranslationKeys = {
   about: {
     title: 'Acerca de',
     intro:
-      'crypt.fyi es una plataforma segura, de código abierto y efímera para compartir secretos que te permite compartir información sensible de manera segura. Ya sean contraseñas, claves API o mensajes confidenciales, crypt.fyi asegura que tus datos permanezcan privados y desaparezcan automáticamente después de ser accedidos.',
+      'crypt.fyi es una plataforma segura, de código abierto y efímera para compartir datos que te permite compartir información sensible de manera segura. Ya sean contraseñas, claves API o mensajes confidenciales, crypt.fyi asegura que tus datos permanezcan privados y desaparezcan automáticamente después de ser accedidos.',
     whyCryptFyi: {
       title: '¿Por qué crypt.fyi?',
       commonPractices: {
@@ -336,7 +336,6 @@ export const es: TranslationKeys = {
       title: 'Código Abierto',
       description:
         'crypt.fyi es de código abierto y auditable. Puedes revisar nuestro código, enviar problemas y contribuir en',
-      cta: 'Crear un Secreto Ahora',
     },
   },
   privacy: {

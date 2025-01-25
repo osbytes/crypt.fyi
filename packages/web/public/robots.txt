@@ -1,3 +1,11 @@
 # Allow all web crawlers
 User-agent: *
 Allow: /
+Allow: /about
+Allow: /privacy
+
+# Sitemaps
+Sitemap: https://crypt.fyi/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
