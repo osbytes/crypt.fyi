@@ -1,6 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from './ui/button';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 interface Props {
   children: ReactNode;

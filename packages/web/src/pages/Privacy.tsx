@@ -1,5 +1,5 @@
 import { config } from '@/config';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 export function Privacy() {

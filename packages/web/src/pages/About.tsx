@@ -1,6 +1,6 @@
 import { config } from '@/config';
 import { IconLock, IconShare, IconFlame } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 export function About() {

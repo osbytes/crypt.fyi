@@ -1,6 +1,6 @@
 import { config } from '@/config';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearch } from '@tanstack/react-router';
 import invariant from 'tiny-invariant';
 import { Card } from '@/components/ui/card';
 import { useState, useRef } from 'react';
@@ -27,12 +27,11 @@ import { useClient } from '@/context/client';
 export function ViewPage() {
   const { t } = useTranslation();
 
-  const { id } = useParams<{ id: string }>();
-  invariant(id, '`id` is required in URL');
-  const [searchParams] = useSearchParams();
-  const key = searchParams.get('key');
+  const { id } = useParams({ from: '/$id' });
+  const search = useSearch({ from: '/$id' });
+  const key = search.key;
   invariant(key, '`key` is required in URL query parameters');
-  const isPasswordSet = searchParams.get('p') === 'true';
+  const isPasswordSet = search.p === 'true';
   const [password, setPassword] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
   const [isRevealed, setIsRevealed] = useState(false);
