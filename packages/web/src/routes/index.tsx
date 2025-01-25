@@ -3,4 +3,4 @@ import { LandingPage } from '@/pages/Landing';
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
-}); 
+});

@@ -8,4 +8,4 @@ export const Route = createFileRoute('/$id')({
     p: z.enum(['true', 'false']).optional(),
   }),
   component: ViewPage,
-}); 
+});

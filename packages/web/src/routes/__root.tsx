@@ -11,4 +11,4 @@ export const Route = createRootRoute({
     redirect({ to: '/' });
     return null;
   },
-}); 
+});

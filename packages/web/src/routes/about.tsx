@@ -3,4 +3,4 @@ import { About } from '@/pages/About';
 
 export const Route = createFileRoute('/about')({
   component: About,
-}); 
+});
