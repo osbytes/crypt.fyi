@@ -14,7 +14,7 @@ const initAppTest = async () => {
     ...baseConfig,
     healthCheckEndpoint: '/some-health-check-endpoint',
     vaultEntryTTLMsDefault: 1000,
-    rateLimitMax: 100,
+    rateLimitMax: Number.MAX_SAFE_INTEGER,
   } satisfies Config;
   const logger = pino({ enabled: false });
   const tokenGenerator = createTokenGenerator({
@@ -313,5 +313,42 @@ describe('app', () => {
       path: `/vault/${id}?h=abc123`,
     });
     expect(getResponse.statusCode).toBe(404);
+  });
+
+  it('should allow either sha512 or sha256 hash during migration period', async () => {
+    const createResponse = await testContext.client.request({
+      method: 'POST',
+      path: '/vault',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        c: 'foobar',
+        b: false,
+        h: 'abc123',
+      }),
+    });
+
+    expect(createResponse.statusCode).toBe(201);
+
+    const { id } = (await createResponse.body.json()) as Record<string, unknown>;
+
+    const getResponse = await testContext.client.request({
+      method: 'GET',
+      path: `/vault/${id}?h=abc123&h2=xyz321`,
+    });
+    expect(getResponse.statusCode).toBe(200);
+
+    const getResponse2 = await testContext.client.request({
+      method: 'GET',
+      path: `/vault/${id}?h=xyz321&h2=abc123`,
+    });
+    expect(getResponse2.statusCode).toBe(200);
+
+    const getResponse3 = await testContext.client.request({
+      method: 'GET',
+      path: `/vault/${id}?h=xyz321&h2=abc1234`,
+    });
+    expect(getResponse3.statusCode).toBe(400);
   });
 });

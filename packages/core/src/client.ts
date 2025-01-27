@@ -8,7 +8,7 @@ import {
 } from './api';
 import { generateRandomString } from './random';
 import { Decrypt, Encrypt, gcm } from './encryption';
-import { sha256 } from './hash';
+import { sha256, sha512 } from './hash';
 
 interface ContentMetadata {
   compression?: {
@@ -109,7 +109,7 @@ export class Client {
     if (input.p) {
       encrypted = await this.encrypt(encrypted, input.p);
     }
-    const hash = sha256(key + (input.p ?? ''));
+    const hash = sha512(key + (input.p ?? ''));
 
     const response = await fetch(`${this.apiUrl}/vault`, {
       method: 'POST',
@@ -146,8 +146,9 @@ export class Client {
   }
 
   async read(id: string, key: string, password?: string) {
-    const h = sha256(key + (password ?? ''));
-    const res = await fetch(`${this.apiUrl}/vault/${id}?h=${h}`, {
+    const h = sha512(key + (password ?? ''));
+    const h2 = sha256(key + (password ?? ''));
+    const res = await fetch(`${this.apiUrl}/vault/${id}?h=${h}&h2=${h2}`, {
       headers: this.getHeaders(),
     });
     if (!res.ok) {

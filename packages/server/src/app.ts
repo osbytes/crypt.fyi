@@ -246,7 +246,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     },
     async handler(req, res) {
       try {
-        const result = await vault.get(req.params.vaultId, req.query.h, req.ip);
+        const result = await vault.get(req.params.vaultId, req.query.h, req.query.h2 ?? '', req.ip);
         if (!result) {
           return res.status(404).send();
         }

@@ -34,6 +34,7 @@ export interface Vault {
   get(
     id: string,
     h: string,
+    h2: string,
     ip: string,
   ): Promise<Pick<VaultValue, 'c' | 'b' | 'ttl' | 'cd'> | undefined>;
   del(id: string, dt: string): Promise<boolean>;

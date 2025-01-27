@@ -19,7 +19,8 @@ export const readVaultParamsSchema = z.object({
 export type ReadVaultParams = z.infer<typeof readVaultParamsSchema>;
 
 export const readVaultQuerySchema = z.object({
-  h: z.string().describe('sha256 hash of the encryption key + optional password'),
+  h: z.string().describe('sha512 hash of the encryption key + optional password'),
+  h2: z.string().describe('sha256 hash of the encryption key + optional password').optional(),
 });
 export type ReadVaultQuery = z.infer<typeof readVaultQuerySchema>;
 

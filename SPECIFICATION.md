@@ -69,7 +69,7 @@ This separation ensures that even if the web server logs are compromised, the de
 2. **Key Management**
    - Decryption key never transmitted to server
    - Optional password protection
-   - SHA-256 key verification
+   - SHA-512 key verification
 
 ### 4.2 Zero-Knowledge Architecture
 
@@ -147,7 +147,7 @@ This separation ensures that even if the web server logs are compromised, the de
    - Generate random encryption key
    - Encrypt content with AES-256-GCM
    - Optional: Encrypt again with user password
-   - Generate SHA-256 hash of key+password
+   - Generate SHA-512 hash of key+password
    - Send encrypted data to server
 
 2. **Retrieving a Secret**
@@ -231,11 +231,7 @@ Each error response will have an appropriate error message in the response body.
 
 ### 11.1 Potential Enhancements
 
-- File encryption support
-- Notification of read receipts
 - Deferred time to available w/ read-side email subscription for availability notifications
-- IP whitelisting / blacklisting
-- Browser extension
 
 ---
 
