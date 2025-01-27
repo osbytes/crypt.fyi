@@ -12,11 +12,20 @@ const client = new Client({
 
 const contextMenuId = '@crypt.fyi/encrypt-selection';
 
-browser.contextMenus.create({
-  id: contextMenuId,
-  title: 'Encrypt and Share with crypt.fyi',
-  contexts: ['selection'],
-});
+browser.contextMenus.remove(contextMenuId).catch(() => {});
+browser.contextMenus.create(
+  {
+    id: contextMenuId,
+    title: 'Encrypt and Share with crypt.fyi',
+    contexts: ['selection'],
+  },
+  () => {
+    const error = browser.runtime.lastError;
+    if (error) {
+      console.warn('[crypt.fyi] Context menu creation error:', error);
+    }
+  },
+);
 
 function isScriptableUrl(url: string): boolean {
   return url.startsWith('http://') || url.startsWith('https://');
@@ -73,10 +82,9 @@ browser.contextMenus.onClicked.addListener(async (info: Menus.OnClickData, tab) 
 
     chrome.notifications.create({
       type: 'basic',
-      iconUrl: chrome.runtime.getURL('icon-48.png'),
+      iconUrl: chrome.runtime.getURL('48.png'),
       title: 'Text Encrypted',
-      message:
-        'The text has been encrypted and the secret URL has been copied to your clipboard. Send to the intended recipient.',
+      message: 'Secret URL copied to clipboard. Ready to share.',
     });
   } catch (error) {
     console.error('[crypt.fyi] Encryption failed:', error);
@@ -84,7 +92,7 @@ browser.contextMenus.onClicked.addListener(async (info: Menus.OnClickData, tab) 
     try {
       chrome.notifications.create({
         type: 'basic',
-        iconUrl: chrome.runtime.getURL('icon-48.png'),
+        iconUrl: chrome.runtime.getURL('48.png'),
         title: 'Encryption Failed',
         message: error instanceof Error ? error.message : 'An unknown error occurred',
       });
