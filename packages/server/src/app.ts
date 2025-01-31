@@ -28,6 +28,10 @@ import {
 } from '@crypt.fyi/core';
 import { Redis } from 'ioredis';
 import { BASE_OTEL_ATTRIBUTES } from './telemetry';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const favicon = fs.readFileSync(path.join(__dirname, 'assets', 'favicon.ico'));
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -134,6 +138,11 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     method: 'GET',
     url: config.healthCheckEndpoint,
     exposeHeadRoute: false,
+    schema: {
+      description: 'Checks the health of the server and its dependencies.',
+      tags: ['health'],
+      summary: 'Health check',
+    },
     handler: async (_, res) => {
       redisEntriesGauge.addCallback(async (result) => {
         const count = await redis.dbsize();
@@ -159,18 +168,18 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     },
   });
 
-  const faviconBase64 =
-    'AAABAAEAICAAAAEAIACoEAAAFgAAACgAAAAgAAAAQAAAAAEAIAAAAAAAABAAAMMOAADDDgAAAAAAAAAAAAAAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AQEB/xcXF/84ODj/SEhI/z8/P/8gICD/BQUF/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8EBAT/QUFB/1ZWVv8zMzP/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/x4eHv+Dg4P/09PT//Ly8v/5+fn/9fX1/+Dg4P+goKD/NDQ0/wEBAf8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/w0NDf/FxcX//////5qamv8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP86Ojr/y8vL///////////////////////////////////////j4+P/Xl5e/wICAv8AAAD/AAAA/wAAAP8AAAD/AAAA/wMDA/81NTX/SEhI/ywsLP8AAAD/DQ0N/8fHx///////nJyc/wAAAP8AAAD/AAAA/wAAAP8AAAD/Kioq/9PT0/////////////7+/v/v7+//4ODg/+zs7P/+/v7////////////r6+v/TU1N/wAAAP8AAAD/AAAA/wAAAP8AAAD/CgoK/729vf//////nZ2d/wAAAP8NDQ3/x8fH//////+cnJz/AAAA/wAAAP8AAAD/AAAA/wUFBf+enp7////////////z8/P/lJSU/zc3N/8eHh7/MDAw/4GBgf/r6+v////////////Ozs7/V1dX/05OTv9PT0//T09P/09PT/9WVlb/1dXV//////+/v7//T09P/1hYWP/Y2Nj//////5ycnP8AAAD/AAAA/wAAAP8AAAD/MjIy/+rq6v//////+/v7/3l5ef8EBAT/AAAA/wAAAP8AAAD/AQEB/15eXv/z8/P////////////8/Pz/+/v7//v7+//7+/v/+/v7//v7+//+/v7///////7+/v/7+/v/+/v7//7+/v//////nJyc/wAAAP8AAAD/AAAA/wAAAP9paWn////////////Kysr/FBQU/wAAAP8AAAD/AAAA/wAAAP8AAAD/CAgI/6urq//5+fn/9fX1//X19f/19fX/9fX1//X19f/19fX//f39//////////////////r6+v/09PT/8/Pz//b29v+UlJT/AAAA/wAAAP8AAAD/AAAA/4qKiv///////////5eXl/8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/ISEh/z4+Pv89PT3/PT09/z09Pf89PT3/Ozs7/2VlZf/v7+//////////////////19fX/1BQUP9dXV3/aWlp/z8/P/8AAAD/AAAA/wAAAP8AAAD/jY2N////////////l5eX/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/RUVF/+Hh4f/v7+//tra2//r6+v/Gxsb/Li4u/7W1tf/y8vL/j4+P/wAAAP8AAAD/AAAA/wAAAP9wcHD////////////Kysr/FBQU/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8CAgL/MDAw/2BgYP8jIyP/a2tr/x4eHv8ICAj/gICA/6mpqf9kZGT/AAAA/wAAAP8AAAD/AAAA/zk5Of/v7+////////v7+/97e3v/BQUF/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8BAQH/AQEB/wEBAf8AAAD/AAAA/wAAAP8AAAD/CAgI/6mpqf////////////Pz8/+VlZX/Ozs7/yEhIf82Njb/SkpK/wkJCf8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/MzMz/9ra2v/////////////////y8vL/4+Pj/+/v7//19fX/iYmJ/w8PD/8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/Q0ND/9TU1P/////////////////////////////////7+/v/f39//wICAv8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/JSUl/4qKiv/U1NT/8vLy//j4+P/w8PD/0tLS/4mJif8lJSX/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AgIC/xcXF/84ODj/RUVF/zU1Nf8WFhb/AgIC/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
-  const faviconIco = Buffer.from(faviconBase64, 'base64');
-
   app.get('/favicon.ico', { schema: { hide: true } }, (_, res) => {
-    res.status(200).send(faviconIco);
+    res.status(200).send(favicon);
   });
 
   app.withTypeProvider<ZodTypeProvider>().route({
     method: 'POST',
     url: '/vault',
     schema: {
+      description:
+        'Creates a new vault entry to store encrypted content with optional security features like burn after reading, IP restrictions, and webhooks.',
+      tags: ['vault'],
+      summary: 'Create new vault entry',
       body: createVaultRequestSchema
         .extend({
           ttl: z
@@ -250,12 +259,16 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     url: '/vault/:vaultId',
     exposeHeadRoute: false,
     schema: {
+      description:
+        'Retrieves the content of a vault entry. If the entry is configured for burn after reading, it will be deleted after this request. IP restrictions and read count limits are enforced.',
+      tags: ['vault'],
+      summary: 'Retrieve vault entry',
       params: readVaultParamsSchema,
       querystring: readVaultQuerySchema,
       response: {
         200: readVaultResponseSchema,
-        404: z.null(),
-        400: z.null(),
+        404: z.null().describe('Vault entry not found'),
+        400: z.null().describe('Invalid key and/or password'),
       },
     },
     async handler(req, res) {
@@ -280,6 +293,10 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     method: 'HEAD',
     url: '/vault/:vaultId',
     schema: {
+      description:
+        'Checks if a vault entry exists. This is useful for checking if a vault entry has been deleted or not.',
+      tags: ['vault'],
+      summary: 'Check if vault entry exists',
       params: readVaultParamsSchema,
       response: {
         200: z.null(),
@@ -300,11 +317,15 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     method: 'DELETE',
     url: '/vault/:vaultId',
     schema: {
+      description:
+        'Deletes a vault entry using the delete token that was provided when the entry was created.',
+      tags: ['vault'],
+      summary: 'Delete vault entry',
       params: deleteVaultParamsSchema,
       body: deleteVaultRequestSchema,
       response: {
-        200: z.null(),
-        404: z.null(),
+        200: z.null().describe('Vault entry successfully deleted'),
+        404: z.null().describe('Vault entry not found'),
       },
     },
     async handler(req, res) {
