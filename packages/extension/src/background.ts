@@ -59,7 +59,7 @@ browser.contextMenus.onClicked.addListener(async (info: Menus.OnClickData, tab) 
           try {
             await navigator.clipboard.writeText(text);
             return true;
-          } catch (err) {
+          } catch {
             const textArea = document.createElement('textarea');
             textArea.value = text;
             document.body.appendChild(textArea);
@@ -68,7 +68,7 @@ browser.contextMenus.onClicked.addListener(async (info: Menus.OnClickData, tab) 
               const success = document.execCommand('copy');
               textArea.remove();
               return success;
-            } catch (e) {
+            } catch {
               textArea.remove();
               return false;
             }
