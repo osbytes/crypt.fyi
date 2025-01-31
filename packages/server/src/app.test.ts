@@ -7,6 +7,7 @@ import Redis from 'ioredis';
 import { createRedisVault } from './vault/redis';
 import { createTokenGenerator } from './vault/tokens';
 import { createNopWebhookSender } from './webhook';
+import { gcm } from '@crypt.fyi/core';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 const initAppTest = async () => {
@@ -279,6 +280,63 @@ describe('app', () => {
 
     const remainingReads = JSON.parse((await testContext.redis.get(`vault:${id}`)) ?? '{}')?.rc;
     expect(remainingReads).toBe(2);
+  });
+
+  it('verifies IPs and webhook URLs are encrypted at rest', async () => {
+    const createResponse = await testContext.client.request({
+      method: 'POST',
+      path: '/vault',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        c: 'secret-content',
+        b: false,
+        h: 'abc123',
+        ips: '192.168.1.1,10.0.0.0/24',
+        wh: {
+          u: 'https://example.com/webhook',
+          n: 'test-webhook',
+          r: true,
+          b: true,
+          fpk: true,
+          fip: true,
+        },
+      }),
+    });
+
+    expect(createResponse.statusCode).toBe(201);
+    const { id } = (await createResponse.body.json()) as Record<string, unknown>;
+    expect(typeof id).toBe('string');
+
+    const redis = new Redis();
+    afterEach(async () => {
+      await redis.quit();
+    });
+
+    const rawValue = await redis.get(`vault:${id}`);
+    expect(rawValue).toBeTruthy();
+
+    const parsedValue = JSON.parse(rawValue!) as {
+      ips: string;
+      wh: { u: string; n: string };
+    };
+
+    // Verify IPs are encrypted
+    expect(parsedValue.ips).not.toBe('192.168.1.1,10.0.0.0/24');
+    expect(parsedValue.ips.length).toBeGreaterThan(0);
+
+    // Verify webhook URL is encrypted
+    expect(parsedValue.wh.u).not.toBe('https://example.com/webhook');
+    expect(parsedValue.wh.u.length).toBeGreaterThan(0);
+
+    const [decryptedIps, decryptedWhU] = await Promise.all([
+      gcm.decrypt(parsedValue.ips, testContext.config.encryptionKey),
+      gcm.decrypt(parsedValue.wh.u, testContext.config.encryptionKey),
+    ]);
+
+    expect(decryptedIps).toBe('192.168.1.1,10.0.0.0/24');
+    expect(decryptedWhU).toBe('https://example.com/webhook');
   });
 
   it('deletes vault entry', async () => {
