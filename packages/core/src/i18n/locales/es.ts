@@ -248,7 +248,7 @@ export const es: TranslationKeys = {
       commonPractices: {
         title: 'El Problema con las Prácticas Comunes',
         description:
-          'Cada día, información sensible como contraseñas, claves API y datos privados se comparte a través de canales inseguros:',
+          'Cada día, información sensible como contraseñas, claves API y datos privados se comparte a través de canales inseguros en texto plano:',
         problems: {
           email:
             'Correo electrónico - puede ser interceptado, almacenado indefinidamente y reenviado sin control',

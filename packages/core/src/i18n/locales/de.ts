@@ -249,7 +249,7 @@ export const de: TranslationKeys = {
       commonPractices: {
         title: 'Das Problem mit gängigen Praktiken',
         description:
-          'Täglich werden sensible Informationen wie Passwörter, API-Schlüssel und private Daten über unsichere Kanäle geteilt:',
+          'Täglich werden sensible Informationen wie Passwörter, API-Schlüssel und private Daten über unsichere Kanäle im Klartext geteilt:',
         problems: {
           email:
             'E-Mail - kann abgefangen, unbegrenzt gespeichert und unkontrolliert weitergeleitet werden',

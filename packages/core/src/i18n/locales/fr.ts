@@ -250,7 +250,7 @@ export const fr: TranslationKeys = {
       commonPractices: {
         title: 'Le Problème avec les Pratiques Courantes',
         description:
-          'Chaque jour, des informations sensibles comme des mots de passe, des clés API et des données privées sont partagées via des canaux non sécurisés :',
+          'Chaque jour, des informations sensibles comme des mots de passe, des clés API et des données privées sont partagées via des canaux non sécurisés en texte clair :',
         problems: {
           email: 'Email - peut être intercepté, stocké indéfiniment et transféré sans contrôle',
           slack:

@@ -229,7 +229,7 @@ export const zh: TranslationKeys = {
       title: '为什么选择 crypt.fyi？',
       commonPractices: {
         title: '常见做法的问题',
-        description: '每天，敏感信息如密码、API 密钥和私密数据都通过不安全的渠道共享：',
+        description: '每天，敏感信息如密码、API 密钥和私密数据都以明文形式通过不安全的渠道共享：',
         problems: {
           email: '电子邮件 - 可能被拦截、无限期存储和转发',
           slack: 'Slack/Teams 消息 - 保留在聊天历史和公司日志中',
