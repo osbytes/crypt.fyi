@@ -147,8 +147,7 @@ export class Client {
 
   async read(id: string, key: string, password?: string) {
     const h = sha512(key + (password ?? ''));
-    const h2 = sha256(key + (password ?? ''));
-    const res = await fetch(`${this.apiUrl}/vault/${id}?h=${h}&h2=${h2}`, {
+    const res = await fetch(`${this.apiUrl}/vault/${id}?h=${h}`, {
       headers: this.getHeaders(),
     });
     if (!res.ok) {

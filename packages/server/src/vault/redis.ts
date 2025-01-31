@@ -71,7 +71,7 @@ export const createRedisVault = (
 
       return { id, dt };
     },
-    async get(id, h, h2, ip) {
+    async get(id, h, ip) {
       const key = getKey(id);
 
       // TODO: try to not pull the full redis entry into memory until the ip address is confirmed to be allowed
@@ -105,7 +105,7 @@ export const createRedisVault = (
   end
 
   local data = cjson.decode(value)
-  if data.h ~= ARGV[1] and data.h ~= ARGV[2] then
+  if data.h ~= ARGV[1] then
     return cjson.encode({ status = "invalid_hash" })
   end
 
@@ -147,7 +147,6 @@ export const createRedisVault = (
         1,
         key,
         h,
-        h2,
       )) as string | null;
       if (!outcome) {
         return undefined;
