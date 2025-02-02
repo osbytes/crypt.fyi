@@ -43,7 +43,9 @@
 - ⌨️ [CLI](https://www.npmjs.com/package/@crypt.fyi/cli) for interacting with the API
 - 🧩 [Chrome Extension](https://chromewebstore.google.com/detail/cryptfyi/hkmbmkjfjfdbpohlllleaacjkacfhald)
 - 🐳 Docker images for the api server and web client
-- 🌐 Localization with a handful of supported languages (more to come - help wanted!)
+- 🌐 Internationalization support for multiple languages
+  - Currently supported: [View supported languages](https://github.com/osbytes/crypt.fyi/tree/main/packages/core/src/i18n/locales)
+  - Contributions welcome for new translations!
 
 ## How It Works
 
