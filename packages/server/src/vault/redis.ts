@@ -16,6 +16,14 @@ const parseResult = async (result: string, encryptionKey: string) => {
   if ('wh' in jsonParsed && jsonParsed.wh.u) {
     jsonParsed.wh.u = await gcm.decrypt(jsonParsed.wh.u, encryptionKey);
   }
+  if (jsonParsed.ips) {
+    try {
+      const ips = await gcm.decrypt(jsonParsed.ips, encryptionKey);
+      jsonParsed.ips = ips;
+    } catch {
+      // ignore - this maintains backward compatibility with existing vault entries that don't have ips encrypted
+    }
+  }
   return vaultValueSchema.parse(jsonParsed);
 };
 
@@ -34,6 +42,11 @@ export const createRedisVault = (
 
       const key = getKey(id);
 
+      const [encryptedIps, encryptedWhU] = await Promise.all([
+        ips ? gcm.encrypt(ips, encryptionKey) : undefined,
+        wh ? gcm.encrypt(wh.u, encryptionKey) : undefined,
+      ]);
+
       const tx = redis.multi();
       tx.setnx(
         key,
@@ -45,14 +58,9 @@ export const createRedisVault = (
           dt,
           ttl,
           cd: Date.now(),
-          ips,
+          ips: encryptedIps,
           rc,
-          wh: wh
-            ? {
-                ...wh,
-                u: await gcm.encrypt(wh.u, encryptionKey),
-              }
-            : undefined,
+          wh: wh && encryptedWhU ? { ...wh, u: encryptedWhU } : undefined,
         } satisfies VaultValue),
       );
       tx.pexpire(key, ttl);
