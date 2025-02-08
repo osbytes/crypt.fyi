@@ -121,7 +121,7 @@ export class Client {
         ttl: input.ttl,
         ips: input.ips,
         rc: input.rc,
-        fa: input.fa,
+        fc: input.fc,
         wh: input.wh
           ? {
               u: input.wh.u,

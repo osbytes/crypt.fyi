@@ -169,7 +169,7 @@ export interface TranslationKeys {
       deleteSecret: string;
       info: {
         expires: string;
-        burnAfterReading: string;
+        failureCount: string;
         passwordProtected: string;
         ipRestrictions: string;
         readCount: string;

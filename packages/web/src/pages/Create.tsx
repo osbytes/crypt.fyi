@@ -152,7 +152,7 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
         .max(10)
         .optional()
         .describe('maximum number of times the secret can be read'),
-      fa: z
+      fc: z
         .number({ coerce: true })
         .min(1)
         .max(10)
@@ -242,7 +242,7 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
   const burn = params.get('burn');
   const ips = params.get('ips');
   const readCount = params.get('readCount');
-  const burnAfter = params.get('fa');
+  const failureCount = params.get('fc');
   const webhookUrl = params.get('webhookUrl');
   const webhookName = params.get('webhookName');
   const webhookBurn = params.get('webhookBurn') === 'true';
@@ -278,7 +278,7 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
     whb: webhookBurn,
     whfpk: webhookFailPk,
     whfip: webhookFailIp,
-    fa: burnAfter ? parseInt(burnAfter, 10) : undefined,
+    fc: failureCount ? parseInt(failureCount, 10) : undefined,
   };
 }
 
@@ -305,8 +305,8 @@ function updateUrlWithFormState(formData: FormDataWithoutContent) {
     params.set('readCount', formData.rc.toString());
   }
 
-  if (formData.fa !== undefined) {
-    params.set('fa', formData.fa.toString());
+  if (formData.fc !== undefined) {
+    params.set('fc', formData.fc.toString());
   }
 
   if (formData.whu) {
@@ -385,7 +385,7 @@ export function CreatePage() {
         whfpk: value.whfpk ?? false,
         whfip: value.whfip ?? false,
         whb: value.whb ?? false,
-        fa: value.fa ?? undefined,
+        fc: value.fc ?? undefined,
       };
 
       if (value.p !== undefined) formState.p = value.p;
@@ -393,7 +393,7 @@ export function CreatePage() {
       if (value.rc !== undefined) formState.rc = value.rc;
       if (value.whu) formState.whu = value.whu;
       if (value.whn) formState.whn = value.whn;
-      if (value.fa !== undefined) formState.fa = value.fa;
+      if (value.fc !== undefined) formState.fc = value.fc;
       updateUrlWithFormState(formState);
     });
     return () => subscription.unsubscribe();
@@ -848,7 +848,7 @@ export function CreatePage() {
                               />
                               <FormField
                                 control={form.control}
-                                name="fa"
+                                name="fc"
                                 render={({ field }) => (
                                   <FormItem>
                                     <FormLabel>
@@ -1123,7 +1123,7 @@ export function CreatePage() {
                     <>
                       <IconFlame className="text-muted-foreground size-4" />
                       <p className="text-muted-foreground">
-                        {t('create.success.info.burnAfterReading')}
+                        {t('create.success.info.failureCountReading')}
                       </p>
                     </>
                   )}

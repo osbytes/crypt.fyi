@@ -314,4 +314,53 @@ describe('app', () => {
     });
     expect(getResponse.statusCode).toBe(404);
   });
+  it('respects the failure count', async () => {
+    const createResponse = await testContext.client.request({
+      method: 'POST',
+      path: '/vault',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        c: 'foobar',
+        b: true,
+        h: 'abc123',
+        fc: 5,
+      }),
+    });
+    expect(createResponse.statusCode).toBe(201);
+    const { id } = (await createResponse.body.json()) as Record<string, unknown>;
+    expect(typeof id).toBe('string');
+
+    const numClients = 5;
+    const clients = Array.from(
+      { length: numClients },
+      () =>
+        new Client(
+          `http://localhost:${(testContext.app.fastify.server.address() as AddressInfo).port}`,
+        ),
+    );
+
+    try {
+      const responses = await Promise.all(
+        clients.map((client) =>
+          client.request({
+            method: 'GET',
+            path: `/vault/${id}?h=xyz789`,
+          }),
+        ),
+      );
+
+      const successfulResponses = responses.filter((r) => r.statusCode === 400);
+      expect(successfulResponses.length).toBe(numClients);
+
+      const verifyResponse = await testContext.client.request({
+        method: 'GET',
+        path: `/vault/${id}?h=abc123`,
+      });
+      expect(verifyResponse.statusCode).toBe(404);
+    } finally {
+      await Promise.all(clients.map((c) => c.close()));
+    }
+  });
 });

@@ -188,7 +188,7 @@ export const fr: TranslationKeys = {
       deleteSecret: 'Supprimer le Secret',
       info: {
         expires: 'Expire dans: {{time}}',
-        burnAfterReading: 'Le secret sera supprimé après sa lecture',
+        failureCount: 'Le secret sera supprimé après sa lecture',
         passwordProtected: 'Protégé par mot de passe',
         ipRestrictions: 'Restriction(s) IP: {{ips}}',
         readCount: 'Nombre de lectures: {{count}}',

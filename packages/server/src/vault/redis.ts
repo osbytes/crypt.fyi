@@ -29,7 +29,7 @@ export const createRedisVault = (
 
   return {
     async set(value) {
-      const { c, h, b, ttl, ips, rc, wh, fa } = value;
+      const { c, h, b, ttl, ips, rc, wh, fc } = value;
       const { id, dt } = await tokenGenerator.generate();
 
       const key = getKey(id);
@@ -41,7 +41,7 @@ export const createRedisVault = (
           c,
           h,
           b,
-          fa,
+          fc,
           dt,
           ttl,
           cd: Date.now(),
@@ -108,9 +108,9 @@ export const createRedisVault = (
   local data = cjson.decode(value)
   if data.h ~= ARGV[1] then
     -- Handle failed attempts
-    if data.fa then
-      data.fa_count = (data.fa_count or 0) + 1
-      if data.fa_count >= data.fa then
+    if data.fc then
+      data.fc = (data.fc or 0) - 1
+      if data.fc <= 0 then
         redis.call('del', KEYS[1])
         return cjson.encode({ status = "invalid_hash", burned = true, reason = "failed_attempts" })
       else
@@ -176,14 +176,25 @@ export const createRedisVault = (
         reason?: 'read_count_zero' | 'burned' | 'ttl_expired' | 'failed_attempts';
       };
       if (redisOutcome.status === 'invalid_hash') {
-        if (wh?.fpk || (redisOutcome.burned && wh?.b)) {
+        const ts = Date.now();
+        if (wh?.fpk) {
           void webhookSender.send({
             url: wh.u,
             name: wh.n,
-            event: redisOutcome.burned ? 'BURN' : 'FAILURE_KEY_PASSWORD',
+            event: 'FAILURE_KEY_PASSWORD',
             id,
             dt,
-            ts: Date.now(),
+            ts,
+          });
+        }
+        if (redisOutcome.burned && wh?.b) {
+          void webhookSender.send({
+            url: wh.u,
+            name: wh.n,
+            event: 'BURN',
+            id,
+            dt,
+            ts,
           });
         }
         throw new ErrorInvalidKeyAndOrPassword();
