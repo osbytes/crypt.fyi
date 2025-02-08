@@ -152,6 +152,12 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
         .max(10)
         .optional()
         .describe('maximum number of times the secret can be read'),
+      fa: z
+        .number({ coerce: true })
+        .min(1)
+        .max(10)
+        .optional()
+        .describe('burn after n failed attempts'),
       whu: z.string().describe('webhook: url of the webhook').optional(),
       whn: z.string().max(50).describe('webhook: name of the secret').optional(),
       whr: z.boolean().default(true).describe('webhook: should the webhook be called on read'),
@@ -236,6 +242,7 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
   const burn = params.get('burn');
   const ips = params.get('ips');
   const readCount = params.get('readCount');
+  const burnAfter = params.get('fa');
   const webhookUrl = params.get('webhookUrl');
   const webhookName = params.get('webhookName');
   const webhookBurn = params.get('webhookBurn') === 'true';
@@ -271,6 +278,7 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
     whb: webhookBurn,
     whfpk: webhookFailPk,
     whfip: webhookFailIp,
+    fa: burnAfter ? parseInt(burnAfter, 10) : undefined,
   };
 }
 
@@ -295,6 +303,10 @@ function updateUrlWithFormState(formData: FormDataWithoutContent) {
 
   if (formData.rc !== undefined) {
     params.set('readCount', formData.rc.toString());
+  }
+
+  if (formData.fa !== undefined) {
+    params.set('fa', formData.fa.toString());
   }
 
   if (formData.whu) {
@@ -348,7 +360,12 @@ export function CreatePage() {
 
   const [isAdvancedConfigurationOpen, setIsAdvancedConfigurationOpen] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return !!(params.get('ips') || params.get('readCount') || params.get('webhookUrl'));
+    return !!(
+      params.get('ips') ||
+      params.get('readCount') ||
+      params.get('webhookUrl') ||
+      params.get('fa')
+    );
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -368,6 +385,7 @@ export function CreatePage() {
         whfpk: value.whfpk ?? false,
         whfip: value.whfip ?? false,
         whb: value.whb ?? false,
+        fa: value.fa ?? undefined,
       };
 
       if (value.p !== undefined) formState.p = value.p;
@@ -375,7 +393,7 @@ export function CreatePage() {
       if (value.rc !== undefined) formState.rc = value.rc;
       if (value.whu) formState.whu = value.whu;
       if (value.whn) formState.whn = value.whn;
-
+      if (value.fa !== undefined) formState.fa = value.fa;
       updateUrlWithFormState(formState);
     });
     return () => subscription.unsubscribe();
@@ -830,6 +848,35 @@ export function CreatePage() {
                               />
                               <FormField
                                 control={form.control}
+                                name="fa"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>
+                                      {t('create.form.advanced.failedAttempts.label')}
+                                    </FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        type="number"
+                                        {...field}
+                                        onChange={(e) =>
+                                          field.onChange(
+                                            e.target.value ? Number(e.target.value) : undefined,
+                                          )
+                                        }
+                                        disabled={createMutation.isPending || field.disabled}
+                                        min={1}
+                                        max={10}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                    <FormDescription>
+                                      {t('create.form.advanced.failedAttempts.description')}
+                                    </FormDescription>
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
                                 name="whu"
                                 render={({ field }) => (
                                   <FormItem>
@@ -963,7 +1010,7 @@ export function CreatePage() {
                                     })}
                                   </pre>
                                 </div>
-                              )}
+                              )}{' '}
                             </div>
                           </motion.div>
                         </CollapsibleContent>

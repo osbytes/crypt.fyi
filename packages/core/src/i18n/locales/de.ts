@@ -142,7 +142,7 @@ export const de: TranslationKeys = {
         description: 'Garantiert, dass nur ein Empfänger auf das Geheimnis zugreifen kann',
       },
       advanced: {
-        toggle: 'Erweiterte Konfiguration',
+        toggle: 'erweiterte Konfiguration',
         ip: {
           label: 'IP/CIDR Positivliste',
           placeholder: '192.168.1.1, 10.0.0.0/24, etc.',
@@ -152,6 +152,10 @@ export const de: TranslationKeys = {
         readCount: {
           label: 'Lesezähler',
           description: 'Maximale Anzahl der Abrufe des Geheimnisses',
+        },
+        failedAttempts: {
+          label: 'Nach fehlgeschlagenen Versuchen löschen',
+          description: 'Geheimnis automatisch nach einer Anzahl fehlgeschlagener Zugriffsversuche löschen',
         },
         webhook: {
           label: 'Webhook',
@@ -183,11 +187,12 @@ export const de: TranslationKeys = {
       deleteSecret: 'Geheimnis löschen',
       info: {
         expires: 'Läuft ab in: {{time}}',
-        burnAfterReading: 'Das Geheimnis wird nach dem Lesen gelöscht',
+        burnAfterReading: 'Geheimnis wird nach dem Lesen gelöscht',
         passwordProtected: 'Passwortgeschützt',
         ipRestrictions: 'IP-Beschränkung(en): {{ips}}',
         readCount: 'Leseanzahl: {{count}}',
         webhook: 'Webhook konfiguriert für: {{events}} ({{url}})',
+        failedAttempts: 'Geheimnis wird nach {{count}} fehlgeschlagenen Versuchen gelöscht',
       },
     },
     errors: {

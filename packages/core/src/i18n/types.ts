@@ -136,6 +136,10 @@ export interface TranslationKeys {
           label: string;
           description: string;
         };
+        failedAttempts: {
+          label: string;
+          description: string;
+        };
         webhook: {
           label: string;
           placeholder: string;
@@ -170,6 +174,7 @@ export interface TranslationKeys {
         ipRestrictions: string;
         readCount: string;
         webhook: string;
+        failedAttempts: string;
       };
     };
     errors: {

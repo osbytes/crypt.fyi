@@ -138,6 +138,10 @@ export const zh: TranslationKeys = {
           label: '阅读次数',
           description: '密文可被阅读的最大次数',
         },
+        failedAttempts: {
+          label: '失败尝试后销毁',
+          description: '在多次访问失败后自动删除密文',
+        },
         webhook: {
           label: 'Webhook',
           placeholder: 'https://example.com/webhook',
@@ -167,11 +171,12 @@ export const zh: TranslationKeys = {
       deleteSecret: '删除密文',
       info: {
         expires: '过期时间：{{time}}',
-        burnAfterReading: '查看后密文将被删除',
+        burnAfterReading: '密文将在查看后删除',
         passwordProtected: '密码保护',
         ipRestrictions: 'IP限制：{{ips}}',
         readCount: '阅读次数：{{count}}',
         webhook: 'Webhook已配置：{{events}} ({{url}})',
+        failedAttempts: '密文将在{{count}}次失败尝试后删除',
       },
     },
     errors: {
