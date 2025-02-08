@@ -145,6 +145,10 @@ export const en: TranslationKeys = {
           label: 'Read count',
           description: 'Maximum number of times the secret can be read',
         },
+        failedAttempts: {
+          label: 'Burn after failed attempts',
+          description: 'Automatically delete the secret after a number of failed access attempts',
+        },
         webhook: {
           label: 'Webhook',
           placeholder: 'https://example.com/webhook',
@@ -175,11 +179,12 @@ export const en: TranslationKeys = {
       deleteSecret: 'Delete Secret',
       info: {
         expires: 'Expires in: {{time}}',
-        burnAfterReading: 'Secret will be deleted after it is viewed',
+        failureCount: 'Secret will be deleted after it is viewed',
         passwordProtected: 'Password protected',
         ipRestrictions: 'IP restriction(s): {{ips}}',
         readCount: 'Read count: {{count}}',
         webhook: 'Webhook configured for: {{events}} ({{url}})',
+        failedAttempts: 'Secret will be deleted after {{count}} failed attempts',
       },
     },
     errors: {

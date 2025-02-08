@@ -29,7 +29,7 @@ export const createRedisVault = (
 
   return {
     async set(value) {
-      const { c, h, b, ttl, ips, rc, wh } = value;
+      const { c, h, b, ttl, ips, rc, wh, fc } = value;
       const { id, dt } = await tokenGenerator.generate();
 
       const key = getKey(id);
@@ -41,6 +41,7 @@ export const createRedisVault = (
           c,
           h,
           b,
+          fc,
           dt,
           ttl,
           cd: Date.now(),
@@ -106,6 +107,23 @@ export const createRedisVault = (
 
   local data = cjson.decode(value)
   if data.h ~= ARGV[1] then
+    -- Handle failed attempts
+    if data.fc then
+      data.fc = (data.fc or 0) - 1
+      if data.fc <= 0 then
+        redis.call('del', KEYS[1])
+        return cjson.encode({ status = "invalid_hash", burned = true, reason = "failed_attempts" })
+      else
+        -- Get the remaining TTL before updating
+        local remainingTTL = redis.call('pttl', KEYS[1])
+        if remainingTTL > 0 then
+          -- Update the stored value with incremented fa_count
+          redis.call('set', KEYS[1], cjson.encode(data))
+          -- Restore the remaining TTL
+          redis.call('pexpire', KEYS[1], remainingTTL)
+        end
+      end
+    end
     return cjson.encode({ status = "invalid_hash" })
   end
 
@@ -155,9 +173,10 @@ export const createRedisVault = (
       const redisOutcome = JSON.parse(outcome) as {
         status: 'invalid_hash' | 'success';
         burned?: boolean;
-        reason?: 'read_count_zero' | 'burned' | 'ttl_expired';
+        reason?: 'read_count_zero' | 'burned' | 'ttl_expired' | 'failed_attempts';
       };
       if (redisOutcome.status === 'invalid_hash') {
+        const ts = Date.now();
         if (wh?.fpk) {
           void webhookSender.send({
             url: wh.u,
@@ -165,7 +184,17 @@ export const createRedisVault = (
             event: 'FAILURE_KEY_PASSWORD',
             id,
             dt,
-            ts: Date.now(),
+            ts,
+          });
+        }
+        if (redisOutcome.burned && wh?.b) {
+          void webhookSender.send({
+            url: wh.u,
+            name: wh.n,
+            event: 'BURN',
+            id,
+            dt,
+            ts,
           });
         }
         throw new ErrorInvalidKeyAndOrPassword();

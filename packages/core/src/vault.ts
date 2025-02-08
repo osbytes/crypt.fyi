@@ -9,6 +9,7 @@ export const vaultValueSchema = z.object({
   cd: z.number().describe('created date time'),
   ips: z.string().describe('ip/cidr allow-list').optional(),
   rc: z.number().describe('maximum number of times the secret can be read').optional(),
+  fc: z.number().min(1).max(10).describe('burn after n failed attempts').optional(),
   wh: z
     .object({
       u: z.string().url().describe('url of the webhook'),

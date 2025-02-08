@@ -152,6 +152,11 @@ export const es: TranslationKeys = {
           label: 'Contador de lecturas',
           description: 'Número máximo de veces que se puede leer el secreto',
         },
+        failedAttempts: {
+          label: 'Eliminar después de intentos fallidos',
+          description:
+            'Eliminar automáticamente el secreto después de varios intentos fallidos de acceso',
+        },
         webhook: {
           label: 'Webhook',
           placeholder: 'https://example.com/webhook',
@@ -182,11 +187,12 @@ export const es: TranslationKeys = {
       deleteSecret: 'Eliminar Secreto',
       info: {
         expires: 'Expira en: {{time}}',
-        burnAfterReading: 'El secreto se eliminará después de ser visto',
+        failureCount: 'El secreto se eliminará después de ser visto',
         passwordProtected: 'Protegido con contraseña',
         ipRestrictions: 'Restricción(es) de IP: {{ips}}',
-        readCount: 'Contador de lecturas: {{count}}',
+        readCount: 'Número de lecturas: {{count}}',
         webhook: 'Webhook configurado para: {{events}} ({{url}})',
+        failedAttempts: 'El secreto se eliminará después de {{count}} intentos fallidos',
       },
     },
     errors: {

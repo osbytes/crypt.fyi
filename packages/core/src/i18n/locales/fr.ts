@@ -142,7 +142,7 @@ export const fr: TranslationKeys = {
         description: "Garantit qu'un seul destinataire peut accéder au secret",
       },
       advanced: {
-        toggle: 'paramètres avancés',
+        toggle: 'configuration avancée',
         ip: {
           label: "Liste d'IP/CIDR autorisées",
           placeholder: '192.168.1.1, 10.0.0.0/24, etc.',
@@ -152,6 +152,11 @@ export const fr: TranslationKeys = {
         readCount: {
           label: 'Nombre de lectures',
           description: 'Nombre maximum de fois que le secret peut être lu',
+        },
+        failedAttempts: {
+          label: 'Supprimer après tentatives échouées',
+          description:
+            "Supprimer automatiquement le secret après un certain nombre de tentatives d'accès échouées",
         },
         webhook: {
           label: 'Webhook',
@@ -182,12 +187,13 @@ export const fr: TranslationKeys = {
       createAnother: 'Créer un Autre',
       deleteSecret: 'Supprimer le Secret',
       info: {
-        expires: 'Expire dans : {{time}}',
-        burnAfterReading: 'Le secret sera supprimé après sa consultation',
+        expires: 'Expire dans: {{time}}',
+        failureCount: 'Le secret sera supprimé après sa lecture',
         passwordProtected: 'Protégé par mot de passe',
-        ipRestrictions: 'Restriction(s) IP : {{ips}}',
-        readCount: 'Nombre de lectures : {{count}}',
-        webhook: 'Webhook configuré pour : {{events}} ({{url}})',
+        ipRestrictions: 'Restriction(s) IP: {{ips}}',
+        readCount: 'Nombre de lectures: {{count}}',
+        webhook: 'Webhook configuré pour: {{events}} ({{url}})',
+        failedAttempts: 'Le secret sera supprimé après {{count}} tentatives échouées',
       },
     },
     errors: {

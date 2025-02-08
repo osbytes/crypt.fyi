@@ -8,7 +8,7 @@ import {
 } from './api';
 import { generateRandomString } from './random';
 import { Decrypt, Encrypt, gcm } from './encryption';
-import { sha256, sha512 } from './hash';
+import { sha512 } from './hash';
 
 interface ContentMetadata {
   compression?: {
@@ -121,6 +121,7 @@ export class Client {
         ttl: input.ttl,
         ips: input.ips,
         rc: input.rc,
+        fc: input.fc,
         wh: input.wh
           ? {
               u: input.wh.u,
