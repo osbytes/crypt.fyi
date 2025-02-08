@@ -38,7 +38,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
     "undici": "^7.2.3",
-    "vitest": "^3.0.3"
+    "vitest": "^3.0.5"
   },
   "dependencies": {
     "@fastify/compress": "^8.0.1",
