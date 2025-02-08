@@ -6,10 +6,12 @@ import {
   VaultValue,
   vaultValueSchema,
   gcm,
+  sleep,
 } from '@crypt.fyi/core';
 import { isDefined } from '../util';
 import { isIpAllowed } from './ips';
 import { WebhookSender } from '../webhook';
+import { RedisLocker } from '../locker/redis';
 
 const parseResult = async (result: string, encryptionKey: string) => {
   const jsonParsed = JSON.parse(result);
@@ -34,6 +36,7 @@ export const createRedisVault = (
   encryptionKey: string,
 ): Vault => {
   const getKey = (id: string) => `vault:${id}`;
+  const locker = new RedisLocker(redis);
 
   return {
     async set(value) {
@@ -83,6 +86,11 @@ export const createRedisVault = (
     async get(id, h, ip) {
       const key = getKey(id);
 
+      await locker.lock(key, 1000, async () => {
+        await sleep(5000);
+      });
+
+      // TODO: try to not pull the full redis entry into memory until the ip address is confirmed to be allowed
       // TODO: try to not pull the full redis entry into memory until the ip address is confirmed to be allowed
       const result = await redis.get(key);
       if (!result) {

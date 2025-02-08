@@ -56,3 +56,15 @@ export interface Logger {
   silent: LogFn;
   child: (obj: Record<string, unknown>) => Logger;
 }
+
+export const nopLogger: Logger = {
+  level: 'silent',
+  trace: () => {},
+  debug: () => {},
+  info: () => {},
+  warn: () => {},
+  error: () => {},
+  fatal: () => {},
+  silent: () => {},
+  child: () => nopLogger,
+};
