@@ -155,7 +155,8 @@ export const de: TranslationKeys = {
         },
         failedAttempts: {
           label: 'Nach fehlgeschlagenen Versuchen löschen',
-          description: 'Geheimnis automatisch nach einer Anzahl fehlgeschlagener Zugriffsversuche löschen',
+          description:
+            'Geheimnis automatisch nach einer Anzahl fehlgeschlagener Zugriffsversuche löschen',
         },
         webhook: {
           label: 'Webhook',

@@ -154,7 +154,8 @@ export const es: TranslationKeys = {
         },
         failedAttempts: {
           label: 'Eliminar después de intentos fallidos',
-          description: 'Eliminar automáticamente el secreto después de varios intentos fallidos de acceso',
+          description:
+            'Eliminar automáticamente el secreto después de varios intentos fallidos de acceso',
         },
         webhook: {
           label: 'Webhook',

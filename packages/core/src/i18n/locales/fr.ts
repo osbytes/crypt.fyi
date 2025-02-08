@@ -155,7 +155,8 @@ export const fr: TranslationKeys = {
         },
         failedAttempts: {
           label: 'Supprimer après tentatives échouées',
-          description: 'Supprimer automatiquement le secret après un certain nombre de tentatives d\'accès échouées',
+          description:
+            "Supprimer automatiquement le secret après un certain nombre de tentatives d'accès échouées",
         },
         webhook: {
           label: 'Webhook',
