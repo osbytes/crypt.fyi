@@ -169,12 +169,12 @@ export interface TranslationKeys {
       deleteSecret: string;
       info: {
         expires: string;
-        failureCount: string;
+        burn: string;
         passwordProtected: string;
         ipRestrictions: string;
         readCount: string;
         webhook: string;
-        failedAttempts: string;
+        failureCount: string;
       };
     };
     errors: {

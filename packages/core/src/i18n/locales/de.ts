@@ -188,12 +188,12 @@ export const de: TranslationKeys = {
       deleteSecret: 'Geheimnis löschen',
       info: {
         expires: 'Läuft ab in: {{time}}',
-        failureCount: 'Geheimnis wird nach dem Lesen gelöscht',
+        burn: 'Geheimnis wird nach dem Lesen gelöscht',
         passwordProtected: 'Passwortgeschützt',
         ipRestrictions: 'IP-Beschränkung(en): {{ips}}',
         readCount: 'Leseanzahl: {{count}}',
         webhook: 'Webhook konfiguriert für: {{events}} ({{url}})',
-        failedAttempts: 'Geheimnis wird nach {{count}} fehlgeschlagenen Versuchen gelöscht',
+        failureCount: 'Geheimnis wird nach {{count}} fehlgeschlagenen Versuchen gelöscht',
       },
     },
     errors: {

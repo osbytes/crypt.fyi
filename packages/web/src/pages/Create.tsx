@@ -623,7 +623,7 @@ export function CreatePage() {
 
   return (
     <div
-      className="max-w-xl mx-auto py-8 relative"
+      className="max-w-3xl mx-auto py-8 relative"
       onDragEnter={handleDragEnter}
       onDragOver={handleDragEnter}
       onDragLeave={handleDragLeave}
@@ -755,56 +755,58 @@ export function CreatePage() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="ttl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('create.form.ttl.label')}</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={(v) => {
-                              field.onChange(Number(v));
-                            }}
-                            defaultValue={field.value?.toString()}
-                            disabled={createMutation.isPending || field.disabled}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder={t('create.form.ttl.placeholder')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {ttlOptions.map(({ label, value }) => (
-                                <SelectItem key={value} value={value.toString()}>
-                                  {label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="b"
-                    render={({ field: { value, onChange, ...rest } }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                        <FormControl>
-                          <Checkbox
-                            {...rest}
-                            checked={value}
-                            onCheckedChange={onChange}
-                            disabled={createMutation.isPending || rest.disabled}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>{t('create.form.burn.label')}</FormLabel>
-                          <FormDescription>{t('create.form.burn.description')}</FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+                  <div className="flex flex-wrap gap-4">
+                    <FormField
+                      control={form.control}
+                      name="b"
+                      render={({ field: { value, onChange, ...rest } }) => (
+                        <FormItem className="flex-1 min-w-[240px] flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                          <FormControl>
+                            <Checkbox
+                              {...rest}
+                              checked={value}
+                              onCheckedChange={onChange}
+                              disabled={createMutation.isPending || rest.disabled}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>{t('create.form.burn.label')}</FormLabel>
+                            <FormDescription>{t('create.form.burn.description')}</FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="ttl"
+                      render={({ field }) => (
+                        <FormItem className="flex-1 min-w-[240px]">
+                          <FormLabel>{t('create.form.ttl.label')}</FormLabel>
+                          <FormControl>
+                            <Select
+                              onValueChange={(v) => {
+                                field.onChange(Number(v));
+                              }}
+                              defaultValue={field.value?.toString()}
+                              disabled={createMutation.isPending || field.disabled}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder={t('create.form.ttl.placeholder')} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {ttlOptions.map(({ label, value }) => (
+                                  <SelectItem key={value} value={value.toString()}>
+                                    {label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Collapsible
                       open={isAdvancedConfigurationOpen}
@@ -823,6 +825,61 @@ export function CreatePage() {
                             transition={{ duration: 0.2 }}
                           >
                             <div className="space-y-4 pt-4">
+                              <div className="flex flex-wrap gap-4">
+                                <FormField
+                                  control={form.control}
+                                  name="rc"
+                                  render={({ field }) => (
+                                    <FormItem className="flex-1 min-w-[240px]">
+                                      <FormLabel>
+                                        {t('create.form.advanced.readCount.label')}
+                                      </FormLabel>
+                                      <FormControl>
+                                        <NumberInput
+                                          {...field}
+                                          onValueChange={(value) => {
+                                            form.setValue('b', !value);
+                                            field.onChange(value);
+                                          }}
+                                          disabled={createMutation.isPending || !!field.disabled}
+                                          min={2}
+                                          max={10}
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                      <FormDescription>
+                                        {t('create.form.advanced.readCount.description')}
+                                      </FormDescription>
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={form.control}
+                                  name="fc"
+                                  render={({ field }) => (
+                                    <FormItem className="flex-1 min-w-[240px]">
+                                      <FormLabel>
+                                        {t('create.form.advanced.failedAttempts.label')}
+                                      </FormLabel>
+                                      <FormControl>
+                                        <NumberInput
+                                          {...field}
+                                          onValueChange={(value) => {
+                                            field.onChange(value);
+                                          }}
+                                          disabled={createMutation.isPending || field.disabled}
+                                          min={1}
+                                          max={10}
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                      <FormDescription>
+                                        {t('create.form.advanced.failedAttempts.description')}
+                                      </FormDescription>
+                                    </FormItem>
+                                  )}
+                                />
+                              </div>
                               <FormField
                                 control={form.control}
                                 name="ips"
@@ -840,59 +897,6 @@ export function CreatePage() {
                                     <FormMessage />
                                     <FormDescription>
                                       {t('create.form.advanced.ip.description')}
-                                    </FormDescription>
-                                  </FormItem>
-                                )}
-                              />
-                              <FormField
-                                control={form.control}
-                                name="rc"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>
-                                      {t('create.form.advanced.readCount.label')}
-                                    </FormLabel>
-                                    <FormControl>
-                                      <NumberInput
-                                        {...field}
-                                        onValueChange={(value) => {
-                                          form.setValue('b', !value);
-                                          field.onChange(value);
-                                        }}
-                                        disabled={createMutation.isPending || !!field.disabled}
-                                        min={2}
-                                        max={10}
-                                      />
-                                    </FormControl>
-                                    <FormMessage />
-                                    <FormDescription>
-                                      {t('create.form.advanced.readCount.description')}
-                                    </FormDescription>
-                                  </FormItem>
-                                )}
-                              />
-                              <FormField
-                                control={form.control}
-                                name="fc"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>
-                                      {t('create.form.advanced.failedAttempts.label')}
-                                    </FormLabel>
-                                    <FormControl>
-                                      <NumberInput
-                                        {...field}
-                                        onValueChange={(value) => {
-                                          field.onChange(value);
-                                        }}
-                                        disabled={createMutation.isPending || field.disabled}
-                                        min={1}
-                                        max={10}
-                                      />
-                                    </FormControl>
-                                    <FormMessage />
-                                    <FormDescription>
-                                      {t('create.form.advanced.failedAttempts.description')}
                                     </FormDescription>
                                   </FormItem>
                                 )}
@@ -1144,8 +1148,16 @@ export function CreatePage() {
                   {form.watch('b') && (
                     <>
                       <IconFlame className="text-muted-foreground size-4" />
+                      <p className="text-muted-foreground">{t('create.success.info.burn')}</p>
+                    </>
+                  )}
+                  {form.watch('fc') && (
+                    <>
+                      <IconFlame className="text-muted-foreground size-4" />
                       <p className="text-muted-foreground">
-                        {t('create.success.info.failureCountReading')}
+                        {t('create.success.info.failureCount', {
+                          count: form.watch('fc'),
+                        })}
                       </p>
                     </>
                   )}
