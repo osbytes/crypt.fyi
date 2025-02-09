@@ -133,6 +133,15 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
+              <IconFlame className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              {t('landing.features.failedAttempts.title')}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {t('landing.features.failedAttempts.description')}
+            </p>
+          </div>
+          <div className="p-4 rounded-lg border bg-card">
+            <h3 className="font-semibold mb-2">
               <IconClock className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
               {t('landing.features.expiration.title')}
             </h3>

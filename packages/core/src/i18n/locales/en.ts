@@ -55,6 +55,11 @@ export const en: TranslationKeys = {
         title: 'Burn After Reading',
         description: 'Automatically destroy secrets after they are accessed for maximum security',
       },
+      failedAttempts: {
+        title: 'Burn After Failed Attempts',
+        description:
+          'Automatically destroy secrets after a number of failed access attempts for enhanced security',
+      },
       expiration: {
         title: 'Auto-Expiration',
         description:

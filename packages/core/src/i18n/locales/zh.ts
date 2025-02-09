@@ -51,6 +51,10 @@ export const zh: TranslationKeys = {
         title: '阅后即焚',
         description: '访问后自动销毁密文以确保最大安全性',
       },
+      failedAttempts: {
+        title: '失败尝试后销毁',
+        description: '在多次访问失败尝试后自动销毁密文以增强安全性',
+      },
       expiration: {
         title: '自动过期',
         description: '设置自定义过期时间，确保密文不会持续超过所需时间',
@@ -131,7 +135,7 @@ export const zh: TranslationKeys = {
         toggle: '高级配置',
         ip: {
           label: 'IP/CIDR 白名单',
-          placeholder: '192.168.1.1, 10.0.0.0/24 等',
+          placeholder: '192.168.1.1, 10.0.0.0/24, 等',
           description: '限制特定 IP 地址或 CIDR 块的访问（逗号分隔）',
         },
         readCount: {
@@ -140,7 +144,7 @@ export const zh: TranslationKeys = {
         },
         failedAttempts: {
           label: '失败尝试后销毁',
-          description: '在多次访问失败后自动删除密文',
+          description: '在多次访问失败尝试后自动销毁密文',
         },
         webhook: {
           label: 'Webhook',

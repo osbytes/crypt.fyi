@@ -57,6 +57,11 @@ export const de: TranslationKeys = {
         description:
           'Geheimnisse werden nach dem Lesen automatisch gelöscht für maximale Sicherheit',
       },
+      failedAttempts: {
+        title: 'Löschen nach fehlgeschlagenen Versuchen',
+        description:
+          'Geheimnisse werden nach einer Anzahl fehlgeschlagener Zugriffsversuche automatisch gelöscht für erhöhte Sicherheit',
+      },
       expiration: {
         title: 'Auto-Ablauf',
         description:

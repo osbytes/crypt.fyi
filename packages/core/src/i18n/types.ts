@@ -89,6 +89,10 @@ export interface TranslationKeys {
         title: string;
         description: string;
       };
+      failedAttempts: {
+        title: string;
+        description: string;
+      };
     };
     steps: {
       encrypt: {

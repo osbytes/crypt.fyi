@@ -58,6 +58,11 @@ export const fr: TranslationKeys = {
         description:
           'Détruisez automatiquement les secrets après leur consultation pour une sécurité maximale',
       },
+      failedAttempts: {
+        title: 'Destruction Après Tentatives Échouées',
+        description:
+          "Détruit automatiquement les secrets après un certain nombre de tentatives d'accès échouées pour une sécurité renforcée",
+      },
       expiration: {
         title: 'Auto-Expiration',
         description:
