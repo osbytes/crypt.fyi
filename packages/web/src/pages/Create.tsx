@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { sha256, ErrorNotFound, sleep } from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
-import React from 'react';
+import { useEffect, useMemo, DragEvent } from 'react';
 import {
   Form,
   FormControl,
@@ -364,8 +364,8 @@ const handleContentDrop = async (
 
 export function CreatePage() {
   const { t } = useTranslation();
-  const formSchema = React.useMemo(() => createFormSchema(t), [t]);
-  const ttlOptions = React.useMemo(() => getTranslatedTtlOptions(t), [t]);
+  const formSchema = useMemo(() => createFormSchema(t), [t]);
+  const ttlOptions = useMemo(() => getTranslatedTtlOptions(t), [t]);
 
   const [isAdvancedConfigurationOpen, setIsAdvancedConfigurationOpen] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -379,14 +379,27 @@ export function CreatePage() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: React.useMemo(() => getInitialValues(ttlOptions), [ttlOptions]),
+    defaultValues: useMemo(() => getInitialValues(ttlOptions), [ttlOptions]),
+    mode: 'onTouched',
   });
   const { watch } = form;
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    return () => {
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'auto';
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const subscription = watch((value) => {
       if (!value) return;
 
+      const scrollPos = window.scrollY;
       const formState: FormDataWithoutContent = {
         b: value.b ?? true,
         ttl: value.ttl ?? DEFAULT_TTL,
@@ -402,7 +415,12 @@ export function CreatePage() {
       if (value.fc) formState.fc = value.fc;
       if (value.whu) formState.whu = value.whu;
       if (value.whn) formState.whn = value.whn;
+
       updateUrlWithFormState(formState);
+      // Restore scroll position after URL update
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPos);
+      });
     });
     return () => subscription.unsubscribe();
   }, [watch]);
@@ -560,7 +578,7 @@ export function CreatePage() {
 
   const [dragState, setDragState] = useState<DragState>('none');
 
-  const handleDragEnter = (e: React.DragEvent) => {
+  const handleDragEnter = (e: DragEvent) => {
     if (form.formState.isSubmitSuccessful) return;
     e.preventDefault();
     e.stopPropagation();
@@ -571,7 +589,7 @@ export function CreatePage() {
     setDragState(hasValidType ? 'dragging' : 'invalid');
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = (e: DragEvent) => {
     if (form.formState.isSubmitSuccessful) return;
     e.preventDefault();
     e.stopPropagation();
@@ -580,7 +598,7 @@ export function CreatePage() {
     }
   };
 
-  const handleDrop = async (e: React.DragEvent) => {
+  const handleDrop = async (e: DragEvent) => {
     if (form.formState.isSubmitSuccessful) return;
     e.preventDefault();
     e.stopPropagation();
