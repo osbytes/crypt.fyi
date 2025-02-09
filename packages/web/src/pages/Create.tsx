@@ -147,15 +147,13 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
           return true;
         }),
       rc: z
-        .number({ coerce: true })
-        .min(2)
-        .max(10)
+        .union([z.number().int().min(2).max(10), z.literal('')])
+        .transform((val) => (val === '' ? undefined : val))
         .optional()
         .describe('maximum number of times the secret can be read'),
       fc: z
-        .number({ coerce: true })
-        .min(1)
-        .max(10)
+        .union([z.number().int().min(1).max(10), z.literal('')])
+        .transform((val) => (val === '' ? undefined : val))
         .optional()
         .describe('burn after n failed attempts'),
       whu: z.string().describe('webhook: url of the webhook').optional(),
@@ -301,11 +299,11 @@ function updateUrlWithFormState(formData: FormDataWithoutContent) {
     params.set('ips', formData.ips);
   }
 
-  if (formData.rc !== undefined) {
+  if (formData.rc) {
     params.set('readCount', formData.rc.toString());
   }
 
-  if (formData.fc !== undefined) {
+  if (formData.fc) {
     params.set('fc', formData.fc.toString());
   }
 
@@ -364,7 +362,7 @@ export function CreatePage() {
       params.get('ips') ||
       params.get('readCount') ||
       params.get('webhookUrl') ||
-      params.get('fa')
+      params.get('fc')
     );
   });
 
@@ -388,12 +386,12 @@ export function CreatePage() {
         fc: value.fc ?? undefined,
       };
 
-      if (value.p !== undefined) formState.p = value.p;
+      if (value.p) formState.p = value.p;
       if (value.ips) formState.ips = value.ips;
-      if (value.rc !== undefined) formState.rc = value.rc;
+      if (value.rc) formState.rc = value.rc;
+      if (value.fc) formState.fc = value.fc;
       if (value.whu) formState.whu = value.whu;
       if (value.whn) formState.whn = value.whn;
-      if (value.fc !== undefined) formState.fc = value.fc;
       updateUrlWithFormState(formState);
     });
     return () => subscription.unsubscribe();
@@ -830,9 +828,11 @@ export function CreatePage() {
                                       <Input
                                         type="number"
                                         {...field}
+                                        value={field.value ?? ''}
                                         onChange={(e) => {
-                                          form.setValue('b', !e.target.value);
-                                          field.onChange(e.target.value || undefined);
+                                          const value = e.target.value;
+                                          form.setValue('b', !value);
+                                          field.onChange(value);
                                         }}
                                         disabled={createMutation.isPending || !!field.disabled}
                                         min={2}
@@ -858,11 +858,8 @@ export function CreatePage() {
                                       <Input
                                         type="number"
                                         {...field}
-                                        onChange={(e) =>
-                                          field.onChange(
-                                            e.target.value ? Number(e.target.value) : undefined,
-                                          )
-                                        }
+                                        value={field.value ?? ''}
+                                        onChange={(e) => field.onChange(e.target.value)}
                                         disabled={createMutation.isPending || field.disabled}
                                         min={1}
                                         max={10}
