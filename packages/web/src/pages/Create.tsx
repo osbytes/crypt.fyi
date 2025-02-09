@@ -240,15 +240,15 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
   const params = new URLSearchParams(window.location.search);
 
   const ttlParam = params.get('ttl');
-  const burn = params.get('burn');
+  const burn = params.get('b');
   const ips = params.get('ips');
-  const readCount = params.get('readCount');
+  const readCount = params.get('rc');
   const failureCount = params.get('fc');
-  const webhookUrl = params.get('webhookUrl');
-  const webhookName = params.get('webhookName');
-  const webhookBurn = params.get('webhookBurn') === 'true';
-  const webhookFailPk = params.get('webhookFailPk') === 'true';
-  const webhookFailIp = params.get('webhookFailIp') === 'true';
+  const webhookUrl = params.get('whu');
+  const webhookName = params.get('whn');
+  const webhookBurn = params.get('whb') === 'true';
+  const webhookFailPk = params.get('whfpk') === 'true';
+  const webhookFailIp = params.get('whfip') === 'true';
 
   let ttl = DEFAULT_TTL;
   if (ttlParam) {
@@ -303,7 +303,7 @@ function updateUrlWithFormState(formData: FormDataWithoutContent) {
   }
 
   if (formData.b !== true) {
-    params.set('burn', formData.b.toString());
+    params.set('b', formData.b.toString());
   }
 
   if (formData.ips) {
@@ -311,7 +311,7 @@ function updateUrlWithFormState(formData: FormDataWithoutContent) {
   }
 
   if (formData.rc) {
-    params.set('readCount', formData.rc.toString());
+    params.set('rc', formData.rc.toString());
   }
 
   if (formData.fc) {
@@ -319,11 +319,11 @@ function updateUrlWithFormState(formData: FormDataWithoutContent) {
   }
 
   if (formData.whu) {
-    params.set('webhookUrl', formData.whu);
-    if (formData.whn) params.set('webhookName', formData.whn);
-    if (formData.whb) params.set('webhookBurn', 'true');
-    if (formData.whfpk) params.set('webhookFailPk', 'true');
-    if (formData.whfip) params.set('webhookFailIp', 'true');
+    params.set('whu', formData.whu);
+    if (formData.whn) params.set('whn', formData.whn);
+    if (formData.whb) params.set('whb', 'true');
+    if (formData.whfpk) params.set('whfpk', 'true');
+    if (formData.whfip) params.set('whfip', 'true');
   }
 
   const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
@@ -371,7 +371,7 @@ export function CreatePage() {
     const params = new URLSearchParams(window.location.search);
     return !!(
       params.get('ips') ||
-      params.get('readCount') ||
+      params.get('rc') ||
       params.get('webhookUrl') ||
       params.get('fc')
     );
