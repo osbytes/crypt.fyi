@@ -60,6 +60,7 @@ import parseDuration from 'parse-duration';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useTranslation } from 'react-i18next';
 import { useClient } from '@/context/client';
+import { NumberInput } from '@/components/NumberInput';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
 
@@ -147,14 +148,16 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
           return true;
         }),
       rc: z
-        .union([z.number().int().min(2).max(10), z.literal('')])
-        .transform((val) => (val === '' ? undefined : val))
-        .optional()
+        .preprocess(
+          (val) => (val === '' || val === undefined ? undefined : Number(val)),
+          z.number().min(2).max(10).optional(),
+        )
         .describe('maximum number of times the secret can be read'),
       fc: z
-        .union([z.number().int().min(1).max(10), z.literal('')])
-        .transform((val) => (val === '' ? undefined : val))
-        .optional()
+        .preprocess(
+          (val) => (val === '' || val === undefined ? undefined : Number(val)),
+          z.number().min(1).max(10).optional(),
+        )
         .describe('burn after n failed attempts'),
       whu: z.string().describe('webhook: url of the webhook').optional(),
       whn: z.string().max(50).describe('webhook: name of the secret').optional(),
@@ -258,8 +261,16 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
   let rc: number | undefined;
   if (readCount) {
     const parsed = parseInt(readCount, 10);
-    if (!isNaN(parsed)) {
+    if (!isNaN(parsed) && parsed >= 2 && parsed <= 10) {
       rc = parsed;
+    }
+  }
+
+  let fc: number | undefined;
+  if (failureCount) {
+    const parsed = parseInt(failureCount, 10);
+    if (!isNaN(parsed) && parsed >= 1 && parsed <= 10) {
+      fc = parsed;
     }
   }
 
@@ -270,13 +281,13 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
     ttl,
     ips: ips || '',
     rc,
+    fc,
     whu: webhookUrl || '',
     whn: webhookName || '',
     whr: true,
     whb: webhookBurn,
     whfpk: webhookFailPk,
     whfip: webhookFailIp,
-    fc: failureCount ? parseInt(failureCount, 10) : undefined,
   };
 }
 
@@ -383,7 +394,6 @@ export function CreatePage() {
         whfpk: value.whfpk ?? false,
         whfip: value.whfip ?? false,
         whb: value.whb ?? false,
-        fc: value.fc ?? undefined,
       };
 
       if (value.p) formState.p = value.p;
@@ -825,12 +835,9 @@ export function CreatePage() {
                                       {t('create.form.advanced.readCount.label')}
                                     </FormLabel>
                                     <FormControl>
-                                      <Input
-                                        type="number"
+                                      <NumberInput
                                         {...field}
-                                        value={field.value ?? ''}
-                                        onChange={(e) => {
-                                          const value = e.target.value;
+                                        onValueChange={(value) => {
                                           form.setValue('b', !value);
                                           field.onChange(value);
                                         }}
@@ -855,11 +862,11 @@ export function CreatePage() {
                                       {t('create.form.advanced.failedAttempts.label')}
                                     </FormLabel>
                                     <FormControl>
-                                      <Input
-                                        type="number"
+                                      <NumberInput
                                         {...field}
-                                        value={field.value ?? ''}
-                                        onChange={(e) => field.onChange(e.target.value)}
+                                        onValueChange={(value) => {
+                                          field.onChange(value);
+                                        }}
                                         disabled={createMutation.isPending || field.disabled}
                                         min={1}
                                         max={10}

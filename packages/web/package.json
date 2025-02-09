@@ -40,6 +40,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.53.2",
     "react-i18next": "^15.2.0",
+    "react-number-format": "^5.4.3",
     "sonner": "^1.7.0",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
