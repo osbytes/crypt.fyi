@@ -136,6 +136,17 @@ export const initApp = async (config: Config, deps: AppDeps) => {
 
   app.route({
     method: 'GET',
+    url: '/',
+    schema: {
+      hide: true,
+    },
+    handler: async (_, res) => {
+      res.redirect(config.healthCheckEndpoint);
+    },
+  });
+
+  app.route({
+    method: 'GET',
     url: config.healthCheckEndpoint,
     exposeHeadRoute: false,
     schema: {
@@ -158,12 +169,18 @@ export const initApp = async (config: Config, deps: AppDeps) => {
         result.observe(totalCPUTime / 1000000, BASE_OTEL_ATTRIBUTES);
       });
 
-      const redisPing = await redis.ping();
+      let redisOK = false;
+      try {
+        await redis.ping();
+        redisOK = true;
+      } catch (error) {
+        logger.error(error);
+      }
 
       res.status(200).send({
         version: config.serviceVersion,
         name: config.serviceName,
-        redis: !!redisPing,
+        redis: redisOK,
       });
     },
   });
