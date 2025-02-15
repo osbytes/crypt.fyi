@@ -335,10 +335,18 @@ const handleContentDrop = async (
 ): Promise<{ content: string; filename?: string }> => {
   if (dataTransfer.files.length > 0) {
     const file = dataTransfer.files[0];
-    const base64 = await new Promise<string>((resolve) => {
+    const base64 = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        resolve(reader.result as string);
+        const result = reader.result;
+        if (typeof result === 'string') {
+          resolve(result);
+        } else {
+          reject(new Error('Invalid file format'));
+        }
+      };
+      reader.onerror = (e) => {
+        reject(e);
       };
       reader.readAsDataURL(file);
     });
