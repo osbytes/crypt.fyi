@@ -486,11 +486,18 @@ export function CreatePage() {
     let content = data.c;
 
     if (selectedFile) {
-      const base64 = await new Promise<string>((resolve) => {
+      const base64 = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
-          const base64 = reader.result as string;
-          resolve(base64);
+          const result = reader.result;
+          if (typeof result === 'string') {
+            resolve(result);
+          } else {
+            reject(new Error('Invalid file format'));
+          }
+        };
+        reader.onerror = (e) => {
+          reject(e);
         };
         reader.readAsDataURL(selectedFile);
       });
