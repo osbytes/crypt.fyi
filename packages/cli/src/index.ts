@@ -35,7 +35,12 @@ program
   .action(async (content, options) => {
 
     if(options.file && !content){
-      content = await readFileSync(options.file, 'utf-8');
+      try {
+        content = await readFileSync(options.file, 'utf-8');
+      } catch (error) {
+        console.log(chalk.red('Failed to read file'));
+        process.exit(1);
+      }
     }
 
     const spinner = ora('Encrypting content...').start();
