@@ -25,13 +25,19 @@ program
 program
   .command('encrypt')
   .description('Encrypt and share a secret')
-  .argument('<content>', 'Content to encrypt')
+  .argument('[content]', 'Content to encrypt')
+  .option('-f, --file <file>', 'Path to file to encrypt')
   .option('-p, --password <password>', 'Password to encrypt with')
   .option('-t, --ttl <duration>', 'Time to live (e.g., 1h, 1d)', '1h')
   .option('-b, --burn', 'Burn after reading', true)
   .option('--ip <ip>', 'Restrict access to specific IP address')
   .option('-r, --reads <count>', 'Number of times the secret can be read', undefined)
   .action(async (content, options) => {
+
+    if(options.file && !content){
+      content = await readFileSync(options.file, 'utf-8');
+    }
+
     const spinner = ora('Encrypting content...').start();
     try {
       spinner.text = 'Creating vault...';
