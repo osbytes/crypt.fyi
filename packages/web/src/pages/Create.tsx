@@ -460,15 +460,9 @@ export function CreatePage() {
         return;
       }
 
-      try {
-        setSelectedFile(file);
-        form.resetField('c');
-        form.setValue('c', `${file.name} (file)`);
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Failed to process file');
-        setSelectedFile(null);
-        form.resetField('c');
-      }
+      setSelectedFile(file);
+      form.resetField('c');
+      form.setValue('c', `${file.name} (file)`);
     }
   };
 
