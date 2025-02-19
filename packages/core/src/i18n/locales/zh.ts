@@ -192,7 +192,10 @@ export const zh: TranslationKeys = {
       deleteFailed: '删除密文失败：{{error}}',
       secretNotFound: '未找到密文',
       unexpectedStatus: '意外的状态码 {{code}}',
-      webhookConfigInvalid: 'Webhook 配置无效 - 至少需要一个 webhook',
+      webhookConfigInvalid: 'Webhook配置无效 - 至少需要一个Webhook事件类型',
+      fileSizeExceeded: '文件大小超过最大允许大小',
+      fileReadError: '读取文件失败',
+      fileReadAborted: '文件读取已中止',
     },
   },
   view: {

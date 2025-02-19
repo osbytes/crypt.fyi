@@ -203,6 +203,9 @@ export const en: TranslationKeys = {
       unexpectedStatus: 'unexpected status code {{code}}',
       webhookConfigInvalid:
         'Webhook configuration is invalid - at least one webhook event type is required',
+      fileSizeExceeded: 'File size exceeded maximum allowed size',
+      fileReadError: 'Failed to read file',
+      fileReadAborted: 'File reading was aborted',
     },
   },
   view: {
