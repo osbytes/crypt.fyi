@@ -63,6 +63,7 @@ import { useClient } from '@/context/client';
 import { NumberInput } from '@/components/NumberInput';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
+const MAX_FILE_SIZE = 1 * 1024 * 1024;
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -330,44 +331,18 @@ function updateUrlWithFormState(formData: FormDataWithoutContent) {
   window.history.replaceState({}, '', newUrl);
 }
 
-const handleContentDrop = async (
-  dataTransfer: DataTransfer,
-): Promise<{ content: string; filename?: string }> => {
+const handleContentDrop = (dataTransfer: DataTransfer): File | string => {
   if (dataTransfer.files.length > 0) {
-    const file = dataTransfer.files[0];
-    const base64 = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result;
-        if (typeof result === 'string') {
-          resolve(result);
-        } else {
-          reject(new Error('Invalid file format'));
-        }
-      };
-      reader.onerror = (e) => {
-        reject(e);
-      };
-      reader.readAsDataURL(file);
-    });
-
-    return {
-      content: JSON.stringify({
-        type: 'file',
-        name: file.name,
-        content: base64,
-      }),
-      filename: file.name,
-    };
+    return dataTransfer.files[0];
   }
 
   const uriList = dataTransfer.getData('text/uri-list');
   if (uriList) {
-    return { content: uriList };
+    return uriList;
   }
 
   const text = dataTransfer.getData('text/plain');
-  return { content: text };
+  return text;
 };
 
 export function CreatePage() {
@@ -474,11 +449,50 @@ export function CreatePage() {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleFiles = (files: File[]) => {
+  const handleFiles = async (files: File[]) => {
     if (files.length > 0) {
-      setSelectedFile(files[0]);
-      form.resetField('c');
-      form.setValue('c', `${files[0].name} (file)`);
+      const file = files[0];
+
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(t('create.errors.fileSizeExceeded'));
+        setSelectedFile(null);
+        form.resetField('c');
+        return;
+      }
+
+      try {
+        setSelectedFile(file);
+        form.resetField('c');
+        form.setValue('c', `${file.name} (file)`);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Failed to process file');
+        setSelectedFile(null);
+        form.resetField('c');
+      }
+    }
+  };
+
+  const handleDrop = async (e: DragEvent) => {
+    if (form.formState.isSubmitSuccessful) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setDragState('none');
+
+    const content = handleContentDrop(e.dataTransfer);
+
+    if (content instanceof File) {
+      if (content.size > MAX_FILE_SIZE) {
+        toast.error(t('create.errors.fileSizeExceeded'));
+        setSelectedFile(null);
+        form.resetField('c');
+        return;
+      }
+
+      setSelectedFile(content);
+      form.setValue('c', `${content.name} (file)`);
+    } else {
+      setSelectedFile(null);
+      form.setValue('c', content);
     }
   };
 
@@ -486,27 +500,29 @@ export function CreatePage() {
     let content = data.c;
 
     if (selectedFile) {
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const result = reader.result;
-          if (typeof result === 'string') {
-            resolve(result);
-          } else {
-            reject(new Error('Invalid file format'));
-          }
-        };
-        reader.onerror = (e) => {
-          reject(e);
-        };
-        reader.readAsDataURL(selectedFile);
-      });
-
-      content = JSON.stringify({
-        type: 'file',
-        name: selectedFile.name,
-        content: base64,
-      });
+      try {
+        const base64 = await new Promise((resolve, reject) => {
+          const fileReader = new FileReader();
+          fileReader.onload = () => {
+            resolve(fileReader.result);
+          };
+          fileReader.onerror = () => {
+            reject(new Error(t('create.errors.fileReadError')));
+          };
+          fileReader.onabort = () => {
+            reject(new Error(t('create.errors.fileReadAborted')));
+          };
+          fileReader.readAsDataURL(selectedFile);
+        });
+        content = JSON.stringify({
+          type: 'file',
+          name: selectedFile.name,
+          content: base64,
+        });
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : t('create.errors.fileReadError'));
+        throw error;
+      }
     }
 
     await createMutation.mutateAsync({
@@ -610,29 +626,6 @@ export function CreatePage() {
     e.stopPropagation();
     if (!e.currentTarget.contains(e.relatedTarget as Node)) {
       setDragState('none');
-    }
-  };
-
-  const handleDrop = async (e: DragEvent) => {
-    if (form.formState.isSubmitSuccessful) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setDragState('none');
-
-    try {
-      const { content, filename } = await handleContentDrop(e.dataTransfer);
-
-      if (filename) {
-        setSelectedFile(new File([content], filename));
-        form.setValue('c', `${filename} (file)`);
-      } else {
-        setSelectedFile(null);
-        form.setValue('c', content);
-      }
-    } catch (error) {
-      toast.error(
-        `Failed to process dropped content${error instanceof Error ? `: ${error.message}` : ''}`,
-      );
     }
   };
 

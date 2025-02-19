@@ -210,7 +210,10 @@ export const es: TranslationKeys = {
       secretNotFound: 'secreto no encontrado',
       unexpectedStatus: 'código de estado inesperado {{code}}',
       webhookConfigInvalid:
-        'La configuración del webhook no es válida - se requiere al menos un webhook',
+        'La configuración del webhook no es válida: se requiere al menos un tipo de evento de webhook',
+      fileSizeExceeded: 'El tamaño del archivo excede el tamaño máximo permitido',
+      fileReadError: 'Error al leer el archivo',
+      fileReadAborted: 'La lectura del archivo fue interrumpida',
     },
   },
   view: {

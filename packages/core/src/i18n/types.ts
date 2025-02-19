@@ -191,6 +191,9 @@ export interface TranslationKeys {
       secretNotFound: string;
       unexpectedStatus: string;
       webhookConfigInvalid: string;
+      fileSizeExceeded: string;
+      fileReadError: string;
+      fileReadAborted: string;
     };
   };
   view: {

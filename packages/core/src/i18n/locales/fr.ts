@@ -212,7 +212,10 @@ export const fr: TranslationKeys = {
       secretNotFound: 'secret non trouvé',
       unexpectedStatus: 'code de statut inattendu {{code}}',
       webhookConfigInvalid:
-        'La configuration du webhook est invalide - au moins un webhook est requis',
+        'La configuration du webhook est invalide - au moins un type d\'événement webhook est requis',
+      fileSizeExceeded: 'La taille du fichier dépasse la taille maximale autorisée',
+      fileReadError: 'Échec de la lecture du fichier',
+      fileReadAborted: 'La lecture du fichier a été interrompue',
     },
   },
   view: {
