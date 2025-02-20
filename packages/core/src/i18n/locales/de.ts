@@ -211,7 +211,10 @@ export const de: TranslationKeys = {
       secretNotFound: 'Geheimnis nicht gefunden',
       unexpectedStatus: 'Unerwarteter Statuscode {{code}}',
       webhookConfigInvalid:
-        'Webhook-Konfiguration ist ungültig - mindestens ein Webhook erforderlich',
+        'Webhook-Konfiguration ist ungültig - mindestens ein Webhook-Ereignistyp ist erforderlich',
+      fileSizeExceeded: 'Dateigröße überschreitet die maximal zulässige Größe',
+      fileReadError: 'Fehler beim Lesen der Datei',
+      fileReadAborted: 'Dateilesen wurde abgebrochen',
     },
   },
   view: {
