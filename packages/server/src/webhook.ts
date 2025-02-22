@@ -1,7 +1,7 @@
 import { Queue, Worker } from 'bullmq';
 import { gcm, isRetryableFetchError } from '@crypt.fyi/core';
-import { Logger } from './logging';
-import Redis from 'ioredis';
+import type { Logger } from './logging.js';
+import { Redis } from 'ioredis';
 import { z } from 'zod';
 
 const webhookEventSchema = z.enum(['READ', 'BURN', 'FAILURE_KEY_PASSWORD', 'FAILURE_IP_ADDRESS']);

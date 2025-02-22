@@ -1,12 +1,16 @@
-import { otlpShutdown } from './telemetry';
-import { initApp } from './app';
-import { Environment, config } from './config';
-import { initLogging } from './logging';
+import { otlpShutdown } from './telemetry.js';
+import { initApp } from './app.js';
+import { Environment, config } from './config.js';
+import { initLogging } from './logging.js';
 import gracefulShutdown from 'http-graceful-shutdown';
-import Redis from 'ioredis';
-import { createRedisVault } from './vault/redis';
-import { createTokenGenerator } from './vault/tokens';
-import { createBullMQWebhookSender, createHTTPWebhookSender, WebhookSender } from './webhook';
+import { Redis } from 'ioredis';
+import { createRedisVault } from './vault/redis.js';
+import { createTokenGenerator } from './vault/tokens.js';
+import {
+  createBullMQWebhookSender,
+  createHTTPWebhookSender,
+  type WebhookSender,
+} from './webhook.js';
 import { createFetchRetryClient } from '@crypt.fyi/core';
 
 const main = async () => {
@@ -63,11 +67,19 @@ const main = async () => {
     redis,
   });
 
-  app.fastify.listen({
-    host: '0.0.0.0',
-    port: config.port,
-  });
-
+  app.fastify.listen(
+    {
+      host: '0.0.0.0',
+      port: config.port,
+    },
+    (err, address) => {
+      if (err) {
+        logger.error(err);
+        process.exit(1);
+      }
+      logger.info(`Server is running on ${address}`);
+    },
+  );
   gracefulShutdown(app.fastify.server, {
     timeout: config.shutdownTimeoutMs,
     development: config.env !== Environment.Prod,
@@ -86,4 +98,4 @@ const main = async () => {
   });
 };
 
-main();
+void main();
