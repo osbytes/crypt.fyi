@@ -1,14 +1,15 @@
-import pino from 'pino';
-import { initApp } from './app';
-import { config as baseConfig, Config } from './config';
-import { Client } from 'undici';
-import { AddressInfo } from 'node:net';
-import Redis from 'ioredis';
-import { createRedisVault } from './vault/redis';
-import { createTokenGenerator } from './vault/tokens';
-import { createNopWebhookSender } from './webhook';
-import { gcm } from '@crypt.fyi/core';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { initApp } from './app.js';
+import { config as baseConfig } from './config.js';
+import type { Config } from './config.js';
+import type { AddressInfo } from 'node:net';
+import { pino } from 'pino';
+import { createRedisVault } from './vault/redis.js';
+import { createTokenGenerator } from './vault/tokens.js';
+import { createNopWebhookSender } from './webhook.js';
+import { Redis } from 'ioredis';
+import { Client } from 'undici';
+import { gcm } from '@crypt.fyi/core';
 
 const initAppTest = async () => {
   const config = {

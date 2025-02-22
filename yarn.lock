@@ -7399,15 +7399,10 @@ parent-module@^1.0.0:
   dependencies:
     callsites "^3.0.0"
 
-parse-duration@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/parse-duration/-/parse-duration-1.1.2.tgz#20008e6c507814761864669bb936e3f4a9a80758"
-  integrity sha512-p8EIONG8L0u7f8GFgfVlL4n8rnChTt8O5FSxgxMz2tjc9FMP199wxVKVB6IbKx11uTbKHACSvaLVIKNnoeNR/A==
-
-parse-duration@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/parse-duration/-/parse-duration-2.0.1.tgz#cf69a67724d88c7fa64a8b680680cb34bbae1802"
-  integrity sha512-SghYXQMoNseARzNK/FMuDuUuGp7QfR8TI+ylQFXnb0th4/UDN/GMFYFpaCNI6z6bkkxTAFuxrkYwhSvw9TWleQ==
+parse-duration@2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/parse-duration/-/parse-duration-2.1.3.tgz#79a61a3ae224a5f4d1b71a8fa79e53d5aa90c902"
+  integrity sha512-MtbharL7Bets65qDBXuDOHHWyY1BxTJZmJ/xGmS90iEbKE0gZ6yZpZtCda7O79GeOi/f0NwBaplIuReExIoVsw==
 
 parse-json@7.1.1:
   version "7.1.1"
