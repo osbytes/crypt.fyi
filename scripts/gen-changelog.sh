@@ -21,7 +21,7 @@ get_target_commit() {
     fi
 
     # Try to find the latest release tag
-    latest_tag=$(git describe --tags --abbrev=0 2>/dev/null)
+    latest_tag=$(git ls-remote --tags --sort="v:refname" | tail -n1 | awk -F" " '{ print $1 }' 2>/dev/null)
     if [ $? -eq 0 ]; then
         echo "$latest_tag"
         return 0
@@ -46,6 +46,8 @@ fi
 # Get the target commit
 target_commit=$(get_target_commit "$1")
 
+echo "Target commit: $target_commit"
+
 # Get the commit log between target and HEAD
 commit_log=$(git log --pretty=format:"%h %s" "$target_commit..HEAD")
 
@@ -55,16 +57,44 @@ if [ -z "$commit_log" ]; then
 fi
 
 # Generate the changelog using llm
-echo "$commit_log" | llm -m gpt-4o "Transform these git commits into a structured changelog.
+echo "$commit_log" | llm -m gpt-4o "Transform these git commits into a structured changelog following these rules:
+
+Output Format:
+### Features
+### Improvements
+### Bug Fixes
+### Security
+### Breaking Changes
+### Dependencies
+### Documentation
 
 Rules:
-- Keep original commit hash in square brackets
-- Start each entry with a present tense verb
-- One line per change
-- Summarize the commit message into a single line that is a concise description of the change
-- Categorize based on commit message content
-- If a section has no entries, omit it entirely
-- Omit changes that are not relevant to the changelog such as copy changes, linting, formatting, minor version updates, etc.
-- Group related commits together and comma separate the hashes in the brackets
+- Group changes into the above categories (omit empty categories)
+- Format each entry as: '- {action} {description} [{commit-hash}]'
+- Start each entry with a clear present-tense verb (add, update, fix, improve, etc.)
+- Keep descriptions concise but informative (max 120 chars)
+- Group related changes and combine their hashes: '[hash1, hash2]'
+- Include breaking changes and deprecation notices prominently
+- Highlight security-relevant changes
+- Include only user-facing or significant internal changes
+
+Exclude:
+- Formatting changes, typo fixes
+- Internal refactoring without functional impact
+- Test-only changes
+- Temporary commits
+- Build/CI tweaks
+- Minor dependency bumps
+
+Example Output:
+### Features
+- Add dark mode support with system preference detection [abc123]
+- Implement user authentication flow [def456, ghi789]
+
+### Bug Fixes
+- Fix memory leak in WebSocket connection [jkl012]
+
+### Security
+- Update password hashing algorithm to Argon2id [mno345]
 
 Input commits:"

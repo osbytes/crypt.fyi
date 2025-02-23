@@ -5,16 +5,20 @@ ENV VITE_API_URL=${VITE_API_URL}
 
 WORKDIR /app
 
-# Copy root workspace files
-COPY package.json yarn.lock ./
+# Enable Corepack
+RUN corepack enable
+
+# Copy root workspace files and Yarn configuration
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn ./.yarn
 
 # Copy package directories structure first
 COPY packages/ ./packages/
 # Remove everything except package.json files
 RUN find packages -type f ! -name "package.json" -delete
 
-# Install dependencies
-RUN yarn install
+# Use --immutable to ensure yarn.lock is respected
+RUN yarn install --immutable
 
 # Then copy all source files
 COPY . .

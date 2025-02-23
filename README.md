@@ -84,12 +84,16 @@ API_URL=https://{your-domain-here} docker compose up --build
 ## Development
 
 1. Clone the repository
-2. Install dependencies:
+2. Enable Corepack:
+   ```bash
+   corepack enable
+   ```
+3. Install dependencies:
    ```bash
    yarn install
    ```
-3. Set up environment variables (see `.env.example`)
-4. Start the development server:
+4. Set up environment variables (see `.env.example`)
+5. Start the development server:
    ```bash
    yarn run dev
    ```
