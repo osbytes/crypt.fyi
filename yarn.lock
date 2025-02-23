@@ -1413,6 +1413,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.0.0"
     cross-env: "npm:^7.0.3"
     eslint: "npm:^9.19.0"
+    jest: "npm:^29.7.0"
     typescript: "npm:^5.3.3"
     vite: "npm:6.1.1"
     vite-plugin-web-extension: "npm:^4.0.0"
