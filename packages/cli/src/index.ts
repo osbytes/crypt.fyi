@@ -38,9 +38,12 @@ program
       try {
         content = await readFileSync(options.file, 'utf-8');
       } catch (error) {
-        console.log(chalk.red('Failed to read file'));
+        console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
         process.exit(1);
       }
+    }else{
+      console.error(chalk.red('Cannot provide both content and file'));
+      process.exit(1);
     }
 
     const spinner = ora('Encrypting content...').start();
@@ -163,7 +166,7 @@ function writeIntoFile(content: string, path: string) {
     writeFileSync(path, content);
     console.log(chalk.green(`\nContent saved to ${path}`));
   } catch (error) {
-    console.log(chalk.red('Failed to save content'));
+    console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
     process.exit(1);
   }
 }
