@@ -33,7 +33,6 @@ program
   .option('--ip <ip>', 'Restrict access to specific IP address')
   .option('-r, --reads <count>', 'Number of times the secret can be read', undefined)
   .action(async (content, options) => {
-
     if (options.file && !content) {
       try {
         content = await readFileSync(options.file, 'utf-8');
@@ -41,7 +40,7 @@ program
         console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
         process.exit(1);
       }
-    }else{
+    } else {
       console.error(chalk.red('Cannot provide both content and file'));
       process.exit(1);
     }
