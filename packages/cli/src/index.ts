@@ -33,16 +33,18 @@ program
   .option('--ip <ip>', 'Restrict access to specific IP address')
   .option('-r, --reads <count>', 'Number of times the secret can be read', undefined)
   .action(async (content, options) => {
-    if (options.file && !content) {
+    if (options.file && content) {
+      console.error(chalk.red('Cannot provide both content and file'));
+      process.exit(1);
+    }
+
+    if (options.file) {
       try {
-        content = await readFileSync(options.file, 'utf-8');
+        content = readFileSync(options.file, 'utf-8');
       } catch (error) {
         console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
         process.exit(1);
       }
-    } else {
-      console.error(chalk.red('Cannot provide both content and file'));
-      process.exit(1);
     }
 
     const spinner = ora('Encrypting content...').start();
