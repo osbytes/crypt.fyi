@@ -2,11 +2,17 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+# Enable Corepack
+RUN corepack enable
+
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn ./.yarn
+
 COPY packages/ ./packages/
 RUN find packages -type f ! -name "package.json" -delete
 
-RUN yarn install
+# Use --immutable to ensure yarn.lock is respected
+RUN yarn install --immutable
 
 COPY . .
 

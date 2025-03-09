@@ -1,15 +1,15 @@
-import Redis from 'ioredis';
-import { TokenGenerator } from './tokens';
+import { Redis } from 'ioredis';
+import type { TokenGenerator } from './tokens.js';
 import {
   ErrorInvalidKeyAndOrPassword,
-  Vault,
-  VaultValue,
+  type Vault,
+  type VaultValue,
   vaultValueSchema,
   gcm,
 } from '@crypt.fyi/core';
-import { isDefined } from '../util';
-import { isIpAllowed } from './ips';
-import { WebhookSender } from '../webhook';
+import { isDefined } from '../util.js';
+import { isIpAllowed } from './ips.js';
+import type { WebhookSender } from '../webhook.js';
 
 const parseResult = async (result: string, encryptionKey: string) => {
   const jsonParsed = JSON.parse(result);

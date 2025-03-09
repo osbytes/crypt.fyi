@@ -6,20 +6,20 @@ import {
   jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
-  ZodTypeProvider,
+  type ZodTypeProvider,
 } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import fastifyRateLimit from '@fastify/rate-limit';
 import { metrics } from '@opentelemetry/api';
-import { Config } from './config';
-import { Logger } from './logging';
+import type { Config } from './config.js';
+import type { Logger } from './logging.js';
 import {
   createVaultResponseSchema,
   readVaultResponseSchema,
   ErrorInvalidKeyAndOrPassword,
-  Vault,
+  type Vault,
   createVaultRequestSchema,
   readVaultQuerySchema,
   readVaultParamsSchema,
@@ -27,11 +27,15 @@ import {
   deleteVaultRequestSchema,
 } from '@crypt.fyi/core';
 import { Redis } from 'ioredis';
-import { BASE_OTEL_ATTRIBUTES } from './telemetry';
-import fs from 'node:fs';
-import path from 'node:path';
+import { BASE_OTEL_ATTRIBUTES } from './telemetry.js';
+import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const favicon = fs.readFileSync(path.join(__dirname, 'assets', 'favicon.ico'));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const favicon = readFileSync(join(__dirname, 'assets', 'favicon.ico'));
 
 declare module 'fastify' {
   interface FastifyRequest {

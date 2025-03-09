@@ -1,5 +1,6 @@
-import pino from 'pino';
-import { Config } from './config';
+import { pino } from 'pino';
+import type { Config } from './config.js';
+import type { FastifyRequest } from 'fastify';
 
 // Strip query parameters from URLs to prevent logging sensitive data
 const stripQueryParams = (url: string) => {
@@ -24,7 +25,7 @@ export const initLogging = async (config: Config): Promise<pino.Logger> => {
       err: pino.stdSerializers.err,
       error: pino.stdSerializers.err,
       // https://fastify.dev/docs/v2.15.x/Documentation/Logging/#log-redaction
-      req(request) {
+      req(request: FastifyRequest) {
         return {
           method: request.method,
           url: stripQueryParams(request.url),

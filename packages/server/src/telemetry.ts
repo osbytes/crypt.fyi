@@ -1,12 +1,12 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { ConsoleSpanExporter, SpanExporter } from '@opentelemetry/sdk-trace-base';
+import { ConsoleSpanExporter, type SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
-import { config } from './config';
-import { Attributes } from '@opentelemetry/api';
-import os from 'node:os';
+import { config } from './config.js';
+import type { Attributes } from '@opentelemetry/api';
+import { hostname } from 'node:os';
 
 let sdk: NodeSDK | undefined = undefined;
 
@@ -38,6 +38,6 @@ export const otlpShutdown = async () => {
 };
 
 export const BASE_OTEL_ATTRIBUTES = {
-  hostname: os.hostname(),
+  hostname: hostname(),
   version: config.serviceVersion,
 } satisfies Attributes;
