@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { Client } from '@crypt.fyi/core';
 import chalk from 'chalk';
 import ora from 'ora';
@@ -25,13 +25,28 @@ program
 program
   .command('encrypt')
   .description('Encrypt and share a secret')
-  .argument('<content>', 'Content to encrypt')
+  .argument('[content]', 'Content to encrypt')
+  .option('-f, --file <file>', 'Path to file to encrypt')
   .option('-p, --password <password>', 'Password to encrypt with')
   .option('-t, --ttl <duration>', 'Time to live (e.g., 1h, 1d)', '1h')
   .option('-b, --burn', 'Burn after reading', true)
   .option('--ip <ip>', 'Restrict access to specific IP address')
   .option('-r, --reads <count>', 'Number of times the secret can be read', undefined)
   .action(async (content, options) => {
+    if (options.file && content) {
+      console.error(chalk.red('Cannot provide both content and file'));
+      process.exit(1);
+    }
+
+    if (options.file) {
+      try {
+        content = readFileSync(options.file, 'utf-8');
+      } catch (error) {
+        console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
+        process.exit(1);
+      }
+    }
+
     const spinner = ora('Encrypting content...').start();
     try {
       spinner.text = 'Creating vault...';
@@ -70,6 +85,7 @@ program
   .command('decrypt')
   .description('Decrypt a secret from the URL')
   .argument('<url>', 'Secret URL')
+  .option('-o --output <file>', 'Output file to save the decrypted content')
   .option('-p, --password <password>', 'Password (if secret is password protected)')
   .action(async (urlString, options) => {
     const spinner = ora('Fetching secret...').start();
@@ -98,13 +114,21 @@ program
           console.log(chalk.blue('File name:'), parsed.name);
           console.log(chalk.yellow('File content (base64):'), parsed.content);
         } else {
-          console.log('\nDecrypted content:');
-          console.log(result.c);
+          if (options.output) {
+            writeIntoFile(result.c, options.output);
+          } else {
+            console.log('\nDecrypted content:');
+            console.log(result.c);
+          }
         }
       } catch {
         // Not JSON, print as regular text
-        console.log('\nDecrypted content:');
-        console.log(result.c);
+        if (options.output) {
+          writeIntoFile(result.c, options.output);
+        } else {
+          console.log('\nDecrypted content:');
+          console.log(result.c);
+        }
       }
 
       if (result.burned) {
@@ -136,4 +160,14 @@ function parseDuration(duration: string): number {
 
   const [, value, unit] = match;
   return parseInt(value, 10) * units[unit];
+}
+
+function writeIntoFile(content: string, path: string) {
+  try {
+    writeFileSync(path, content);
+    console.log(chalk.green(`\nContent saved to ${path}`));
+  } catch (error) {
+    console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
+    process.exit(1);
+  }
 }
