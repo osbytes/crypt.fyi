@@ -6,7 +6,6 @@ WORKDIR /app
 RUN corepack enable
 
 COPY package.json yarn.lock .yarnrc.yml ./
-COPY .yarn ./.yarn
 
 COPY packages/ ./packages/
 RUN find packages -type f ! -name "package.json" -delete
