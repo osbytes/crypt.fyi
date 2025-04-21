@@ -63,7 +63,7 @@
     "@opentelemetry/semantic-conventions": "^1.18.1",
     "bullmq": "^5.34.8",
     "bytes": "^3.1.2",
-    "fastify": "^5.3.1",
+    "fastify": "^5.3.2",
     "fastify-type-provider-zod": "^4.0.2",
     "http-graceful-shutdown": "^3.1.13",
     "ioredis": "^5.4.1",
