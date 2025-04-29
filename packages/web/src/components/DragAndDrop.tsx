@@ -72,7 +72,7 @@ export function DragAndDrop({ children, onFileDrop, className }: DragAndDropProp
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className={cn(
-              'fixed inset-0 border-2 border-dashed z-50 flex items-center justify-center backdrop-blur-sm',
+              'fixed inset-0 border-2 border-dashed z-50 flex items-center justify-center backdrop-blur-xs',
               dragState === 'dragging'
                 ? 'border-primary bg-primary/5'
                 : 'border-destructive bg-destructive/5',
