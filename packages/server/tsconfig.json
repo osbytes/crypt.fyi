@@ -112,5 +112,10 @@
     "*.config.js",
     "*.config.mjs",
     "*.config.cjs"
-  ]
+  ],
+  "ts-node": {
+    "experimentalSpecifierResolution": "node",
+    "transpileOnly": true,
+    "esm": true
+  }
 }

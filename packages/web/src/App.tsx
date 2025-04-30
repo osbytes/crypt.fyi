@@ -31,13 +31,13 @@ export default function App() {
           <Toaster
             toastOptions={{
               classNames: {
-                toast: 'bg-background p-2 rounded-lg outline-accent border-accent',
-                title: 'text-foreground',
-                description: 'text-muted-foreground',
-                closeButton: 'text-foreground',
-                actionButton: 'text-foreground',
-                cancelButton: 'text-foreground',
-                icon: 'text-foreground',
+                toast: '!bg-background !p-2 !rounded-lg !outline-accent !border-accent',
+                title: '!text-foreground',
+                description: '!text-muted-foreground',
+                closeButton: '!text-foreground',
+                actionButton: '!text-foreground',
+                cancelButton: '!text-foreground',
+                icon: '!text-foreground',
               },
             }}
           />

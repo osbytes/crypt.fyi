@@ -292,11 +292,23 @@ function getInitialValues(ttlOptions: ReadonlyArray<{ value: number }>) {
   };
 }
 
-type FormSchema = ReturnType<typeof createFormSchema>;
-type FormData = z.infer<FormSchema>;
-type FormDataWithoutContent = Omit<FormData, 'c'>;
+type FormValues = {
+  c: string;
+  b: boolean;
+  ttl: number;
+  whr: boolean;
+  whfpk: boolean;
+  whfip: boolean;
+  whb: boolean;
+  p?: string;
+  ips?: string;
+  rc?: number;
+  fc?: number;
+  whu?: string;
+  whn?: string;
+};
 
-function updateUrlWithFormState(formData: FormDataWithoutContent) {
+function updateUrlWithFormState(formData: FormValues) {
   const params = new URLSearchParams();
 
   if (formData.ttl !== DEFAULT_TTL) {
@@ -347,7 +359,7 @@ const handleContentDrop = (dataTransfer: DataTransfer): File | string => {
 
 export function CreatePage() {
   const { t } = useTranslation();
-  const formSchema = useMemo(() => createFormSchema(t), [t]);
+  const formSchema = useMemo(() => createFormSchema(t), [t]) as z.ZodType<FormValues>;
   const ttlOptions = useMemo(() => getTranslatedTtlOptions(t), [t]);
 
   const [isAdvancedConfigurationOpen, setIsAdvancedConfigurationOpen] = useState(() => {
@@ -360,7 +372,7 @@ export function CreatePage() {
     );
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: useMemo(() => getInitialValues(ttlOptions), [ttlOptions]),
     mode: 'onTouched',
@@ -383,7 +395,8 @@ export function CreatePage() {
       if (!value) return;
 
       const scrollPos = window.scrollY;
-      const formState: FormDataWithoutContent = {
+      const formState: FormValues = {
+        c: value.c ?? '',
         b: value.b ?? true,
         ttl: value.ttl ?? DEFAULT_TTL,
         whr: value.whr ?? false,
@@ -411,7 +424,7 @@ export function CreatePage() {
   const { client } = useClient();
 
   const createMutation = useMutation({
-    mutationFn: async (input: z.infer<typeof formSchema>) => {
+    mutationFn: async (input: FormValues) => {
       await sleep(500, { enabled: config.IS_DEV });
       const result = await client.create({
         ...input,
@@ -490,7 +503,7 @@ export function CreatePage() {
     }
   };
 
-  async function onSubmit(data: z.infer<typeof formSchema>) {
+  async function onSubmit(data: FormValues) {
     let content = data.c;
 
     if (selectedFile) {
@@ -538,7 +551,7 @@ export function CreatePage() {
 
     const { c: _, ...valuesToKeep } = currentValues;
     Object.entries(valuesToKeep).forEach(([field, value]) => {
-      form.setValue(field as keyof FormData, value);
+      form.setValue(field as keyof FormValues, value);
     });
   };
 
@@ -638,7 +651,7 @@ export function CreatePage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className={cn(
-              'absolute inset-0 border-2 border-dashed rounded-lg z-50 flex items-center justify-center backdrop-blur-sm',
+              'absolute inset-0 border-2 border-dashed rounded-lg z-50 flex items-center justify-center backdrop-blur-xs',
               dragState === 'dragging'
                 ? 'border-primary bg-primary/5'
                 : 'border-destructive bg-destructive/5',

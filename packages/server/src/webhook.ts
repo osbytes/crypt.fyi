@@ -66,7 +66,7 @@ export const createBullMQWebhookSender = ({
   const QUEUE_NAME = 'webhooks';
   const JOB_NAME = 'webhook';
   const queue = new Queue<string>(QUEUE_NAME, {
-    connection: redis,
+    connection: redis.options,
     streams: {
       events: {
         maxLen: streamEventsMaxLength,
@@ -137,7 +137,7 @@ export const createBullMQWebhookSender = ({
         clearTimeout(timeoutId);
       }
     },
-    { connection: redis, concurrency, drainDelay: Math.round(drainDelayMs / 1000) },
+    { connection: redis.options, concurrency, drainDelay: Math.round(drainDelayMs / 1000) },
   );
 
   worker.on('failed', async (job, error) => {

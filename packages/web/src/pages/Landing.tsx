@@ -97,7 +97,7 @@ export function LandingPage() {
         <div className="grid md:grid-cols-3 gap-6">
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconShieldLock className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconShieldLock className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.encryption.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -106,7 +106,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconLock className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconLock className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.security.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -115,7 +115,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconEyeOff className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconEyeOff className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.zeroKnowledge.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -124,7 +124,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconFlame className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconFlame className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.burn.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -133,7 +133,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconFlame className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconFlame className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.failedAttempts.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -142,7 +142,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconClock className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconClock className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.expiration.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -151,7 +151,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconKey className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconKey className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.password.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -160,7 +160,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconFiles className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconFiles className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.files.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -169,7 +169,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconWebhook className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconWebhook className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.webhooks.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -178,7 +178,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconWorld className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconWorld className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.ipControl.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -187,7 +187,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconNumbers className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconNumbers className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.readLimits.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -196,7 +196,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconQrcode className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconQrcode className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.qrCode.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
@@ -205,7 +205,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconTerminal2 className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconTerminal2 className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               <a
                 href="https://www.npmjs.com/package/@crypt.fyi/cli"
                 target="_blank"
@@ -218,7 +218,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconBrandChrome className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconBrandChrome className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               <a
                 href="https://chromewebstore.google.com/detail/cryptfyi/hkmbmkjfjfdbpohlllleaacjkacfhald"
                 target="_blank"
@@ -233,7 +233,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 rounded-lg border bg-card">
             <h3 className="font-semibold mb-2">
-              <IconBrandDocker className="inline mr-2 w-5 h-5 text-primary flex-shrink-0" />
+              <IconBrandDocker className="inline mr-2 w-5 h-5 text-primary shrink-0" />
               {t('landing.features.docker.title')}
             </h3>
             <p className="text-sm text-muted-foreground">
