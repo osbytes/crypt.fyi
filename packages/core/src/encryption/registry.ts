@@ -1,7 +1,8 @@
-import { EncryptionAlgorithm, CompressionAlgorithm, ContentMetadata } from './types';
+import { EncryptionAlgorithm, CompressionAlgorithm } from './types';
 import { encrypt as gcmEncrypt, decrypt as gcmDecrypt } from './gcm';
 import { encrypt as mlkemEncrypt, decrypt as mlkemDecrypt } from './mlkem';
 import { deflate, inflate } from 'pako';
+import { ProcessingMetadata } from '../vault';
 
 export const encryptionRegistry: Record<string, EncryptionAlgorithm> = {
   'aes-256-gcm': {
@@ -19,13 +20,13 @@ export const encryptionRegistry: Record<string, EncryptionAlgorithm> = {
 export const compressionRegistry: Record<string, CompressionAlgorithm> = {
   'zlib:pako': {
     name: 'zlib:pako',
-    compress: (data: Uint8Array) => deflate(data),
-    decompress: (data: Uint8Array) => inflate(data),
+    compress: deflate,
+    decompress: inflate,
   },
   none: {
     name: 'none',
-    compress: (data: Uint8Array) => data,
-    decompress: (data: Uint8Array) => data,
+    compress: (data) => data,
+    decompress: (data) => data,
   },
 };
 
@@ -45,7 +46,7 @@ export function getCompressionAlgorithm(name: string): CompressionAlgorithm {
   return algorithm;
 }
 
-export function validateMetadata(metadata: ContentMetadata): void {
+export function validateMetadata(metadata: ProcessingMetadata): void {
   if (metadata.compression?.algorithm && !compressionRegistry[metadata.compression.algorithm]) {
     throw new Error(
       `Compression algorithm ${metadata.compression.algorithm} not found in registry`,

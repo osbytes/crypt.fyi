@@ -1,3 +1,5 @@
+import { ProcessingMetadata } from '../vault';
+
 export type Encrypt = (data: string, key: string) => Promise<string>;
 export type Decrypt = (data: string, key: string) => Promise<string>;
 export type Compress = (data: Uint8Array) => Uint8Array;
@@ -15,17 +17,8 @@ export interface CompressionAlgorithm {
   decompress: Decompress;
 }
 
-export interface ContentMetadata {
-  compression?: {
-    algorithm: 'zlib:pako' | 'none';
-  };
-  encryption: {
-    algorithm: 'aes-256-gcm' | 'ml-kem-768';
-  };
-}
-
 export interface EncodedContent {
-  metadata: ContentMetadata;
+  metadata: ProcessingMetadata;
   data: string; // Base64 encoded encrypted/compressed data
 }
 

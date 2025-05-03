@@ -8,7 +8,7 @@ import {
 import { generateRandomString } from './random';
 import { sha512 } from './hash';
 import { encryptionRegistry, compressionRegistry, validateMetadata } from './encryption/registry';
-import { ContentMetadata } from './encryption/types';
+import { ProcessingMetadata } from './vault';
 
 export class Client {
   private readonly apiUrl: string;
@@ -41,7 +41,7 @@ export class Client {
 
   private async processContent(
     content: string,
-    metadata: ContentMetadata,
+    metadata: ProcessingMetadata,
     key: string,
   ): Promise<string> {
     validateMetadata(metadata);
@@ -63,19 +63,17 @@ export class Client {
 
   private async recoverContent(
     encoded: string,
-    metadata: ContentMetadata,
+    metadata: ProcessingMetadata,
     key: string,
   ): Promise<string> {
     validateMetadata(metadata);
     let recovered = encoded;
 
-    // Apply decryption if specified
     if (metadata.encryption?.algorithm) {
       const algorithm = encryptionRegistry[metadata.encryption.algorithm];
       recovered = await algorithm.decrypt(recovered, key);
     }
 
-    // Apply decompression if specified
     if (metadata.compression?.algorithm) {
       const algorithm = compressionRegistry[metadata.compression.algorithm];
       const decompressed = algorithm.decompress(Buffer.from(recovered, 'base64'));
@@ -86,16 +84,16 @@ export class Client {
   }
 
   async create(
-    input: Omit<CreateVaultRequest, 'h'> & { p?: string },
+    input: Omit<CreateVaultRequest, 'h' | 'm'> & { p?: string; m?: ProcessingMetadata },
   ): Promise<CreateVaultResponse & { key: string; hash: string }> {
     const key = await generateRandomString(this.keyLength);
 
-    const metadata: ContentMetadata = {
+    const metadata: ProcessingMetadata = input.m ?? {
       compression: {
         algorithm: 'zlib:pako',
       },
       encryption: {
-        algorithm: 'aes-256-gcm',
+        algorithm: 'ml-kem-768',
       },
     };
 
