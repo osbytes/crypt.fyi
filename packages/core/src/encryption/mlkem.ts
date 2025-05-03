@@ -4,7 +4,7 @@ import { concatBytes, utf8ToBytes } from '@noble/hashes/utils';
 import { Buffer } from '../buffer';
 import { Decrypt, Encrypt, DecryptError, EncryptError } from './encryption';
 import { gcm } from '@noble/ciphers/aes';
-import { sha512 } from '@noble/hashes/sha512';
+import { sha512 } from '@noble/hashes/sha2';
 
 const IV_LENGTH = 12;
 const CIPHERTEXT_LENGTH = 1088;

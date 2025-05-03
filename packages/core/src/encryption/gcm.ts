@@ -1,6 +1,6 @@
 import { gcm } from '@noble/ciphers/aes';
 import { pbkdf2Async } from '@noble/hashes/pbkdf2';
-import { sha256 as nobleSha256 } from '@noble/hashes/sha256';
+import { sha256 as nobleSha256 } from '@noble/hashes/sha2';
 import { randomBytes } from '@noble/hashes/utils';
 import { concatBytes, utf8ToBytes } from '@noble/hashes/utils';
 import { Decrypt, Encrypt, DecryptError, EncryptError } from './encryption';
