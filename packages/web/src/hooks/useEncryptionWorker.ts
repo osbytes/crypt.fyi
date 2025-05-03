@@ -14,7 +14,7 @@ export function useEncryptionWorker() {
     };
   }, []);
 
-  const encrypt = useCallback((content: string, password: string): Promise<string> => {
+  const encrypt = useCallback((content: string, password: string, algorithm: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       if (!workerRef.current) {
         reject(new Error('Worker not initialized'));
@@ -23,7 +23,7 @@ export function useEncryptionWorker() {
 
       const handleMessage = (e: MessageEvent<MessageResult>) => {
         if (e.data.type === 'success') {
-          resolve(e.data.result);
+          resolve(e.data.result!);
         } else if (e.data.type === 'error') {
           reject(new Error(e.data.error));
         }
@@ -35,11 +35,12 @@ export function useEncryptionWorker() {
         type: 'encrypt',
         content,
         password,
+        algorithm,
       } satisfies Message);
     });
   }, []);
 
-  const decrypt = useCallback((content: string, password: string): Promise<string> => {
+  const decrypt = useCallback((content: string, password: string, algorithm: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       if (!workerRef.current) {
         reject(new Error('Worker not initialized'));
@@ -48,7 +49,7 @@ export function useEncryptionWorker() {
 
       const handleMessage = (e: MessageEvent<MessageResult>) => {
         if (e.data.type === 'success') {
-          resolve(e.data.result);
+          resolve(e.data.result!);
         } else if (e.data.type === 'error') {
           reject(new Error(e.data.error));
         }
@@ -60,9 +61,60 @@ export function useEncryptionWorker() {
         type: 'decrypt',
         content,
         password,
+        algorithm,
       } satisfies Message);
     });
   }, []);
 
-  return useMemo(() => ({ encrypt, decrypt }), [encrypt, decrypt]);
+  const compress = useCallback((content: string, algorithm: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!workerRef.current) {
+        reject(new Error('Worker not initialized'));
+        return;
+      }
+
+      const handleMessage = (e: MessageEvent<MessageResult>) => {
+        if (e.data.type === 'success') {
+          resolve(e.data.result!);
+        } else if (e.data.type === 'error') {
+          reject(new Error(e.data.error));
+        }
+        workerRef.current?.removeEventListener('message', handleMessage);
+      };
+
+      workerRef.current.addEventListener('message', handleMessage);
+      workerRef.current.postMessage({
+        type: 'compress',
+        content,
+        algorithm,
+      } satisfies Message);
+    });
+  }, []);
+
+  const decompress = useCallback((content: string, algorithm: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!workerRef.current) {
+        reject(new Error('Worker not initialized'));
+        return;
+      }
+
+      const handleMessage = (e: MessageEvent<MessageResult>) => {
+        if (e.data.type === 'success') {
+          resolve(e.data.result!);
+        } else if (e.data.type === 'error') {
+          reject(new Error(e.data.error));
+        }
+        workerRef.current?.removeEventListener('message', handleMessage);
+      };
+
+      workerRef.current.addEventListener('message', handleMessage);
+      workerRef.current.postMessage({
+        type: 'decompress',
+        content,
+        algorithm,
+      } satisfies Message);
+    });
+  }, []);
+
+  return useMemo(() => ({ encrypt, decrypt, compress, decompress }), [encrypt, decrypt, compress, decompress]);
 }

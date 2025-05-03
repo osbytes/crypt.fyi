@@ -1,8 +1,23 @@
 import { z } from 'zod';
 
+export const processingMetadataSchema = z
+  .object({
+    compression: z
+      .object({
+        algorithm: z.enum(['zlib:pako', 'none']),
+      })
+      .optional(),
+    encryption: z.object({
+      algorithm: z.enum(['aes-256-gcm', 'ml-kem-768']),
+    }),
+  })
+  .describe('processing metadata including compression and encryption algorithms');
+export type ProcessingMetadata = z.infer<typeof processingMetadataSchema>;
+
 export const vaultValueSchema = z.object({
   c: z.string().describe('encrypted content'),
   h: z.string().describe('sha256 hash of the encryption key + optional password'),
+  m: processingMetadataSchema,
   b: z.boolean().describe('burn after reading'),
   dt: z.string().describe('delete token'),
   ttl: z.number().describe('time to live (TTL) in milliseconds'),
@@ -36,7 +51,7 @@ export interface Vault {
     id: string,
     h: string,
     ip: string,
-  ): Promise<Pick<VaultValue, 'c' | 'b' | 'ttl' | 'cd'> | undefined>;
+  ): Promise<Pick<VaultValue, 'c' | 'b' | 'ttl' | 'cd' | 'm'> | undefined>;
   del(id: string, dt: string): Promise<boolean>;
   exists(id: string): Promise<boolean>;
 }

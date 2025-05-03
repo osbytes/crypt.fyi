@@ -37,7 +37,7 @@ export const createRedisVault = (
 
   return {
     async set(value) {
-      const { c, h, b, ttl, ips, rc, wh, fc } = value;
+      const { c, h, b, ttl, ips, rc, wh, fc, m } = value;
       const { id, dt } = await tokenGenerator.generate();
 
       const key = getKey(id);
@@ -58,6 +58,7 @@ export const createRedisVault = (
           dt,
           ttl,
           cd: Date.now(),
+          m,
           ips: encryptedIps,
           rc,
           wh: wh && encryptedWhU ? { ...wh, u: encryptedWhU } : undefined,
@@ -89,7 +90,7 @@ export const createRedisVault = (
         return undefined;
       }
 
-      const { ips, c, b, ttl, cd, dt, wh } = await parseResult(result, encryptionKey);
+      const { ips, c, b, ttl, cd, dt, wh, m } = await parseResult(result, encryptionKey);
       if (!isIpAllowed(ip, ips)) {
         if (wh?.fip) {
           void webhookSender.send({
@@ -239,6 +240,7 @@ export const createRedisVault = (
         b,
         ttl,
         cd,
+        m,
       };
     },
     async del(id, dt) {

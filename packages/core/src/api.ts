@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { vaultValueSchema } from './vault';
+import { processingMetadataSchema, vaultValueSchema } from './vault';
 
 export const createVaultRequestSchema = vaultValueSchema.omit({
   cd: true,
@@ -28,6 +28,7 @@ export const readVaultResponseSchema = z.object({
   b: z.boolean().describe('burn after reading'),
   ttl: z.number().describe('time to live (TTL) in milliseconds'),
   cd: z.number().describe('created date time'),
+  m: processingMetadataSchema,
 });
 export type ReadVaultResponse = z.infer<typeof readVaultResponseSchema>;
 
