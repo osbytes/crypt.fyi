@@ -1,5 +1,3 @@
-import { ProcessingMetadata } from '../vault';
-
 export type Encrypt = (data: string, key: string) => Promise<string>;
 export type Decrypt = (data: string, key: string) => Promise<string>;
 export type Compress = (data: Uint8Array) => Uint8Array;
@@ -15,11 +13,6 @@ export interface CompressionAlgorithm {
   name: string;
   compress: Compress;
   decompress: Decompress;
-}
-
-export interface EncodedContent {
-  metadata: ProcessingMetadata;
-  data: string; // Base64 encoded encrypted/compressed data
 }
 
 export class DecryptError extends Error {
