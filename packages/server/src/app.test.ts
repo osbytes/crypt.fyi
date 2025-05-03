@@ -9,7 +9,7 @@ import { createTokenGenerator } from './vault/tokens.js';
 import { createNopWebhookSender } from './webhook.js';
 import { Redis } from 'ioredis';
 import { Client } from 'undici';
-import { gcm } from '@crypt.fyi/core';
+import { gcm, type CreateVaultRequest } from '@crypt.fyi/core';
 
 const initAppTest = async () => {
   const config = {
@@ -76,7 +76,13 @@ describe('app', () => {
         c: 'foobar',
         b: true,
         h: 'abc123',
-      }),
+        ttl: 1000,
+        m: {
+          encryption: {
+            algorithm: 'aes-256-gcm',
+          },
+        },
+      } satisfies CreateVaultRequest),
     });
 
     expect(createResponse.statusCode).toBe(201);
@@ -112,7 +118,12 @@ describe('app', () => {
         b: true,
         ttl: 5000,
         h: 'abc123',
-      }),
+        m: {
+          encryption: {
+            algorithm: 'aes-256-gcm',
+          },
+        },
+      } satisfies CreateVaultRequest),
     });
 
     expect(createResponse.statusCode).toBe(201);
@@ -183,7 +194,12 @@ describe('app', () => {
         h: 'abc123',
         b: false,
         rc: readCount,
-      }),
+        m: {
+          encryption: {
+            algorithm: 'aes-256-gcm',
+          },
+        },
+      } satisfies CreateVaultRequest),
     });
 
     expect(createResponse.statusCode).toBe(201);
@@ -256,7 +272,12 @@ describe('app', () => {
         h: 'abc123',
         b: false,
         rc: readCount,
-      }),
+        m: {
+          encryption: {
+            algorithm: 'aes-256-gcm',
+          },
+        },
+      } satisfies CreateVaultRequest),
     });
 
     expect(createResponse.statusCode).toBe(201);
@@ -294,6 +315,7 @@ describe('app', () => {
         c: 'secret-content',
         b: false,
         h: 'abc123',
+        ttl: 1000,
         ips: '192.168.1.1,10.0.0.0/24',
         wh: {
           u: 'https://example.com/webhook',
@@ -303,7 +325,12 @@ describe('app', () => {
           fpk: true,
           fip: true,
         },
-      }),
+        m: {
+          encryption: {
+            algorithm: 'aes-256-gcm',
+          },
+        },
+      } satisfies CreateVaultRequest),
     });
 
     expect(createResponse.statusCode).toBe(201);
@@ -351,7 +378,13 @@ describe('app', () => {
         c: 'foobar',
         b: true,
         h: 'abc123',
-      }),
+        ttl: 1000,
+        m: {
+          encryption: {
+            algorithm: 'aes-256-gcm',
+          },
+        },
+      } satisfies CreateVaultRequest),
     });
     const { id, dt } = (await createResponse.body.json()) as Record<string, unknown>;
 
@@ -384,8 +417,14 @@ describe('app', () => {
         c: 'foobar',
         b: true,
         h: 'abc123',
+        ttl: 1000,
         fc: 5,
-      }),
+        m: {
+          encryption: {
+            algorithm: 'aes-256-gcm',
+          },
+        },
+      } satisfies CreateVaultRequest),
     });
     expect(createResponse.statusCode).toBe(201);
     const { id } = (await createResponse.body.json()) as Record<string, unknown>;
