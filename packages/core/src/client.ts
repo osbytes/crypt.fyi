@@ -10,6 +10,7 @@ import { sha512 } from './hash';
 import { encryptionRegistry, compressionRegistry, validateMetadata } from './encryption/registry';
 import { ProcessingMetadata } from './vault';
 import { gcm } from './encryption';
+import { inflate } from 'pako';
 
 export class Client {
   private readonly apiUrl: string;
@@ -64,16 +65,25 @@ export class Client {
 
   private async recoverContent(
     encoded: string,
-    metadata: ProcessingMetadata,
     key: string,
+    metadata?: ProcessingMetadata,
   ): Promise<string> {
-    try {
-      validateMetadata(metadata);
-    } catch {
+    if (!metadata) {
       // Backward compatibility prior to introduction of metadata
-      const decrypted = await gcm.decrypt(encoded, key);
+      const decrypted = JSON.parse(await gcm.decrypt(encoded, key)) as any;
+      if ('metadata' in decrypted) {
+        let processedContent = Buffer.from(decrypted.data, 'base64');
+        if (decrypted.metadata.compression?.algorithm === 'zlib:pako') {
+          const decompressed = inflate(processedContent);
+          processedContent = Buffer.from(decompressed);
+        }
+        return new TextDecoder().decode(processedContent);
+      }
       return decrypted;
     }
+
+    validateMetadata(metadata);
+
     let recovered = encoded;
 
     if (metadata.encryption?.algorithm) {
@@ -161,10 +171,10 @@ export class Client {
 
     const data = await (res.json() as Promise<ReadVaultResponse>);
     const decrypted = password
-      ? await this.recoverContent(data.c, data.m, password).then((d) =>
-          this.recoverContent(d, data.m, key),
+      ? await this.recoverContent(data.c, password, data.m).then((d) =>
+          this.recoverContent(d, key, data.m),
         )
-      : await this.recoverContent(data.c, data.m, key);
+      : await this.recoverContent(data.c, key, data.m);
 
     return {
       c: decrypted,

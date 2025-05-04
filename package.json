@@ -12,7 +12,7 @@
     "typecheck": "turbo typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "redis": "docker compose run --publish 6379:6379 redis"
+    "redis": "docker compose run -p 6379:6379 -v ./redis-data:/data redis redis-server --save 1 1 --loglevel warning"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.1",

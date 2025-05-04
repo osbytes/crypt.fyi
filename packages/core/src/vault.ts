@@ -17,7 +17,7 @@ export type ProcessingMetadata = z.infer<typeof processingMetadataSchema>;
 export const vaultValueSchema = z.object({
   c: z.string().describe('encrypted content'),
   h: z.string().describe('sha256 hash of the encryption key + optional password'),
-  m: processingMetadataSchema,
+  m: processingMetadataSchema.optional(),
   b: z.boolean().describe('burn after reading'),
   dt: z.string().describe('delete token'),
   ttl: z.number().describe('time to live (TTL) in milliseconds'),
