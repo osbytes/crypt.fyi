@@ -10,8 +10,6 @@ export const ClientContext = createContext<ClientContext>({
   client: new Client({
     apiUrl: config.API_URL,
     keyLength: 32,
-    encrypt: () => Promise.resolve(''),
-    decrypt: () => Promise.resolve(''),
   }),
 });
 

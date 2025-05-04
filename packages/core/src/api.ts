@@ -23,11 +23,12 @@ export const readVaultQuerySchema = z.object({
 });
 export type ReadVaultQuery = z.infer<typeof readVaultQuerySchema>;
 
-export const readVaultResponseSchema = z.object({
-  c: z.string().describe('encrypted content'),
-  b: z.boolean().describe('burn after reading'),
-  ttl: z.number().describe('time to live (TTL) in milliseconds'),
-  cd: z.number().describe('created date time'),
+export const readVaultResponseSchema = vaultValueSchema.pick({
+  c: true,
+  b: true,
+  ttl: true,
+  cd: true,
+  m: true,
 });
 export type ReadVaultResponse = z.infer<typeof readVaultResponseSchema>;
 

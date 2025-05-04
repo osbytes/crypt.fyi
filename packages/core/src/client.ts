@@ -1,4 +1,3 @@
-import { inflate, deflate } from 'pako';
 import { Buffer } from './buffer';
 import {
   CreateVaultRequest,
@@ -7,47 +6,28 @@ import {
   ReadVaultResponse,
 } from './api';
 import { generateRandomString } from './random';
-import { Decrypt, Encrypt, gcm } from './encryption';
 import { sha512 } from './hash';
-
-interface ContentMetadata {
-  compression?: {
-    algorithm: 'zlib:pako';
-  };
-  encryption: {
-    algorithm: 'aes-256-gcm';
-  };
-}
-
-interface EncodedContent {
-  metadata: ContentMetadata;
-  data: string;
-}
+import { encryptionRegistry, compressionRegistry, validateMetadata } from './encryption/registry';
+import { ProcessingMetadata } from './vault';
+import { gcm } from './encryption';
+import { inflate } from 'pako';
 
 export class Client {
   private readonly apiUrl: string;
   private readonly keyLength: number;
-  private readonly encrypt: Encrypt;
-  private readonly decrypt: Decrypt;
   private readonly xClient: string | undefined;
 
   constructor({
     apiUrl,
     keyLength = 32,
-    encrypt = gcm.encrypt,
-    decrypt = gcm.decrypt,
-    xClient = undefined,
+    xClient,
   }: {
     apiUrl: string;
     keyLength?: number;
-    encrypt?: Encrypt;
-    decrypt?: Decrypt;
     xClient?: string;
   }) {
     this.apiUrl = apiUrl;
     this.keyLength = keyLength;
-    this.encrypt = encrypt;
-    this.decrypt = decrypt;
     this.xClient = xClient;
   }
 
@@ -61,62 +41,91 @@ export class Client {
     return headers;
   }
 
-  private compressContent(content: string): string {
-    const compressed = deflate(new TextEncoder().encode(content));
-    const result: EncodedContent = {
-      metadata: {
-        compression: {
-          algorithm: 'zlib:pako',
-        },
-        encryption: {
-          algorithm: 'aes-256-gcm',
-        },
-      },
-      data: Buffer.from(compressed).toString('base64'),
-    };
-    return JSON.stringify(result);
+  private async processContent(
+    content: string,
+    metadata: ProcessingMetadata,
+    key: string,
+  ): Promise<string> {
+    validateMetadata(metadata);
+    let processed = content;
+
+    if (metadata.compression?.algorithm) {
+      const algorithm = compressionRegistry[metadata.compression.algorithm];
+      const compressed = algorithm.compress(new TextEncoder().encode(processed));
+      processed = Buffer.from(compressed).toString('base64');
+    }
+
+    if (metadata.encryption?.algorithm) {
+      const algorithm = encryptionRegistry[metadata.encryption.algorithm];
+      processed = await algorithm.encrypt(processed, key);
+    }
+
+    return processed;
   }
 
-  private decompressContent(content: string): string {
-    try {
-      const parsed = JSON.parse(content) as EncodedContent;
-
-      if (parsed.metadata) {
-        let processedContent = Buffer.from(parsed.data, 'base64');
-
-        if (parsed.metadata.compression?.algorithm === 'zlib:pako') {
+  private async recoverContent(
+    encoded: string,
+    key: string,
+    metadata?: ProcessingMetadata,
+  ): Promise<string> {
+    if (!metadata) {
+      // Backward compatibility prior to introduction of metadata
+      const decrypted = JSON.parse(await gcm.decrypt(encoded, key)) as any;
+      if ('metadata' in decrypted) {
+        let processedContent = Buffer.from(decrypted.data, 'base64');
+        if (decrypted.metadata.compression?.algorithm === 'zlib:pako') {
           const decompressed = inflate(processedContent);
           processedContent = Buffer.from(decompressed);
         }
-        // other future compression versions
-
         return new TextDecoder().decode(processedContent);
       }
-    } catch {
-      // If parsing fails, assume unencoded content
+      return decrypted;
     }
-    return content;
+
+    validateMetadata(metadata);
+
+    let recovered = encoded;
+
+    if (metadata.encryption?.algorithm) {
+      const algorithm = encryptionRegistry[metadata.encryption.algorithm];
+      recovered = await algorithm.decrypt(recovered, key);
+    }
+
+    if (metadata.compression?.algorithm) {
+      const algorithm = compressionRegistry[metadata.compression.algorithm];
+      const decompressed = algorithm.decompress(Buffer.from(recovered, 'base64'));
+      recovered = new TextDecoder().decode(decompressed);
+    }
+
+    return recovered;
   }
 
   async create(
-    input: Omit<CreateVaultRequest, 'h'> & { p?: string },
+    input: Omit<CreateVaultRequest, 'h' | 'm'> & { p?: string; m?: ProcessingMetadata },
   ): Promise<CreateVaultResponse & { key: string; hash: string }> {
     const key = await generateRandomString(this.keyLength);
 
-    const compressed = this.compressContent(input.c);
+    const metadata: ProcessingMetadata = input.m ?? {
+      compression: {
+        algorithm: 'zlib:pako',
+      },
+      encryption: {
+        algorithm: 'ml-kem-768',
+      },
+    };
 
-    let encrypted = await this.encrypt(compressed, key);
-    if (input.p) {
-      encrypted = await this.encrypt(encrypted, input.p);
-    }
+    const processed = await this.processContent(input.c, metadata, key).then((r) =>
+      !input.p ? r : this.processContent(r, metadata, input.p),
+    );
     const hash = sha512(key + (input.p ?? ''));
 
     const response = await fetch(`${this.apiUrl}/vault`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({
-        c: encrypted,
+        c: processed,
         h: hash,
+        m: metadata,
         b: input.b,
         ttl: input.ttl,
         ips: input.ips,
@@ -162,13 +171,13 @@ export class Client {
 
     const data = await (res.json() as Promise<ReadVaultResponse>);
     const decrypted = password
-      ? await this.decrypt(data.c, password).then((d) => this.decrypt(d, key))
-      : await this.decrypt(data.c, key);
-
-    const decompressed = this.decompressContent(decrypted);
+      ? await this.recoverContent(data.c, password, data.m).then((d) =>
+          this.recoverContent(d, key, data.m),
+        )
+      : await this.recoverContent(data.c, key, data.m);
 
     return {
-      c: decompressed,
+      c: decrypted,
       burned: data.b,
       cd: data.cd,
       ttl: data.ttl,
