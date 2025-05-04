@@ -20,7 +20,8 @@ export const zh: TranslationKeys = {
       tagline: '以安全和隐私为设计理念 - 因为无知也是一种幸福',
     },
     header: {
-      tagline: '使用零知识<aesLink>AES-256</aesLink><e2eLink>端到端加密</e2eLink>的临时数据分享',
+      tagline:
+        '使用零知识<aesLink>ML-KEM</aesLink><e2eLink>后量子端到端加密</e2eLink>的临时数据分享',
     },
     time: {
       minute_one: '{{count}} 分钟',
@@ -37,7 +38,7 @@ export const zh: TranslationKeys = {
     features: {
       encryption: {
         title: '端到端加密',
-        description: '在数据离开浏览器之前使用 AES-256-GCM 加密确保安全',
+        description: '在数据离开浏览器之前使用 ML-KEM 后量子加密确保安全',
       },
       security: {
         title: '增强安全性',
@@ -291,7 +292,7 @@ export const zh: TranslationKeys = {
       encryption: {
         title: '端到端加密',
         description:
-          '所有密文在传输前都使用 AES-256-GCM 加密在您的浏览器中进行加密。加密密钥永远不会离开您的设备，确保真正的端到端加密。',
+          '所有密文在传输前都使用 ML-KEM 后量子加密在您的浏览器中进行加密。加密密钥永远不会离开您的设备，确保真正的端到端加密。',
         features: {
           key: '加密密钥来自密码学安全的随机生成',
           derivation: '密钥派生使用 PBKDF2 和 SHA-256',
@@ -311,7 +312,7 @@ export const zh: TranslationKeys = {
         title: '数据保护',
         description: '多层安全确保您的数据受到保护：',
         features: {
-          encryption: '客户端加密/解密',
+          encryption: '所有加密/解密都在您的浏览器中使用 ML-KEM 后量子加密进行',
           tls: '所有 API 通信都使用 TLS 加密',
           destruction: '访问后自动销毁密文',
           logging: '不记录敏感数据的服务器日志',
@@ -365,7 +366,7 @@ export const zh: TranslationKeys = {
       title: '数据存储和安全',
       description: '我们的安全措施包括：',
       items: {
-        encryption: '所有加密/解密都在您的浏览器中使用 AES-256-GCM 进行',
+        encryption: '所有加密/解密都在您的浏览器中使用 ML-KEM 后量子加密进行',
         csp: '严格的内容安全策略 (CSP) 以防止 XSS 攻击',
         tls: '所有 API 通信都使用 TLS 加密',
         expiration: '具有可配置生存时间 (TTL) 的自动数据过期',

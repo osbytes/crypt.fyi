@@ -22,7 +22,7 @@ export const fr: TranslationKeys = {
     },
     header: {
       tagline:
-        'Partagez des données éphémères avec un chiffrement <aesLink>AES-256</aesLink> <e2eLink>de bout en bout</e2eLink> à connaissance nulle',
+        'Partagez des données éphémères avec un chiffrement <aesLink>ML-KEM</aesLink> <e2eLink>post-quantique de bout en bout</e2eLink> à connaissance nulle',
     },
     time: {
       minute_one: '{{count}} minute',
@@ -41,7 +41,7 @@ export const fr: TranslationKeys = {
       encryption: {
         title: 'Chiffrement de Bout en Bout',
         description:
-          "Sécurisez vos données avec le chiffrement AES-256-GCM avant qu'elles ne quittent votre navigateur",
+          "Sécurisez vos données avec le chiffrement ML-KEM post-quantique avant qu'elles ne quittent votre navigateur",
       },
       security: {
         title: 'Sécurité Renforcée',
@@ -318,7 +318,7 @@ export const fr: TranslationKeys = {
       encryption: {
         title: 'Chiffrement de Bout en Bout',
         description:
-          'Tous les secrets sont chiffrés en utilisant le chiffrement AES-256-GCM dans votre navigateur avant la transmission. La clé de chiffrement ne quitte jamais votre appareil, assurant un véritable chiffrement de bout en bout.',
+          'Tous les secrets sont chiffrés en utilisant le chiffrement ML-KEM post-quantique dans votre navigateur avant la transmission. La clé de chiffrement ne quitte jamais votre appareil, assurant un véritable chiffrement de bout en bout.',
         features: {
           key: "La clé de chiffrement est dérivée d'une génération aléatoire cryptographiquement sûre",
           derivation: 'La dérivation des clés utilise PBKDF2 avec SHA-256',
@@ -339,7 +339,8 @@ export const fr: TranslationKeys = {
         title: 'Protection des Données',
         description: 'Plusieurs couches de sécurité assurent que vos données restent protégées :',
         features: {
-          encryption: 'Chiffrement/déchiffrement côté client',
+          encryption:
+            'Tout le chiffrement/déchiffrement se fait dans votre navigateur en utilisant ML-KEM post-quantique',
           tls: 'Chiffrement TLS pour toutes les communications API',
           destruction: 'Destruction automatique du secret après consultation',
           logging: 'Pas de journalisation des données sensibles sur le serveur',
@@ -399,7 +400,7 @@ export const fr: TranslationKeys = {
       description: 'Nos mesures de sécurité incluent :',
       items: {
         encryption:
-          'Tout le chiffrement/déchiffrement se fait dans votre navigateur en utilisant AES-256-GCM',
+          'Tout le chiffrement/déchiffrement se fait dans votre navigateur en utilisant ML-KEM post-quantique',
         csp: 'Politique de sécurité du contenu (CSP) stricte pour prévenir les attaques XSS',
         tls: 'Chiffrement TLS pour toutes les communications API',
         expiration: 'Expiration automatique des données avec durée de vie configurable (TTL)',

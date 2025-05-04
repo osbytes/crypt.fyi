@@ -21,7 +21,7 @@ export const de: TranslationKeys = {
     },
     header: {
       tagline:
-        'Kurzlebiger Datenaustausch mit Zero-Knowledge <aesLink>AES-256</aesLink> <e2eLink>Ende-zu-Ende-Verschlüsselung</e2eLink>',
+        'Kurzlebiger Datenaustausch mit Zero-Knowledge <aesLink>ML-KEM</aesLink> <e2eLink>Post-Quanten Ende-zu-Ende-Verschlüsselung</e2eLink>',
     },
     time: {
       minute_one: '{{count}} Minute',
@@ -40,7 +40,7 @@ export const de: TranslationKeys = {
       encryption: {
         title: 'Ende-zu-Ende-Verschlüsselung',
         description:
-          'Sichern Sie Ihre Daten mit AES-256-GCM-Verschlüsselung, bevor sie Ihren Browser verlassen',
+          'Sichern Sie Ihre Daten mit ML-KEM Post-Quanten-Verschlüsselung, bevor sie Ihren Browser verlassen',
       },
       security: {
         title: 'Erweiterte Sicherheit',
@@ -316,7 +316,7 @@ export const de: TranslationKeys = {
       encryption: {
         title: 'Ende-zu-Ende-Verschlüsselung',
         description:
-          'Alle Geheimnisse werden vor der Übertragung in Ihrem Browser mit AES-256-GCM-Verschlüsselung verschlüsselt. Der Verschlüsselungsschlüssel verlässt nie Ihr Gerät und gewährleistet so echte Ende-zu-Ende-Verschlüsselung.',
+          'Alle Geheimnisse werden vor der Übertragung in Ihrem Browser mit ML-KEM Post-Quanten-Verschlüsselung verschlüsselt. Der Verschlüsselungsschlüssel verlässt nie Ihr Gerät und gewährleistet so echte Ende-zu-Ende-Verschlüsselung.',
         features: {
           key: 'Verschlüsselungsschlüssel wird aus einer kryptografisch sicheren Zufallsgenerierung abgeleitet',
           derivation: 'Schlüsselableitung verwendet PBKDF2 mit SHA-256',
@@ -397,7 +397,7 @@ export const de: TranslationKeys = {
       description: 'Unsere Sicherheitsmaßnahmen umfassen:',
       items: {
         encryption:
-          'Alle Ver- und Entschlüsselung erfolgt in Ihrem Browser unter Verwendung von AES-256-GCM',
+          'Alle Ver- und Entschlüsselung erfolgt in Ihrem Browser unter Verwendung von ML-KEM Post-Quanten-Verschlüsselung',
         csp: 'Strikte Content Security Policy (CSP) zur Verhinderung von XSS-Angriffen',
         tls: 'TLS-Verschlüsselung für alle API-Kommunikation',
         expiration: 'Automatischer Datenablauf mit konfigurierbarer Lebensdauer (TTL)',

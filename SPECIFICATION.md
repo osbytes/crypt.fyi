@@ -4,7 +4,7 @@
 
 ### 1.1 Purpose
 
-crypt.fyi is a zero-knowledge, end-to-end encrypted secret sharing platform that enables users to securely share sensitive information using AES-256 encryption. The system is designed with a "zero-knowledge" architecture, meaning the server never has access to unencrypted data or encryption keys.
+crypt.fyi is a zero-knowledge, end-to-end encrypted secret sharing platform that enables users to securely share sensitive information using ML-KEM post-quantum encryption. The system is designed with a "zero-knowledge" architecture, meaning the server never has access to unencrypted data or encryption keys.
 
 ### 1.2 Scope
 
@@ -60,7 +60,7 @@ This separation ensures that even if the web server logs are compromised, the de
 
 1. **Client-Side Encryption**
 
-   - AES-256-GCM encryption with PBKDF2 key derivation and random salt and initialization vector (IV)
+   - ML-KEM post-quantum encryption with PBKDF2 key derivation and random salt and initialization vector (IV)
    - Unique encryption key per secret
    - All encryption/decryption occurs in the browser
    - Optional password protection for layered encryption
@@ -145,7 +145,7 @@ This separation ensures that even if the web server logs are compromised, the de
 1. **Creating a Secret**
 
    - Generate random encryption key
-   - Encrypt content with AES-256-GCM
+   - Encrypt content with ML-KEM post-quantum encryption
    - Optional: Encrypt again with user password
    - Generate SHA-512 hash of key+password
    - Send encrypted data to server

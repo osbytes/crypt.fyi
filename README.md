@@ -28,7 +28,7 @@
 
 ## Features
 
-- 🔐 End-to-end encryption using AES-256-GCM
+- 🔐 End-to-end encryption using ML-KEM post-quantum cryptography
 - 🛡️ Strict Content Security Policy (CSP) to prevent XSS attacks and unauthorized resource loading
 - 🛡️ Strict rate limits to mitigate brute-force attacks
 - 🤫 Zero-knowledge architecture - server never sees unencrypted data or decryption keys

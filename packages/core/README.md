@@ -8,7 +8,7 @@ Core library for interacting with the [crypt.fyi](https://crypt.fyi) API. This p
 
 ## Features
 
-- 🔒 AES-256-GCM encryption
+- 🔒 ML-KEM post-quantum encryption
 - 🗜️ Content compression using zlib
 - 🔑 Password protection support
 - ⏰ Time-to-live (TTL) functionality

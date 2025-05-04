@@ -21,7 +21,7 @@ export const en: TranslationKeys = {
     },
     header: {
       tagline:
-        'Ephemeral data sharing with zero-knowledge <aesLink>AES-256</aesLink> <e2eLink>end-to-end encryption</e2eLink>',
+        'Ephemeral data sharing with zero-knowledge <aesLink>ML-KEM</aesLink> <e2eLink>post-quantum end-to-end encryption</e2eLink>',
     },
     time: {
       minute_one: '{{count}} minute',
@@ -39,7 +39,8 @@ export const en: TranslationKeys = {
     features: {
       encryption: {
         title: 'End-to-end Encryption',
-        description: 'Secure your data with AES-256-GCM encryption before it leaves your browser',
+        description:
+          'Secure your data with ML-KEM post-quantum encryption before it leaves your browser',
       },
       security: {
         title: 'Enhanced Security',
@@ -304,7 +305,7 @@ export const en: TranslationKeys = {
       encryption: {
         title: 'End-to-End Encryption',
         description:
-          'All secrets are encrypted using AES-256-GCM encryption in your browser before transmission. The encryption key never leaves your device, ensuring true end-to-end encryption.',
+          'All secrets are encrypted using ML-KEM post-quantum encryption in your browser before transmission. The encryption key never leaves your device, ensuring true end-to-end encryption.',
         features: {
           key: 'Encryption key is derived from a cryptographically secure random generation',
           derivation: 'Key derivation uses PBKDF2 with SHA-256',
@@ -325,7 +326,8 @@ export const en: TranslationKeys = {
         title: 'Data Protection',
         description: 'Multiple layers of security ensure your data remains protected:',
         features: {
-          encryption: 'Client-side encryption/decryption',
+          encryption:
+            'All encryption/decryption occurs in your browser using ML-KEM post-quantum encryption',
           tls: 'TLS encryption for all API communications',
           destruction: 'Automatic secret destruction after access',
           logging: 'No server-side logging of sensitive data',
@@ -383,7 +385,8 @@ export const en: TranslationKeys = {
       title: 'Data Storage and Security',
       description: 'Our security measures include:',
       items: {
-        encryption: 'All encryption/decryption occurs in your browser using AES-256-GCM',
+        encryption:
+          'All encryption/decryption occurs in your browser using ML-KEM post-quantum encryption',
         csp: 'Strict Content Security Policy (CSP) to prevent XSS attacks',
         tls: 'TLS encryption for all API communications',
         expiration: 'Automatic data expiration with configurable Time-To-Live (TTL)',

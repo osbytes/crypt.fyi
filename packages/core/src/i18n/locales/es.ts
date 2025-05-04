@@ -22,7 +22,7 @@ export const es: TranslationKeys = {
     },
     header: {
       tagline:
-        'Compartir datos efímeros con cifrado <aesLink>AES-256</aesLink> de <e2eLink>extremo a extremo</e2eLink> de conocimiento cero',
+        'Compartir datos efímeros con cifrado <aesLink>ML-KEM</aesLink> <e2eLink>post-cuántico de extremo a extremo</e2eLink> de conocimiento cero',
     },
     time: {
       minute_one: '{{count}} minuto',
@@ -41,7 +41,7 @@ export const es: TranslationKeys = {
       encryption: {
         title: 'Cifrado de Extremo a Extremo',
         description:
-          'Asegura tus datos con cifrado AES-256-GCM antes de que salgan de tu navegador',
+          'Asegura tus datos con cifrado ML-KEM post-cuántico antes de que salgan de tu navegador',
       },
       security: {
         title: 'Seguridad Mejorada',
@@ -317,7 +317,7 @@ export const es: TranslationKeys = {
       encryption: {
         title: 'Cifrado de Extremo a Extremo',
         description:
-          'Todos los secretos se cifran usando cifrado AES-256-GCM en tu navegador antes de la transmisión. La clave de cifrado nunca sale de tu dispositivo, asegurando un verdadero cifrado de extremo a extremo.',
+          'Todos los secretos se cifran usando cifrado ML-KEM post-cuántico en tu navegador antes de la transmisión. La clave de cifrado nunca sale de tu dispositivo, asegurando un verdadero cifrado de extremo a extremo.',
         features: {
           key: 'La clave de cifrado se deriva de una generación aleatoria criptográficamente segura',
           derivation: 'La derivación de claves usa PBKDF2 con SHA-256',
@@ -338,7 +338,8 @@ export const es: TranslationKeys = {
         title: 'Protección de Datos',
         description: 'Múltiples capas de seguridad aseguran que tus datos permanezcan protegidos:',
         features: {
-          encryption: 'Cifrado/descifrado del lado del cliente',
+          encryption:
+            'Todo el cifrado/descifrado ocurre en tu navegador usando ML-KEM post-cuántico',
           tls: 'Cifrado TLS para todas las comunicaciones API',
           destruction: 'Destrucción automática del secreto después del acceso',
           logging: 'Sin registro de datos sensibles en el servidor',
@@ -397,7 +398,7 @@ export const es: TranslationKeys = {
       title: 'Almacenamiento y Seguridad de Datos',
       description: 'Nuestras medidas de seguridad incluyen:',
       items: {
-        encryption: 'Todo el cifrado/descifrado ocurre en tu navegador usando AES-256-GCM',
+        encryption: 'Todo el cifrado/descifrado ocurre en tu navegador usando ML-KEM post-cuántico',
         csp: 'Política de Seguridad de Contenido (CSP) estricta para prevenir ataques XSS',
         tls: 'Cifrado TLS para todas las comunicaciones API',
         expiration: 'Vencimiento automático de datos con tiempo de vida configurable (TTL)',
