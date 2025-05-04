@@ -9,6 +9,7 @@ import { generateRandomString } from './random';
 import { sha512 } from './hash';
 import { encryptionRegistry, compressionRegistry, validateMetadata } from './encryption/registry';
 import { ProcessingMetadata } from './vault';
+import { gcm } from './encryption';
 
 export class Client {
   private readonly apiUrl: string;
@@ -18,7 +19,7 @@ export class Client {
   constructor({
     apiUrl,
     keyLength = 32,
-    xClient = undefined,
+    xClient,
   }: {
     apiUrl: string;
     keyLength?: number;
@@ -66,7 +67,13 @@ export class Client {
     metadata: ProcessingMetadata,
     key: string,
   ): Promise<string> {
-    validateMetadata(metadata);
+    try {
+      validateMetadata(metadata);
+    } catch {
+      // Backward compatibility prior to introduction of metadata
+      const decrypted = await gcm.decrypt(encoded, key);
+      return decrypted;
+    }
     let recovered = encoded;
 
     if (metadata.encryption?.algorithm) {

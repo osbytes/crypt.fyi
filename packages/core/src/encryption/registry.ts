@@ -15,7 +15,7 @@ export const encryptionRegistry: Record<string, EncryptionAlgorithm> = {
     encrypt: mlkemEncrypt,
     decrypt: mlkemDecrypt,
   },
-};
+} as const;
 
 export const compressionRegistry: Record<string, CompressionAlgorithm> = {
   'zlib:pako': {
