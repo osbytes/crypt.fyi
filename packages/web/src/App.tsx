@@ -6,6 +6,7 @@ import { ThemeProvider } from './theme';
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
+import { TooltipProvider } from './components/ui/tooltip';
 
 const queryClient = new QueryClient();
 
@@ -27,7 +28,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <ClientProvider>
-          <RouterProvider router={router} />
+          <TooltipProvider>
+            <RouterProvider router={router} />
+          </TooltipProvider>
           <Toaster
             toastOptions={{
               classNames: {
