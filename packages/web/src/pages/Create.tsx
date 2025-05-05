@@ -44,6 +44,7 @@ import {
   IconShare,
   IconFile,
   IconWebhook,
+  IconInfoCircle,
 } from '@tabler/icons-react';
 import { useRef, useState } from 'react';
 import { clipboardCopy } from '@/lib/clipboardCopy';
@@ -61,6 +62,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { useTranslation } from 'react-i18next';
 import { useClient } from '@/context/client';
 import { NumberInput } from '@/components/NumberInput';
+import { TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip } from '@/components/ui/tooltip';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
 const MAX_FILE_SIZE = 1 * 1024 * 1024;
@@ -845,9 +848,17 @@ export function CreatePage() {
                                   control={form.control}
                                   name="rc"
                                   render={({ field }) => (
-                                    <FormItem className="flex-1 min-w-[240px]">
-                                      <FormLabel>
+                                    <FormItem className="flex-1 min-w-[240px] group">
+                                      <FormLabel className="flex items-center gap-2">
                                         {t('create.form.advanced.readCount.label')}
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            {t('create.form.advanced.readCount.description')}
+                                          </TooltipContent>
+                                        </Tooltip>
                                       </FormLabel>
                                       <FormControl>
                                         <NumberInput
@@ -862,9 +873,6 @@ export function CreatePage() {
                                         />
                                       </FormControl>
                                       <FormMessage />
-                                      <FormDescription>
-                                        {t('create.form.advanced.readCount.description')}
-                                      </FormDescription>
                                     </FormItem>
                                   )}
                                 />
@@ -872,9 +880,17 @@ export function CreatePage() {
                                   control={form.control}
                                   name="fc"
                                   render={({ field }) => (
-                                    <FormItem className="flex-1 min-w-[240px]">
-                                      <FormLabel>
+                                    <FormItem className="flex-1 min-w-[240px] group">
+                                      <FormLabel className="flex items-center gap-2">
                                         {t('create.form.advanced.failedAttempts.label')}
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            {t('create.form.advanced.failedAttempts.description')}
+                                          </TooltipContent>
+                                        </Tooltip>
                                       </FormLabel>
                                       <FormControl>
                                         <NumberInput
@@ -888,9 +904,6 @@ export function CreatePage() {
                                         />
                                       </FormControl>
                                       <FormMessage />
-                                      <FormDescription>
-                                        {t('create.form.advanced.failedAttempts.description')}
-                                      </FormDescription>
                                     </FormItem>
                                   )}
                                 />
@@ -899,8 +912,18 @@ export function CreatePage() {
                                 control={form.control}
                                 name="ips"
                                 render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>{t('create.form.advanced.ip.label')}</FormLabel>
+                                  <FormItem className="group">
+                                    <FormLabel className="flex items-center gap-2">
+                                      {t('create.form.advanced.ip.label')}
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          {t('create.form.advanced.ip.description')}
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </FormLabel>
                                     <FormControl>
                                       <Input
                                         type="text"
@@ -910,9 +933,6 @@ export function CreatePage() {
                                       />
                                     </FormControl>
                                     <FormMessage />
-                                    <FormDescription>
-                                      {t('create.form.advanced.ip.description')}
-                                    </FormDescription>
                                   </FormItem>
                                 )}
                               />
@@ -920,8 +940,18 @@ export function CreatePage() {
                                 control={form.control}
                                 name="whu"
                                 render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>{t('create.form.advanced.webhook.label')}</FormLabel>
+                                  <FormItem className="group">
+                                    <FormLabel className="flex items-center gap-2">
+                                      {t('create.form.advanced.webhook.label')}
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          {t('create.form.advanced.webhook.description')}
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </FormLabel>
                                     <FormControl>
                                       <Input
                                         type="url"
@@ -931,9 +961,6 @@ export function CreatePage() {
                                       />
                                     </FormControl>
                                     <FormMessage />
-                                    <FormDescription>
-                                      {t('create.form.advanced.webhook.description')}
-                                    </FormDescription>
                                   </FormItem>
                                 )}
                               />
@@ -943,9 +970,17 @@ export function CreatePage() {
                                     control={form.control}
                                     name="whn"
                                     render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>
+                                      <FormItem className="group">
+                                        <FormLabel className="flex items-center gap-2">
                                           {t('create.form.advanced.webhook.nameLabel')}
+                                          <Tooltip>
+                                            <TooltipTrigger asChild>
+                                              <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                              {t('create.form.advanced.webhook.nameDescription')}
+                                            </TooltipContent>
+                                          </Tooltip>
                                         </FormLabel>
                                         <FormControl>
                                           <Input
@@ -957,9 +992,6 @@ export function CreatePage() {
                                             disabled={createMutation.isPending || field.disabled}
                                           />
                                         </FormControl>
-                                        <FormDescription>
-                                          {t('create.form.advanced.webhook.nameDescription')}
-                                        </FormDescription>
                                       </FormItem>
                                     )}
                                   />
