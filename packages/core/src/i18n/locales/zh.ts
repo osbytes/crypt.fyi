@@ -54,7 +54,8 @@ export const zh: TranslationKeys = {
       },
       burn: {
         title: '一次性秘密共享',
-        description: '秘密在查看后自动删除，确保只能访问一次。完美适用于永远不应该持久存在的敏感信息。',
+        description:
+          '秘密在查看后自动删除，确保只能访问一次。完美适用于永远不应该持久存在的敏感信息。',
       },
       failedAttempts: {
         title: '失败尝试后销毁',
@@ -246,8 +247,7 @@ export const zh: TranslationKeys = {
       title: '为什么选择crypt.fyi？',
       commonPractices: {
         title: '常见做法的问题',
-        description:
-          '每天，密码、API密钥和私人数据等敏感信息通过不安全的渠道以明文形式共享：',
+        description: '每天，密码、API密钥和私人数据等敏感信息通过不安全的渠道以明文形式共享：',
         problems: {
           email: '电子邮件 - 可能被拦截、无限期存储和不受控制地转发',
           slack: 'Slack/Teams消息 - 保留在聊天历史和公司日志中',
@@ -307,8 +307,7 @@ export const zh: TranslationKeys = {
       },
       zeroKnowledge: {
         title: '真正的零知识架构',
-        description:
-          '我们的服务器永远看不到您的未加密数据。我们使用零知识架构，其中：',
+        description: '我们的服务器永远看不到您的未加密数据。我们使用零知识架构，其中：',
         features: {
           clientSide: '所有加密/解密都在您的浏览器中客户端进行',
           storage: '服务器只存储它们无法解密的加密数据',
@@ -319,8 +318,7 @@ export const zh: TranslationKeys = {
         title: '数据保护',
         description: '多层安全确保您的数据保持受保护：',
         features: {
-          encryption:
-            '所有加密/解密都在您的浏览器中使用ML-KEM后量子加密进行',
+          encryption: '所有加密/解密都在您的浏览器中使用ML-KEM后量子加密进行',
           tls: '所有API通信的TLS加密',
           destruction: '访问后自动删除秘密',
           logging: '服务器端不记录敏感数据',
@@ -330,8 +328,7 @@ export const zh: TranslationKeys = {
     },
     openSource: {
       title: '开源',
-      description:
-        'crypt.fyi是开源且可验证的。您可以检查我们的零知识实现、后量子加密并在',
+      description: 'crypt.fyi是开源且可验证的。您可以检查我们的零知识实现、后量子加密并在',
     },
   },
   privacy: {

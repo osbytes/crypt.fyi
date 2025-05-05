@@ -36,12 +36,12 @@ export const fr: TranslationKeys = {
   landing: {
     title: 'Partage de Secrets Zero-Knowledge',
     subtitle:
-      'Partage sécurisé unique d\'informations sensibles avec chiffrement post-quantique ML-KEM de bout en bout. Vos secrets sont chiffrés dans votre navigateur, ne sont jamais accessibles à nos serveurs et sont automatiquement supprimés après consultation.',
+      "Partage sécurisé unique d'informations sensibles avec chiffrement post-quantique ML-KEM de bout en bout. Vos secrets sont chiffrés dans votre navigateur, ne sont jamais accessibles à nos serveurs et sont automatiquement supprimés après consultation.",
     features: {
       encryption: {
         title: 'Chiffrement Post-Quantique ML-KEM',
         description:
-          'Le chiffrement post-quantique ML-KEM de pointe garantit que vos données restent sécurisées même contre les futures menaces de l\'informatique quantique. Tout le chiffrement se fait dans votre navigateur avant la transmission.',
+          "Le chiffrement post-quantique ML-KEM de pointe garantit que vos données restent sécurisées même contre les futures menaces de l'informatique quantique. Tout le chiffrement se fait dans votre navigateur avant la transmission.",
       },
       security: {
         title: 'Sécurité Renforcée',
@@ -55,7 +55,8 @@ export const fr: TranslationKeys = {
       },
       burn: {
         title: 'Partage de Secrets à Usage Unique',
-        description: 'Les secrets sont automatiquement supprimés après consultation, garantissant qu\'ils ne peuvent être consultés qu\'une seule fois. Parfait pour les informations sensibles qui ne doivent jamais persister.',
+        description:
+          "Les secrets sont automatiquement supprimés après consultation, garantissant qu'ils ne peuvent être consultés qu'une seule fois. Parfait pour les informations sensibles qui ne doivent jamais persister.",
       },
       failedAttempts: {
         title: 'Destruction Après Tentatives Échouées',
@@ -265,18 +266,23 @@ export const fr: TranslationKeys = {
         description:
           'Chaque jour, des informations sensibles comme des mots de passe, des clés API et des données privées sont partagées en clair via des canaux non sécurisés :',
         problems: {
-          email: 'Email - peut être intercepté, stocké indéfiniment et transféré de manière incontrôlée',
-          slack: 'Messages Slack/Teams - restent dans l\'historique des chats et les journaux d\'entreprise',
-          sms: 'SMS/Textes - stockés sur plusieurs appareils et serveurs d\'opérateurs',
-          messaging: 'Messagerie instantanée - souvent sans chiffrement approprié et suppression des données',
+          email:
+            'Email - peut être intercepté, stocké indéfiniment et transféré de manière incontrôlée',
+          slack:
+            "Messages Slack/Teams - restent dans l'historique des chats et les journaux d'entreprise",
+          sms: "SMS/Textes - stockés sur plusieurs appareils et serveurs d'opérateurs",
+          messaging:
+            'Messagerie instantanée - souvent sans chiffrement approprié et suppression des données',
         },
       },
       existingSolutions: {
         title: 'Solutions existantes et leurs limitations',
-        description: 'Bien qu\'il existe d\'autres outils dans ce domaine, chacun a ses limitations :',
+        description:
+          "Bien qu'il existe d'autres outils dans ce domaine, chacun a ses limitations :",
         limitations: {
-          onePassword: '1Password - excellent pour la gestion des mots de passe d\'équipe, mais',
-          onePasswordLink: 'ne prend pas en charge le partage interne pour les utilisateurs externes',
+          onePassword: "1Password - excellent pour la gestion des mots de passe d'équipe, mais",
+          onePasswordLink:
+            'ne prend pas en charge le partage interne pour les utilisateurs externes',
           otherTools:
             'PrivateBin/PwPush/OneTimeSecret - fonctionnalité de base similaire, mais interfaces utilisateur et piles technologiques obsolètes, et manque souvent de',
           otherToolsConfigLink: 'Architecture Zero-Knowledge',
@@ -284,9 +290,9 @@ export const fr: TranslationKeys = {
         },
       },
       approach: {
-        title: 'L\'approche crypt.fyi',
+        title: "L'approche crypt.fyi",
         description:
-          'crypt.fyi a été conçu pour relever ces défis tout en utilisant des technologies web modernes et des normes de sécurité. Nous combinons l\'architecture Zero-Knowledge avec le chiffrement post-quantique ML-KEM et garantissons que vos données restent privées et sécurisées. Le résultat est un outil à la fois hautement sécurisé et convivial.',
+          "crypt.fyi a été conçu pour relever ces défis tout en utilisant des technologies web modernes et des normes de sécurité. Nous combinons l'architecture Zero-Knowledge avec le chiffrement post-quantique ML-KEM et garantissons que vos données restent privées et sécurisées. Le résultat est un outil à la fois hautement sécurisé et convivial.",
       },
     },
     howItWorks: {
@@ -316,9 +322,9 @@ export const fr: TranslationKeys = {
         description:
           'Tous les secrets sont chiffrés avec le chiffrement post-quantique ML-KEM dans votre navigateur avant transmission. La clé de chiffrement ne quitte jamais votre appareil, garantissant un véritable chiffrement Zero-Knowledge de bout en bout.',
         features: {
-          key: 'La clé de chiffrement est dérivée d\'une génération aléatoire cryptographiquement sécurisée',
+          key: "La clé de chiffrement est dérivée d'une génération aléatoire cryptographiquement sécurisée",
           derivation: 'La dérivation de clé utilise PBKDF2 avec SHA-256',
-          vector: 'Chaque secret a un vecteur d\'initialisation (IV) unique',
+          vector: "Chaque secret a un vecteur d'initialisation (IV) unique",
         },
       },
       zeroKnowledge: {
@@ -326,14 +332,17 @@ export const fr: TranslationKeys = {
         description:
           'Nos serveurs ne voient jamais vos données non chiffrées. Nous utilisons une architecture Zero-Knowledge où :',
         features: {
-          clientSide: 'Tout le chiffrement/déchiffrement est effectué côté client dans votre navigateur',
-          storage: 'Les serveurs ne stockent que des données chiffrées qu\'ils ne peuvent pas déchiffrer',
-          keys: 'Les clés de chiffrement sont transmises via des fragments d\'URL qui n\'atteignent jamais le serveur API backend',
+          clientSide:
+            'Tout le chiffrement/déchiffrement est effectué côté client dans votre navigateur',
+          storage:
+            "Les serveurs ne stockent que des données chiffrées qu'ils ne peuvent pas déchiffrer",
+          keys: "Les clés de chiffrement sont transmises via des fragments d'URL qui n'atteignent jamais le serveur API backend",
         },
       },
       protection: {
         title: 'Protection des Données',
-        description: 'Plusieurs couches de sécurité garantissent que vos données restent protégées :',
+        description:
+          'Plusieurs couches de sécurité garantissent que vos données restent protégées :',
         features: {
           encryption:
             'Tout le chiffrement/déchiffrement est effectué dans votre navigateur avec le chiffrement post-quantique ML-KEM',

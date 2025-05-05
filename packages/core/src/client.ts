@@ -110,7 +110,7 @@ export class Client {
         algorithm: 'zlib:pako',
       },
       encryption: {
-        algorithm: 'ml-kem-768',
+        algorithm: 'ml-kem-768-2',
       },
     };
 

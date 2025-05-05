@@ -54,7 +54,8 @@ export const en: TranslationKeys = {
       },
       burn: {
         title: 'One-Time Secret Sharing',
-        description: 'Secrets are automatically destroyed after viewing, ensuring they can only be accessed once. Perfect for sharing sensitive information that should never persist.',
+        description:
+          'Secrets are automatically destroyed after viewing, ensuring they can only be accessed once. Perfect for sharing sensitive information that should never persist.',
       },
       failedAttempts: {
         title: 'Burn After Failed Attempts',
@@ -286,7 +287,7 @@ export const en: TranslationKeys = {
         encrypt: {
           title: '1. Encrypt',
           description:
-            "Your secret is encrypted in your browser using ML-KEM post-quantum encryption before it ever leaves your device. The encryption happens entirely client-side, ensuring zero-knowledge of your data.",
+            'Your secret is encrypted in your browser using ML-KEM post-quantum encryption before it ever leaves your device. The encryption happens entirely client-side, ensuring zero-knowledge of your data.',
         },
         share: {
           title: '2. Share',

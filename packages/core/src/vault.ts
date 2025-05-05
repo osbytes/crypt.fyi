@@ -8,7 +8,7 @@ export const processingMetadataSchema = z
       })
       .optional(),
     encryption: z.object({
-      algorithm: z.enum(['aes-256-gcm', 'ml-kem-768']),
+      algorithm: z.enum(['aes-256-gcm', 'ml-kem-768', 'ml-kem-768-2']),
     }),
   })
   .describe('processing metadata including compression and encryption algorithms');

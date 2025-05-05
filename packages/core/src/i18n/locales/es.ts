@@ -55,7 +55,8 @@ export const es: TranslationKeys = {
       },
       burn: {
         title: 'Compartir Secretos de Un Solo Uso',
-        description: 'Los secretos se eliminan automáticamente después de ser vistos, garantizando que solo puedan ser accedidos una vez. Perfecto para compartir información sensible que nunca debe persistir.',
+        description:
+          'Los secretos se eliminan automáticamente después de ser vistos, garantizando que solo puedan ser accedidos una vez. Perfecto para compartir información sensible que nunca debe persistir.',
       },
       failedAttempts: {
         title: 'Destruir Después de Intentos Fallidos',
@@ -263,15 +264,19 @@ export const es: TranslationKeys = {
         description:
           'Cada día, información sensible como contraseñas, claves API y datos privados se comparten a través de canales inseguros en texto plano:',
         problems: {
-          email: 'Correo electrónico - puede ser interceptado, almacenado indefinidamente y reenviado sin control',
-          slack: 'Mensajes de Slack/Teams - permanecen en el historial de chat y registros de la empresa',
+          email:
+            'Correo electrónico - puede ser interceptado, almacenado indefinidamente y reenviado sin control',
+          slack:
+            'Mensajes de Slack/Teams - permanecen en el historial de chat y registros de la empresa',
           sms: 'Mensajes SMS/Texto - almacenados en múltiples dispositivos y servidores de operadores',
-          messaging: 'Mensajería instantánea - a menudo carece de cifrado adecuado y eliminación de datos',
+          messaging:
+            'Mensajería instantánea - a menudo carece de cifrado adecuado y eliminación de datos',
         },
       },
       existingSolutions: {
         title: 'Soluciones Existentes y Sus Limitaciones',
-        description: 'Si bien hay otras herramientas en este espacio, cada una tiene sus limitaciones:',
+        description:
+          'Si bien hay otras herramientas en este espacio, cada una tiene sus limitaciones:',
         limitations: {
           onePassword: '1Password - excelente para gestión de contraseñas en equipo, pero',
           onePasswordLink: 'no admite compartir internamente con usuarios externos',

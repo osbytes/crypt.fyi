@@ -54,7 +54,8 @@ export const de: TranslationKeys = {
       },
       burn: {
         title: 'Einmaliges Geheimnis-Sharing',
-        description: 'Geheimnisse werden nach der Ansicht automatisch gelöscht, sodass sie nur einmal zugänglich sind. Perfekt für sensible Informationen, die niemals bestehen bleiben sollten.',
+        description:
+          'Geheimnisse werden nach der Ansicht automatisch gelöscht, sodass sie nur einmal zugänglich sind. Perfekt für sensible Informationen, die niemals bestehen bleiben sollten.',
       },
       failedAttempts: {
         title: 'Löschen nach fehlgeschlagenen Versuchen',
@@ -264,7 +265,8 @@ export const de: TranslationKeys = {
         description:
           'Täglich werden sensible Informationen wie Passwörter, API-Schlüssel und private Daten über unsichere Kanäle im Klartext geteilt:',
         problems: {
-          email: 'E-Mail - kann abgefangen, unbegrenzt gespeichert und unkontrolliert weitergeleitet werden',
+          email:
+            'E-Mail - kann abgefangen, unbegrenzt gespeichert und unkontrolliert weitergeleitet werden',
           slack: 'Slack/Teams-Nachrichten - bleiben im Chatverlauf und Firmenprotokollen',
           sms: 'SMS/Textnachrichten - auf mehreren Geräten und Carrier-Servern gespeichert',
           messaging: 'Instant Messaging - oft ohne angemessene Verschlüsselung und Datenlöschung',
@@ -272,7 +274,8 @@ export const de: TranslationKeys = {
       },
       existingSolutions: {
         title: 'Bestehende Lösungen und ihre Einschränkungen',
-        description: 'Während es andere Tools in diesem Bereich gibt, hat jedes seine Einschränkungen:',
+        description:
+          'Während es andere Tools in diesem Bereich gibt, hat jedes seine Einschränkungen:',
         limitations: {
           onePassword: '1Password - ausgezeichnet für Team-Passwortverwaltung, aber',
           onePasswordLink: 'unterstützt keine interne Freigabe für externe Nicht-Benutzer',

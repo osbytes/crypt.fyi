@@ -1,4 +1,4 @@
-import { gcm, mlkem } from './';
+import { gcm, mlkem, mlkem2 } from './';
 
 const algorithms = [
   {
@@ -10,6 +10,11 @@ const algorithms = [
     name: 'mlkem',
     encrypt: mlkem.encrypt,
     decrypt: mlkem.decrypt,
+  },
+  {
+    name: 'mlkem2',
+    encrypt: mlkem2.encrypt,
+    decrypt: mlkem2.decrypt,
   },
 ];
 
