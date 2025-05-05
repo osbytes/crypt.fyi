@@ -34,29 +34,28 @@ export const fr: TranslationKeys = {
     },
   },
   landing: {
-    title: 'Partagez des Données Sensibles en Toute Sécurité',
+    title: 'Partage de Secrets Zero-Knowledge',
     subtitle:
-      'crypt.fyi permet le partage de données sensibles avec chiffrement de bout en bout à connaissance nulle et suppression automatique',
+      'Partage sécurisé unique d\'informations sensibles avec chiffrement post-quantique ML-KEM de bout en bout. Vos secrets sont chiffrés dans votre navigateur, ne sont jamais accessibles à nos serveurs et sont automatiquement supprimés après consultation.',
     features: {
       encryption: {
-        title: 'Chiffrement de Bout en Bout',
+        title: 'Chiffrement Post-Quantique ML-KEM',
         description:
-          "Sécurisez vos données avec le chiffrement ML-KEM post-quantique avant qu'elles ne quittent votre navigateur",
+          'Le chiffrement post-quantique ML-KEM de pointe garantit que vos données restent sécurisées même contre les futures menaces de l\'informatique quantique. Tout le chiffrement se fait dans votre navigateur avant la transmission.',
       },
       security: {
         title: 'Sécurité Renforcée',
         description:
-          'Politique de sécurité du contenu (CSP) stricte et limites de débit pour atténuer les attaques XSS et par force brute',
+          'Plusieurs couches de protection incluant une Politique de Sécurité du Contenu (CSP) stricte, limitation de débit et restrictions IP. Chiffrement résistant aux quantiques avec suppression automatique après consultation.',
       },
       zeroKnowledge: {
-        title: 'Connaissance Nulle',
+        title: 'Architecture Zero-Knowledge Véritable',
         description:
-          'Nos serveurs ne voient jamais vos données non chiffrées - seuls vous et votre destinataire y ont accès',
+          'Nos serveurs ne voient jamais vos données non chiffrées. La clé de chiffrement ne quitte jamais votre appareil, et tout le déchiffrement se fait dans votre navigateur. Confidentialité totale grâce au chiffrement de bout en bout.',
       },
       burn: {
-        title: 'Destruction Après Lecture',
-        description:
-          'Détruisez automatiquement les secrets après leur consultation pour une sécurité maximale',
+        title: 'Partage de Secrets à Usage Unique',
+        description: 'Les secrets sont automatiquement supprimés après consultation, garantissant qu\'ils ne peuvent être consultés qu\'une seule fois. Parfait pour les informations sensibles qui ne doivent jamais persister.',
       },
       failedAttempts: {
         title: 'Destruction Après Tentatives Échouées',
@@ -258,92 +257,89 @@ export const fr: TranslationKeys = {
   about: {
     title: 'À Propos',
     intro:
-      "crypt.fyi est une plateforme sécurisée, open source et éphémère de partage de données qui vous permet de partager des informations sensibles en toute sécurité. Qu'il s'agisse de mots de passe, de clés API ou de messages confidentiels, crypt.fyi garantit que vos données restent privées et disparaissent automatiquement après avoir été consultées.",
+      'crypt.fyi est une plateforme sécurisée et open-source avec une architecture Zero-Knowledge qui vous permet de partager des informations sensibles en toute sécurité avec un chiffrement post-quantique de bout en bout. Que ce soit des mots de passe, des clés API ou des messages confidentiels - crypt.fyi garantit que vos données restent privées, ne sont jamais accessibles à nos serveurs et sont automatiquement supprimées après consultation.',
     whyCryptFyi: {
       title: 'Pourquoi crypt.fyi ?',
       commonPractices: {
-        title: 'Le Problème avec les Pratiques Courantes',
+        title: 'Le problème des pratiques courantes',
         description:
-          'Chaque jour, des informations sensibles comme des mots de passe, des clés API et des données privées sont partagées via des canaux non sécurisés en texte clair :',
+          'Chaque jour, des informations sensibles comme des mots de passe, des clés API et des données privées sont partagées en clair via des canaux non sécurisés :',
         problems: {
-          email: 'Email - peut être intercepté, stocké indéfiniment et transféré sans contrôle',
-          slack:
-            "Messages Slack/Teams - restent dans l'historique des discussions et les journaux d'entreprise",
-          sms: "SMS/Messages texte - stockés sur plusieurs appareils et serveurs d'opérateurs",
-          messaging:
-            'Messagerie instantanée - manque souvent de chiffrement adéquat et de suppression des données',
+          email: 'Email - peut être intercepté, stocké indéfiniment et transféré de manière incontrôlée',
+          slack: 'Messages Slack/Teams - restent dans l\'historique des chats et les journaux d\'entreprise',
+          sms: 'SMS/Textes - stockés sur plusieurs appareils et serveurs d\'opérateurs',
+          messaging: 'Messagerie instantanée - souvent sans chiffrement approprié et suppression des données',
         },
       },
       existingSolutions: {
-        title: 'Solutions Existantes et Leurs Limites',
-        description: "Bien qu'il existe d'autres outils dans ce domaine, chacun a ses limites :",
+        title: 'Solutions existantes et leurs limitations',
+        description: 'Bien qu\'il existe d\'autres outils dans ce domaine, chacun a ses limitations :',
         limitations: {
-          onePassword: '1Password - excellent pour la gestion des mots de passe en équipe, mais',
-          onePasswordLink:
-            'ne prend pas en charge le partage externe avec des utilisateurs non enregistrés',
+          onePassword: '1Password - excellent pour la gestion des mots de passe d\'équipe, mais',
+          onePasswordLink: 'ne prend pas en charge le partage interne pour les utilisateurs externes',
           otherTools:
-            'PrivateBin/PwPush/OneTimeSecret - fonctionnalité de base similaire, mais interfaces utilisateur dépassées et piles technologiques anciennes, plus certaines',
-          otherToolsConfigLink: 'configurations',
-          otherToolsSecurityLink: 'fonctionnalités de sécurité',
+            'PrivateBin/PwPush/OneTimeSecret - fonctionnalité de base similaire, mais interfaces utilisateur et piles technologiques obsolètes, et manque souvent de',
+          otherToolsConfigLink: 'Architecture Zero-Knowledge',
+          otherToolsSecurityLink: 'Chiffrement Post-Quantique',
         },
       },
       approach: {
-        title: "L'Approche de crypt.fyi",
+        title: 'L\'approche crypt.fyi',
         description:
-          'crypt.fyi a été construit pour répondre à ces défis tout en adoptant les technologies web modernes. Il combine les principes de sécurité des solutions existantes avec une interface propre et intuitive et une pile technologique moderne. Le résultat est un outil à la fois hautement sécurisé et agréable à utiliser.',
+          'crypt.fyi a été conçu pour relever ces défis tout en utilisant des technologies web modernes et des normes de sécurité. Nous combinons l\'architecture Zero-Knowledge avec le chiffrement post-quantique ML-KEM et garantissons que vos données restent privées et sécurisées. Le résultat est un outil à la fois hautement sécurisé et convivial.',
       },
     },
     howItWorks: {
-      title: 'Comment Ça Marche',
+      title: 'Comment ça marche',
       steps: {
         encrypt: {
           title: '1. Chiffrer',
           description:
-            'Votre secret est chiffré directement dans votre navigateur avant de quitter votre appareil. Seules les personnes ayant le lien spécial, que vous avez explicitement partagé, peuvent le déchiffrer.',
+            'Votre secret est chiffré dans votre navigateur avec le chiffrement post-quantique ML-KEM avant de quitter votre appareil. Le chiffrement est effectué entièrement côté client et garantit le Zero-Knowledge de vos données.',
         },
         share: {
           title: '2. Partager',
           description:
-            'Partagez le lien sécurisé avec votre destinataire. Le lien contient tout ce qui est nécessaire pour déchiffrer le message, sauf si un mot de passe est spécifié.',
+            'Partagez le lien sécurisé avec votre destinataire. Le lien contient tout ce qui est nécessaire pour déchiffrer le message, mais nos serveurs ne voient jamais le contenu non chiffré.',
         },
         burn: {
-          title: '3. Détruire après lecture',
+          title: '3. Supprimer après lecture',
           description:
-            'Une fois consulté, si "détruire après lecture" est coché, le secret est définitivement supprimé de nos serveurs. Sans laisser de traces.',
+            'Après consultation, le secret est définitivement supprimé de nos serveurs si "Supprimer après lecture" est activé. Aucune trace ne reste, garantissant le Zero-Knowledge complet de vos données.',
         },
       },
     },
     security: {
       title: 'Implémentation de la Sécurité',
       encryption: {
-        title: 'Chiffrement de Bout en Bout',
+        title: 'Chiffrement Post-Quantique Zero-Knowledge',
         description:
-          'Tous les secrets sont chiffrés en utilisant le chiffrement ML-KEM post-quantique dans votre navigateur avant la transmission. La clé de chiffrement ne quitte jamais votre appareil, assurant un véritable chiffrement de bout en bout.',
+          'Tous les secrets sont chiffrés avec le chiffrement post-quantique ML-KEM dans votre navigateur avant transmission. La clé de chiffrement ne quitte jamais votre appareil, garantissant un véritable chiffrement Zero-Knowledge de bout en bout.',
         features: {
-          key: "La clé de chiffrement est dérivée d'une génération aléatoire cryptographiquement sûre",
-          derivation: 'La dérivation des clés utilise PBKDF2 avec SHA-256',
-          vector: "Chaque secret a un vecteur d'initialisation (IV) unique",
+          key: 'La clé de chiffrement est dérivée d\'une génération aléatoire cryptographiquement sécurisée',
+          derivation: 'La dérivation de clé utilise PBKDF2 avec SHA-256',
+          vector: 'Chaque secret a un vecteur d\'initialisation (IV) unique',
         },
       },
       zeroKnowledge: {
-        title: 'Architecture à Connaissance Nulle',
+        title: 'Véritable Architecture Zero-Knowledge',
         description:
-          'Nos serveurs ne voient jamais vos données non chiffrées. Nous employons une architecture à connaissance nulle où :',
+          'Nos serveurs ne voient jamais vos données non chiffrées. Nous utilisons une architecture Zero-Knowledge où :',
         features: {
-          clientSide: 'Tout le chiffrement/déchiffrement se fait côté client',
-          storage: 'Les serveurs ne stockent que des données chiffrées',
-          keys: "Les clés de chiffrement sont transmises via des fragments d'URL, qui n'atteignent jamais le serveur API backend",
+          clientSide: 'Tout le chiffrement/déchiffrement est effectué côté client dans votre navigateur',
+          storage: 'Les serveurs ne stockent que des données chiffrées qu\'ils ne peuvent pas déchiffrer',
+          keys: 'Les clés de chiffrement sont transmises via des fragments d\'URL qui n\'atteignent jamais le serveur API backend',
         },
       },
       protection: {
         title: 'Protection des Données',
-        description: 'Plusieurs couches de sécurité assurent que vos données restent protégées :',
+        description: 'Plusieurs couches de sécurité garantissent que vos données restent protégées :',
         features: {
           encryption:
-            'Tout le chiffrement/déchiffrement se fait dans votre navigateur en utilisant ML-KEM post-quantique',
+            'Tout le chiffrement/déchiffrement est effectué dans votre navigateur avec le chiffrement post-quantique ML-KEM',
           tls: 'Chiffrement TLS pour toutes les communications API',
-          destruction: 'Destruction automatique du secret après consultation',
-          logging: 'Pas de journalisation des données sensibles sur le serveur',
+          destruction: 'Suppression automatique des secrets après consultation',
+          logging: 'Aucune journalisation côté serveur des données sensibles',
           password: 'Protection par mot de passe optionnelle pour une sécurité supplémentaire',
         },
       },
@@ -351,7 +347,7 @@ export const fr: TranslationKeys = {
     openSource: {
       title: 'Open Source',
       description:
-        'crypt.fyi est open source et auditable. Vous pouvez examiner notre code, signaler des problèmes et contribuer sur',
+        'crypt.fyi est open source et vérifiable. Vous pouvez examiner notre implémentation Zero-Knowledge, le chiffrement post-quantique et contribuer sur',
     },
   },
   privacy: {

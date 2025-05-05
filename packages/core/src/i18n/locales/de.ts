@@ -33,29 +33,28 @@ export const de: TranslationKeys = {
     },
   },
   landing: {
-    title: 'Sicherer Austausch sensibler Daten',
+    title: 'Zero-Knowledge Geheimnis-Sharing',
     subtitle:
-      'crypt.fyi ermöglicht Zero-Knowledge Ende-zu-Ende verschlüsseltes Teilen sensibler Daten mit automatischer Löschung',
+      'Sicheres einmaliges Teilen sensibler Informationen mit ML-KEM Post-Quanten Ende-zu-Ende-Verschlüsselung. Ihre Geheimnisse werden in Ihrem Browser verschlüsselt, sind für unsere Server nie zugänglich und werden nach dem Ansehen automatisch gelöscht.',
     features: {
       encryption: {
-        title: 'Ende-zu-Ende-Verschlüsselung',
+        title: 'ML-KEM Post-Quanten-Verschlüsselung',
         description:
-          'Sichern Sie Ihre Daten mit ML-KEM Post-Quanten-Verschlüsselung, bevor sie Ihren Browser verlassen',
+          'State-of-the-art ML-KEM Post-Quanten-Verschlüsselung stellt sicher, dass Ihre Daten auch gegen zukünftige Quantencomputer-Bedrohungen sicher bleiben. Die gesamte Verschlüsselung erfolgt in Ihrem Browser vor der Übertragung.',
       },
       security: {
         title: 'Erweiterte Sicherheit',
         description:
-          'Strikte Content Security Policy (CSP) und Ratenbegrenzungen zum Schutz vor XSS- und Brute-Force-Angriffen',
+          'Mehrere Schutzebenen einschließlich strikter Content Security Policy (CSP), Ratenbegrenzung und IP-Beschränkungen. Quantenresistente Verschlüsselung mit automatischer Löschung nach der Ansicht.',
       },
       zeroKnowledge: {
-        title: 'Zero-Knowledge',
+        title: 'Echte Zero-Knowledge-Architektur',
         description:
-          'Unsere Server sehen nie Ihre unverschlüsselten Daten - nur Sie und Ihr Empfänger haben Zugriff',
+          'Unsere Server sehen Ihre unverschlüsselten Daten nie. Der Verschlüsselungsschlüssel verlässt Ihr Gerät nie, und die gesamte Entschlüsselung erfolgt in Ihrem Browser. Absolute Privatsphäre durch Ende-zu-Ende-Verschlüsselung.',
       },
       burn: {
-        title: 'Einmal-Lesen',
-        description:
-          'Geheimnisse werden nach dem Lesen automatisch gelöscht für maximale Sicherheit',
+        title: 'Einmaliges Geheimnis-Sharing',
+        description: 'Geheimnisse werden nach der Ansicht automatisch gelöscht, sodass sie nur einmal zugänglich sind. Perfekt für sensible Informationen, die niemals bestehen bleiben sollten.',
       },
       failedAttempts: {
         title: 'Löschen nach fehlgeschlagenen Versuchen',
@@ -255,9 +254,9 @@ export const de: TranslationKeys = {
     },
   },
   about: {
-    title: 'Über uns',
+    title: 'Über',
     intro:
-      'crypt.fyi ist eine sichere, quelloffene Plattform für kurzlebigen Datenaustausch, die es Ihnen ermöglicht, sensible Informationen sicher zu teilen. Ob Passwörter, API-Schlüssel oder vertrauliche Nachrichten - crypt.fyi stellt sicher, dass Ihre Daten privat bleiben und nach dem Zugriff automatisch verschwinden.',
+      'crypt.fyi ist eine sichere, Open-Source-Plattform mit Zero-Knowledge-Architektur, die es Ihnen ermöglicht, sensible Informationen sicher mit Post-Quanten Ende-zu-Ende-Verschlüsselung zu teilen. Ob Passwörter, API-Schlüssel oder vertrauliche Nachrichten - crypt.fyi stellt sicher, dass Ihre Daten privat bleiben, für unsere Server nie zugänglich sind und nach dem Zugriff automatisch gelöscht werden.',
     whyCryptFyi: {
       title: 'Warum crypt.fyi?',
       commonPractices: {
@@ -265,30 +264,28 @@ export const de: TranslationKeys = {
         description:
           'Täglich werden sensible Informationen wie Passwörter, API-Schlüssel und private Daten über unsichere Kanäle im Klartext geteilt:',
         problems: {
-          email:
-            'E-Mail - kann abgefangen, unbegrenzt gespeichert und unkontrolliert weitergeleitet werden',
-          slack: 'Slack/Teams-Nachrichten - bleiben im Chat-Verlauf und Firmenprotokollen',
-          sms: 'SMS/Textnachrichten - auf mehreren Geräten und Betreiberservern gespeichert',
+          email: 'E-Mail - kann abgefangen, unbegrenzt gespeichert und unkontrolliert weitergeleitet werden',
+          slack: 'Slack/Teams-Nachrichten - bleiben im Chatverlauf und Firmenprotokollen',
+          sms: 'SMS/Textnachrichten - auf mehreren Geräten und Carrier-Servern gespeichert',
           messaging: 'Instant Messaging - oft ohne angemessene Verschlüsselung und Datenlöschung',
         },
       },
       existingSolutions: {
-        title: 'Bestehende Lösungen und ihre Grenzen',
-        description:
-          'Während es andere Tools in diesem Bereich gibt, hat jedes seine Einschränkungen:',
+        title: 'Bestehende Lösungen und ihre Einschränkungen',
+        description: 'Während es andere Tools in diesem Bereich gibt, hat jedes seine Einschränkungen:',
         limitations: {
-          onePassword: '1Password - hervorragend für Team-Passwortverwaltung, aber',
-          onePasswordLink: 'unterstützt keine externe Freigabe für Nicht-Benutzer',
+          onePassword: '1Password - ausgezeichnet für Team-Passwortverwaltung, aber',
+          onePasswordLink: 'unterstützt keine interne Freigabe für externe Nicht-Benutzer',
           otherTools:
-            'PrivateBin/PwPush/OneTimeSecret - ähnliche Kernfunktionalität, aber veraltete Benutzeroberflächen und Technologie-Stacks sowie fehlende',
-          otherToolsConfigLink: 'Konfigurierbarkeit',
-          otherToolsSecurityLink: 'Sicherheitsfunktionen',
+            'PrivateBin/PwPush/OneTimeSecret - ähnliche Kernfunktionalität, aber veraltete Benutzeroberflächen und Technologie-Stacks, und oft fehlt',
+          otherToolsConfigLink: 'Zero-Knowledge-Architektur',
+          otherToolsSecurityLink: 'Post-Quanten-Verschlüsselung',
         },
       },
       approach: {
-        title: 'Der crypt.fyi-Ansatz',
+        title: 'Der crypt.fyi Ansatz',
         description:
-          'crypt.fyi wurde entwickelt, um diese Herausforderungen zu bewältigen und dabei moderne Webtechnologien zu nutzen. Es kombiniert die Sicherheitsprinzipien bestehender Lösungen mit einer übersichtlichen, intuitiven Oberfläche und einem modernen Tech-Stack. Das Ergebnis ist ein Tool, das sowohl hochsicher als auch angenehm zu benutzen ist.',
+          'crypt.fyi wurde entwickelt, um diese Herausforderungen zu bewältigen und dabei moderne Webtechnologien und Sicherheitsstandards zu nutzen. Wir kombinieren Zero-Knowledge-Architektur mit ML-KEM Post-Quanten-Verschlüsselung und stellen sicher, dass Ihre Daten privat und sicher bleiben. Das Ergebnis ist ein Tool, das sowohl hochsicher als auch benutzerfreundlich ist.',
       },
     },
     howItWorks: {
@@ -297,58 +294,59 @@ export const de: TranslationKeys = {
         encrypt: {
           title: '1. Verschlüsseln',
           description:
-            'Ihr Geheimnis wird direkt in Ihrem Browser verschlüsselt, bevor es Ihr Gerät verlässt. Nur Personen mit dem speziellen Link, den Sie explizit geteilt haben, können es entschlüsseln.',
+            'Ihr Geheimnis wird in Ihrem Browser mit ML-KEM Post-Quanten-Verschlüsselung verschlüsselt, bevor es Ihr Gerät verlässt. Die Verschlüsselung erfolgt vollständig clientseitig und gewährleistet Zero-Knowledge Ihrer Daten.',
         },
         share: {
           title: '2. Teilen',
           description:
-            'Teilen Sie den sicheren Link mit Ihrem gewünschten Empfänger. Der Link enthält alles Notwendige zur Entschlüsselung der Nachricht, sofern kein Passwort festgelegt wurde.',
+            'Teilen Sie den sicheren Link mit Ihrem Empfänger. Der Link enthält alles, was zum Entschlüsseln der Nachricht benötigt wird, aber unsere Server sehen den unverschlüsselten Inhalt nie.',
         },
         burn: {
           title: '3. Nach dem Lesen löschen',
           description:
-            'Nach dem Zugriff wird das Geheimnis, falls "Nach dem Lesen löschen" aktiviert ist, permanent von unseren Servern gelöscht. Keine Spuren bleiben zurück.',
+            'Nach dem Zugriff wird das Geheimnis, wenn "Nach dem Lesen löschen" aktiviert ist, dauerhaft von unseren Servern gelöscht. Keine Spuren bleiben zurück, was vollständiges Zero-Knowledge Ihrer Daten gewährleistet.',
         },
       },
     },
     security: {
       title: 'Sicherheitsimplementierung',
       encryption: {
-        title: 'Ende-zu-Ende-Verschlüsselung',
+        title: 'Zero-Knowledge Post-Quanten-Verschlüsselung',
         description:
-          'Alle Geheimnisse werden vor der Übertragung in Ihrem Browser mit ML-KEM Post-Quanten-Verschlüsselung verschlüsselt. Der Verschlüsselungsschlüssel verlässt nie Ihr Gerät und gewährleistet so echte Ende-zu-Ende-Verschlüsselung.',
+          'Alle Geheimnisse werden mit ML-KEM Post-Quanten-Verschlüsselung in Ihrem Browser verschlüsselt, bevor sie übertragen werden. Der Verschlüsselungsschlüssel verlässt Ihr Gerät nie, was echte Zero-Knowledge Ende-zu-Ende-Verschlüsselung gewährleistet.',
         features: {
-          key: 'Verschlüsselungsschlüssel wird aus einer kryptografisch sicheren Zufallsgenerierung abgeleitet',
+          key: 'Der Verschlüsselungsschlüssel wird aus einer kryptographisch sicheren Zufallsgenerierung abgeleitet',
           derivation: 'Schlüsselableitung verwendet PBKDF2 mit SHA-256',
-          vector: 'Jedes Geheimnis hat einen einzigartigen Initialisierungsvektor (IV)',
+          vector: 'Jedes Geheimnis hat einen eindeutigen Initialisierungsvektor (IV)',
         },
       },
       zeroKnowledge: {
-        title: 'Zero-Knowledge-Architektur',
+        title: 'Echte Zero-Knowledge-Architektur',
         description:
           'Unsere Server sehen nie Ihre unverschlüsselten Daten. Wir verwenden eine Zero-Knowledge-Architektur, bei der:',
         features: {
-          clientSide: 'Alle Ver- und Entschlüsselung clientseitig erfolgt',
-          storage: 'Server nur verschlüsselte Daten speichern',
-          keys: 'Verschlüsselungsschlüssel über URL-Fragmente übertragen werden, die nie den Backend-API-Server erreichen',
+          clientSide: 'Alle Verschlüsselung/Entschlüsselung erfolgt clientseitig in Ihrem Browser',
+          storage: 'Server speichern nur verschlüsselte Daten, die sie nicht entschlüsseln können',
+          keys: 'Verschlüsselungsschlüssel werden über URL-Fragmente übertragen, die nie den Backend-API-Server erreichen',
         },
       },
       protection: {
         title: 'Datenschutz',
         description: 'Mehrere Sicherheitsebenen stellen sicher, dass Ihre Daten geschützt bleiben:',
         features: {
-          encryption: 'Clientseitige Ver- und Entschlüsselung',
+          encryption:
+            'Alle Verschlüsselung/Entschlüsselung erfolgt in Ihrem Browser mit ML-KEM Post-Quanten-Verschlüsselung',
           tls: 'TLS-Verschlüsselung für alle API-Kommunikation',
-          destruction: 'Automatische Geheimniszerstörung nach Zugriff',
+          destruction: 'Automatische Geheimnislöschung nach Zugriff',
           logging: 'Keine serverseitige Protokollierung sensibler Daten',
-          password: 'Optionaler Passwortschutz für zusätzliche Sicherheit',
+          password: 'Optionale Passwortschutz für zusätzliche Sicherheit',
         },
       },
     },
     openSource: {
       title: 'Open Source',
       description:
-        'crypt.fyi ist quelloffen und überprüfbar. Sie können unseren Code einsehen, Probleme melden und auf GitHub beitragen',
+        'crypt.fyi ist Open Source und überprüfbar. Sie können unsere Zero-Knowledge-Implementierung, Post-Quanten-Verschlüsselung überprüfen und auf',
     },
   },
   privacy: {

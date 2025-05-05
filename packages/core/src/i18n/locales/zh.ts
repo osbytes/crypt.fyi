@@ -33,24 +33,28 @@ export const zh: TranslationKeys = {
     },
   },
   landing: {
-    title: '安全共享敏感数据',
-    subtitle: 'crypt.fyi 支持零知识端到端加密的敏感数据共享，并提供自动删除功能',
+    title: '零知识秘密共享',
+    subtitle:
+      '使用ML-KEM后量子端到端加密安全地一次性共享敏感信息。您的秘密在浏览器中加密，我们的服务器永远无法访问，并在查看后自动删除。',
     features: {
       encryption: {
-        title: '端到端加密',
-        description: '在数据离开浏览器之前使用 ML-KEM 后量子加密确保安全',
+        title: 'ML-KEM后量子加密',
+        description:
+          '最先进的ML-KEM后量子加密确保您的数据即使面对未来的量子计算威胁也能保持安全。所有加密都在传输前在您的浏览器中完成。',
       },
       security: {
-        title: '增强安全性',
-        description: '严格的内容安全策略（CSP）和速率限制，以减轻 XSS 和暴力攻击',
+        title: '增强安全',
+        description:
+          '多层保护包括严格的内容安全策略(CSP)、速率限制和IP限制。量子抗性加密，查看后自动删除。',
       },
       zeroKnowledge: {
-        title: '零知识架构',
-        description: '我们的服务器永远不会看到您的未加密数据 - 只有您和接收者可以访问',
+        title: '真正的零知识架构',
+        description:
+          '我们的服务器永远看不到您的未加密数据。加密密钥永远不会离开您的设备，所有解密都在您的浏览器中进行。通过端到端加密实现完全隐私。',
       },
       burn: {
-        title: '阅后即焚',
-        description: '访问后自动销毁密文以确保最大安全性',
+        title: '一次性秘密共享',
+        description: '秘密在查看后自动删除，确保只能访问一次。完美适用于永远不应该持久存在的敏感信息。',
       },
       failedAttempts: {
         title: '失败尝试后销毁',
@@ -237,35 +241,36 @@ export const zh: TranslationKeys = {
   about: {
     title: '关于',
     intro:
-      'crypt.fyi 是一个安全、开源、临时的数据分享平台，使您能够安全地分享敏感信息。无论是密码、API 密钥还是机密消息，crypt.fyi 都能确保您的数据保持私密，并在被访问后自动消失。',
+      'crypt.fyi是一个安全的开源平台，采用零知识架构，让您能够安全地共享敏感信息，使用后量子端到端加密。无论是密码、API密钥还是机密消息 - crypt.fyi确保您的数据保持私密，永远不会被我们的服务器访问，并在访问后自动删除。',
     whyCryptFyi: {
-      title: '为什么选择 crypt.fyi？',
+      title: '为什么选择crypt.fyi？',
       commonPractices: {
         title: '常见做法的问题',
-        description: '每天，敏感信息如密码、API 密钥和私密数据都以明文形式通过不安全的渠道共享：',
+        description:
+          '每天，密码、API密钥和私人数据等敏感信息通过不安全的渠道以明文形式共享：',
         problems: {
-          email: '电子邮件 - 可能被拦截、无限期存储和转发',
-          slack: 'Slack/Teams 消息 - 保留在聊天历史和公司日志中',
-          sms: '短信 - 存储在多个设备和运营商服务器上',
+          email: '电子邮件 - 可能被拦截、无限期存储和不受控制地转发',
+          slack: 'Slack/Teams消息 - 保留在聊天历史和公司日志中',
+          sms: '短信/文本 - 存储在多个设备和运营商服务器上',
           messaging: '即时通讯 - 通常缺乏适当的加密和数据删除',
         },
       },
       existingSolutions: {
         title: '现有解决方案及其局限性',
-        description: '虽然这个领域有其他工具，但每个都有其局限性：',
+        description: '虽然该领域有其他工具，但每个都有其局限性：',
         limitations: {
-          onePassword: '1Password - 出色的团队密码管理工具，但',
-          onePasswordLink: '不支持与外部非用户共享',
+          onePassword: '1Password - 团队密码管理的优秀选择，但',
+          onePasswordLink: '不支持与外部非用户的内部共享',
           otherTools:
-            'PrivateBin/PwPush/OneTimeSecret - 核心功能相似，但用户界面和技术栈较旧，且缺少一些',
-          otherToolsConfigLink: '可配置性',
-          otherToolsSecurityLink: '安全功能',
+            'PrivateBin/PwPush/OneTimeSecret - 类似的核心功能，但用户界面和技术栈过时，且通常缺乏',
+          otherToolsConfigLink: '零知识架构',
+          otherToolsSecurityLink: '后量子加密',
         },
       },
       approach: {
-        title: 'crypt.fyi 的方法',
+        title: 'crypt.fyi的方法',
         description:
-          'crypt.fyi 在拥抱现代网络技术的同时解决这些挑战。它将现有解决方案的安全原则与清晰、直观的界面和现代技术栈相结合。结果是一个既高度安全又易于使用的工具。',
+          'crypt.fyi旨在应对这些挑战，同时利用现代Web技术和安全标准。我们结合零知识架构和ML-KEM后量子加密，确保您的数据保持私密和安全。结果是一个既高度安全又用户友好的工具。',
       },
     },
     howItWorks: {
@@ -274,55 +279,59 @@ export const zh: TranslationKeys = {
         encrypt: {
           title: '1. 加密',
           description:
-            '您的密文在离开设备之前就在浏览器中加密。只有拥有您明确共享的特殊链接的人才能解密。',
+            '您的秘密在离开设备之前在浏览器中使用ML-KEM后量子加密进行加密。加密完全在客户端进行，确保您的数据零知识。',
         },
         share: {
-          title: '2. 分享',
-          description: '与预期接收者分享安全链接。除非指定密码，否则链接包含解密消息所需的一切。',
+          title: '2. 共享',
+          description:
+            '与您的接收者共享安全链接。链接包含解密消息所需的一切，但我们的服务器永远看不到未加密的内容。',
         },
         burn: {
           title: '3. 阅后即焚',
           description:
-            '一旦被访问，如果选中了"阅后即焚"，密文将从我们的服务器上永久删除。不留任何痕迹。',
+            '如果启用了"阅后即焚"，访问后秘密将从我们的服务器永久删除。不留任何痕迹，确保您的数据完全零知识。',
         },
       },
     },
     security: {
       title: '安全实现',
       encryption: {
-        title: '端到端加密',
+        title: '零知识后量子加密',
         description:
-          '所有密文在传输前都使用 ML-KEM 后量子加密在您的浏览器中进行加密。加密密钥永远不会离开您的设备，确保真正的端到端加密。',
+          '所有秘密在传输前都在您的浏览器中使用ML-KEM后量子加密进行加密。加密密钥永远不会离开您的设备，确保真正的零知识端到端加密。',
         features: {
           key: '加密密钥来自密码学安全的随机生成',
-          derivation: '密钥派生使用 PBKDF2 和 SHA-256',
-          vector: '每个密文都有唯一的初始化向量（IV）',
+          derivation: '密钥派生使用PBKDF2和SHA-256',
+          vector: '每个秘密都有唯一的初始化向量(IV)',
         },
       },
       zeroKnowledge: {
-        title: '零知识架构',
-        description: '我们的服务器永远不会看到您的未加密数据。我们采用零知识架构：',
+        title: '真正的零知识架构',
+        description:
+          '我们的服务器永远看不到您的未加密数据。我们使用零知识架构，其中：',
         features: {
-          clientSide: '所有加密/解密都在客户端进行',
-          storage: '服务器只存储加密数据',
-          keys: '加密密钥通过 URL 片段传输，永远不会到达后端 API 服务器',
+          clientSide: '所有加密/解密都在您的浏览器中客户端进行',
+          storage: '服务器只存储它们无法解密的加密数据',
+          keys: '加密密钥通过URL片段传输，永远不会到达后端API服务器',
         },
       },
       protection: {
         title: '数据保护',
-        description: '多层安全确保您的数据受到保护：',
+        description: '多层安全确保您的数据保持受保护：',
         features: {
-          encryption: '所有加密/解密都在您的浏览器中使用 ML-KEM 后量子加密进行',
-          tls: '所有 API 通信都使用 TLS 加密',
-          destruction: '访问后自动销毁密文',
-          logging: '不记录敏感数据的服务器日志',
-          password: '可选的密码保护以提供额外安全性',
+          encryption:
+            '所有加密/解密都在您的浏览器中使用ML-KEM后量子加密进行',
+          tls: '所有API通信的TLS加密',
+          destruction: '访问后自动删除秘密',
+          logging: '服务器端不记录敏感数据',
+          password: '可选的密码保护以增加安全性',
         },
       },
     },
     openSource: {
       title: '开源',
-      description: 'crypt.fyi 是开源且可审计的。您可以在以下位置查看我们的代码、提交问题和贡献',
+      description:
+        'crypt.fyi是开源且可验证的。您可以检查我们的零知识实现、后量子加密并在',
     },
   },
   privacy: {

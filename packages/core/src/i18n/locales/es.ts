@@ -34,29 +34,28 @@ export const es: TranslationKeys = {
     },
   },
   landing: {
-    title: 'Compartir Datos Sensibles de Forma Segura',
+    title: 'Compartir Secretos de Conocimiento Cero',
     subtitle:
-      'crypt.fyi permite el intercambio de datos sensibles cifrados de extremo a extremo con conocimiento cero y eliminación automática',
+      'Comparte información sensible de forma segura con cifrado post-cuántico ML-KEM de extremo a extremo. Tus secretos se cifran en tu navegador, nunca accesibles para nuestros servidores, y se eliminan automáticamente después de ser vistos.',
     features: {
       encryption: {
-        title: 'Cifrado de Extremo a Extremo',
+        title: 'Cifrado Post-Cuántico ML-KEM',
         description:
-          'Asegura tus datos con cifrado ML-KEM post-cuántico antes de que salgan de tu navegador',
+          'El cifrado post-cuántico ML-KEM de última generación garantiza que tus datos permanezcan seguros incluso contra futuras amenazas de computación cuántica. Todo el cifrado ocurre en tu navegador antes de la transmisión.',
       },
       security: {
         title: 'Seguridad Mejorada',
         description:
-          'Política de seguridad de contenido (CSP) estricta y límites de velocidad para mitigar ataques XSS y de fuerza bruta',
+          'Múltiples capas de protección incluyendo Política de Seguridad de Contenido (CSP) estricta, limitación de velocidad y restricciones IP. Cifrado resistente a cuánticos con eliminación automática después de la visualización.',
       },
       zeroKnowledge: {
-        title: 'Conocimiento Cero',
+        title: 'Arquitectura de Conocimiento Cero Verdadera',
         description:
-          'Nuestros servidores nunca ven tus datos sin cifrar - solo tú y tu destinatario tienen acceso',
+          'Nuestros servidores nunca ven tus datos sin cifrar. La clave de cifrado nunca sale de tu dispositivo, y todo el descifrado ocurre en tu navegador. Privacidad total a través de cifrado de extremo a extremo.',
       },
       burn: {
-        title: 'Destruir al Leer',
-        description:
-          'Destruye automáticamente los secretos después de ser accedidos para máxima seguridad',
+        title: 'Compartir Secretos de Un Solo Uso',
+        description: 'Los secretos se eliminan automáticamente después de ser vistos, garantizando que solo puedan ser accedidos una vez. Perfecto para compartir información sensible que nunca debe persistir.',
       },
       failedAttempts: {
         title: 'Destruir Después de Intentos Fallidos',
@@ -256,40 +255,36 @@ export const es: TranslationKeys = {
   about: {
     title: 'Acerca de',
     intro:
-      'crypt.fyi es una plataforma segura, de código abierto y efímera para compartir datos que te permite compartir información sensible de manera segura. Ya sean contraseñas, claves API o mensajes confidenciales, crypt.fyi asegura que tus datos permanezcan privados y desaparezcan automáticamente después de ser accedidos.',
+      'crypt.fyi es una plataforma segura, de código abierto y de conocimiento cero que te permite compartir información sensible de forma segura con cifrado post-cuántico de extremo a extremo. Ya sean contraseñas, claves API o mensajes confidenciales, crypt.fyi garantiza que tus datos permanezcan privados, nunca accesibles para nuestros servidores, y desaparezcan automáticamente después de ser accedidos.',
     whyCryptFyi: {
       title: '¿Por qué crypt.fyi?',
       commonPractices: {
         title: 'El Problema con las Prácticas Comunes',
         description:
-          'Cada día, información sensible como contraseñas, claves API y datos privados se comparte a través de canales inseguros en texto plano:',
+          'Cada día, información sensible como contraseñas, claves API y datos privados se comparten a través de canales inseguros en texto plano:',
         problems: {
-          email:
-            'Correo electrónico - puede ser interceptado, almacenado indefinidamente y reenviado sin control',
-          slack:
-            'Mensajes de Slack/Teams - permanecen en el historial del chat y registros de la empresa',
-          sms: 'SMS/Mensajes de texto - almacenados en múltiples dispositivos y servidores de operadores',
-          messaging:
-            'Mensajería instantánea - a menudo carece de cifrado adecuado y eliminación de datos',
+          email: 'Correo electrónico - puede ser interceptado, almacenado indefinidamente y reenviado sin control',
+          slack: 'Mensajes de Slack/Teams - permanecen en el historial de chat y registros de la empresa',
+          sms: 'Mensajes SMS/Texto - almacenados en múltiples dispositivos y servidores de operadores',
+          messaging: 'Mensajería instantánea - a menudo carece de cifrado adecuado y eliminación de datos',
         },
       },
       existingSolutions: {
         title: 'Soluciones Existentes y Sus Limitaciones',
-        description:
-          'Si bien hay otras herramientas en este espacio, cada una tiene sus limitaciones:',
+        description: 'Si bien hay otras herramientas en este espacio, cada una tiene sus limitaciones:',
         limitations: {
-          onePassword: '1Password - excelente para la gestión de contraseñas en equipo, pero',
-          onePasswordLink: 'no admite compartir externamente con usuarios no registrados',
+          onePassword: '1Password - excelente para gestión de contraseñas en equipo, pero',
+          onePasswordLink: 'no admite compartir internamente con usuarios externos',
           otherTools:
-            'PrivateBin/PwPush/OneTimeSecret - funcionalidad básica similar, pero interfaces de usuario desactualizadas y pilas tecnológicas antiguas, además de algunas',
-          otherToolsConfigLink: 'configuraciones',
-          otherToolsSecurityLink: 'características de seguridad',
+            'PrivateBin/PwPush/OneTimeSecret - funcionalidad básica similar, pero interfaces de usuario y stacks tecnológicos obsoletos, y a menudo carecen de',
+          otherToolsConfigLink: 'arquitectura de conocimiento cero',
+          otherToolsSecurityLink: 'cifrado post-cuántico',
         },
       },
       approach: {
         title: 'El Enfoque de crypt.fyi',
         description:
-          'crypt.fyi fue construido para abordar estos desafíos mientras adopta tecnologías web modernas. Combina los principios de seguridad de las soluciones existentes con una interfaz limpia e intuitiva y una pila tecnológica moderna. El resultado es una herramienta que es tanto altamente segura como agradable de usar.',
+          'crypt.fyi fue construido para abordar estos desafíos mientras adopta tecnologías web modernas y estándares de seguridad. Combinamos arquitectura de conocimiento cero con cifrado post-cuántico ML-KEM, garantizando que tus datos permanezcan privados y seguros. El resultado es una herramienta que es tanto altamente segura como agradable de usar.',
       },
     },
     howItWorks: {
@@ -298,39 +293,39 @@ export const es: TranslationKeys = {
         encrypt: {
           title: '1. Cifrar',
           description:
-            'Tu secreto se cifra directamente en tu navegador antes de salir de tu dispositivo. Solo las personas con el enlace especial, que has compartido explícitamente, pueden descifrarlo.',
+            'Tu secreto se cifra en tu navegador usando cifrado post-cuántico ML-KEM antes de salir de tu dispositivo. El cifrado ocurre completamente del lado del cliente, garantizando conocimiento cero de tus datos.',
         },
         share: {
           title: '2. Compartir',
           description:
-            'Comparte el enlace seguro con tu destinatario. El enlace contiene todo lo necesario para descifrar el mensaje, a menos que se especifique una contraseña.',
+            'Comparte el enlace seguro con tu destinatario. El enlace contiene todo lo necesario para descifrar el mensaje, pero nuestros servidores nunca ven el contenido sin cifrar.',
         },
         burn: {
           title: '3. Destruir después de leer',
           description:
-            'Una vez accedido, si "destruir después de leer" está marcado, el secreto se elimina permanentemente de nuestros servidores. Sin dejar rastros.',
+            'Una vez accedido, si "destruir después de leer" está marcado, el secreto se elimina permanentemente de nuestros servidores. Sin dejar rastros, manteniendo conocimiento cero completo de tus datos.',
         },
       },
     },
     security: {
       title: 'Implementación de Seguridad',
       encryption: {
-        title: 'Cifrado de Extremo a Extremo',
+        title: 'Cifrado Post-Cuántico de Conocimiento Cero',
         description:
-          'Todos los secretos se cifran usando cifrado ML-KEM post-cuántico en tu navegador antes de la transmisión. La clave de cifrado nunca sale de tu dispositivo, asegurando un verdadero cifrado de extremo a extremo.',
+          'Todos los secretos se cifran usando cifrado post-cuántico ML-KEM en tu navegador antes de la transmisión. La clave de cifrado nunca sale de tu dispositivo, garantizando cifrado de extremo a extremo de conocimiento cero verdadero.',
         features: {
           key: 'La clave de cifrado se deriva de una generación aleatoria criptográficamente segura',
-          derivation: 'La derivación de claves usa PBKDF2 con SHA-256',
+          derivation: 'La derivación de clave usa PBKDF2 con SHA-256',
           vector: 'Cada secreto tiene un vector de inicialización (IV) único',
         },
       },
       zeroKnowledge: {
-        title: 'Arquitectura de Conocimiento Cero',
+        title: 'Arquitectura de Conocimiento Cero Verdadera',
         description:
           'Nuestros servidores nunca ven tus datos sin cifrar. Empleamos una arquitectura de conocimiento cero donde:',
         features: {
-          clientSide: 'Todo el cifrado/descifrado ocurre del lado del cliente',
-          storage: 'Los servidores solo almacenan datos cifrados',
+          clientSide: 'Todo el cifrado/descifrado ocurre del lado del cliente en tu navegador',
+          storage: 'Los servidores solo almacenan datos cifrados que no pueden descifrar',
           keys: 'Las claves de cifrado se transmiten a través de fragmentos de URL, que nunca llegan al servidor API backend',
         },
       },
@@ -339,10 +334,10 @@ export const es: TranslationKeys = {
         description: 'Múltiples capas de seguridad aseguran que tus datos permanezcan protegidos:',
         features: {
           encryption:
-            'Todo el cifrado/descifrado ocurre en tu navegador usando ML-KEM post-cuántico',
+            'Todo el cifrado/descifrado ocurre en tu navegador usando cifrado post-cuántico ML-KEM',
           tls: 'Cifrado TLS para todas las comunicaciones API',
-          destruction: 'Destrucción automática del secreto después del acceso',
-          logging: 'Sin registro de datos sensibles en el servidor',
+          destruction: 'Destrucción automática de secretos después del acceso',
+          logging: 'Sin registro del lado del servidor de datos sensibles',
           password: 'Protección opcional con contraseña para seguridad adicional',
         },
       },
@@ -350,7 +345,7 @@ export const es: TranslationKeys = {
     openSource: {
       title: 'Código Abierto',
       description:
-        'crypt.fyi es de código abierto y auditable. Puedes revisar nuestro código, enviar problemas y contribuir en',
+        'crypt.fyi es de código abierto y auditable. Puedes revisar nuestra implementación de conocimiento cero, cifrado post-cuántico, y contribuir en',
     },
   },
   privacy: {

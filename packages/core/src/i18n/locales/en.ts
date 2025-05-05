@@ -33,28 +33,28 @@ export const en: TranslationKeys = {
     },
   },
   landing: {
-    title: 'Secure Sensitive Data Sharing',
+    title: 'Open-Source Zero-Knowledge Secret Sharing',
     subtitle:
-      'crypt.fyi enables zero-knowledge end-to-end encrypted sensitive data sharing with automatic deletion',
+      'Secure one-time sharing of sensitive information with ML-KEM post-quantum end-to-end encryption. Your secrets are encrypted in your browser, never accessible to our servers, and automatically deleted after viewing. Fully auditable open-source codebase.',
     features: {
       encryption: {
-        title: 'End-to-end Encryption',
+        title: 'ML-KEM Post-Quantum Encryption',
         description:
-          'Secure your data with ML-KEM post-quantum encryption before it leaves your browser',
+          'State-of-the-art ML-KEM post-quantum encryption ensures your data remains secure even against future quantum computing threats. All encryption happens in your browser before transmission.',
       },
       security: {
         title: 'Enhanced Security',
         description:
-          'Strict Content Security Policy (CSP) and rate limits to mitigate XSS and brute-force attacks',
+          'Multiple layers of protection including strict Content Security Policy (CSP), rate limiting, and IP restrictions. Quantum-resistant encryption with automatic deletion after viewing.',
       },
       zeroKnowledge: {
-        title: 'Zero-knowledge',
+        title: 'True Zero-Knowledge Architecture',
         description:
-          'Our servers never see your unencrypted data - only you and your recipient have access',
+          'Our servers never see your unencrypted data. The encryption key never leaves your device, and all decryption happens in your browser. Complete privacy through end-to-end encryption.',
       },
       burn: {
-        title: 'Burn After Reading',
-        description: 'Automatically destroy secrets after they are accessed for maximum security',
+        title: 'One-Time Secret Sharing',
+        description: 'Secrets are automatically destroyed after viewing, ensuring they can only be accessed once. Perfect for sharing sensitive information that should never persist.',
       },
       failedAttempts: {
         title: 'Burn After Failed Attempts',
@@ -248,7 +248,7 @@ export const en: TranslationKeys = {
   about: {
     title: 'About',
     intro:
-      "crypt.fyi is a secure, open-source, ephemeral data-sharing platform that enables you to share sensitive information safely. Whether it's passwords, API keys, or confidential messages, crypt.fyi ensures your data remains private and automatically disappears after being accessed.",
+      "crypt.fyi is a secure, open-source, zero-knowledge data-sharing platform that enables you to share sensitive information safely with post-quantum end-to-end encryption. Whether it's passwords, API keys, or confidential messages, crypt.fyi ensures your data remains private, never accessible to our servers, and automatically disappears after being accessed.",
     whyCryptFyi: {
       title: 'Why crypt.fyi?',
       commonPractices: {
@@ -269,15 +269,15 @@ export const en: TranslationKeys = {
           onePassword: '1Password - excellent for team password management, but',
           onePasswordLink: "doesn't support external non-users sharing internally",
           otherTools:
-            'PrivateBin/PwPush/OneTimeSecret - similar core functionality, but dated user interfaces and technology stacks as well as some missing',
-          otherToolsConfigLink: 'configurability',
-          otherToolsSecurityLink: 'security features',
+            'PrivateBin/PwPush/OneTimeSecret - similar core functionality, but dated user interfaces, technology stacks, and often lack',
+          otherToolsConfigLink: 'zero-knowledge architecture',
+          otherToolsSecurityLink: 'post-quantum encryption',
         },
       },
       approach: {
         title: 'The crypt.fyi Approach',
         description:
-          "crypt.fyi was built to address these challenges while embracing modern web technologies. It combines the security principles of existing solutions with a clean, intuitive interface and a modern tech stack. The result is a tool that's both highly secure and pleasant to use.",
+          "crypt.fyi was built to address these challenges while embracing modern web technologies and security standards. We combine zero-knowledge architecture with ML-KEM post-quantum encryption, ensuring your data remains private and secure. The result is a tool that's both highly secure and pleasant to use.",
       },
     },
     howItWorks: {
@@ -286,26 +286,26 @@ export const en: TranslationKeys = {
         encrypt: {
           title: '1. Encrypt',
           description:
-            "Your secret is encrypted right in your browser before it ever leaves your device. Only people with the special link, that you've explicitly shared, can decrypt it.",
+            "Your secret is encrypted in your browser using ML-KEM post-quantum encryption before it ever leaves your device. The encryption happens entirely client-side, ensuring zero-knowledge of your data.",
         },
         share: {
           title: '2. Share',
           description:
-            'Share the secure link with your intended recipient. The link contains everything needed to decrypt the message, unless a password is specified.',
+            'Share the secure link with your intended recipient. The link contains everything needed to decrypt the message, but our servers never see the unencrypted content.',
         },
         burn: {
           title: '3. Burn after read',
           description:
-            "Once accessed, if 'burn after read' is checked, the secret is permanently deleted from our servers. No traces left behind.",
+            "Once accessed, if 'burn after read' is checked, the secret is permanently deleted from our servers. No traces left behind, maintaining complete zero-knowledge of your data.",
         },
       },
     },
     security: {
       title: 'Security Implementation',
       encryption: {
-        title: 'End-to-End Encryption',
+        title: 'Zero-Knowledge Post-Quantum Encryption',
         description:
-          'All secrets are encrypted using ML-KEM post-quantum encryption in your browser before transmission. The encryption key never leaves your device, ensuring true end-to-end encryption.',
+          'All secrets are encrypted using ML-KEM post-quantum encryption in your browser before transmission. The encryption key never leaves your device, ensuring true zero-knowledge end-to-end encryption.',
         features: {
           key: 'Encryption key is derived from a cryptographically secure random generation',
           derivation: 'Key derivation uses PBKDF2 with SHA-256',
@@ -313,12 +313,12 @@ export const en: TranslationKeys = {
         },
       },
       zeroKnowledge: {
-        title: 'Zero-Knowledge Architecture',
+        title: 'True Zero-Knowledge Architecture',
         description:
           'Our servers never see your unencrypted data. We employ a zero-knowledge architecture where:',
         features: {
-          clientSide: 'All encryption/decryption happens client-side',
-          storage: 'Servers only store encrypted data',
+          clientSide: 'All encryption/decryption happens client-side in your browser',
+          storage: 'Servers only store encrypted data they cannot decrypt',
           keys: 'Encryption keys are transmitted via URL fragments, which never reach the backend api server',
         },
       },
@@ -338,7 +338,7 @@ export const en: TranslationKeys = {
     openSource: {
       title: 'Open Source',
       description:
-        'crypt.fyi is open source and auditable. You can review our code, submit issues, and contribute on',
+        'crypt.fyi is open source and auditable. You can review our zero-knowledge implementation, post-quantum encryption, and contribute on',
     },
   },
   privacy: {
