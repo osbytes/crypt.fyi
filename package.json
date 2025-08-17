@@ -25,13 +25,13 @@
     "turbo": "^2.5.2",
     "typescript": "^5.8.3"
   },
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.9.2",
   "resolutions": {
     "esbuild": "0.25.0"
   },
   "version": "0.0.0",
   "engines": {
     "node": ">=22.0.0",
-    "yarn": ">=4.6.0"
+    "yarn": ">=4.9.0"
   }
 }
