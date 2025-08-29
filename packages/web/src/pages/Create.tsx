@@ -370,7 +370,7 @@ export function CreatePage() {
     return !!(
       params.get('ips') ||
       params.get('rc') ||
-      params.get('webhookUrl') ||
+      params.get('whu') ||
       params.get('fc')
     );
   });
