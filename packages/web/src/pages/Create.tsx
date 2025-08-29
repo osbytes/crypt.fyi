@@ -683,7 +683,15 @@ export function CreatePage() {
           >
             <Card className="p-4">
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form
+                  onKeyDown={(e) => {
+                    if (e.metaKey && e.key === 'Enter') {
+                      form.handleSubmit(onSubmit)(e);
+                    }
+                  }}
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
                   <FormField
                     control={form.control}
                     name="c"
