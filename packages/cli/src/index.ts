@@ -64,7 +64,7 @@ program
       console.log('\nShare these details with the recipient:');
       console.log(chalk.blue('\nSecret URL:'));
       console.log(
-        `${config.webUrl}/${result.id}?key=${result.key}${options.password ? `&p=true` : ''}`,
+        `${config.webUrl}/${result.id}${options.password ? `?p=true` : ''}#${result.key}`,
       );
 
       if (options.password) {
@@ -93,7 +93,7 @@ program
     try {
       const url = new URL(urlString);
       const id = url.pathname.split('/').pop();
-      const key = url.searchParams.get('key');
+      const key = url.hash.slice(1); // Remove the # symbol
       if (!id || !key) {
         throw new Error('Invalid URL');
       }

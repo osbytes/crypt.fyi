@@ -29,9 +29,10 @@ export function ViewPage() {
 
   const { id } = useParams({ from: '/$id' });
   const search = useSearch({ from: '/$id' });
-  const key = search.key;
-  invariant(key, '`key` is required in URL query parameters');
   const isPasswordSet = search.p;
+  const key = window.location.hash.slice(1);
+  invariant(key, '`key` is required in URL hash');
+
   const [password, setPassword] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
   const [isRevealed, setIsRevealed] = useState(false);

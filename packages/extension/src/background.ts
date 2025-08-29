@@ -50,7 +50,7 @@ browser.contextMenus.onClicked.addListener(async (info: Menus.OnClickData, tab) 
       b: true,
       ttl: config.defaultTtl,
     });
-    const url = `${config.webUrl}/${result.id}?key=${result.key}`;
+    const url = `${config.webUrl}/${result.id}#${result.key}`;
 
     await chrome.scripting.executeScript({
       target: { tabId },
