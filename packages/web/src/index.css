@@ -118,3 +118,24 @@
     draw-stroke 2.5s ease forwards,
     fill-in 4s ease forwards;
 }
+
+/* Sonner toast close button theme responsiveness */
+[data-close-button="true"] {
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--background)) !important;
+  border: 1px solid hsl(var(--border));
+}
+
+[data-close-button="true"]:hover {
+  background-color: hsl(var(--muted)) !important;
+}
+
+[data-close-button="true"] svg {
+  stroke: hsl(var(--foreground));
+}
+
+/* Ensure the close button icon inherits the current theme color */
+[data-close-button="true"] svg path,
+[data-close-button="true"] svg line {
+  stroke: hsl(var(--foreground));
+}

@@ -5,6 +5,7 @@ import { z } from 'zod';
 export const Route = createFileRoute('/$id')({
   validateSearch: z.object({
     p: z.boolean({ coerce: true }).optional(),
+    key: z.string().optional(),
   }),
   component: ViewPage,
 });

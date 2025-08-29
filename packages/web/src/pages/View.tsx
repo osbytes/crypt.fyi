@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useParams, useSearch } from '@tanstack/react-router';
 import invariant from 'tiny-invariant';
 import { Card } from '@/components/ui/card';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button/button';
@@ -30,8 +30,11 @@ export function ViewPage() {
   const { id } = useParams({ from: '/$id' });
   const search = useSearch({ from: '/$id' });
   const isPasswordSet = search.p;
-  const key = window.location.hash.slice(1);
+  // TODO: Remove the search.key fallback once the `key` parameter is to no longer be supported.
+  const key = window.location.hash.slice(1)?.trim() || search.key;
   invariant(key, '`key` is required in URL hash');
+
+  useKeyInSearchParamsDeprecationToast();
 
   const [password, setPassword] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
@@ -278,4 +281,38 @@ export function ViewPage() {
       </Dialog>
     </div>
   );
+}
+
+// Outdated clients may use the `key` parameter in the URL search parameters to generate the secret.
+// This is deprecated and will be removed in the future.
+// This hook shows a toast to the user to let them know that the secret sender may be using an
+// outdated client to genereate the secret.
+function useKeyInSearchParamsDeprecationToast() {
+  const searchKey = useSearch({ from: '/$id' });
+  useEffect(() => {
+    if (searchKey) {
+      toast.warning(
+        <div className="space-y-2">
+          <p>
+            Using <code>key</code> in the URL search parameters is deprecated. The secret sender may
+            be using an outdated client to genereate the secret.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            <a
+              href="https://github.com/osbytes/crypt.fyi/issues/100"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              See crypt.fyi/issues/100
+            </a>
+          </p>
+        </div>,
+        {
+          id: 'key-in-url-search-params-deprecated',
+          closeButton: true,
+          duration: Infinity,
+        },
+      );
+    }
+  }, [searchKey]);
 }
