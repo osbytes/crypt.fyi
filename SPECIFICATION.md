@@ -1,238 +1,387 @@
-# crypt.fyi System Specification (RFC)
+RFC XXXX                    crypt.fyi Protocol                January 2025
 
-## 1. Introduction
 
-### 1.1 Purpose
+                    crypt.fyi System Specification
 
-crypt.fyi is a zero-knowledge, end-to-end encrypted secret sharing platform that enables users to securely share sensitive information using ML-KEM post-quantum encryption. The system is designed with a "zero-knowledge" architecture, meaning the server never has access to unencrypted data or encryption keys.
+Status of This Memo
 
-### 1.2 Scope
+   This document specifies the crypt.fyi protocol for secure, ephemeral
+   secret sharing. It describes the architecture, security model, and
+   implementation requirements for a zero-knowledge secret sharing
+   platform using post-quantum cryptography.
 
-This document outlines the system architecture, security measures, and interaction patterns between client and server components of the crypt.fyi system.
+Copyright Notice
 
-## 2. System Architecture
+   Copyright (c) 2025 crypt.fyi contributors. All rights reserved.
 
-### 2.1 High-Level Overview
+Abstract
 
-crypt.fyi follows a client-server architecture with the following main components:
+   This document defines the crypt.fyi protocol, a system for secure,
+   ephemeral sharing of sensitive information using post-quantum
+   cryptography. The protocol implements a zero-knowledge architecture
+   where encrypted secrets are stored temporarily on a server that
+   cannot decrypt the content. The system supports features including
+   burn-after-reading, time-based expiration, IP restrictions, read
+   count limits, and webhook notifications.
 
-- Web Client (Browser-based interface)
-- Web Server (Static file server)
-- API Server
-- Data Store (Ephemeral storage)
+Table of Contents
 
-### 2.2 Component Interaction Flow
+   1. Introduction
+   2. Protocol Overview
+   3. Cryptographic Specifications
+   4. Message Formats
+   5. API Endpoints
+   6. Security Considerations
+   7. Implementation Requirements
+   8. Error Handling
+   9. IANA Considerations
+   10. References
 
-```
-[Web Client] <--> [Web Server] // Serves static files only
-[Web Client] <--> [API Server] <--> [Data Store]
-     ^
-     |
-[Client-side Encryption/Decryption]
-```
+1. Introduction
 
-### 2.3 Server Separation
+1.1. Purpose
 
-The system deliberately separates the web server (serving static files) from the API server for enhanced security:
+   crypt.fyi is a zero-knowledge, end-to-end encrypted secret sharing
+   platform that enables users to securely share sensitive information
+   using ML-KEM post-quantum encryption. The system is designed with a
+   "zero-knowledge" architecture, meaning the server never has access
+   to unencrypted data or encryption keys.
 
-1. **Web Server**
+1.2. Scope
 
-   - Serves only static files (HTML, CSS, JS)
-   - Configured to strip URL query parameters and fragments from request logging
-   - Configured with strict Content Security Policy (CSP)
-   - Ideally runs on a separate server / hosting platform from API server
+   This document outlines the system architecture, security measures,
+   and interaction patterns between client and server components of the
+   crypt.fyi system.
 
-2. **API Server**
-   - Handles only encrypted data operations
-   - Never receives or processes URLs containing decryption keys
-   - Only receives hashed keys for verification
-   - Operates independently from web server
+2. Protocol Overview
 
-This separation ensures that even if the web server logs are compromised, the decryption keys (which are part of the URL fragment) remain secure as they are never sent to the API server. The API server only receives the necessary hashed values for verification, maintaining the zero-knowledge architecture.
+2.1. Architecture Components
 
-## 3. API Endpoints
+   crypt.fyi follows a client-server architecture with the following
+   main components:
 
-[Open API Specification](https://api.crypt.fyi/docs)
+   o  Web Client (Browser-based interface)
+   o  Web Server (Static file server)
+   o  API Server
+   o  Data Store (Redis for ephemeral storage)
 
-## 4. Security Measures
+2.2. Component Interaction Flow
 
-### 4.1 Encryption
+   [Web Client] <--> [Web Server] // Serves static files only
+   [Web Client] <--> [API Server] <--> [Redis Data Store]
+        ^
+        |
+   [Client-side Encryption/Decryption]
 
-1. **Client-Side Encryption**
+2.3. Zero-Knowledge Proof Mechanism
 
-   - ML-KEM post-quantum encryption with PBKDF2 key derivation and random salt and initialization vector (IV)
-   - Unique encryption key per secret
-   - All encryption/decryption occurs in the browser
-   - Optional password protection for layered encryption
-     - Password is not embedded in the URL and is ideally shared/transmitted to the recipient separately from the unique vault URL
+   The protocol implements a zero-knowledge proof system where the server
+   can verify that a client possesses the correct decryption key without
+   ever seeing the key itself:
 
-2. **Key Management**
-   - Decryption key never transmitted to server
-   - Optional password protection
-   - SHA-512 key verification
+   1. Client generates a random encryption key during secret creation
+   2. Client optionally combines key with user-provided password
+   3. Client computes SHA-512 hash of (key + password)
+   4. Server stores encrypted content alongside the hash
+   5. During retrieval, client proves knowledge by providing the same hash
+   6. Server releases encrypted content only upon hash verification
+   7. Client performs decryption locally using the original key/password
 
-### 4.2 Zero-Knowledge Architecture
+2.4. URL Fragment Security
 
-1. **Server Security**
+   The decryption key MUST be passed in the URL fragment (after the #
+   symbol) to prevent transmission to the server:
 
-   - Server only receives and stores encrypted data
-   - Server cannot decrypt content
-   - No user accounts or authentication
-   - No logging of sensitive data
+   Example URL structure:
+   https://crypt.fyi/v/{vaultId}#{base64-encoded-key}
 
-2. **Data Security**
-   - Automatic data expiration (TTL)
-   - Burn after reading option
-     - Must be implemented using atomic operations
-     - Must guarantee exactly one successful read when burn is enabled
-     - Must prevent race conditions in concurrent access scenarios
-   - No persistent storage
-   - Secure deletion of data
+   URL fragments are processed entirely client-side by the browser and
+   are never sent to the server in HTTP requests. This ensures that:
 
-### 4.3 Transport Security
+   o  Web server logs never contain decryption keys
+   o  Network intermediaries cannot observe keys
+   o  Server-side code cannot accidentally log or process keys
+   o  The zero-knowledge architecture is maintained
+
+2.5. Server Separation
+
+   The system deliberately separates the web server (serving static
+   files) from the API server for enhanced security:
+
+2.5.1. Web Server
+
+   o  MUST serve only static files (HTML, CSS, JS)
+   o  MUST be configured to strip URL query parameters and fragments
+      from request logging
+   o  MUST be configured with strict Content Security Policy (CSP)
+   o  SHOULD run on a separate server/hosting platform from API server
+
+2.5.2. API Server
+
+   o  MUST handle only encrypted data operations
+   o  MUST NOT receive or process URLs containing decryption keys
+   o  MUST only receive hashed keys for verification (SHA-512)
+   o  MUST operate independently from web server
 
-- CORS protection
-- Rate limiting
-- Request size limits
-- TLS transport encryption
-- Strict Content Security Policy (CSP)
-  - No eval() or unsafe-inline
-  - Restricted source origins
-  - Frame ancestors disabled
-  - Strict MIME type checking
-  - XSS protection headers
+   This separation ensures that even if the web server logs are
+   compromised, the decryption keys remain secure as they are never
+   transmitted to any server component.
 
-## 5. Data Storage Requirements
+3. Cryptographic Specifications
 
-### 5.1 Storage Properties
+3.1. Encryption Algorithms
 
-1. **Ephemeral Nature**
+   The system supports multiple encryption algorithms identified by
+   algorithm identifiers:
 
-   - All data must be temporary
-   - Configurable Time-To-Live (TTL) per entry
-   - Automatic expiration and cleanup
+   o  "aes-256-gcm": AES-256 in Galois/Counter Mode
+   o  "ml-kem-768": ML-KEM-768 post-quantum algorithm (legacy)
+   o  "ml-kem-768-2": ML-KEM-768 with ChaCha20-Poly1305 (current)
 
-2. **Concurrency Requirements**
+3.1.1. ML-KEM-768-2 (Recommended)
+
+   Implementations using ML-KEM-768-2 MUST use:
+   o  ML-KEM-768 for key encapsulation
+   o  SHA3-512 for key derivation from password and salt
+   o  ChaCha20-Poly1305 for symmetric encryption
+   o  32-byte random salt
+   o  12-byte random initialization vector
+
+3.1.2. Key Derivation
+
+   Key derivation process for ML-KEM-768-2:
+   1. Generate 32-byte random salt
+   2. Derive key using SHA3-512(password || salt)
+   3. Generate ML-KEM-768 keypair using derived key
+   4. Perform key encapsulation to get shared secret
+   5. Use shared secret with ChaCha20-Poly1305
+
+3.2. Hash Functions
+
+   Implementations MUST use:
+   o  SHA-512 for key verification hash (key + optional password)
+   o  SHA3-512 for key derivation in ML-KEM-768-2
+
+3.3. Compression
+
+   Implementations MAY use optional compression:
+   o  "zlib:pako": zlib compression via pako library
+   o  "none": no compression (default)
+
+4. Message Formats
+
+4.1. Vault Entry Structure
+
+   {
+     "c": "<base64-encoded-encrypted-content>",
+     "h": "<sha512-hash-of-key-and-password>",
+     "m": {
+       "compression": {
+         "algorithm": "zlib:pako" | "none"
+       },
+       "encryption": {
+         "algorithm": "aes-256-gcm" | "ml-kem-768" | "ml-kem-768-2"
+       }
+     },
+     "b": <boolean-burn-after-reading>,
+     "dt": "<delete-token>",
+     "ttl": <time-to-live-milliseconds>,
+     "cd": <created-date-timestamp>,
+     "ips": "<encrypted-ip-cidr-allowlist>",
+     "rc": <read-count-limit>,
+     "fc": <failed-attempts-limit>,
+     "wh": {
+       "u": "<encrypted-webhook-url>",
+       "n": "<webhook-name>",
+       "r": <notify-on-read>,
+       "fpk": <notify-on-failed-key>,
+       "fip": <notify-on-failed-ip>,
+       "b": <notify-on-burn>
+     }
+   }
+
+5. API Endpoints
+
+   Complete API specification available at: https://api.crypt.fyi/docs
+
+5.1. Create Vault Entry
+
+   POST /vault
+   
+   Creates a new vault entry with encrypted content.
+
+5.2. Retrieve Vault Entry
+
+   GET /vault/{vaultId}?h={hash}
+   
+   Retrieves vault content using vault ID and key hash.
+
+5.3. Check Vault Existence
+
+   HEAD /vault/{vaultId}
+   
+   Checks if a vault entry exists without retrieving content.
+
+5.4. Delete Vault Entry
+
+   DELETE /vault/{vaultId}
+   
+   Deletes vault entry using delete token.
+
+6.1. Zero-Knowledge Architecture
+
+   The system implements true zero-knowledge security where the server
+   can verify client authorization without learning any sensitive
+   information:
+
+   o  Server MUST only receive and store encrypted data
+   o  Server MUST NOT be able to decrypt content under any circumstances
+   o  No user accounts or authentication MUST be required
+   o  Server MUST NOT log sensitive data or encryption keys
+   o  Decryption keys MUST NOT be transmitted to server due to URL
+      fragment usage
+   o  Client MUST prove key possession through cryptographic hash
+      verification
+   o  Hash MUST NOT be reversible to obtain the original key or password
+   o  Even with full API server compromise, encrypted data MUST remain
+      secure
+
+6.2. Data Security
+
+   o  Data MUST have automatic expiration (TTL: 1 second to 7 days)
+   o  Burn after reading MUST use atomic Redis operations
+   o  Read count limits MUST NOT exceed 10 reads
+   o  Failed attempt limits MUST be between 1-10 attempts before burning
+   o  Implementation MUST NOT use persistent storage - ephemeral Redis
+      storage only
+   o  Data MUST be securely deleted upon expiration or burning
+
+6.3. Access Control
+
+   o  IP address restrictions MAY use CIDR notation
+   o  Implementations MUST NOT allow more than 3 IP restrictions per
+      vault entry
+   o  Key authentication MUST use SHA-512 hash verification
+
+6.4. Transport Security
+
+   o  All API endpoints MUST use HTTPS
+   o  CORS protection MUST be implemented with configurable origins
+   o  Rate limiting MUST be enforced (default: 10 requests per minute
+      per IP)
+   o  Request size limits MUST be enforced (default: 100KB)
+   o  Strict Content Security Policy (CSP) MUST be implemented:
+     - eval() and unsafe-inline MUST NOT be allowed
+     - Source origins MUST be restricted
+     - Frame ancestors MUST be disabled
+     - MIME type checking MUST be strict
+   o  Security headers MUST be implemented (HSTS, XSS protection, etc.)
+
+6.5. Webhook Security
 
-   - Must support concurrent access
-   - Must maintain data consistency
-   - Must provide atomic operations for critical functions
-     - Especially for burn-after-reading functionality
-     - For deletion operations
+   o  Webhook URLs MUST be encrypted in storage
+   o  Retry attempts MUST be configurable with a maximum of 5
+   o  Request timeout protection MUST be implemented (3 seconds default)
+   o  Implementations MAY send event notifications for:
+     - Successful reads
+     - Failed authentication attempts
+     - IP access violations
+     - Secret burning
 
-3. **Performance Requirements**
-   - Fast read and write operations
-   - Efficient handling of concurrent requests
-   - Scalable storage solution
+7. Implementation Requirements
 
-### 5.2 Data Integrity
+7.1. Storage Requirements
 
-1. **Consistency**
+7.1.1. Redis Configuration
 
-   - Atomic operations where required
-   - Proper handling of race conditions
-   - Guaranteed execution order for critical operations
+   o  Implementations MUST use ephemeral storage (Redis recommended)
+   o  TTL per entry MUST be configurable (1 second to 7 days)
+   o  Automatic expiration and cleanup MUST be implemented
+   o  Atomic operations MUST be used for critical functions:
+     - Burn-after-reading implementation
+     - Read count decrementation
+     - Failed attempt tracking
 
-2. **Reliability**
-   - Data available until expiration or deletion
-   - Proper error handling
-   - Recovery from system failures
+7.1.2. Concurrency Requirements
 
-## 6. Client Implementation
+   o  Implementations MUST support concurrent access
+   o  Data consistency MUST be maintained using atomic transactions
+   o  Atomic operations SHOULD use Lua scripts to prevent race conditions
+   o  Concurrent read/delete operations MUST be handled properly
 
-### 6.1 Encryption Process
+7.1.3. Performance Requirements
 
-1. **Creating a Secret**
+   o  Read and write operations SHOULD be optimized for speed
+   o  Concurrent requests MUST be handled efficiently
+   o  Storage deployment SHOULD be scalable
+   o  Connection pooling SHOULD be used for optimal performance
 
-   - Generate random encryption key
-   - Encrypt content with ML-KEM post-quantum encryption
-   - Optional: Encrypt again with user password
-   - Generate SHA-512 hash of key+password
-   - Send encrypted data to server
+7.2. Server Configuration
 
-2. **Retrieving a Secret**
-   - Extract key from URL fragment
-   - Request encrypted data using ID
-   - Verify key hash
-   - Decrypt with key (and password if set)
-   - Optional: Automatic deletion after reading
+7.2.1. Environment Variables
 
-## 7. System Constraints
+   Key configuration parameters:
+   o  REDIS_URL: Redis connection string
+   o  ENCRYPTION_KEY: Server-side encryption key for metadata
+   o  RATE_LIMIT_MAX: Maximum requests per time window
+   o  BODY_LIMIT_BYTES: Maximum request body size
+   o  CORS_ORIGIN: Allowed CORS origins
+   o  WEBHOOK_*: Webhook configuration parameters
 
-### 7.1 API Rate Limits
+7.2.2. Default Limits
 
-- Configurable per-IP rate limiting
-- Default: Specified in server configuration
-- Must be enforced at the API level
+   o  Vault entry TTL SHOULD default to 1 hour (MUST be configurable:
+      1s to 7 days)
+   o  Body limit SHOULD default to 100KB
+   o  Rate limit SHOULD default to 10 requests per minute per IP
+   o  IP restrictions MUST NOT exceed 3 per vault
+   o  Read count MUST NOT exceed 10
+   o  Vault ID length SHOULD be 20 characters
+   o  Delete token length SHOULD be 20 characters
 
-### 7.2 Content Limits
+8. Error Handling
 
-- Maximum content size: 50KB
-- Enforced at the API level
+8.1. HTTP Status Codes
 
-## 8. Error Handling
+   o  200: Success
+   o  201: Vault entry created successfully  
+   o  400: Invalid key/password hash or malformed request
+   o  404: Vault entry not found or already burned
+   o  429: Rate limit exceeded
+   o  500: Internal server error
 
-### 8.1 Error Responses
+8.2. Error Response Format
 
-- 400: Invalid key/password hash
-- 404: Secret not found or already burned
-- 429: Rate limit exceeded
-- 500: Server error
+   Error responses include appropriate error messages in the response
+   body following standard HTTP error response patterns.
 
-Each error response will have an appropriate error message in the response body.
+9. IANA Considerations
 
-## 9. Rate Limiting and Quotas
+   This document does not require any IANA actions. The protocol uses
+   standard HTTP methods and does not define new URI schemes, media
+   types, or other values requiring IANA registration.
 
-### 9.1 API Rate Limits
+10. References
 
-- Per-IP rate limiting enforced
-- Configurable rate limit window and request quota
-- Rate limits apply to all API endpoints
+10.1. Normative References
 
-### 9.2 Content Limits
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
 
-- Maximum content size: 50KB
-- TTL Constraints:
-  - Minimum: 1 second
-  - Maximum: 7 days
-  - Default: 1 hour
+   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS)
+              Protocol Version 1.3", RFC 8446, August 2018.
 
-## 10. Security Measures
+10.2. Informative References
 
-### 10.1 Transport Security
+   [ML-KEM]   National Institute of Standards and Technology,
+              "Module-Lattice-based Key-Encapsulation Mechanism
+              Standard", FIPS 203, August 2024.
 
-- Mandatory HTTPS for all API endpoints
-- Strict Transport Security (HSTS) enforcement
-- Modern TLS protocols only
+   [ChaCha20] Nir, Y. and A. Langley, "ChaCha20 and Poly1305 for IETF
+              Protocols", RFC 8439, June 2018.
 
-### 10.2 Security Headers
+Authors' Addresses
 
-- Content Security Policy (CSP)
-  - No eval() or unsafe-inline
-  - Restricted source origins
-  - Frame ancestors disabled
-  - Strict MIME type checking
-- Cross-Origin Resource Sharing (CORS)
-  - Strict origin validation
-  - Limited allowed methods
-  - Controlled header exposure
-- XSS Protection Headers
-- Content Type Options
-- Referrer Policy
-
-### 10.3 Request/Response Security
-
-- Request size limits
-- Response sanitization
-- No sensitive data in logs
-- Secure error handling
-
-## 11. Future Considerations
-
-### 11.1 Potential Enhancements
-
-- Deferred time to available w/ read-side email subscription for availability notifications
-
----
-
-This specification is a living document and will be updated as the system evolves.
+   crypt.fyi contributors
+   Email: hi@crypt.fyi
+   URI:   https://crypt.fyi
