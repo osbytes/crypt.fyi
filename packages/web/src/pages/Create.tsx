@@ -444,12 +444,7 @@ export function CreatePage() {
           : undefined,
       });
 
-      const searchParams = new URLSearchParams();
-      searchParams.set('key', result.key);
-      if (input.p) {
-        searchParams.set('p', 'true');
-      }
-      const url = `${window.location.origin}/${result.id}?${searchParams.toString()}`;
+      const url = `${window.location.origin}/${result.id}${input.p ? '?p=true' : ''}#${result.key}`;
       await clipboardCopy(url);
       toast.info(t('create.success.urlCopied'));
 
@@ -585,14 +580,13 @@ export function CreatePage() {
   let maskedUrl = createMutation.data?.url;
   if (isUrlMasked && createMutation.data?.url) {
     const url = new URL(createMutation.data.url);
-    const searchParams = new URLSearchParams(url.search);
-    const key = searchParams.get('key');
+    const key = url.hash.slice(1); // Remove the # symbol
 
     if (key) {
-      searchParams.set('key', '*'.repeat(key.length));
+      maskedUrl = `${url.origin}/${'*'.repeat(createMutation.data.id.length)}${url.search}#${'*'.repeat(key.length)}`;
+    } else {
+      maskedUrl = `${url.origin}/${'*'.repeat(createMutation.data.id.length)}${url.search}`;
     }
-
-    maskedUrl = `${url.origin}/${'*'.repeat(createMutation.data.id.length)}?${searchParams.toString()}`;
   }
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -764,10 +758,10 @@ export function CreatePage() {
                         <FormLabel>{t('create.form.password.label')}</FormLabel>
                         <FormControl>
                           <Input
-                            type="password"
                             placeholder={t('create.form.password.placeholder')}
                             {...field}
                             disabled={createMutation.isPending || field.disabled}
+                            type="new-password"
                           />
                         </FormControl>
                       </FormItem>
