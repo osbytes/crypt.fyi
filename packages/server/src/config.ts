@@ -34,42 +34,36 @@ const env = getEnv();
 const logLevels = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const;
 
 const configSchema = z.object({
-  shutdownTimeoutMs: z
-    .number({ coerce: true })
+  shutdownTimeoutMs: z.coerce
+    .number()
     .default(1000 * 30)
     .describe('graceful shutdown timeout in milliseconds'),
-  port: z.number({ coerce: true }).default(4321).describe('port to listen on for HTTP server'),
+  port: z.coerce.number().default(4321).describe('port to listen on for HTTP server'),
   healthCheckEndpoint: z.string().default('/health').describe('endpoint for health check'),
   env: z.nativeEnum(Environment).default(Environment.Dev).describe('environment'),
   logLevel: z.enum(logLevels).default('info').describe('log level'),
-  rateLimitMax: z
-    .number({ coerce: true })
-    .default(10)
-    .describe("max requests per 'rate limit time window'"),
-  rateLimitWindowMs: z
-    .number({ coerce: true })
+  rateLimitMax: z.coerce.number().default(10).describe("max requests per 'rate limit time window'"),
+  rateLimitWindowMs: z.coerce
+    .number()
     .default(1000 * 60)
     .describe('rate limit time window in milliseconds'),
   rateLimitNameSpace: z.string().default('rate-limit:').describe('rate limit namespace'),
   redisUrl: z.string().default('redis://localhost:6379').describe('redis URL'),
-  vaultEntryTTLMsMin: z
-    .number({ coerce: true })
+  vaultEntryTTLMsMin: z.coerce
+    .number()
     .default(1000)
     .describe('vault entry time to live minimum in milliseconds'),
-  vaultEntryTTLMsMax: z
-    .number({ coerce: true })
+  vaultEntryTTLMsMax: z.coerce
+    .number()
     .default(1000 * 60 * 60 * 24 * 7)
     .describe('vault entry time to live maximum in milliseconds'),
-  vaultEntryTTLMsDefault: z
-    .number({ coerce: true })
+  vaultEntryTTLMsDefault: z.coerce
+    .number()
     .default(1000 * 60 * 60)
     .describe('vault entry time to live default in milliseconds'),
-  vaultEntryIdentifierLength: z
-    .number({ coerce: true })
-    .default(20)
-    .describe('vault entry ID length'),
-  vaultEntryDeleteTokenLength: z
-    .number({ coerce: true })
+  vaultEntryIdentifierLength: z.coerce.number().default(20).describe('vault entry ID length'),
+  vaultEntryDeleteTokenLength: z.coerce
+    .number()
     .default(20)
     .describe('vault entry delete token length'),
   bodyLimit: z
@@ -96,7 +90,7 @@ const configSchema = z.object({
       'allowed CORS headers (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers',
     ),
   encryptionKey: z.string().describe('encryption key'),
-  otelEnabled: z.boolean({ coerce: true }).default(false).describe('enable OpenTelemetry tracing'),
+  otelEnabled: z.coerce.boolean().default(false).describe('enable OpenTelemetry tracing'),
   otelExporterOtlpEndpoint: z.string().describe('OpenTelemetry collector endpoint').optional(),
   serviceName: z
     .string()
@@ -110,42 +104,39 @@ const configSchema = z.object({
     .string()
     .default(packageJson.description)
     .describe('service description from package.json or env'),
-  maxIpRestrictions: z.number({ coerce: true }).default(3).describe('max IP restrictions'),
-  maxReadCount: z.number({ coerce: true }).default(10).describe('max read count'),
-  webhookRequestTimeoutMs: z
-    .number({ coerce: true })
+  maxIpRestrictions: z.coerce.number().default(3).describe('max IP restrictions'),
+  maxReadCount: z.coerce.number().default(10).describe('max read count'),
+  webhookRequestTimeoutMs: z.coerce
+    .number()
     .default(3_000)
     .describe('webhook request timeout in milliseconds'),
-  webhookMaxAttempts: z
-    .number({ coerce: true })
+  webhookMaxAttempts: z.coerce
+    .number()
     .default(5)
     .describe('maximum number of webhook delivery attempts'),
   webhookBackoffType: z
     .enum(['fixed', 'exponential'])
     .default('exponential')
     .describe('webhook retry backoff strategy type'),
-  webhookBackoffDelayMs: z
-    .number({ coerce: true })
+  webhookBackoffDelayMs: z.coerce
+    .number()
     .default(5_000)
     .describe('webhook retry backoff delay in milliseconds'),
-  webhookRemoveOnComplete: z
-    .boolean({ coerce: true })
+  webhookRemoveOnComplete: z.coerce
+    .boolean()
     .default(true)
     .describe('remove webhook jobs from queue when complete'),
-  webhookRemoveOnFail: z
-    .boolean({ coerce: true })
+  webhookRemoveOnFail: z.coerce
+    .boolean()
     .default(true)
     .describe('remove webhook jobs from queue when failed'),
-  webhookConcurrency: z
-    .number({ coerce: true })
-    .default(50)
-    .describe('number of concurrent webhook jobs'),
-  webhookDrainDelayMs: z
-    .number({ coerce: true })
+  webhookConcurrency: z.coerce.number().default(50).describe('number of concurrent webhook jobs'),
+  webhookDrainDelayMs: z.coerce
+    .number()
     .default(15_000)
     .describe('number of milliseconds to long poll for jobs when the queue is empty.'),
-  webhookStreamEventsMaxLength: z
-    .number({ coerce: true })
+  webhookStreamEventsMaxLength: z.coerce
+    .number()
     .default(100)
     .describe('maximum length of webhook events stream'),
   webhookSender: z.enum(['bullmq', 'http']).default('bullmq').describe('webhook sender type'),

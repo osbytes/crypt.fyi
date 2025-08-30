@@ -8,131 +8,115 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as NewRouteImport } from './routes/new'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as IdRouteImport } from './routes/$id'
+import { Route as IndexRouteImport } from './routes/index'
 
-import { Route as rootRoute } from './routes/__root';
-import { Route as PrivacyImport } from './routes/privacy';
-import { Route as NewImport } from './routes/new';
-import { Route as AboutImport } from './routes/about';
-import { Route as IdImport } from './routes/$id';
-import { Route as IndexImport } from './routes/index';
-
-// Create/Update Routes
-
-const PrivacyRoute = PrivacyImport.update({
+const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
-  getParentRoute: () => rootRoute,
-} as any);
-
-const NewRoute = NewImport.update({
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
-  getParentRoute: () => rootRoute,
-} as any);
-
-const AboutRoute = AboutImport.update({
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
-  getParentRoute: () => rootRoute,
-} as any);
-
-const IdRoute = IdImport.update({
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IdRoute = IdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => rootRoute,
-} as any);
-
-const IndexRoute = IndexImport.update({
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any);
+  getParentRoute: () => rootRouteImport,
+} as any)
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/$id': typeof IdRoute
+  '/about': typeof AboutRoute
+  '/new': typeof NewRoute
+  '/privacy': typeof PrivacyRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/$id': typeof IdRoute
+  '/about': typeof AboutRoute
+  '/new': typeof NewRoute
+  '/privacy': typeof PrivacyRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/$id': typeof IdRoute
+  '/about': typeof AboutRoute
+  '/new': typeof NewRoute
+  '/privacy': typeof PrivacyRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/$id' | '/about' | '/new' | '/privacy'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/$id' | '/about' | '/new' | '/privacy'
+  id: '__root__' | '/' | '/$id' | '/about' | '/new' | '/privacy'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  IdRoute: typeof IdRoute
+  AboutRoute: typeof AboutRoute
+  NewRoute: typeof NewRoute
+  PrivacyRoute: typeof PrivacyRoute
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/';
-      path: '/';
-      fullPath: '/';
-      preLoaderRoute: typeof IndexImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/$id': {
-      id: '/$id';
-      path: '/$id';
-      fullPath: '/$id';
-      preLoaderRoute: typeof IdImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/about': {
-      id: '/about';
-      path: '/about';
-      fullPath: '/about';
-      preLoaderRoute: typeof AboutImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/new': {
-      id: '/new';
-      path: '/new';
-      fullPath: '/new';
-      preLoaderRoute: typeof NewImport;
-      parentRoute: typeof rootRoute;
-    };
     '/privacy': {
-      id: '/privacy';
-      path: '/privacy';
-      fullPath: '/privacy';
-      preLoaderRoute: typeof PrivacyImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/new': {
+      id: '/new'
+      path: '/new'
+      fullPath: '/new'
+      preLoaderRoute: typeof NewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$id': {
+      id: '/$id'
+      path: '/$id'
+      fullPath: '/$id'
+      preLoaderRoute: typeof IdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
-}
-
-// Create and export the route tree
-
-export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute;
-  '/$id': typeof IdRoute;
-  '/about': typeof AboutRoute;
-  '/new': typeof NewRoute;
-  '/privacy': typeof PrivacyRoute;
-}
-
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute;
-  '/$id': typeof IdRoute;
-  '/about': typeof AboutRoute;
-  '/new': typeof NewRoute;
-  '/privacy': typeof PrivacyRoute;
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute;
-  '/': typeof IndexRoute;
-  '/$id': typeof IdRoute;
-  '/about': typeof AboutRoute;
-  '/new': typeof NewRoute;
-  '/privacy': typeof PrivacyRoute;
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/' | '/$id' | '/about' | '/new' | '/privacy';
-  fileRoutesByTo: FileRoutesByTo;
-  to: '/' | '/$id' | '/about' | '/new' | '/privacy';
-  id: '__root__' | '/' | '/$id' | '/about' | '/new' | '/privacy';
-  fileRoutesById: FileRoutesById;
-}
-
-export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  IdRoute: typeof IdRoute;
-  AboutRoute: typeof AboutRoute;
-  NewRoute: typeof NewRoute;
-  PrivacyRoute: typeof PrivacyRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -141,40 +125,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   NewRoute: NewRoute,
   PrivacyRoute: PrivacyRoute,
-};
-
-export const routeTree = rootRoute
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/$id",
-        "/about",
-        "/new",
-        "/privacy"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/$id": {
-      "filePath": "$id.tsx"
-    },
-    "/about": {
-      "filePath": "about.tsx"
-    },
-    "/new": {
-      "filePath": "new.tsx"
-    },
-    "/privacy": {
-      "filePath": "privacy.tsx"
-    }
-  }
 }
-ROUTE_MANIFEST_END */
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
