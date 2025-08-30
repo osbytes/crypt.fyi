@@ -209,8 +209,8 @@ export const initApp = async (config: Config, deps: AppDeps) => {
             .max(config.vaultEntryTTLMsMax)
             .default(config.vaultEntryTTLMsDefault)
             .describe('time to live (TTL) in milliseconds'),
-          rc: z
-            .number({ coerce: true })
+          rc: z.coerce
+            .number()
             .min(2)
             .max(config.maxReadCount)
             .optional()
@@ -222,18 +222,19 @@ export const initApp = async (config: Config, deps: AppDeps) => {
 
             if (ips.length > config.maxIpRestrictions) {
               ctx.addIssue({
-                code: z.ZodIssueCode.too_big,
+                code: 'too_big',
                 maximum: config.maxIpRestrictions,
                 type: 'array',
                 inclusive: true,
                 message: `Too many IP restrictions (max ${config.maxIpRestrictions})`,
+                origin: 'array',
               });
-              return false;
+              return;
             }
 
             for (const ip of ips) {
               const trimmed = ip.trim();
-              const isValidIP = z.string().ip().safeParse(trimmed).success;
+              const isValidIP = z.union([z.ipv4(), z.ipv6()]).safeParse(trimmed).success;
               const isValidCIDR = z
                 .string()
                 .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
@@ -241,24 +242,24 @@ export const initApp = async (config: Config, deps: AppDeps) => {
 
               if (!isValidIP && !isValidCIDR) {
                 ctx.addIssue({
-                  code: z.ZodIssueCode.custom,
+                  code: 'custom',
                   message: `Invalid IP address or CIDR block: ${trimmed}`,
                 });
-                return false;
+                return;
               }
             }
           }
 
           if (val.c.length === 0) {
             ctx.addIssue({
-              code: z.ZodIssueCode.custom,
+              code: 'custom',
               path: ['c'],
               message: 'Content is required',
             });
           }
           if (val.b && val.rc !== undefined) {
             ctx.addIssue({
-              code: z.ZodIssueCode.custom,
+              code: 'custom',
               path: ['rc'],
               message: 'Read count cannot be used with burn after reading',
             });

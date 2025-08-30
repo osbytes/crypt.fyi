@@ -288,7 +288,8 @@ export function ViewPage() {
 // This hook shows a toast to the user to let them know that the secret sender may be using an
 // outdated client to genereate the secret.
 function useKeyInSearchParamsDeprecationToast() {
-  const searchKey = useSearch({ from: '/$id' });
+  const search = useSearch({ from: '/$id' });
+  const searchKey = search.key;
   useEffect(() => {
     if (searchKey) {
       toast.warning(

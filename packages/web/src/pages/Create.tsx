@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { sha256, ErrorNotFound, sleep } from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -111,30 +111,31 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
       c: z.string().default('').describe('encrypted content'),
       b: z.boolean().default(true).describe('burn after reading'),
       p: z.string().default('').describe('password').optional(),
-      ttl: z.number({ coerce: true }).default(HOUR).describe('time to live (TTL) in milliseconds'),
+      ttl: z.coerce.number().default(HOUR).describe('time to live (TTL) in milliseconds'),
       ips: z
         .string()
         .default('')
         .describe('IP address or CIDR block restrictions')
         .optional()
         .superRefine((val, ctx) => {
-          if (!val) return true;
+          if (!val) return;
           const ips = val.split(',');
 
           if (ips.length > config.MAX_IP_RESTRICTIONS) {
             ctx.addIssue({
-              code: z.ZodIssueCode.too_big,
+              code: 'too_big',
               maximum: config.MAX_IP_RESTRICTIONS,
               type: 'array',
               inclusive: true,
               message: t('create.errors.tooManyIps', { max: config.MAX_IP_RESTRICTIONS }),
+              origin: 'array',
             });
-            return false;
+            return;
           }
 
           for (const ip of ips) {
             const trimmed = ip.trim();
-            const isValidIP = z.string().ip().safeParse(trimmed).success;
+            const isValidIP = z.union([z.ipv4(), z.ipv6()]).safeParse(trimmed).success;
             const isValidCIDR = z
               .string()
               .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
@@ -142,14 +143,12 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
 
             if (!isValidIP && !isValidCIDR) {
               ctx.addIssue({
-                code: z.ZodIssueCode.custom,
+                code: 'custom',
                 message: t('create.errors.invalidIp', { ip: trimmed }),
               });
-              return false;
+              return;
             }
           }
-
-          return true;
         }),
       rc: z
         .preprocess(
@@ -184,21 +183,21 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
     .superRefine((data, ctx) => {
       if (data.c.length === 0) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['c'],
           message: t('create.errors.contentRequired'),
         });
       }
       if (data.b && data.rc !== undefined) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['rc'],
           message: t('create.errors.readCountWithBurn'),
         });
       }
       if (data.whu && !(data.whr || data.whfpk || data.whfip || data.whb)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['whu'],
           message: t('create.errors.webhookConfigInvalid'),
         });
@@ -362,21 +361,16 @@ const handleContentDrop = (dataTransfer: DataTransfer): File | string => {
 
 export function CreatePage() {
   const { t } = useTranslation();
-  const formSchema = useMemo(() => createFormSchema(t), [t]) as z.ZodType<FormValues>;
+  const formSchema = useMemo(() => createFormSchema(t), [t]);
   const ttlOptions = useMemo(() => getTranslatedTtlOptions(t), [t]);
 
   const [isAdvancedConfigurationOpen, setIsAdvancedConfigurationOpen] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return !!(
-      params.get('ips') ||
-      params.get('rc') ||
-      params.get('whu') ||
-      params.get('fc')
-    );
+    return !!(params.get('ips') || params.get('rc') || params.get('whu') || params.get('fc'));
   });
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as Resolver<FormValues>,
     defaultValues: useMemo(() => getInitialValues(ttlOptions), [ttlOptions]),
     mode: 'onTouched',
   });

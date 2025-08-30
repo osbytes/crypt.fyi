@@ -1,4 +1,4 @@
-import { pino } from 'pino';
+import pino from 'pino';
 import type { Config } from './config.js';
 import type { FastifyRequest } from 'fastify';
 
