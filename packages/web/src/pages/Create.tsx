@@ -691,6 +691,7 @@ export function CreatePage() {
                             {...field}
                             disabled={createMutation.isPending || field.disabled || !!selectedFile}
                             placeholder={t('create.form.content.placeholder')}
+                            autoFocus
                           />
                         </FormControl>
                         <FormMessage />
