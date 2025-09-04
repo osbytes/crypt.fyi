@@ -92,7 +92,10 @@ const configSchema = z.object({
   encryptionKey: z.string().describe('encryption key'),
   otelEnabled: z.coerce.boolean().default(false).describe('enable OpenTelemetry tracing'),
   otelExporterOtlpEndpoint: z.string().describe('OpenTelemetry collector endpoint').optional(),
-  otelExporterOtlpHeaders: z.record(z.string(), z.string()).describe('OpenTelemetry collector headers').optional(),
+  otelExporterOtlpHeaders: z
+    .record(z.string(), z.string())
+    .describe('OpenTelemetry collector headers')
+    .optional(),
   serviceName: z
     .string()
     .default(packageJson.name)
@@ -177,7 +180,9 @@ export const config = (() => {
     encryptionKey,
     otelEnabled: process.env.OTEL_ENABLED,
     otelExporterOtlpEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
-    otelExporterOtlpHeaders: process.env.OTEL_EXPORTER_OTLP_HEADERS ? JSON.parse(process.env.OTEL_EXPORTER_OTLP_HEADERS) : undefined,
+    otelExporterOtlpHeaders: process.env.OTEL_EXPORTER_OTLP_HEADERS
+      ? JSON.parse(process.env.OTEL_EXPORTER_OTLP_HEADERS)
+      : undefined,
     serviceName: process.env.SERVICE_NAME,
     serviceVersion: process.env.SERVICE_VERSION,
     serviceDescription: process.env.SERVICE_DESCRIPTION,
