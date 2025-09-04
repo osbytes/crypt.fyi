@@ -16,6 +16,7 @@ if (config.otelEnabled) {
   if (config.otelExporterOtlpEndpoint) {
     exporter = new OTLPTraceExporter({
       url: config.otelExporterOtlpEndpoint,
+      headers: config.otelExporterOtlpHeaders,
     });
   } else {
     exporter = new ConsoleSpanExporter();
