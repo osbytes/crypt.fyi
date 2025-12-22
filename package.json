@@ -29,7 +29,9 @@
   "resolutions": {
     "esbuild": "0.25.0",
     "tmp": "0.2.5",
-    "@babel/runtime": "^7.28.3"
+    "@babel/runtime": "^7.28.3",
+    "glob@^10.2.0": ">=10.5.0",
+    "glob@^11.0.0": ">=11.1.0"
   },
   "version": "0.0.0",
   "engines": {
