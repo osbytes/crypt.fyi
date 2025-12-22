@@ -1,0 +1,119 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build all packages
+        run: yarn build
+
+      - name: Run tests
+        run: yarn test
+
+      # Publish extension to Chrome Web Store
+      - name: Publish to Chrome Web Store
+        if: ${{ secrets.CHROME_EXTENSION_ID != '' && secrets.CHROME_CLIENT_ID != '' && secrets.CHROME_CLIENT_SECRET != '' && secrets.CHROME_REFRESH_TOKEN != '' }}
+        env:
+          EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        run: |
+          echo "Publishing extension to Chrome Web Store..."
+
+          # Install chrome-webstore-upload-cli
+          npm install -g chrome-webstore-upload-cli
+
+          # Create zip of extension
+          cd packages/extension/dist
+          zip -r extension.zip .
+          cd ../../..
+
+          # Upload to Chrome Web Store
+          chrome-webstore-upload upload \
+            --source packages/extension/dist/extension.zip \
+            --extension-id "$EXTENSION_ID" \
+            --client-id "$CLIENT_ID" \
+            --client-secret "$CLIENT_SECRET" \
+            --refresh-token "$REFRESH_TOKEN" \
+            --auto-publish
+
+      # Publish packages to npm (if they are not private)
+      - name: Publish to npm
+        if: ${{ secrets.NPM_TOKEN != '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "Publishing packages to npm..."
+
+          # Publish core package if not private
+          if [ -d "packages/core" ]; then
+            cd packages/core
+            if [ "$(node -p "require('./package.json').private || false")" != "true" ]; then
+              npm publish --access public --provenance
+            else
+              echo "Skipping packages/core (marked as private)"
+            fi
+            cd ../..
+          fi
+
+          # Publish CLI package if not private
+          if [ -d "packages/cli" ]; then
+            cd packages/cli
+            if [ "$(node -p "require('./package.json').private || false")" != "true" ]; then
+              npm publish --access public --provenance
+            else
+              echo "Skipping packages/cli (marked as private)"
+            fi
+            cd ../..
+          fi
+
+      # Upload extension build as release asset
+      - name: Upload extension to release
+        run: |
+          cd packages/extension/dist
+          zip -r ../../../extension-${{ github.ref_name }}.zip .
+          cd ../../..
+          gh release upload ${{ github.ref_name }} extension-${{ github.ref_name }}.zip
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Release summary
+        run: |
+          echo "✅ Release ${{ github.ref_name }} published successfully!"
+          echo ""
+          echo "Published artifacts:"
+
+          if [ "${{ secrets.CHROME_EXTENSION_ID }}" != "" ]; then
+            echo "  - Chrome Web Store extension"
+          fi
+
+          if [ "${{ secrets.NPM_TOKEN }}" != "" ]; then
+            echo "  - npm packages (if public)"
+          fi
+
+          echo "  - Extension zip attached to GitHub release"

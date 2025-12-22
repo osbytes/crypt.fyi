@@ -1,63 +1,32 @@
 #!/bin/bash
 
+# Generate changelog using LLM or fallback to conventional format
+# This script generates a changelog from git commits since the last tag
+
+set -e
+
 # Configuration
 LLM_MODEL=${LLM_MODEL:-"gpt-4o"}
+OUTPUT_FILE=${OUTPUT_FILE:-"CHANGELOG.md"}
+
+# Colors for output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
 # Function to show usage
 show_usage() {
-    echo "Usage: $0 [OPTIONS] [commit-hash]"
+    echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "Options:"
     echo "  -m, --model MODEL     LLM model to use (default: $LLM_MODEL)"
-
+    echo "  -o, --output FILE     Output file (default: $OUTPUT_FILE)"
     echo "  -h, --help            Show this help message"
-    echo ""
-    echo "If no commit-hash is provided, will try to find last release tag or fallback to 1 week ago"
     echo ""
     echo "Environment variables:"
     echo "  LLM_MODEL             Override default LLM model"
+    echo "  OUTPUT_FILE           Override output file"
     exit 1
-}
-
-# Function to get the target commit
-get_target_commit() {
-    if [ ! -z "$1" ]; then
-        # Verify if the provided hash exists
-        if git rev-parse --quiet --verify "$1^{commit}" >/dev/null; then
-            echo "$1"
-            return 0
-        else
-            echo "Error: Invalid commit hash provided" >&2
-            exit 1
-        fi
-    fi
-
-    # Try to find the latest release tag
-    latest_tag=$(git ls-remote --tags --sort="v:refname" | tail -n1 | awk -F" " '{ print $1 }' 2>/dev/null)
-    if [ $? -eq 0 ] && [ ! -z "$latest_tag" ]; then
-        echo "$latest_tag"
-        return 0
-    fi
-
-    # Fallback to 1 week ago
-    echo $(git rev-list -1 --before="1 week ago" HEAD)
-}
-
-# Function to validate changelog format
-validate_changelog() {
-    local changelog="$1"
-    
-    # Check if it contains expected sections
-    if ! echo "$changelog" | grep -q "### "; then
-        return 1
-    fi
-    
-    # Check if it contains commit hashes
-    if ! echo "$changelog" | grep -q "\[[a-f0-9]\{7,\}\]"; then
-        return 1
-    fi
-    
-    return 0
 }
 
 # Parse command line arguments
@@ -67,7 +36,10 @@ while [[ $# -gt 0 ]]; do
             LLM_MODEL="$2"
             shift 2
             ;;
-
+        -o|--output)
+            OUTPUT_FILE="$2"
+            shift 2
+            ;;
         -h|--help)
             show_usage
             ;;
@@ -76,7 +48,6 @@ while [[ $# -gt 0 ]]; do
             show_usage
             ;;
         *)
-            COMMIT_HASH="$1"
             shift
             ;;
     esac
@@ -88,43 +59,38 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
     exit 1
 fi
 
-# Check if llm is installed
-if ! command -v llm &> /dev/null; then
-    echo "Error: llm CLI tool is not installed. Please install it first." >&2
-    exit 1
+# Get the latest tag
+latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+if [ -z "$latest_tag" ]; then
+    echo -e "${YELLOW}⚠ No previous tags found. Generating changelog from all commits...${NC}"
+    target_commit=$(git rev-list --max-parents=0 HEAD)
+else
+    echo -e "${GREEN}📋 Generating changelog since tag: $latest_tag${NC}"
+    target_commit=$latest_tag
 fi
 
-# Get the target commit
-target_commit=$(get_target_commit "$COMMIT_HASH")
-
-if [ -z "$target_commit" ]; then
-    echo "Error: Could not determine target commit" >&2
-    exit 1
-fi
-
-echo "Target commit: $target_commit"
-echo "Using LLM model: $LLM_MODEL"
-
-# Get the commit log between target and HEAD with more context
+# Get the commit log
 commit_log=$(git log --pretty=format:"%h|%s|%an|%ad" --date=short "$target_commit..HEAD")
 
 if [ -z "$commit_log" ]; then
-    echo "No changes found between $target_commit and HEAD"
+    echo "No changes found since $target_commit"
     exit 0
 fi
 
 echo "Found $(echo "$commit_log" | wc -l | tr -d ' ') commits to process..."
 
-# Generate the changelog using llm
-echo "Generating changelog with $LLM_MODEL..."
+# Try to use LLM if available
+if command -v llm &> /dev/null; then
+    echo "Generating changelog with $LLM_MODEL..."
 
-changelog=$(echo "$commit_log" | llm -m "$LLM_MODEL" "Transform these git commits into a structured changelog following these rules:
+    changelog=$(echo "$commit_log" | llm -m "$LLM_MODEL" "Transform these git commits into a structured changelog following these rules:
 
 COMMIT FORMAT: hash|subject|author|date
 
 OUTPUT FORMAT (omit empty categories):
 ### Features
-### Improvements  
+### Improvements
 ### Bug Fixes
 ### Security
 ### Breaking Changes
@@ -173,22 +139,19 @@ EXAMPLE OUTPUT:
 
 Input commits:")
 
-# Check if llm command succeeded
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to generate changelog with llm" >&2
-    exit 1
+    if [ $? -eq 0 ] && [ ! -z "$changelog" ]; then
+        echo "$changelog"
+        exit 0
+    else
+        echo -e "${YELLOW}⚠ LLM generation failed, falling back to conventional format...${NC}"
+    fi
 fi
 
-# Validate the generated changelog
-if ! validate_changelog "$changelog"; then
-    echo "Warning: Generated changelog may not be properly formatted" >&2
-    echo "Raw output:" >&2
-    echo "$changelog" >&2
-    exit 1
-fi
+# Fallback: Generate conventional changelog
+echo "Generating conventional changelog..."
 
-# Output the changelog
+echo "### Changes"
 echo ""
-echo "Generated changelog:"
-echo "=================="
-echo "$changelog"
+while IFS='|' read -r hash subject author date; do
+    echo "- $subject [$hash]"
+done <<< "$commit_log"
