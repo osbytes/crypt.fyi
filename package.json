@@ -28,8 +28,8 @@
   "packageManager": "yarn@4.6.0",
   "resolutions": {
     "esbuild": "0.25.0",
-    "glob": "^11.1.0",
-    "tmp": "0.2.5"
+    "tmp": "0.2.5",
+    "@babel/runtime": "^7.28.3"
   },
   "version": "0.0.0",
   "engines": {
