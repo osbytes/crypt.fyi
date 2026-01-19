@@ -12,7 +12,14 @@
     "typecheck": "turbo typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "redis": "docker compose run -p 6379:6379 -v ./redis-data:/data redis redis-server --save 1 1 --loglevel warning"
+    "redis": "docker compose run -p 6379:6379 -v ./redis-data:/data redis redis-server --save 1 1 --loglevel warning",
+    "release": "./scripts/release.sh",
+    "release:dry-run": "./scripts/release.sh --dry-run",
+    "release:major": "./scripts/release.sh major",
+    "release:minor": "./scripts/release.sh minor",
+    "release:patch": "./scripts/release.sh patch",
+    "validate": "./scripts/validate-release.sh",
+    "changelog": "./scripts/generate-changelog.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
