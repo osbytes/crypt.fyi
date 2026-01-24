@@ -136,7 +136,7 @@ export const de: TranslationKeys = {
       },
       password: {
         label: 'Passwort',
-        placeholder: 'Optional (aber empfohlen)',
+        placeholder: 'Passwort eingeben (mindestens 5 Zeichen)',
       },
       ttl: {
         label: 'Gültigkeitsdauer',
@@ -203,6 +203,8 @@ export const de: TranslationKeys = {
     },
     errors: {
       contentRequired: 'Inhalt ist erforderlich',
+      passwordMinLength: 'Passwort muss mindestens 5 Zeichen lang sein',
+      passwordTooSimple: 'Passwort ist zu einfach',
       readCountWithBurn: 'Lesezähler kann nicht mit "Nach dem Lesen löschen" kombiniert werden',
       tooManyIps: 'Zu viele IP-Beschränkungen (maximal {{max}})',
       invalidIp: 'Ungültige IP-Adresse oder CIDR-Block: {{ip}}',

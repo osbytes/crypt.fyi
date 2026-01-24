@@ -40,7 +40,6 @@ import {
   IconX,
   IconNetwork,
   IconChevronDown,
-  IconBrandGithub,
   IconShare,
   IconFile,
   IconWebhook,
@@ -110,7 +109,11 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
     .object({
       c: z.string().default('').describe('encrypted content'),
       b: z.boolean().default(true).describe('burn after reading'),
-      p: z.string().default('').describe('password').optional(),
+      p: z
+        .string()
+        .min(5, t('create.errors.passwordMinLength'))
+        .refine((val) => val !== '12345', t('create.errors.passwordTooSimple'))
+        .describe('password'),
       ttl: z.coerce.number().default(HOUR).describe('time to live (TTL) in milliseconds'),
       ips: z
         .string()
@@ -302,7 +305,7 @@ type FormValues = {
   whfpk: boolean;
   whfip: boolean;
   whb: boolean;
-  p?: string;
+  p: string;
   ips?: string;
   rc?: number;
   fc?: number;
@@ -395,14 +398,13 @@ export function CreatePage() {
       const formState: FormValues = {
         c: value.c ?? '',
         b: value.b ?? true,
+        p: value.p ?? '',
         ttl: value.ttl ?? DEFAULT_TTL,
         whr: value.whr ?? false,
         whfpk: value.whfpk ?? false,
         whfip: value.whfip ?? false,
         whb: value.whb ?? false,
       };
-
-      if (value.p) formState.p = value.p;
       if (value.ips) formState.ips = value.ips;
       if (value.rc) formState.rc = value.rc;
       if (value.fc) formState.fc = value.fc;
@@ -629,7 +631,7 @@ export function CreatePage() {
 
   return (
     <div
-      className="max-w-3xl mx-auto py-8 relative"
+      className="max-w-3xl w-full mx-auto py-8 px-4 relative self-start"
       onDragEnter={handleDragEnter}
       onDragOver={handleDragEnter}
       onDragLeave={handleDragLeave}
@@ -1256,17 +1258,6 @@ export function CreatePage() {
                 </div>
               </div>
             </Card>
-            <div className="mt-4 text-center">
-              <a
-                href={config.CRYPT_FYI_GITHUB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <IconBrandGithub className="size-4" />
-                {t('common.starOnGithub')}
-              </a>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>

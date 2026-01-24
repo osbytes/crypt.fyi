@@ -127,7 +127,7 @@ export const zh: TranslationKeys = {
       },
       password: {
         label: '密码',
-        placeholder: '可选（但建议使用）',
+        placeholder: '输入密码（至少5个字符）',
       },
       ttl: {
         label: '有效期',
@@ -191,6 +191,8 @@ export const zh: TranslationKeys = {
     },
     errors: {
       contentRequired: '内容为必填项',
+      passwordMinLength: '密码必须至少5个字符',
+      passwordTooSimple: '密码太简单',
       readCountWithBurn: '阅后即焚模式下不能设置阅读次数',
       tooManyIps: 'IP 限制过多（最大 {{max}}）',
       invalidIp: '无效的 IP 地址或 CIDR 块：{{ip}}',

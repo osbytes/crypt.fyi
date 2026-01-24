@@ -136,7 +136,7 @@ export const fr: TranslationKeys = {
       },
       password: {
         label: 'Mot de passe',
-        placeholder: 'Optionnel (mais recommandé)',
+        placeholder: 'Entrez un mot de passe (minimum 5 caractères)',
       },
       ttl: {
         label: 'Durée de vie',
@@ -203,6 +203,8 @@ export const fr: TranslationKeys = {
     },
     errors: {
       contentRequired: 'Le contenu est requis',
+      passwordMinLength: 'Le mot de passe doit contenir au moins 5 caractères',
+      passwordTooSimple: 'Le mot de passe est trop simple',
       readCountWithBurn:
         'Le nombre de lectures ne peut pas être utilisé avec la destruction après lecture',
       tooManyIps: 'Trop de restrictions IP (maximum {{max}})',

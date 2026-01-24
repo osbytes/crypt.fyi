@@ -87,7 +87,7 @@ export function ViewPage() {
 
   if (decryptMutation.error instanceof ErrorNotFound || (isPasswordSet && !existsQuery.data)) {
     return (
-      <div className="max-w-3xl mx-auto mt-8 text-center">
+      <div className="max-w-3xl mx-auto text-center p-4">
         <Card className="p-8">
           <h1 className="text-2xl font-semibold mb-4">{t('view.notFound.title')}</h1>
           <p className="text-muted-foreground mb-6">{t('view.notFound.description')}</p>
@@ -107,7 +107,7 @@ export function ViewPage() {
   // Show initial confirmation screen to require user input before fetching the secret
   if (!hasUserConfirmed && !isPasswordSet) {
     return (
-      <div className="max-w-3xl mx-auto mt-8 flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center p-4">
         <Button
           onClick={() => {
             setHasUserConfirmed(true);
@@ -235,7 +235,7 @@ export function ViewPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 py-8">
+    <div className="max-w-3xl mx-auto p-4 w-full">
       {content}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

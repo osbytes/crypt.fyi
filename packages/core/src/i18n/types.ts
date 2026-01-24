@@ -183,6 +183,8 @@ export interface TranslationKeys {
     };
     errors: {
       contentRequired: string;
+      passwordMinLength: string;
+      passwordTooSimple: string;
       readCountWithBurn: string;
       tooManyIps: string;
       invalidIp: string;

@@ -131,7 +131,7 @@ export const en: TranslationKeys = {
       },
       password: {
         label: 'Password',
-        placeholder: 'Optional (but recommended)',
+        placeholder: 'Enter a password (minimum 5 characters)',
       },
       ttl: {
         label: 'Time to live',
@@ -196,6 +196,8 @@ export const en: TranslationKeys = {
     },
     errors: {
       contentRequired: 'Content is required',
+      passwordMinLength: 'Password must be at least 5 characters',
+      passwordTooSimple: 'Password is too simple',
       readCountWithBurn: 'Read count cannot be used with burn after reading',
       tooManyIps: 'Too many IP restrictions (max {{max}})',
       invalidIp: 'Invalid IP address or CIDR block: {{ip}}',

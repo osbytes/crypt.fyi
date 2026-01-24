@@ -135,7 +135,7 @@ export const es: TranslationKeys = {
       },
       password: {
         label: 'Contraseña',
-        placeholder: 'Opcional (pero recomendado)',
+        placeholder: 'Ingresa una contraseña (mínimo 5 caracteres)',
       },
       ttl: {
         label: 'Tiempo de vida',
@@ -202,6 +202,8 @@ export const es: TranslationKeys = {
     },
     errors: {
       contentRequired: 'El contenido es requerido',
+      passwordMinLength: 'La contraseña debe tener al menos 5 caracteres',
+      passwordTooSimple: 'La contraseña es demasiado simple',
       readCountWithBurn: 'El contador de lecturas no se puede usar con destruir después de leer',
       tooManyIps: 'Demasiadas restricciones de IP (máximo {{max}})',
       invalidIp: 'Dirección IP o bloque CIDR inválido: {{ip}}',
