@@ -182,9 +182,11 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       }
 
       res.status(200).send({
-        version: config.serviceVersion,
-        name: config.serviceName,
-        redis: redisOK,
+        //version: config.serviceVersion,
+        //name: "cfcrypt", //config.serviceName,
+        //redis: redisOK,
+        status: "ok",
+        kv: "ok"
       });
     },
   });
