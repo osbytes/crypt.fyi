@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import Fastify from 'fastify';
+import Fastify, { type FastifyError } from 'fastify';
 import helmet from '@fastify/helmet';
 import compression from '@fastify/compress';
 import {
@@ -360,7 +360,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     },
   });
 
-  app.setErrorHandler(function (error: any, req, res) {
+  app.setErrorHandler(function (error: FastifyError, req, res) {
     req.log.error(error);
 
     if (res.sent) return;
