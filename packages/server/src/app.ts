@@ -110,7 +110,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     res.header('Access-Control-Allow-Headers', config.corsHeaders);
 
     if (req.method === 'OPTIONS') {
-      return res.send();
+      return res.send('');
     }
 
     const ac = new AbortController();
@@ -297,13 +297,13 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       try {
         const result = await vault.get(req.params.vaultId, req.query.h, req.ip);
         if (!result) {
-          return res.status(404).send();
+          return res.status(404).send(null);
         }
 
         return res.send(result);
       } catch (error) {
         if (error instanceof ErrorInvalidKeyAndOrPassword) {
-          return res.status(400).send();
+          return res.status(400).send(null);
         }
 
         throw error;
@@ -328,10 +328,10 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     async handler(req, res) {
       const exists = await vault.exists(req.params.vaultId);
       if (!exists) {
-        return res.status(404).send();
+        return res.status(404).send(null);
       }
 
-      return res.status(200).send();
+      return res.status(200).send(null);
     },
   });
 
@@ -353,14 +353,14 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     async handler(req, res) {
       const result = await vault.del(req.params.vaultId, req.body.dt);
       if (!result) {
-        return res.status(404).send();
+        return res.status(404).send(null);
       }
 
-      return res.status(200).send();
+      return res.status(200).send(null);
     },
   });
 
-  app.setErrorHandler(function (error, req, res) {
+  app.setErrorHandler(function (error: any, req, res) {
     req.log.error(error);
 
     if (res.sent) return;

@@ -45,7 +45,7 @@
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2",
-    "undici": "^7.18.2",
+    "undici": "^8.0.2",
     "vitest": "^3.2.4"
   },
   "dependencies": {
@@ -63,7 +63,7 @@
     "@opentelemetry/semantic-conventions": "^1.36.0",
     "bullmq": "^5.58.3",
     "bytes": "^3.1.2",
-    "fastify": "^5.5.0",
+    "fastify": "^5.8.4",
     "fastify-type-provider-zod": "^5.0.3",
     "http-graceful-shutdown": "^3.1.14",
     "ioredis": "^5.7.0",
