@@ -780,7 +780,12 @@ export function CreatePage() {
                             <Checkbox
                               {...rest}
                               checked={value}
-                              onCheckedChange={onChange}
+                              onCheckedChange={(checked) => {
+                                onChange(checked);
+                                if (checked) {
+                                  form.setValue('rc', undefined);
+                                }
+                              }}
                               disabled={createMutation.isPending || rest.disabled}
                             />
                           </FormControl>
