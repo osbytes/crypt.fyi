@@ -32,10 +32,47 @@ program
   .option('-b, --burn', 'Burn after reading', true)
   .option('--ip <ip>', 'Restrict access to specific IP address')
   .option('-r, --reads <count>', 'Number of times the secret can be read', undefined)
+  .option('--webhook-url <url>', 'HTTPS (or HTTP) webhook URL for secret notifications')
+  .option('--webhook-name <name>', 'Optional label for this secret in webhook payloads (max 50 chars)')
+  .option(
+    '--no-webhook-on-read',
+    'Do not POST to the webhook when the secret is read successfully',
+  )
+  .option(
+    '--webhook-on-failed-key',
+    'POST to the webhook when decryption fails (wrong key or password)',
+  )
+  .option(
+    '--webhook-on-failed-ip',
+    'POST to the webhook when the viewer IP fails the IP allow-list',
+  )
+  .option('--webhook-on-burn', 'POST to the webhook when the secret is burned')
   .action(async (content, options) => {
     if (options.file && content) {
       console.error(chalk.red('Cannot provide both content and file'));
       process.exit(1);
+    }
+
+    const webhookUrl = options.webhookUrl?.trim();
+
+    // Webhook toggles only apply with a non-empty `--webhook-url`; reject dangling options (avoids accidental API calls).
+    if (!webhookUrl) {
+      if (options.webhookName) {
+        console.error(chalk.red('--webhook-name requires --webhook-url'));
+        process.exit(1);
+      }
+      if (options.webhookOnRead === false) {
+        console.error(chalk.red('--webhook-url is required when using --no-webhook-on-read'));
+        process.exit(1);
+      }
+      if (
+        options.webhookOnFailedKey ||
+        options.webhookOnFailedIp ||
+        options.webhookOnBurn
+      ) {
+        console.error(chalk.red('Webhook toggle flags require --webhook-url'));
+        process.exit(1);
+      }
     }
 
     if (options.file) {
@@ -45,6 +82,15 @@ program
         console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
         process.exit(1);
       }
+    }
+
+    try {
+      if (webhookUrl) {
+        validateWebhookCliInput(webhookUrl, options.webhookName);
+      }
+    } catch (e) {
+      console.error(chalk.red(e instanceof Error ? e.message : 'Unknown error'));
+      process.exit(1);
     }
 
     const spinner = ora('Encrypting content...').start();
@@ -57,6 +103,18 @@ program
         ttl: parseDuration(options.ttl),
         ips: options.ip,
         rc: options.reads ? parseInt(options.reads, 10) : undefined,
+        ...(webhookUrl
+          ? {
+              wh: {
+                u: webhookUrl,
+                n: trimmedWebhookName(options.webhookName),
+                r: options.webhookOnRead,
+                fpk: options.webhookOnFailedKey ?? false,
+                fip: options.webhookOnFailedIp ?? false,
+                b: options.webhookOnBurn ?? false,
+              },
+            }
+          : {}),
       });
 
       spinner.succeed('Secret encrypted and stored successfully!');
@@ -144,6 +202,34 @@ program
   });
 
 program.parse();
+
+function trimmedWebhookName(name: string | undefined): string | undefined {
+  if (name === undefined) {
+    return undefined;
+  }
+
+  const trimmedName = name.trim();
+  return trimmedName === '' ? undefined : trimmedName;
+}
+
+function validateWebhookCliInput(urlString: string, name: string | undefined): void {
+  let url: URL;
+  
+  try {
+    url = new URL(urlString);
+  } catch {
+    throw new Error('Invalid webhook URL');
+  }
+
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+    throw new Error('Webhook URL must use HTTP or HTTPS');
+  }
+
+  const trimmedName = trimmedWebhookName(name);
+  if (trimmedName && trimmedName.length > 50) {
+    throw new Error('Webhook name must be at most 50 characters');
+  }
+}
 
 function parseDuration(duration: string): number {
   const units: Record<string, number> = {
