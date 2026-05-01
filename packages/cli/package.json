@@ -19,7 +19,8 @@
     "build": "ncc build src/index.ts -o dist",
     "lint": "eslint \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "jest --verbose"
   },
   "dependencies": {
     "@crypt.fyi/core": "*",
@@ -29,11 +30,14 @@
     "zod": "^4.1.5"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.18.0",
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "@vercel/ncc": "^0.38.3",
     "eslint": "^9.34.0",
+    "jest": "^30.1.1",
+    "ts-jest": "^29.4.1",
     "typescript": "^5.9.2"
   }
 }

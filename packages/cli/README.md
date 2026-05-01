@@ -21,13 +21,19 @@ cfyi encrypt --help
 
 ### Encrypt with a webhook
 
-Use the same webhook options as the website’s advanced settings. The server receives `POST` notifications at your URL when the configured events occur (for example, when the secret is read or burned).
+Use the same webhook options as the website's advanced settings. The server receives `POST` notifications at your URL when the configured events occur.
 
 ```bash
 cfyi encrypt "your secret" \
-  --webhook-url https://example.com/hooks/crypt-fyi \
-  --webhook-name "CI token" \
-  --webhook-on-burn
+  --wh-url https://example.com/hooks/crypt-fyi \
+  --wh-events read,burn \
+  --wh-name "CI token"
 ```
 
-By default, the API is also notified on a successful read; pass `--no-webhook-on-read` to disable that.
+Available events for `--wh-events`:
+- `read` - When the secret is read successfully (default)
+- `burn` - When the secret is burned
+- `failed-key` - When decryption fails (wrong key or password)
+- `failed-ip` - When the viewer IP fails the IP allow-list
+
+Multiple events can be specified as a comma-separated list (e.g., `read,burn,failed-key`).
