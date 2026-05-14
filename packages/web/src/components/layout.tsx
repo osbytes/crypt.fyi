@@ -111,6 +111,20 @@ export function Layout({ children }: LayoutProps) {
               >
                 Github
               </a>
+              <a
+                href="https://www.osbytes.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="osbytes - open source bytes"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <img
+                  src="https://www.osbytes.io/badge.svg"
+                  alt="osbytes - open source bytes"
+                  width="32"
+                  height="32"
+                />
+              </a>
             </div>
             <div className="text-sm text-muted-foreground text-center">
               {t('common.footer.tagline')}
