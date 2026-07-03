@@ -17,12 +17,7 @@ export const fr: TranslationKeys = {
     confirm: 'Confirmer',
     requestNewLanguage: 'Demander nouvelle langue ou corriger traductions',
     footer: {
-      tagline:
-        "Construit avec la sécurité et la confidentialité à l'esprit - parce que l'ignorance peut être une bénédiction",
-    },
-    header: {
-      tagline:
-        'Partagez des données éphémères avec un chiffrement <aesLink>ML-KEM</aesLink> <e2eLink>post-quantique de bout en bout</e2eLink> à connaissance nulle',
+      tagline: 'Conçu avec la sécurité et la confidentialité au cœur',
     },
     time: {
       minute_one: '{{count}} minute',
@@ -41,7 +36,7 @@ export const fr: TranslationKeys = {
       encryption: {
         title: 'Chiffrement Post-Quantique ML-KEM',
         description:
-          "Le chiffrement post-quantique ML-KEM de pointe garantit que vos données restent sécurisées même contre les futures menaces de l'informatique quantique. Tout le chiffrement se fait dans votre navigateur avant la transmission.",
+          "L'encapsulation de clé post-quantique ML-KEM ajoute une couche de défense en profondeur contre les futures attaques quantiques de type « récolter maintenant, déchiffrer plus tard ». Tout le chiffrement se fait dans votre navigateur avant la transmission.",
       },
       security: {
         title: 'Sécurité Renforcée',
@@ -131,8 +126,10 @@ export const fr: TranslationKeys = {
       content: {
         label: 'Contenu secret',
         placeholder: 'Saisissez votre contenu secret ici...',
-        fileHint: 'ajoutez un fichier en le déposant ou en cliquant ici',
+        fileHint: 'ajoutez un fichier en le déposant ou en cliquant ici (max 1 Mo)',
         fileSelected: 'Fichier sélectionné : {{name}} ({{size}} Ko)',
+        dropFile: 'Déposez le fichier ici',
+        invalidFileType: 'Type de fichier invalide',
       },
       password: {
         label: 'Mot de passe',
@@ -144,7 +141,8 @@ export const fr: TranslationKeys = {
       },
       burn: {
         label: 'Détruire après lecture',
-        description: "Garantit qu'un seul destinataire peut accéder au secret",
+        description:
+          "Garantit que le secret ne peut être lu qu'une seule fois — par la première personne qui ouvre le lien",
       },
       advanced: {
         toggle: 'configuration avancée',
@@ -185,6 +183,9 @@ export const fr: TranslationKeys = {
         password: "Partagez l'URL et le mot de passe avec le destinataire souhaité",
       },
       urlCopied: 'URL copiée dans le presse-papiers',
+      secretDeleted: 'Secret supprimé',
+      qrDownloaded: 'Code QR téléchargé',
+      qrDownloadFailed: 'Échec du téléchargement du code QR : {{error}}',
       qrCode: {
         title: "Code QR de l'URL du Secret",
         description: "Téléchargez et partagez le code QR de l'URL du secret",
@@ -213,7 +214,7 @@ export const fr: TranslationKeys = {
       unexpectedStatus: 'code de statut inattendu {{code}}',
       webhookConfigInvalid:
         "La configuration du webhook est invalide - au moins un type d'événement webhook est requis",
-      fileSizeExceeded: 'La taille du fichier dépasse la taille maximale autorisée',
+      fileSizeExceeded: 'Le fichier est trop volumineux. La taille maximale est {{max}}.',
       fileReadError: 'Échec de la lecture du fichier',
       fileReadAborted: 'La lecture du fichier a été interrompue',
     },
@@ -223,6 +224,17 @@ export const fr: TranslationKeys = {
       title: 'Secret Non Trouvé',
       description: 'Ce secret a peut-être expiré ou a été supprimé.',
       createNew: 'Créer un Nouveau Secret',
+    },
+    invalidLink: {
+      title: 'Ce lien est invalide',
+      description:
+        "Le lien est incomplet ou a été modifié pendant le transfert, le secret ne peut donc pas être déchiffré. Demandez à l'expéditeur de partager à nouveau le lien complet.",
+      createNew: 'Créer un Nouveau Secret',
+    },
+    connectionError: {
+      title: 'Impossible de joindre le serveur',
+      description: 'Le secret existe peut-être encore. Vérifiez votre connexion et réessayez.',
+      tryAgain: 'Réessayer',
     },
     password: {
       title: 'Saisir le Mot de Passe',
@@ -240,7 +252,7 @@ export const fr: TranslationKeys = {
       clickToReveal: "Cliquez sur l'icône œil ci-dessus pour révéler le secret",
       passwordProtected:
         'Ce secret est protégé par un mot de passe. Cliquez pour saisir le mot de passe.',
-      clickToEnterPassword: 'Cliquez pour saisir le mot de passe',
+      ariaLabel: 'Contenu secret',
     },
     info: {
       burnedAfterReading:
@@ -323,7 +335,8 @@ export const fr: TranslationKeys = {
           'Tous les secrets sont chiffrés avec le chiffrement post-quantique ML-KEM dans votre navigateur avant transmission. La clé de chiffrement ne quitte jamais votre appareil, garantissant un véritable chiffrement Zero-Knowledge de bout en bout.',
         features: {
           key: "La clé de chiffrement est dérivée d'une génération aléatoire cryptographiquement sécurisée",
-          derivation: 'La dérivation de clé utilise PBKDF2 avec SHA-256',
+          derivation:
+            'Les mots de passe sont renforcés avec Argon2id (à forte mémoire) ; la couche de contenu utilise le mécanisme de clé ML-KEM-768 avec ChaCha20-Poly1305',
           vector: "Chaque secret a un vecteur d'initialisation (IV) unique",
         },
       },

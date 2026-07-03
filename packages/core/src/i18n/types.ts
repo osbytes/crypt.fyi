@@ -17,9 +17,6 @@ export interface TranslationKeys {
     footer: {
       tagline: string;
     };
-    header: {
-      tagline: string;
-    };
     time: {
       minute_one: string;
       minute_other: string;
@@ -116,6 +113,8 @@ export interface TranslationKeys {
         placeholder: string;
         fileHint: string;
         fileSelected: string;
+        dropFile: string;
+        invalidFileType: string;
       };
       password: {
         label: string;
@@ -165,6 +164,9 @@ export interface TranslationKeys {
         password: string;
       };
       urlCopied: string;
+      secretDeleted: string;
+      qrDownloaded: string;
+      qrDownloadFailed: string;
       qrCode: {
         title: string;
         description: string;
@@ -202,6 +204,16 @@ export interface TranslationKeys {
       description: string;
       createNew: string;
     };
+    invalidLink: {
+      title: string;
+      description: string;
+      createNew: string;
+    };
+    connectionError: {
+      title: string;
+      description: string;
+      tryAgain: string;
+    };
     password: {
       title: string;
       placeholder: string;
@@ -217,7 +229,7 @@ export interface TranslationKeys {
       copiedToClipboard: string;
       clickToReveal: string;
       passwordProtected: string;
-      clickToEnterPassword: string;
+      ariaLabel: string;
     };
     info: {
       burnedAfterReading: string;

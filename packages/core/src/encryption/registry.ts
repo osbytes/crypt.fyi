@@ -2,6 +2,7 @@ import { EncryptionAlgorithm, CompressionAlgorithm } from './types';
 import { encrypt as gcmEncrypt, decrypt as gcmDecrypt } from './gcm';
 import { encrypt as mlkemEncrypt, decrypt as mlkemDecrypt } from './mlkem';
 import { encrypt as mlkem2Encrypt, decrypt as mlkem2Decrypt } from './mlkem2';
+import { encrypt as mlkemArgon2Encrypt, decrypt as mlkemArgon2Decrypt } from './mlkem_argon2';
 import { deflate, inflate } from 'pako';
 import { ProcessingMetadata } from '../vault';
 
@@ -23,6 +24,11 @@ export const encryptionRegistry: Record<
     name: 'ml-kem-768-2',
     encrypt: mlkem2Encrypt,
     decrypt: mlkem2Decrypt,
+  },
+  'ml-kem-768-argon2': {
+    name: 'ml-kem-768-argon2',
+    encrypt: mlkemArgon2Encrypt,
+    decrypt: mlkemArgon2Decrypt,
   },
 } as const;
 
