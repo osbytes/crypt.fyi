@@ -81,12 +81,17 @@ export const validateWebhookUrl = (url: string, options: ValidateWebhookUrlOptio
   const allowedProtocols =
     options.allowedProtocols ?? (requireHttps ? ['https:'] : ['http:', 'https:']);
 
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    throw new SsrfError('Invalid webhook URL');
-  }
+  // Infer the URL type from `new URL(...)` rather than annotating `parsed: URL`.
+  // During the DTS rollup build the explicit annotation can resolve to a
+  // different global `URL` type (DOM vs node), which fails structural checks
+  // (missing createObjectURL/revokeObjectURL/canParse). Inference avoids that.
+  const parsed = (() => {
+    try {
+      return new URL(url);
+    } catch {
+      throw new SsrfError('Invalid webhook URL');
+    }
+  })();
 
   if (!allowedProtocols.includes(parsed.protocol)) {
     throw new SsrfError(
