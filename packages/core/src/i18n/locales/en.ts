@@ -137,7 +137,8 @@ export const en: TranslationKeys = {
       },
       burn: {
         label: 'Burn after reading',
-        description: 'Guarantees the secret can be read only once — the first person to open the link',
+        description:
+          'Guarantees the secret can be read only once — the first person to open the link',
       },
       advanced: {
         toggle: 'advanced configuration',

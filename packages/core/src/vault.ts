@@ -39,7 +39,8 @@ export const vaultValueSchema = z.object({
         .string()
         .url()
         .refine((url) => isValidWebhookUrl(url, { requireHttps: false }), {
-          message: 'Webhook URL must be a public http(s) URL and must not target a private or reserved address',
+          message:
+            'Webhook URL must be a public http(s) URL and must not target a private or reserved address',
         })
         .describe('url of the webhook'),
       n: z.string().max(50).describe('name of the secret').optional(),

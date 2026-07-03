@@ -57,8 +57,12 @@ describe('validateWebhookUrl', () => {
   });
 
   it('rejects disallowed schemes', () => {
-    expect(() => validateWebhookUrl('ftp://example.com', { requireHttps: false })).toThrow(SsrfError);
-    expect(() => validateWebhookUrl('http://example.com', { requireHttps: true })).toThrow(SsrfError);
+    expect(() => validateWebhookUrl('ftp://example.com', { requireHttps: false })).toThrow(
+      SsrfError,
+    );
+    expect(() => validateWebhookUrl('http://example.com', { requireHttps: true })).toThrow(
+      SsrfError,
+    );
   });
 
   it('accepts public https URLs', () => {
