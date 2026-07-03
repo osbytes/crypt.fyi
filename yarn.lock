@@ -1500,6 +1500,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^8.41.0"
     buffer: "npm:^6.0.3"
     eslint: "npm:^9.34.0"
+    ipaddr.js: "npm:^2.4.0"
     jest: "npm:^30.1.1"
     pako: "npm:^2.1.0"
     ts-jest: "npm:^29.4.1"
@@ -9402,6 +9403,13 @@ __metadata:
   version: 2.3.0
   resolution: "ipaddr.js@npm:2.3.0"
   checksum: 10c0/084bab99e2f6875d7a62adc3325e1c64b038a12c9521e35fb967b5e263a8b3afb1b8884dd77c276092331f5d63298b767491e10997ef147c62da01b143780bbd
+  languageName: node
+  linkType: hard
+
+"ipaddr.js@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "ipaddr.js@npm:2.4.0"
+  checksum: 10c0/47c2f17677b40054ca50a09e1228cf818c0d02d4474c2e0e29232c6668b3c4d51a3cfc19d1e17897d7baf4d933b3111d6bdf5cfbe55ab184165469a75f2bf177
   languageName: node
   linkType: hard
 

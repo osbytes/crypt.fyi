@@ -85,7 +85,51 @@ export function ViewPage() {
     return <Loader />;
   }
 
-  if (decryptMutation.error instanceof ErrorNotFound || (isPasswordSet && !existsQuery.data)) {
+  const decryptError = decryptMutation.error;
+  const isWrongKeyWithoutPassword =
+    decryptError instanceof ErrorInvalidKeyAndOrPassword && !isPasswordSet;
+  // A failed existence check (network/server error, not a definitive "false")
+  // must not be reported as "not found".
+  const existsFailed = isPasswordSet && existsQuery.isError;
+  const unexpectedDecryptError =
+    decryptError &&
+    !(decryptError instanceof ErrorInvalidKeyAndOrPassword) &&
+    !(decryptError instanceof ErrorNotFound);
+
+  if (existsFailed || unexpectedDecryptError) {
+    return (
+      <div className="max-w-3xl mx-auto mt-8 text-center">
+        <Card className="p-8">
+          <h1 className="text-2xl font-semibold mb-4">{t('view.connectionError.title')}</h1>
+          <p className="text-muted-foreground mb-6">{t('view.connectionError.description')}</p>
+          <Button
+            onClick={() => {
+              if (existsFailed) existsQuery.refetch();
+              if (unexpectedDecryptError) decryptMutation.reset();
+            }}
+          >
+            {t('view.connectionError.tryAgain')}
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isWrongKeyWithoutPassword) {
+    return (
+      <div className="max-w-3xl mx-auto mt-8 text-center">
+        <Card className="p-8">
+          <h1 className="text-2xl font-semibold mb-4">{t('view.invalidLink.title')}</h1>
+          <p className="text-muted-foreground mb-6">{t('view.invalidLink.description')}</p>
+          <Button asChild>
+            <Link to="/new">{t('view.invalidLink.createNew')}</Link>
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  if (decryptError instanceof ErrorNotFound || (isPasswordSet && existsQuery.data === false)) {
     return (
       <div className="max-w-3xl mx-auto mt-8 text-center">
         <Card className="p-8">
@@ -97,11 +141,6 @@ export function ViewPage() {
         </Card>
       </div>
     );
-  } else if (
-    decryptMutation.error &&
-    !(decryptMutation.error instanceof ErrorInvalidKeyAndOrPassword)
-  ) {
-    throw decryptMutation.error;
   }
 
   // Show initial confirmation screen to require user input before fetching the secret
@@ -209,8 +248,7 @@ export function ViewPage() {
                   'text-wrap break-words whitespace-pre-wrap font-mono text-sm',
                   !isRevealed && 'blur-md select-none',
                 )}
-                role="textbox"
-                aria-label="Secret content"
+                aria-label={t('view.content.ariaLabel')}
               >
                 {decryptedContent}
               </pre>
@@ -286,7 +324,7 @@ export function ViewPage() {
 // Outdated clients may use the `key` parameter in the URL search parameters to generate the secret.
 // This is deprecated and will be removed in the future.
 // This hook shows a toast to the user to let them know that the secret sender may be using an
-// outdated client to genereate the secret.
+// outdated client to generate the secret.
 function useKeyInSearchParamsDeprecationToast() {
   const search = useSearch({ from: '/$id' });
   const searchKey = search.key;
@@ -296,7 +334,7 @@ function useKeyInSearchParamsDeprecationToast() {
         <div className="space-y-2">
           <p>
             Using <code>key</code> in the URL search parameters is deprecated. The secret sender may
-            be using an outdated client to genereate the secret.
+            be using an outdated client to generate the secret.
           </p>
           <p className="text-sm text-muted-foreground">
             <a

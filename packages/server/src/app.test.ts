@@ -9,7 +9,7 @@ import { createTokenGenerator } from './vault/tokens.js';
 import { createNopWebhookSender } from './webhook.js';
 import { Redis } from 'ioredis';
 import { Client } from 'undici';
-import { gcm, type CreateVaultRequest } from '@crypt.fyi/core';
+import { machine, type CreateVaultRequest } from '@crypt.fyi/core';
 
 const initAppTest = async () => {
   const config = {
@@ -359,8 +359,8 @@ describe('app', () => {
     expect(parsedValue.wh.u.length).toBeGreaterThan(0);
 
     const [decryptedIps, decryptedWhU] = await Promise.all([
-      gcm.decrypt(parsedValue.ips, testContext.config.encryptionKey),
-      gcm.decrypt(parsedValue.wh.u, testContext.config.encryptionKey),
+      machine.decrypt(parsedValue.ips, testContext.config.encryptionKey),
+      machine.decrypt(parsedValue.wh.u, testContext.config.encryptionKey),
     ]);
 
     expect(decryptedIps).toBe('192.168.1.1,10.0.0.0/24');

@@ -17,11 +17,7 @@ export const de: TranslationKeys = {
     confirm: 'Bestätigen',
     requestNewLanguage: 'Neue Sprache anfordern oder Übersetzungen korrigieren',
     footer: {
-      tagline: 'Mit Sicherheit und Privatsphäre im Fokus - weil Unwissenheit ein Segen sein kann',
-    },
-    header: {
-      tagline:
-        'Kurzlebiger Datenaustausch mit Zero-Knowledge <aesLink>ML-KEM</aesLink> <e2eLink>Post-Quanten Ende-zu-Ende-Verschlüsselung</e2eLink>',
+      tagline: 'Mit Sicherheit und Privatsphäre als Kern',
     },
     time: {
       minute_one: '{{count}} Minute',
@@ -40,7 +36,7 @@ export const de: TranslationKeys = {
       encryption: {
         title: 'ML-KEM Post-Quanten-Verschlüsselung',
         description:
-          'State-of-the-art ML-KEM Post-Quanten-Verschlüsselung stellt sicher, dass Ihre Daten auch gegen zukünftige Quantencomputer-Bedrohungen sicher bleiben. Die gesamte Verschlüsselung erfolgt in Ihrem Browser vor der Übertragung.',
+          'Die ML-KEM Post-Quanten-Schlüsselkapselung fügt eine zusätzliche Schutzebene gegen künftige "Harvest-now, decrypt-later"-Quantenangriffe hinzu. Die gesamte Verschlüsselung erfolgt in Ihrem Browser vor der Übertragung.',
       },
       security: {
         title: 'Erweiterte Sicherheit',
@@ -131,8 +127,10 @@ export const de: TranslationKeys = {
       content: {
         label: 'Geheimer Inhalt',
         placeholder: 'Geben Sie hier Ihren geheimen Inhalt ein...',
-        fileHint: 'Datei per Drag & Drop hinzufügen oder hier klicken',
+        fileHint: 'Datei per Drag & Drop hinzufügen oder hier klicken (max. 1 MB)',
         fileSelected: 'Datei ausgewählt: {{name}} ({{size}} KB)',
+        dropFile: 'Datei hier ablegen',
+        invalidFileType: 'Ungültiger Dateityp',
       },
       password: {
         label: 'Passwort',
@@ -144,7 +142,8 @@ export const de: TranslationKeys = {
       },
       burn: {
         label: 'Nach dem Lesen löschen',
-        description: 'Garantiert, dass nur ein Empfänger auf das Geheimnis zugreifen kann',
+        description:
+          'Garantiert, dass das Geheimnis nur einmal gelesen werden kann — von der ersten Person, die den Link öffnet',
       },
       advanced: {
         toggle: 'erweiterte Konfiguration',
@@ -185,6 +184,9 @@ export const de: TranslationKeys = {
         password: 'Teilen Sie die URL und das Passwort mit dem gewünschten Empfänger',
       },
       urlCopied: 'URL in die Zwischenablage kopiert',
+      secretDeleted: 'Geheimnis gelöscht',
+      qrDownloaded: 'QR-Code heruntergeladen',
+      qrDownloadFailed: 'QR-Code konnte nicht heruntergeladen werden: {{error}}',
       qrCode: {
         title: 'Geheimnis-URL QR-Code',
         description: 'Laden Sie den QR-Code der Geheimnis-URL herunter und teilen Sie ihn',
@@ -212,7 +214,7 @@ export const de: TranslationKeys = {
       unexpectedStatus: 'Unerwarteter Statuscode {{code}}',
       webhookConfigInvalid:
         'Webhook-Konfiguration ist ungültig - mindestens ein Webhook-Ereignistyp ist erforderlich',
-      fileSizeExceeded: 'Dateigröße überschreitet die maximal zulässige Größe',
+      fileSizeExceeded: 'Datei ist zu groß. Maximale Größe ist {{max}}.',
       fileReadError: 'Fehler beim Lesen der Datei',
       fileReadAborted: 'Dateilesen wurde abgebrochen',
     },
@@ -222,6 +224,18 @@ export const de: TranslationKeys = {
       title: 'Geheimnis nicht gefunden',
       description: 'Dieses Geheimnis ist möglicherweise abgelaufen oder wurde gelöscht.',
       createNew: 'Neues Geheimnis erstellen',
+    },
+    invalidLink: {
+      title: 'Dieser Link ist ungültig',
+      description:
+        'Der Link ist unvollständig oder wurde bei der Übertragung verändert, sodass das Geheimnis nicht entschlüsselt werden kann. Bitten Sie den Absender, den vollständigen Link erneut zu senden.',
+      createNew: 'Neues Geheimnis erstellen',
+    },
+    connectionError: {
+      title: 'Server nicht erreichbar',
+      description:
+        'Das Geheimnis existiert möglicherweise noch. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+      tryAgain: 'Erneut versuchen',
     },
     password: {
       title: 'Passwort eingeben',
@@ -239,7 +253,7 @@ export const de: TranslationKeys = {
       clickToReveal: 'Klicken Sie auf das Augensymbol oben, um das Geheimnis anzuzeigen',
       passwordProtected:
         'Dieses Geheimnis ist passwortgeschützt. Klicken Sie, um das Passwort einzugeben.',
-      clickToEnterPassword: 'Klicken Sie, um das Passwort einzugeben',
+      ariaLabel: 'Geheimer Inhalt',
     },
     info: {
       burnedAfterReading:
@@ -319,7 +333,8 @@ export const de: TranslationKeys = {
           'Alle Geheimnisse werden mit ML-KEM Post-Quanten-Verschlüsselung in Ihrem Browser verschlüsselt, bevor sie übertragen werden. Der Verschlüsselungsschlüssel verlässt Ihr Gerät nie, was echte Zero-Knowledge Ende-zu-Ende-Verschlüsselung gewährleistet.',
         features: {
           key: 'Der Verschlüsselungsschlüssel wird aus einer kryptographisch sicheren Zufallsgenerierung abgeleitet',
-          derivation: 'Schlüsselableitung verwendet PBKDF2 mit SHA-256',
+          derivation:
+            'Passwörter werden mit Argon2id (speicherhart) gestreckt; die Inhaltsebene nutzt ML-KEM-768-Schlüsselkapselung mit ChaCha20-Poly1305',
           vector: 'Jedes Geheimnis hat einen eindeutigen Initialisierungsvektor (IV)',
         },
       },

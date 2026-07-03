@@ -17,11 +17,7 @@ export const zh: TranslationKeys = {
     confirm: '确认',
     requestNewLanguage: '请求新语言或修正翻译',
     footer: {
-      tagline: '以安全和隐私为设计理念 - 因为无知也是一种幸福',
-    },
-    header: {
-      tagline:
-        '使用零知识<aesLink>ML-KEM</aesLink><e2eLink>后量子端到端加密</e2eLink>的临时数据分享',
+      tagline: '以安全和隐私为核心构建',
     },
     time: {
       minute_one: '{{count}} 分钟',
@@ -40,7 +36,7 @@ export const zh: TranslationKeys = {
       encryption: {
         title: 'ML-KEM后量子加密',
         description:
-          '最先进的ML-KEM后量子加密确保您的数据即使面对未来的量子计算威胁也能保持安全。所有加密都在传输前在您的浏览器中完成。',
+          'ML-KEM 后量子密钥封装增加了一层纵深防御，以抵御未来"先收集、后解密"的量子攻击。所有加密都在传输前在您的浏览器中完成。',
       },
       security: {
         title: '增强安全',
@@ -122,8 +118,10 @@ export const zh: TranslationKeys = {
       content: {
         label: '密文内容',
         placeholder: '在此输入您的密文内容...',
-        fileHint: '拖放或点击此处添加文件',
+        fileHint: '拖放或点击此处添加文件（最大 1 MB）',
         fileSelected: '已选择文件：{{name}}（{{size}} KB）',
+        dropFile: '拖放文件到此处',
+        invalidFileType: '无效的文件类型',
       },
       password: {
         label: '密码',
@@ -135,7 +133,7 @@ export const zh: TranslationKeys = {
       },
       burn: {
         label: '阅后即焚',
-        description: '确保只有一个接收者可以访问密文',
+        description: '确保密文只能被读取一次——由第一个打开链接的人',
       },
       advanced: {
         toggle: '高级配置',
@@ -173,6 +171,9 @@ export const zh: TranslationKeys = {
         password: '与预期接收者分享 URL 和密码',
       },
       urlCopied: 'URL 已复制到剪贴板',
+      secretDeleted: '密文已删除',
+      qrDownloaded: '二维码已下载',
+      qrDownloadFailed: '下载二维码失败：{{error}}',
       qrCode: {
         title: '密文 URL 二维码',
         description: '下载并分享密文 URL 二维码',
@@ -199,7 +200,7 @@ export const zh: TranslationKeys = {
       secretNotFound: '未找到密文',
       unexpectedStatus: '意外的状态码 {{code}}',
       webhookConfigInvalid: 'Webhook配置无效 - 至少需要一个Webhook事件类型',
-      fileSizeExceeded: '文件大小超过最大允许大小',
+      fileSizeExceeded: '文件过大。最大大小为 {{max}}。',
       fileReadError: '读取文件失败',
       fileReadAborted: '文件读取已中止',
     },
@@ -209,6 +210,16 @@ export const zh: TranslationKeys = {
       title: '未找到密文',
       description: '此密文可能已过期或被删除。',
       createNew: '创建新密文',
+    },
+    invalidLink: {
+      title: '此链接无效',
+      description: '链接不完整或在传输过程中被更改，因此无法解密密文。请让发送者重新分享完整链接。',
+      createNew: '创建新密文',
+    },
+    connectionError: {
+      title: '无法连接服务器',
+      description: '密文可能仍然存在。请检查您的网络连接后重试。',
+      tryAgain: '重试',
     },
     password: {
       title: '输入密码',
@@ -225,7 +236,7 @@ export const zh: TranslationKeys = {
       copiedToClipboard: '密文已复制到剪贴板',
       clickToReveal: '点击上方的眼睛图标显示密文',
       passwordProtected: '此密文受密码保护。点击输入密码。',
-      clickToEnterPassword: '点击输入密码',
+      ariaLabel: '密文内容',
     },
     info: {
       burnedAfterReading: '此密文在您查看后已被删除，离开页面后将无法再次访问。',
@@ -301,7 +312,8 @@ export const zh: TranslationKeys = {
           '所有秘密在传输前都在您的浏览器中使用ML-KEM后量子加密进行加密。加密密钥永远不会离开您的设备，确保真正的零知识端到端加密。',
         features: {
           key: '加密密钥来自密码学安全的随机生成',
-          derivation: '密钥派生使用PBKDF2和SHA-256',
+          derivation:
+            '密码使用 Argon2id（内存密集型）进行强化；内容层采用 ML-KEM-768 密钥封装与 ChaCha20-Poly1305',
           vector: '每个秘密都有唯一的初始化向量(IV)',
         },
       },

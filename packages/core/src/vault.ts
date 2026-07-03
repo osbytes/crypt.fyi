@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isValidWebhookUrl } from './ssrf';
 
 export const processingMetadataSchema = z
   .object({
@@ -8,7 +9,14 @@ export const processingMetadataSchema = z
       })
       .optional(),
     encryption: z.object({
-      algorithm: z.enum(['aes-256-gcm', 'ml-kem-768', 'ml-kem-768-2']),
+      algorithm: z.enum(['aes-256-gcm', 'ml-kem-768', 'ml-kem-768-2', 'ml-kem-768-argon2']),
+      // Optional algorithm for the user-password encryption layer. The primary
+      // `algorithm` encrypts the high-entropy URL key layer (which needs no
+      // memory-hard KDF); when a password is used, this hardens only that layer.
+      // Absent on legacy entries, which encrypt both layers with `algorithm`.
+      passwordAlgorithm: z
+        .enum(['aes-256-gcm', 'ml-kem-768', 'ml-kem-768-2', 'ml-kem-768-argon2'])
+        .optional(),
     }),
   })
   .describe('processing metadata including compression and encryption algorithms');
@@ -27,7 +35,13 @@ export const vaultValueSchema = z.object({
   fc: z.number().min(1).max(10).describe('burn after n failed attempts').optional(),
   wh: z
     .object({
-      u: z.string().url().describe('url of the webhook'),
+      u: z
+        .string()
+        .url()
+        .refine((url) => isValidWebhookUrl(url, { requireHttps: false }), {
+          message: 'Webhook URL must be a public http(s) URL and must not target a private or reserved address',
+        })
+        .describe('url of the webhook'),
       n: z.string().max(50).describe('name of the secret').optional(),
       r: z.boolean().default(true).describe('should the webhook be called on read'),
       fpk: z

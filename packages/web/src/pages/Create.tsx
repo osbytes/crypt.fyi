@@ -67,6 +67,7 @@ import { Tooltip } from '@/components/ui/tooltip';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
 const MAX_FILE_SIZE = 1 * 1024 * 1024;
+const MAX_FILE_SIZE_LABEL = '1 MB';
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -136,10 +137,7 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
           for (const ip of ips) {
             const trimmed = ip.trim();
             const isValidIP = z.union([z.ipv4(), z.ipv6()]).safeParse(trimmed).success;
-            const isValidCIDR = z
-              .string()
-              .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
-              .safeParse(trimmed).success;
+            const isValidCIDR = z.union([z.cidrv4(), z.cidrv6()]).safeParse(trimmed).success;
 
             if (!isValidIP && !isValidCIDR) {
               ctx.addIssue({
@@ -459,7 +457,7 @@ export function CreatePage() {
       const file = files[0];
 
       if (file.size > MAX_FILE_SIZE) {
-        toast.error(t('create.errors.fileSizeExceeded'));
+        toast.error(t('create.errors.fileSizeExceeded', { max: MAX_FILE_SIZE_LABEL }));
         setSelectedFile(null);
         form.resetField('c');
         return;
@@ -481,7 +479,7 @@ export function CreatePage() {
 
     if (content instanceof File) {
       if (content.size > MAX_FILE_SIZE) {
-        toast.error(t('create.errors.fileSizeExceeded'));
+        toast.error(t('create.errors.fileSizeExceeded', { max: MAX_FILE_SIZE_LABEL }));
         setSelectedFile(null);
         form.resetField('c');
         return;
@@ -564,7 +562,7 @@ export function CreatePage() {
       toast.error(error.message);
     },
     onSuccess() {
-      toast.success('Secret deleted');
+      toast.success(t('create.success.secretDeleted'));
       setIsUrlMasked(true);
       resetForNewSecret();
     },
@@ -599,9 +597,9 @@ export function CreatePage() {
       link.download = `crypt.fyi-qr-${hash.slice(0, 8)}.png`;
       link.href = dataUrl;
       link.click();
-      toast.success('QR code downloaded');
+      toast.success(t('create.success.qrDownloaded'));
     } catch (error) {
-      toast.error(`Failed to download QR code: ${error}`);
+      toast.error(t('create.success.qrDownloadFailed', { error: String(error) }));
     }
   };
 
@@ -654,7 +652,9 @@ export function CreatePage() {
                 dragState === 'dragging' ? 'text-primary' : 'text-destructive',
               )}
             >
-              {dragState === 'dragging' ? 'Drop file here' : 'Invalid file type'}
+              {dragState === 'dragging'
+                ? t('create.form.content.dropFile')
+                : t('create.form.content.invalidFileType')}
             </p>
           </motion.div>
         )}
@@ -673,7 +673,7 @@ export function CreatePage() {
               <Form {...form}>
                 <form
                   onKeyDown={(e) => {
-                    if (e.metaKey && e.key === 'Enter') {
+                    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                       form.handleSubmit(onSubmit)(e);
                     }
                   }}
@@ -697,14 +697,25 @@ export function CreatePage() {
                         <FormMessage />
                         <div className="flex items-center gap-2 text-[0.8rem] text-muted-foreground">
                           <p
+                            role="button"
+                            tabIndex={createMutation.isPending ? -1 : 0}
                             className={cn(
-                              'flex items-center justify-between cursor-pointer',
+                              'flex items-center justify-between cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                               createMutation.isPending && 'pointer-events-none',
                             )}
                             aria-disabled={createMutation.isPending}
                             onClick={() =>
                               !createMutation.isPending && fileInputRef.current?.click()
                             }
+                            onKeyDown={(e) => {
+                              if (
+                                !createMutation.isPending &&
+                                (e.key === 'Enter' || e.key === ' ')
+                              ) {
+                                e.preventDefault();
+                                fileInputRef.current?.click();
+                              }
+                            }}
                           >
                             <IconFile size={18} className="mr-1" />
                             {selectedFile ? (
@@ -764,7 +775,8 @@ export function CreatePage() {
                             placeholder={t('create.form.password.placeholder')}
                             {...field}
                             disabled={createMutation.isPending || field.disabled}
-                            type="new-password"
+                            type="password"
+                            autoComplete="new-password"
                           />
                         </FormControl>
                       </FormItem>
@@ -855,7 +867,7 @@ export function CreatePage() {
                                         {t('create.form.advanced.readCount.label')}
                                         <Tooltip>
                                           <TooltipTrigger asChild>
-                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
                                           </TooltipTrigger>
                                           <TooltipContent>
                                             {t('create.form.advanced.readCount.description')}
@@ -887,7 +899,7 @@ export function CreatePage() {
                                         {t('create.form.advanced.failedAttempts.label')}
                                         <Tooltip>
                                           <TooltipTrigger asChild>
-                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
                                           </TooltipTrigger>
                                           <TooltipContent>
                                             {t('create.form.advanced.failedAttempts.description')}
@@ -919,7 +931,7 @@ export function CreatePage() {
                                       {t('create.form.advanced.ip.label')}
                                       <Tooltip>
                                         <TooltipTrigger asChild>
-                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
                                         </TooltipTrigger>
                                         <TooltipContent>
                                           {t('create.form.advanced.ip.description')}
@@ -947,7 +959,7 @@ export function CreatePage() {
                                       {t('create.form.advanced.webhook.label')}
                                       <Tooltip>
                                         <TooltipTrigger asChild>
-                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
                                         </TooltipTrigger>
                                         <TooltipContent>
                                           {t('create.form.advanced.webhook.description')}
@@ -977,7 +989,7 @@ export function CreatePage() {
                                           {t('create.form.advanced.webhook.nameLabel')}
                                           <Tooltip>
                                             <TooltipTrigger asChild>
-                                              <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                              <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
                                             </TooltipTrigger>
                                             <TooltipContent>
                                               {t('create.form.advanced.webhook.nameDescription')}

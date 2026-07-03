@@ -17,11 +17,7 @@ export const en: TranslationKeys = {
     confirm: 'Confirm',
     requestNewLanguage: 'Request new or fix translations',
     footer: {
-      tagline: 'Built with security and privacy in mind - because ignorance can be bliss',
-    },
-    header: {
-      tagline:
-        'Ephemeral data sharing with zero-knowledge <aesLink>ML-KEM</aesLink> <e2eLink>post-quantum end-to-end encryption</e2eLink>',
+      tagline: 'Built with security and privacy at its core',
     },
     time: {
       minute_one: '{{count}} minute',
@@ -40,7 +36,7 @@ export const en: TranslationKeys = {
       encryption: {
         title: 'ML-KEM Post-Quantum Encryption',
         description:
-          'State-of-the-art ML-KEM post-quantum encryption ensures your data remains secure even against future quantum computing threats. All encryption happens in your browser before transmission.',
+          'ML-KEM post-quantum key encapsulation adds a defense-in-depth layer against future "harvest-now, decrypt-later" quantum attacks. All encryption happens in your browser before transmission.',
       },
       security: {
         title: 'Enhanced Security',
@@ -126,8 +122,10 @@ export const en: TranslationKeys = {
       content: {
         label: 'Secret content',
         placeholder: 'Enter your secret content or file here...',
-        fileHint: 'add a file by drag-n-drop or clicking here',
+        fileHint: 'add a file by drag-n-drop or clicking here (max 1 MB)',
         fileSelected: 'File selected: {{name}} ({{size}} KB)',
+        dropFile: 'Drop file here',
+        invalidFileType: 'Invalid file type',
       },
       password: {
         label: 'Password',
@@ -139,7 +137,7 @@ export const en: TranslationKeys = {
       },
       burn: {
         label: 'Burn after reading',
-        description: 'Guarantees only one recipient can access the secret',
+        description: 'Guarantees the secret can be read only once — the first person to open the link',
       },
       advanced: {
         toggle: 'advanced configuration',
@@ -178,6 +176,9 @@ export const en: TranslationKeys = {
         password: 'Share the URL and password with the desired recipient',
       },
       urlCopied: 'URL copied to clipboard',
+      secretDeleted: 'Secret deleted',
+      qrDownloaded: 'QR code downloaded',
+      qrDownloadFailed: 'Failed to download QR code: {{error}}',
       qrCode: {
         title: 'Secret URL QR Code',
         description: 'Download and share the secret URL QR Code',
@@ -205,7 +206,7 @@ export const en: TranslationKeys = {
       unexpectedStatus: 'unexpected status code {{code}}',
       webhookConfigInvalid:
         'Webhook configuration is invalid - at least one webhook event type is required',
-      fileSizeExceeded: 'File size exceeded maximum allowed size',
+      fileSizeExceeded: 'File is too large. Maximum size is {{max}}.',
       fileReadError: 'Failed to read file',
       fileReadAborted: 'File reading was aborted',
     },
@@ -215,6 +216,17 @@ export const en: TranslationKeys = {
       title: 'Secret Not Found',
       description: 'This secret may have expired or been deleted.',
       createNew: 'Create New Secret',
+    },
+    invalidLink: {
+      title: 'This link is invalid',
+      description:
+        'The link is incomplete or was altered in transit, so the secret cannot be decrypted. Ask the sender to share the full link again.',
+      createNew: 'Create New Secret',
+    },
+    connectionError: {
+      title: "Couldn't reach the server",
+      description: 'The secret may still exist. Check your connection and try again.',
+      tryAgain: 'Try Again',
     },
     password: {
       title: 'Enter Password',
@@ -231,11 +243,11 @@ export const en: TranslationKeys = {
       copiedToClipboard: 'Secret copied to clipboard',
       clickToReveal: 'Click the eye icon above to reveal the secret',
       passwordProtected: 'This secret is password protected. Click to enter password.',
-      clickToEnterPassword: 'Click to enter password',
+      ariaLabel: 'Secret content',
     },
     info: {
       burnedAfterReading:
-        'This secret was deleted after your viewing and is no longer available after leaving the page.',
+        'This secret has been permanently deleted. Once you leave this page, it cannot be viewed again.',
       expiresIn: 'Expires {{time}}',
     },
     errors: {
@@ -309,7 +321,8 @@ export const en: TranslationKeys = {
           'All secrets are encrypted using ML-KEM post-quantum encryption in your browser before transmission. The encryption key never leaves your device, ensuring true zero-knowledge end-to-end encryption.',
         features: {
           key: 'Encryption key is derived from a cryptographically secure random generation',
-          derivation: 'Key derivation uses PBKDF2 with SHA-256',
+          derivation:
+            'Passwords are stretched with Argon2id (memory-hard); the content layer uses ML-KEM-768 key encapsulation with ChaCha20-Poly1305',
           vector: 'Each secret has a unique initialization vector (IV)',
         },
       },

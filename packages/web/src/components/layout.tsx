@@ -109,7 +109,7 @@ export function Layout({ children }: LayoutProps) {
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                Github
+                GitHub
               </a>
               <a
                 href="https://www.osbytes.io"

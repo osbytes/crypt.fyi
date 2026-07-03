@@ -1,5 +1,5 @@
 import { Queue, Worker } from 'bullmq';
-import { gcm, isRetryableFetchError } from '@crypt.fyi/core';
+import { machine, isRetryableFetchError } from '@crypt.fyi/core';
 import type { Logger } from './logging.js';
 import { Redis } from 'ioredis';
 import { z } from 'zod';
@@ -90,7 +90,7 @@ export const createBullMQWebhookSender = ({
         return;
       }
 
-      const dataString = await gcm.decrypt(job.data, encryptionKey);
+      const dataString = await machine.decrypt(job.data, encryptionKey);
       const message = messageSchema.parse(JSON.parse(dataString));
 
       const ac = new AbortController();
@@ -142,7 +142,7 @@ export const createBullMQWebhookSender = ({
 
   worker.on('failed', async (job, error) => {
     if (job && job.attemptsMade >= maxAttempts) {
-      const dataString = await gcm.decrypt(job.data, encryptionKey);
+      const dataString = await machine.decrypt(job.data, encryptionKey);
       const message = messageSchema.parse(JSON.parse(dataString));
       logger.info(
         {
@@ -160,7 +160,7 @@ export const createBullMQWebhookSender = ({
   return {
     webhookSender: {
       send: async (message) => {
-        await queue.add(JOB_NAME, await gcm.encrypt(JSON.stringify(message), encryptionKey));
+        await queue.add(JOB_NAME, await machine.encrypt(JSON.stringify(message), encryptionKey));
       },
     },
     cleanup: async () => {
