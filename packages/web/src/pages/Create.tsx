@@ -370,7 +370,11 @@ export function CreatePage() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema) as Resolver<FormValues>,
     defaultValues: useMemo(() => getInitialValues(ttlOptions), [ttlOptions]),
-    mode: 'onTouched',
+    // Validate only on submit so blurring an empty field (e.g. tabbing/clicking
+    // away from the content textarea toward the file button) doesn't surface the
+    // "content required" error and shift layout.
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
   });
   const { watch } = form;
 
