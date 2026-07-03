@@ -1,6 +1,6 @@
 {
   "name": "@crypt.fyi/cli",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "type": "module",
   "bin": {
     "cfyi": "./dist/index.js"
