@@ -87,7 +87,7 @@ API_URL=https://{your-domain-here} docker compose up --build
 
 ### Railway
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/Pmkrsc?referralCode=ToZEjF)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/Pmkrsc?referralCode=ToZEjF&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 ## Development
 
