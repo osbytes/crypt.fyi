@@ -60,7 +60,9 @@ for (const target of releaseTargets) {
 }
 
 if (forceChromePublish) {
-  console.log('FORCE_CHROME_PUBLISH set — Chrome Web Store publish will run even if tags already exist.');
+  console.log(
+    'FORCE_CHROME_PUBLISH set — Chrome Web Store publish will run even if tags already exist.',
+  );
 }
 
 console.log('Building publishable packages…');
