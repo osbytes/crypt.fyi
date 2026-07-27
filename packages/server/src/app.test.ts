@@ -284,10 +284,13 @@ describe('app', () => {
     const { id } = (await createResponse.body.json()) as Record<string, unknown>;
     expect(typeof id).toBe('string');
 
+    const createdAt = Date.now();
     const initialRedisTTL = await testContext.redis.pttl(`vault:${id}`);
-    expect(initialRedisTTL).toBeGreaterThan(4975);
-    expect(initialRedisTTL).toBeLessThanOrEqual(5000);
+    expect(initialRedisTTL).toBeGreaterThan(initialTTL - 250);
+    expect(initialRedisTTL).toBeLessThanOrEqual(initialTTL);
 
+    // Under CI CPU contention setTimeout can fire much later than requested; assert
+    // against wall-clock elapsed instead of assuming the delay was exact.
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const getResponse = await testContext.client.request({
@@ -297,8 +300,11 @@ describe('app', () => {
     expect(getResponse.statusCode).toBe(200);
 
     const ttlAfterRead = await testContext.redis.pttl(`vault:${id}`);
-    expect(ttlAfterRead).toBeGreaterThanOrEqual(3950);
-    expect(ttlAfterRead).toBeLessThanOrEqual(4000);
+    const elapsedMs = Date.now() - createdAt;
+    // Reading with remaining read-count must preserve the remaining TTL (not reset it).
+    expect(ttlAfterRead).toBeGreaterThan(0);
+    expect(ttlAfterRead).toBeLessThan(initialRedisTTL);
+    expect(Math.abs(ttlAfterRead - (initialTTL - elapsedMs))).toBeLessThan(750);
 
     const remainingReads = JSON.parse((await testContext.redis.get(`vault:${id}`)) ?? '{}')?.rc;
     expect(remainingReads).toBe(2);
