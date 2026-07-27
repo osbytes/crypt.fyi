@@ -12,7 +12,8 @@
     "redis": "docker compose run --rm -p 6379:6379 -v ./redis-data:/data redis redis-server --save 1 1 --loglevel notice",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "node ./scripts/release.mjs"
+    "release": "node ./scripts/release.mjs",
+    "release:extension": "node ./scripts/publish-extension.mjs"
   },
   "devDependencies": {
     "@changesets/changelog-github": "0.7.0",
@@ -21,7 +22,7 @@
     "@typescript-eslint/eslint-plugin": "8.41.0",
     "@typescript-eslint/parser": "8.41.0",
     "chrome-webstore-upload-cli": "4.0.1",
-    "concurrently": "9.2.1",
+    "concurrently": "10.0.4",
     "eslint": "9.39.2",
     "globals": "16.3.0",
     "prettier": "3.6.2",

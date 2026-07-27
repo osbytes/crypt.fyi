@@ -22,21 +22,26 @@ const missing = Object.entries(envMap)
   .map(([key]) => key);
 
 if (missing.length > 0) {
-  console.log(
-    `Skipping Chrome Web Store publish — missing secrets: ${missing
-      .map((key) => `CHROME_${key}`)
-      .join(', ')}`,
-  );
+  const message = `Chrome Web Store publish missing secrets: ${missing
+    .map((key) => `CHROME_${key}`)
+    .join(', ')}`;
+
+  // Release intentionally scheduled a Chrome publish — fail instead of silently skipping.
+  if (process.env.REQUIRE_CHROME_PUBLISH === '1' || process.env.REQUIRE_CHROME_PUBLISH === 'true') {
+    console.error(message);
+    process.exit(1);
+  }
+
+  console.log(`Skipping ${message}`);
   process.exit(0);
 }
 
-if (!existsSync(distDir)) {
-  console.log('Building extension…');
-  execFileSync('pnpm', ['--filter', '@crypt.fyi/extension', 'build'], {
-    stdio: 'inherit',
-    cwd: root,
-  });
-}
+// Always rebuild so standalone / force republish uploads match package.json version.
+console.log('Building extension…');
+execFileSync('pnpm', ['--filter', '@crypt.fyi/extension', 'build'], {
+  stdio: 'inherit',
+  cwd: root,
+});
 
 if (!existsSync(distDir)) {
   throw new Error(`Extension dist not found at ${distDir}`);

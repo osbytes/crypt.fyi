@@ -35,6 +35,34 @@ function ensureGitTag(tag) {
   return true;
 }
 
+function isTruthy(value) {
+  return value === '1' || value === 'true';
+}
+
+const forceChromePublish = isTruthy(process.env.FORCE_CHROME_PUBLISH);
+
+const releaseTargets = [
+  { name: '@crypt.fyi/core', dir: 'packages/core', registry: 'npm' },
+  { name: '@crypt.fyi/cli', dir: 'packages/cli', registry: 'npm' },
+  { name: '@crypt.fyi/extension', dir: 'packages/extension', registry: 'chrome' },
+];
+
+// Snapshot before `changeset publish`, which also creates tags for private packages.
+// Chrome publish must not depend on our local ensureGitTag succeeding after that.
+const pendingChromeTags = new Set();
+for (const target of releaseTargets) {
+  if (target.registry !== 'chrome') continue;
+  const pkg = readJson(path.join(root, target.dir, 'package.json'));
+  const tag = `${pkg.name}@${pkg.version}`;
+  if (forceChromePublish || !tagExists(tag)) {
+    pendingChromeTags.add(tag);
+  }
+}
+
+if (forceChromePublish) {
+  console.log('FORCE_CHROME_PUBLISH set — Chrome Web Store publish will run even if tags already exist.');
+}
+
 console.log('Building publishable packages…');
 run('pnpm', [
   'exec',
@@ -48,24 +76,24 @@ run('pnpm', [
 console.log('Publishing npm packages via changesets…');
 run('pnpm', ['exec', 'changeset', 'publish']);
 
-const releaseTargets = [
-  { name: '@crypt.fyi/core', dir: 'packages/core', registry: 'npm' },
-  { name: '@crypt.fyi/cli', dir: 'packages/cli', registry: 'npm' },
-  { name: '@crypt.fyi/extension', dir: 'packages/extension', registry: 'chrome' },
-];
-
 for (const target of releaseTargets) {
   const pkg = readJson(path.join(root, target.dir, 'package.json'));
   const tag = `${pkg.name}@${pkg.version}`;
-  const created = ensureGitTag(tag);
+  ensureGitTag(tag);
 
-  if (target.registry === 'chrome' && created) {
+  if (target.registry === 'chrome' && pendingChromeTags.has(tag)) {
     const publishScript = path.join(root, 'scripts', 'publish-extension.mjs');
     if (!existsSync(publishScript)) {
       throw new Error(`Missing ${publishScript}`);
     }
     console.log(`Publishing ${tag} to the Chrome Web Store…`);
-    run('node', [publishScript]);
+    run('node', [publishScript], {
+      env: {
+        ...process.env,
+        // Fail closed in CI when we intentionally scheduled a Chrome publish.
+        REQUIRE_CHROME_PUBLISH: '1',
+      },
+    });
   }
 }
 
