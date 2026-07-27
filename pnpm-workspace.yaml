@@ -1,0 +1,60 @@
+packages:
+  - 'packages/*'
+
+# --- Supply-chain / install security (pnpm 11+) ---
+# Delay installing freshly published versions so malicious releases can be yanked.
+# https://pnpm.io/settings#minimumreleaseage
+minimumReleaseAge: 1440 # 1 day
+minimumReleaseAgeExclude:
+  - '@crypt.fyi/*'
+
+# Block transitive git/http/file/link/portal dependencies from external packages.
+blockExoticSubdeps: true
+
+# Reject trust-level downgrades on recently published versions.
+trustPolicy: no-downgrade
+# Older packages often predate trusted-publisher metadata; ignore after 30 days.
+trustPolicyIgnoreAfter: 43200
+
+# Lifecycle scripts are denied unless explicitly allowed below.
+strictDepBuilds: true
+allowBuilds:
+  esbuild: true
+  '@swc/core': true
+  unrs-resolver: true
+  msgpackr-extract: true
+  protobufjs: true
+  spawn-sync: true
+
+# Keep peer dependency resolution strict.
+strictPeerDependencies: true
+autoInstallPeers: false
+
+# Verify deps before script runs in local/CI.
+verifyDepsBeforeRun: install
+
+# Pin newly added dependencies to exact versions (no ^/~).
+savePrefix: ''
+
+# Fail when Node/pnpm engines don't match.
+engineStrict: true
+
+# Prefer the committed lockfile; CI also passes --frozen-lockfile.
+preferFrozenLockfile: true
+lockfile: true
+
+# Security-related version pins (migrated from Yarn resolutions).
+overrides:
+  esbuild: 0.25.0
+  tmp: 0.2.6
+  '@babel/runtime': ^7.28.3
+  shell-quote: 1.8.4
+  vite: 8.0.16
+  '@opentelemetry/core': 2.8.0
+  '@babel/core': 7.29.6
+  # Selective overrides for vulnerable ranges previously pinned under Yarn.
+  'glob@>=10.2.0 <10.5.0': '>=10.5.0'
+  'glob@>=11.0.0 <11.1.0': '>=11.1.0'
+  'undici@>=6.25.0 <6.27.0': 6.27.0
+  'js-yaml@3': 3.15.0
+  'js-yaml@4': 4.2.0

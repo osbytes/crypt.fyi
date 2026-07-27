@@ -92,19 +92,29 @@ API_URL=https://{your-domain-here} docker compose up --build
 ## Development
 
 1. Clone the repository
-2. Enable Corepack:
+2. Enable Corepack (uses the `packageManager` field → pnpm):
    ```bash
    corepack enable
    ```
 3. Install dependencies:
    ```bash
-   yarn install
+   pnpm install
    ```
 4. Set up environment variables (see `.env.example`)
 5. Start the development server:
    ```bash
-   yarn run dev
+   pnpm dev
    ```
+
+### Releasing packages
+
+Publishable packages: `@crypt.fyi/core` and `@crypt.fyi/cli` (npm), plus the Chrome extension.
+
+1. Record changes: `pnpm changeset`
+2. Merge to `main` — the Release workflow opens a Version Packages PR (or publishes when that PR is merged)
+3. Required GitHub secrets for publishing:
+   - `NPM_TOKEN`
+   - `CHROME_EXTENSION_ID`, `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN`, `CHROME_PUBLISHER_ID`
 
 ## Technical Stack
 

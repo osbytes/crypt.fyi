@@ -4,3 +4,4 @@ dist
 coverage
 *.md
 *.gen.ts
+pnpm-lock.yaml

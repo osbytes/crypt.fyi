@@ -20,10 +20,11 @@ By participating in this project, you agree to maintain a respectful and constru
 
 ## Development Setup
 
-1. Install dependencies:
+1. Enable Corepack and install dependencies:
 
    ```bash
-   yarn install
+   corepack enable
+   pnpm install
    ```
 
 2. Copy `.env.example` to `.env` and configure environment variables
@@ -32,8 +33,20 @@ By participating in this project, you agree to maintain a respectful and constru
 
 4. Start the development server:
    ```bash
-   yarn run dev
+   pnpm dev
    ```
+
+### Versioning & releases
+
+Use Changesets for version bumps and publishing:
+
+```bash
+pnpm changeset          # describe your change
+pnpm version-packages   # apply version bumps locally (CI usually does this)
+pnpm release            # build, publish npm packages, tag, upload Chrome extension
+```
+
+On `main`, `.github/workflows/release.yml` opens a Version Packages PR or runs `pnpm release`.
 
 ## Pull Request Process
 

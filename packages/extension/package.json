@@ -4,16 +4,17 @@
   "version": "0.0.15",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@crypt.fyi/core": "workspace:*",
+    "webextension-polyfill": "^0.12.0"
+  },
   "scripts": {
     "dev": "cross-env VITE_API_URL=http://localhost:4321 VITE_WEB_URL=http://localhost:5173 vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src",
-    "test": "jest --passWithNoTests"
-  },
-  "dependencies": {
-    "@crypt.fyi/core": "*",
-    "webextension-polyfill": "^0.12.0"
+    "test": "jest --passWithNoTests",
+    "publish:chrome": "node ../../scripts/publish-extension.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.4",

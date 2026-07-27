@@ -14,13 +14,13 @@ This browser extension allows you to quickly encrypt and share text selections u
 1. Install dependencies:
 
 ```bash
-yarn install
+pnpm install
 ```
 
 2. Start the development server:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 3. Load the extension in your browser:
@@ -40,7 +40,7 @@ yarn dev
 To build the extension for production:
 
 ```bash
-yarn build
+pnpm build
 ```
 
 The built extension will be in the `dist` directory.
