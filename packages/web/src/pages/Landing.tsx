@@ -60,11 +60,7 @@ export function LandingPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <motion.div
-        {...fadeUp}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-20"
-      >
+      <motion.div {...fadeUp} transition={{ duration: 0.5 }} className="text-center mb-20">
         <Logo className="w-20 mx-auto mb-6" animate />
         <h1 className="text-4xl font-bold mb-4 tracking-tight">{t('landing.title')}</h1>
         <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -80,11 +76,7 @@ export function LandingPage() {
         </div>
       </motion.div>
 
-      <motion.div
-        {...fadeUp}
-        transition={{ duration: 0.5, delay: 0.15 }}
-        className="mb-24"
-      >
+      <motion.div {...fadeUp} transition={{ duration: 0.5, delay: 0.15 }} className="mb-24">
         <div className="grid md:grid-cols-3 gap-10">
           <div className="text-center">
             <IconLock className="w-10 h-10 mx-auto mb-3 text-primary" />
@@ -96,9 +88,7 @@ export function LandingPage() {
           <div className="text-center">
             <IconShare className="w-10 h-10 mx-auto mb-3 text-primary" />
             <h2 className="text-lg font-semibold mb-2">{t('landing.steps.share.title')}</h2>
-            <p className="text-muted-foreground text-sm">
-              {t('landing.steps.share.description')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('landing.steps.share.description')}</p>
           </div>
           <div className="text-center">
             <IconFlame className="w-10 h-10 mx-auto mb-3 text-primary" />
@@ -110,11 +100,7 @@ export function LandingPage() {
         </div>
       </motion.div>
 
-      <motion.div
-        {...fadeUp}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="mb-24"
-      >
+      <motion.div {...fadeUp} transition={{ duration: 0.5, delay: 0.3 }} className="mb-24">
         <h2 className="text-2xl font-bold text-center mb-10">{t('landing.pillars.title')}</h2>
         <div className="grid sm:grid-cols-2 gap-x-12 gap-y-10">
           {pillars.map(({ icon: Icon, title, description }) => (
@@ -128,7 +114,9 @@ export function LandingPage() {
           ))}
         </div>
         <p className="text-center text-sm text-muted-foreground mt-10">
-          <span className="font-medium text-foreground/80">{t('landing.alsoIncludes.label')}: </span>
+          <span className="font-medium text-foreground/80">
+            {t('landing.alsoIncludes.label')}:{' '}
+          </span>
           {alsoIncludes.join(' · ')}
         </p>
       </motion.div>
@@ -152,11 +140,7 @@ export function LandingPage() {
               </a>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <a
-                href={config.CRYPT_FYI_DOCKER_DOCS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={config.CRYPT_FYI_DOCKER_DOCS_URL} target="_blank" rel="noopener noreferrer">
                 <IconBrandDocker className="w-5 h-5" />
                 {t('landing.selfHost.dockerCompose')}
               </a>
@@ -165,11 +149,7 @@ export function LandingPage() {
         </div>
       </motion.div>
 
-      <motion.div
-        {...fadeUp}
-        transition={{ duration: 0.5, delay: 0.5 }}
-        className="mb-16"
-      >
+      <motion.div {...fadeUp} transition={{ duration: 0.5, delay: 0.5 }} className="mb-16">
         <nav
           aria-label="Ecosystem"
           className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 text-sm text-muted-foreground"

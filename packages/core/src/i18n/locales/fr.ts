@@ -241,7 +241,7 @@ export const fr: TranslationKeys = {
     title: 'À propos',
     what: {
       description:
-        "crypt.fyi est un moyen zero-knowledge de partager des informations sensibles — mots de passe, clés API, fichiers — via un lien. Le chiffrement a lieu dans votre navigateur, nos serveurs ne voient jamais le texte en clair, et les secrets peuvent disparaître après lecture.",
+        'crypt.fyi est un moyen zero-knowledge de partager des informations sensibles — mots de passe, clés API, fichiers — via un lien. Le chiffrement a lieu dans votre navigateur, nos serveurs ne voient jamais le texte en clair, et les secrets peuvent disparaître après lecture.',
       traditionalTitle: 'Pourquoi ne pas simplement envoyer un e-mail ou un SMS ?',
       traditionalDescription:
         "Les e-mails, SMS, Slack et chats conservent des copies : dans les boîtes de réception, l'historique des messages, les journaux des opérateurs et sur chaque appareil synchronisé. Une fois qu'un mot de passe est collé dans ces canaux, vous perdez le contrôle sur qui peut le retrouver plus tard. crypt.fyi est conçu pour une transmission délibérée, à usage unique — partagez le lien, ajoutez éventuellement un mot de passe ou une liste d'IP, et laissez le secret disparaître une fois le besoin passé.",

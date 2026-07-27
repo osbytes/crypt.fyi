@@ -64,7 +64,8 @@ export const zh: TranslationKeys = {
     },
     selfHost: {
       title: '运行您自己的实例',
-      description: '在您的基础设施上部署相同的零知识技术栈——一键部署到 Railway，或使用 Docker Compose 随处部署。',
+      description:
+        '在您的基础设施上部署相同的零知识技术栈——一键部署到 Railway，或使用 Docker Compose 随处部署。',
       deployOnRailway: '部署到 Railway',
       dockerCompose: 'Docker Compose',
     },
