@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -34,30 +38,31 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Check formatting
-        run: yarn format:check
+        run: pnpm format:check
 
       - name: Build
-        run: |
-          yarn build
+        run: pnpm build
 
       - name: Lint
-        run: |
-          yarn lint
+        run: pnpm lint
 
       - name: Type check
-        run: |
-          yarn typecheck
+        run: pnpm typecheck
 
       - name: Test
-        run: |
-          yarn test
+        run: pnpm test

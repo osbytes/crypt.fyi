@@ -2,12 +2,7 @@ node_modules
 .env
 dist
 .turbo
-.yarn/*
-!.yarn/cache
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+.pnpm-store
 redis-data
 dist.zip
+extension.zip

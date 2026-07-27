@@ -14,6 +14,10 @@
     "type": "git",
     "url": "https://github.com/osbytes/crypt.fyi.git"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "sideEffects": false,
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
@@ -33,6 +37,7 @@
     "zod": "^4.1.5"
   },
   "devDependencies": {
+    "@jest/globals": "^30.4.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.18.0",
     "@types/pako": "^2.0.4",

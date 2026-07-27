@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": ["@changesets/changelog-github", { "repo": "osbytes/crypt.fyi" }],
+  "commit": false,
+  "fixed": [
+    [
+      "@crypt.fyi/core",
+      "@crypt.fyi/cli",
+      "@crypt.fyi/extension",
+      "@crypt.fyi/web",
+      "@crypt.fyi/server"
+    ]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [],
+  "privatePackages": {
+    "version": true,
+    "tag": true
+  }
+}
