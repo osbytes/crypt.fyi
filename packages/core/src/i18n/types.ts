@@ -29,67 +29,44 @@ export interface TranslationKeys {
   landing: {
     title: string;
     subtitle: string;
-    features: {
-      encryption: {
-        title: string;
-        description: string;
-      };
-      security: {
-        title: string;
-        description: string;
-      };
+    pillars: {
+      title: string;
       zeroKnowledge: {
         title: string;
         description: string;
       };
-      burn: {
+      ephemeral: {
         title: string;
         description: string;
       };
-      expiration: {
+      defense: {
         title: string;
         description: string;
       };
-      password: {
+      open: {
         title: string;
         description: string;
       };
-      files: {
-        title: string;
-        description: string;
-      };
-      webhooks: {
-        title: string;
-        description: string;
-      };
-      ipControl: {
-        title: string;
-        description: string;
-      };
-      readLimits: {
-        title: string;
-        description: string;
-      };
-      qrCode: {
-        title: string;
-        description: string;
-      };
-      cli: {
-        title: string;
-        description: string;
-      };
-      chromeExtension: {
-        title: string;
-        description: string;
-      };
-      docker: {
-        title: string;
-        description: string;
-      };
-      failedAttempts: {
-        title: string;
-        description: string;
-      };
+    };
+    alsoIncludes: {
+      label: string;
+      password: string;
+      files: string;
+      webhooks: string;
+      qrCode: string;
+      ipControl: string;
+      readLimits: string;
+    };
+    selfHost: {
+      title: string;
+      description: string;
+      deployOnRailway: string;
+      dockerCompose: string;
+    };
+    ecosystem: {
+      cli: string;
+      chromeExtension: string;
+      github: string;
     };
     steps: {
       encrypt: {
@@ -245,87 +222,24 @@ export interface TranslationKeys {
   };
   about: {
     title: string;
-    intro: string;
-    whyCryptFyi: {
-      title: string;
-      commonPractices: {
-        title: string;
-        description: string;
-        problems: {
-          email: string;
-          slack: string;
-          sms: string;
-          messaging: string;
-        };
-      };
-      existingSolutions: {
-        title: string;
-        description: string;
-        limitations: {
-          onePassword: string;
-          onePasswordLink: string;
-          otherTools: string;
-          otherToolsConfigLink: string;
-          otherToolsSecurityLink: string;
-        };
-      };
-      approach: {
-        title: string;
-        description: string;
-      };
+    what: {
+      description: string;
+      traditionalTitle: string;
+      traditionalDescription: string;
     };
-    howItWorks: {
+    letter: {
       title: string;
-      steps: {
-        encrypt: {
-          title: string;
-          description: string;
-        };
-        share: {
-          title: string;
-          description: string;
-        };
-        burn: {
-          title: string;
-          description: string;
-        };
-      };
-    };
-    security: {
-      title: string;
-      encryption: {
-        title: string;
-        description: string;
-        features: {
-          key: string;
-          derivation: string;
-          vector: string;
-        };
-      };
-      zeroKnowledge: {
-        title: string;
-        description: string;
-        features: {
-          clientSide: string;
-          storage: string;
-          keys: string;
-        };
-      };
-      protection: {
-        title: string;
-        description: string;
-        features: {
-          encryption: string;
-          tls: string;
-          destruction: string;
-          logging: string;
-          password: string;
-        };
-      };
+      p1: string;
+      p2: string;
+      p3: string;
+      signOff: string;
     };
     openSource: {
-      title: string;
       description: string;
+    };
+    technical: {
+      prompt: string;
+      specLink: string;
     };
   };
   privacy: {

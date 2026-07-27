@@ -31,72 +31,47 @@ export const zh: TranslationKeys = {
   landing: {
     title: '零知识秘密共享',
     subtitle:
-      '使用ML-KEM后量子端到端加密安全地一次性共享敏感信息。您的秘密在浏览器中加密，我们的服务器永远无法访问，并在查看后自动删除。',
-    features: {
-      encryption: {
-        title: 'ML-KEM后量子加密',
-        description:
-          'ML-KEM 后量子密钥封装增加了一层纵深防御，以抵御未来"先收集、后解密"的量子攻击。所有加密都在传输前在您的浏览器中完成。',
-      },
-      security: {
-        title: '增强安全',
-        description:
-          '多层保护包括严格的内容安全策略(CSP)、速率限制和IP限制。量子抗性加密，查看后自动删除。',
-      },
+      '在浏览器中加密。分享一次。永久消失。后量子端到端加密——我们的服务器永远看不到您的秘密。',
+    pillars: {
+      title: '为信任而构建',
       zeroKnowledge: {
-        title: '真正的零知识架构',
+        title: '真正的零知识',
         description:
-          '我们的服务器永远看不到您的未加密数据。加密密钥永远不会离开您的设备，所有解密都在您的浏览器中进行。通过端到端加密实现完全隐私。',
+          '加密密钥永远不会离开您的设备。解密仅在接收者的浏览器中进行——服务器永远看不到明文。',
       },
-      burn: {
-        title: '一次性秘密共享',
+      ephemeral: {
+        title: '默认即用即焚',
+        description: '阅后即焚、自定义 TTL 和阅读限制，确保敏感数据不会存留超过必要时间。',
+      },
+      defense: {
+        title: '纵深防御',
         description:
-          '秘密在查看后自动删除，确保只能访问一次。完美适用于永远不应该持久存在的敏感信息。',
+          'ML-KEM 后量子加密、严格 CSP、速率限制和可选 IP 白名单——分层保护，而非单一勾选项。',
       },
-      failedAttempts: {
-        title: '失败尝试后销毁',
-        description: '在多次访问失败尝试后自动销毁密文以增强安全性',
+      open: {
+        title: '开放且可审计',
+        description: '完全开源，专为自托管设计。检查代码、运行自己的实例或参与贡献。',
       },
-      expiration: {
-        title: '自动过期',
-        description: '设置自定义过期时间，确保密文不会持续超过所需时间',
-      },
-      password: {
-        title: '密码保护',
-        description: '通过可选的密码保护添加额外的安全层',
-      },
-      files: {
-        title: '文件共享',
-        description: '使用简单的拖放功能安全地共享文件',
-      },
-      webhooks: {
-        title: 'Webhook 通知',
-        description: '当您的密文被访问、销毁或无法读取时获得通知',
-      },
-      ipControl: {
-        title: 'IP 限制',
-        description: '通过限制可以查看密文的 IP 地址或 CIDR 范围来控制访问',
-      },
-      readLimits: {
-        title: '阅读限制',
-        description: '设置最大查看次数以限制密文可被访问的次数',
-      },
-      qrCode: {
-        title: '二维码',
-        description: '生成二维码以便在移动设备上轻松共享您的密文 URL',
-      },
-      cli: {
-        title: 'CLI 工具',
-        description: '使用我们的命令行界面自动化密文共享',
-      },
-      chromeExtension: {
-        title: 'Chrome 扩展',
-        description: '使用我们的 Chrome 扩展直接从浏览器共享密文',
-      },
-      docker: {
-        title: 'Docker 支持',
-        description: '使用我们的官方 Docker 镜像部署您自己的实例',
-      },
+    },
+    alsoIncludes: {
+      label: '还包括',
+      password: '密码保护',
+      files: '文件共享',
+      webhooks: 'Webhook',
+      qrCode: '二维码',
+      ipControl: 'IP 白名单',
+      readLimits: '阅读限制',
+    },
+    selfHost: {
+      title: '运行您自己的实例',
+      description: '在您的基础设施上部署相同的零知识技术栈——一键部署到 Railway，或使用 Docker Compose 随处部署。',
+      deployOnRailway: '部署到 Railway',
+      dockerCompose: 'Docker Compose',
+    },
+    ecosystem: {
+      cli: 'CLI',
+      chromeExtension: 'Chrome 扩展',
+      github: 'GitHub',
     },
     steps: {
       encrypt: {
@@ -252,95 +227,26 @@ export const zh: TranslationKeys = {
   },
   about: {
     title: '关于',
-    intro:
-      'crypt.fyi是一个安全的开源平台，采用零知识架构，让您能够安全地共享敏感信息，使用后量子端到端加密。无论是密码、API密钥还是机密消息 - crypt.fyi确保您的数据保持私密，永远不会被我们的服务器访问，并在访问后自动删除。',
-    whyCryptFyi: {
-      title: '为什么选择crypt.fyi？',
-      commonPractices: {
-        title: '常见做法的问题',
-        description: '每天，密码、API密钥和私人数据等敏感信息通过不安全的渠道以明文形式共享：',
-        problems: {
-          email: '电子邮件 - 可能被拦截、无限期存储和不受控制地转发',
-          slack: 'Slack/Teams消息 - 保留在聊天历史和公司日志中',
-          sms: '短信/文本 - 存储在多个设备和运营商服务器上',
-          messaging: '即时通讯 - 通常缺乏适当的加密和数据删除',
-        },
-      },
-      existingSolutions: {
-        title: '现有解决方案及其局限性',
-        description: '虽然该领域有其他工具，但每个都有其局限性：',
-        limitations: {
-          onePassword: '1Password - 团队密码管理的优秀选择，但',
-          onePasswordLink: '不支持与外部非用户的内部共享',
-          otherTools:
-            'PrivateBin/PwPush/OneTimeSecret - 类似的核心功能，但用户界面和技术栈过时，且通常缺乏',
-          otherToolsConfigLink: '零知识架构',
-          otherToolsSecurityLink: '后量子加密',
-        },
-      },
-      approach: {
-        title: 'crypt.fyi的方法',
-        description:
-          'crypt.fyi旨在应对这些挑战，同时利用现代Web技术和安全标准。我们结合零知识架构和ML-KEM后量子加密，确保您的数据保持私密和安全。结果是一个既高度安全又用户友好的工具。',
-      },
+    what: {
+      description:
+        'crypt.fyi 是一种零知识方式，通过链接分享敏感信息——密码、API 密钥、文件。加密在您的浏览器中完成，我们的服务器永远看不到明文，秘密可在被读取后消失。',
+      traditionalTitle: '为什么不直接发邮件或短信？',
+      traditionalDescription:
+        '邮件、短信、Slack 和聊天都会留下副本：收件箱、消息记录、运营商日志，以及每台同步过的设备。一旦把密码粘贴到这些渠道，你就失去了对谁能事后找到它的控制。crypt.fyi 用于一次刻意的交接——分享链接，可选添加密码或 IP 白名单，并在用完后让秘密消失。',
     },
-    howItWorks: {
-      title: '工作原理',
-      steps: {
-        encrypt: {
-          title: '1. 加密',
-          description:
-            '您的秘密在离开设备之前在浏览器中使用ML-KEM后量子加密进行加密。加密完全在客户端进行，确保您的数据零知识。',
-        },
-        share: {
-          title: '2. 共享',
-          description:
-            '与您的接收者共享安全链接。链接包含解密消息所需的一切，但我们的服务器永远看不到未加密的内容。',
-        },
-        burn: {
-          title: '3. 阅后即焚',
-          description:
-            '如果启用了"阅后即焚"，访问后秘密将从我们的服务器永久删除。不留任何痕迹，确保您的数据完全零知识。',
-        },
-      },
-    },
-    security: {
-      title: '安全实现',
-      encryption: {
-        title: '零知识后量子加密',
-        description:
-          '所有秘密在传输前都在您的浏览器中使用ML-KEM后量子加密进行加密。加密密钥永远不会离开您的设备，确保真正的零知识端到端加密。',
-        features: {
-          key: '加密密钥来自密码学安全的随机生成',
-          derivation:
-            '密码使用 Argon2id（内存密集型）进行强化；内容层采用 ML-KEM-768 密钥封装与 ChaCha20-Poly1305',
-          vector: '每个秘密都有唯一的初始化向量(IV)',
-        },
-      },
-      zeroKnowledge: {
-        title: '真正的零知识架构',
-        description: '我们的服务器永远看不到您的未加密数据。我们使用零知识架构，其中：',
-        features: {
-          clientSide: '所有加密/解密都在您的浏览器中客户端进行',
-          storage: '服务器只存储它们无法解密的加密数据',
-          keys: '加密密钥通过URL片段传输，永远不会到达后端API服务器',
-        },
-      },
-      protection: {
-        title: '数据保护',
-        description: '多层安全确保您的数据保持受保护：',
-        features: {
-          encryption: '所有加密/解密都在您的浏览器中使用ML-KEM后量子加密进行',
-          tls: '所有API通信的TLS加密',
-          destruction: '访问后自动删除秘密',
-          logging: '服务器端不记录敏感数据',
-          password: '可选的密码保护以增加安全性',
-        },
-      },
+    letter: {
+      title: '作者的一封短笺',
+      p1: '我创建 crypt.fyi，是因为我已经在用的工具，在我需要分享敏感内容时——尤其是对密码管理器之外的人——往往缺少真正符合我工作方式的控制能力。',
+      p2: '现有方案常常缺少日常真正重要的体验细节：丰富的限制能力（如 IP 白名单、阅读次数、失败尝试后销毁、Webhook）；CLI 与浏览器扩展；已保存/预填配置。技术上，有些也落后于现代加密标准，或缺少真正的原子读后即焚，从而无法避免竞态条件下被多次读取。',
+      p3: '于是我做了新的东西：开源、可自托管，并在我自己想要的密码学与控制能力上旗帜鲜明。',
+      signOff: '— Dillon',
     },
     openSource: {
-      title: '开源',
-      description: 'crypt.fyi是开源且可验证的。您可以检查我们的零知识实现、后量子加密并在',
+      description: 'crypt.fyi 开源且可审计。你可以审查实现、自行托管，或在此贡献：',
+    },
+    technical: {
+      prompt: '想了解更多技术细节？',
+      specLink: '阅读协议规范',
     },
   },
   privacy: {
