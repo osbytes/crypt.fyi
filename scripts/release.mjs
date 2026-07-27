@@ -39,7 +39,10 @@ function isTruthy(value) {
   return value === '1' || value === 'true';
 }
 
-const forceChromePublish = isTruthy(process.env.FORCE_CHROME_PUBLISH);
+// Manual workflow runs should always attempt Chrome publish for the current
+// package version. A git tag only means GitHub tagged the release — it does
+// not mean the Chrome Web Store received the build.
+const publishChromeAlways = isTruthy(process.env.PUBLISH_CHROME);
 
 const releaseTargets = [
   { name: '@crypt.fyi/core', dir: 'packages/core', registry: 'npm' },
@@ -48,21 +51,18 @@ const releaseTargets = [
 ];
 
 // Snapshot before `changeset publish`, which also creates tags for private packages.
-// Chrome publish must not depend on our local ensureGitTag succeeding after that.
 const pendingChromeTags = new Set();
 for (const target of releaseTargets) {
   if (target.registry !== 'chrome') continue;
   const pkg = readJson(path.join(root, target.dir, 'package.json'));
   const tag = `${pkg.name}@${pkg.version}`;
-  if (forceChromePublish || !tagExists(tag)) {
+  if (publishChromeAlways || !tagExists(tag)) {
     pendingChromeTags.add(tag);
   }
 }
 
-if (forceChromePublish) {
-  console.log(
-    'FORCE_CHROME_PUBLISH set — Chrome Web Store publish will run even if tags already exist.',
-  );
+if (publishChromeAlways) {
+  console.log('PUBLISH_CHROME set — publishing current extension version to the Chrome Web Store.');
 }
 
 console.log('Building publishable packages…');

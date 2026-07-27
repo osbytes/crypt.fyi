@@ -37,8 +37,9 @@ if (missing.length > 0) {
 }
 
 // Always rebuild so standalone / force republish uploads match package.json version.
-console.log('Building extension…');
-execFileSync('pnpm', ['--filter', '@crypt.fyi/extension', 'build'], {
+// Use turbo so workspace deps (e.g. @crypt.fyi/core) build first via dependsOn: ["^build"].
+console.log('Building extension and dependencies…');
+execFileSync('pnpm', ['exec', 'turbo', 'build', '--filter=@crypt.fyi/extension'], {
   stdio: 'inherit',
   cwd: root,
 });
