@@ -1,11 +1,11 @@
 import { config } from '@/config';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useParams, useSearch } from '@tanstack/react-router';
-import invariant from 'tiny-invariant';
 import { Card } from '@/components/ui/card';
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button/button';
 import { toast } from 'sonner';
 import {
@@ -23,25 +23,46 @@ import { Loader } from '@/components/ui/loader';
 import { ErrorInvalidKeyAndOrPassword, ErrorNotFound, sleep } from '@crypt.fyi/core';
 import { useTranslation } from 'react-i18next';
 import { useClient } from '@/context/client';
+import { resolveDecryptionKey } from '@/lib/secretUrl';
+import type { DecryptionKeySource } from '@/lib/secretUrl';
+import { consumeLegacyQueryKey } from '@/lib/legacyKeyBootstrap';
 
 export function ViewPage() {
   const { t } = useTranslation();
-
   const { id } = useParams({ from: '/$id' });
   const search = useSearch({ from: '/$id' });
-  const isPasswordSet = search.p;
-  // TODO: Remove the search.key fallback once the `key` parameter is to no longer be supported.
-  const key = window.location.hash.slice(1)?.trim() || search.key;
-  invariant(key, '`key` is required in URL hash');
+  const isPasswordSet = Boolean(search.p);
 
-  useKeyInSearchParamsDeprecationToast();
+  // Keep the raw key outside render state and React Query. It exists only in
+  // the URL/entry control and this short-lived ref until decryption succeeds.
+  const decryptionKeyRef = useRef('');
+  const keySourceRef = useRef<DecryptionKeySource>('missing');
+  const hadLegacyQueryKeyRef = useRef(false);
+  const hasReadInitialKeyRef = useRef(false);
+  if (!hasReadInitialKeyRef.current) {
+    const legacyCapture = consumeLegacyQueryKey();
+    const resolved = resolveDecryptionKey(window.location.hash, legacyCapture.legacyQueryKey);
+    decryptionKeyRef.current = resolved.key;
+    keySourceRef.current = resolved.source;
+    hadLegacyQueryKeyRef.current = legacyCapture.hadLegacyQueryKey || resolved.hadLegacyQueryKey;
+    hasReadInitialKeyRef.current = true;
+  }
 
-  const [password, setPassword] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(isPasswordSet);
+  const [hasDecryptionKey, setHasDecryptionKey] = useState(
+    () => decryptionKeyRef.current.length > 0,
+  );
+  const [isDialogOpen, setIsDialogOpen] = useState(
+    () => isPasswordSet && decryptionKeyRef.current.length > 0,
+  );
   const [isRevealed, setIsRevealed] = useState(false);
   const [hasUserConfirmed, setHasUserConfirmed] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [keyEntryError, setKeyEntryError] = useState<string | null>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef('');
+
+  const hadLegacyQueryKey = hadLegacyQueryKeyRef.current;
+  useLegacyKeyWarning(hadLegacyQueryKey);
 
   const { client } = useClient();
 
@@ -49,37 +70,108 @@ export function ViewPage() {
     queryKey: [id, 'exists'],
     queryFn: async () => {
       await sleep(500, { enabled: config.IS_DEV });
-      const exists = await client.exists(id);
-      return exists;
+      return client.exists(id);
     },
     retry: () => false,
-    enabled: isPasswordSet,
+    enabled: isPasswordSet && hasDecryptionKey,
   });
+  useEffect(() => {
+    if (existsQuery.data === false) {
+      decryptionKeyRef.current = '';
+      passwordRef.current = '';
+    }
+  }, [existsQuery.data]);
 
   const decryptMutation = useMutation({
-    mutationKey: [id, key, password],
+    mutationKey: [id, 'decrypt'],
     mutationFn: async () => {
-      const result = await client.read(id, key, password);
-      return result;
+      const key = decryptionKeyRef.current;
+      if (!key) {
+        throw new Error('Decryption key is unavailable');
+      }
+      return client.read(id, key, passwordRef.current);
     },
     retry: () => false,
+    gcTime: 0,
     onSuccess() {
+      // JavaScript strings cannot be zeroed, but dropping our reference avoids
+      // retaining an additional key copy after it is no longer needed.
+      decryptionKeyRef.current = '';
+      passwordRef.current = '';
+      if (passwordInputRef.current) passwordInputRef.current.value = '';
       setIsDialogOpen(false);
       setPasswordError(null);
     },
     onError(error) {
       if (error instanceof ErrorInvalidKeyAndOrPassword) {
+        if (!isPasswordSet && keySourceRef.current === 'manual') {
+          decryptionKeyRef.current = '';
+          keySourceRef.current = 'missing';
+          setHasDecryptionKey(false);
+          setHasUserConfirmed(false);
+          setKeyEntryError(t('view.key.error'));
+          return;
+        }
+        if (!isPasswordSet) {
+          decryptionKeyRef.current = '';
+          return;
+        }
+
         setPasswordError(t('view.password.error'));
         setTimeout(() => {
           passwordInputRef.current?.focus();
         }, 100);
       } else if (error instanceof ErrorNotFound) {
+        decryptionKeyRef.current = '';
+        passwordRef.current = '';
         setIsDialogOpen(false);
-      } else {
-        toast.error(error.message);
       }
     },
   });
+
+  const promptForDifferentKey = (error: string | null = null) => {
+    decryptionKeyRef.current = '';
+    keySourceRef.current = 'missing';
+    decryptMutation.reset();
+    setHasDecryptionKey(false);
+    setHasUserConfirmed(false);
+    setIsDialogOpen(false);
+    passwordRef.current = '';
+    if (passwordInputRef.current) passwordInputRef.current.value = '';
+    setPasswordError(null);
+    setKeyEntryError(error);
+  };
+
+  const submitDecryptionKey = (key: string) => {
+    const normalizedKey = key.trim();
+    if (!normalizedKey) {
+      setKeyEntryError(t('view.key.required'));
+      return;
+    }
+
+    decryptMutation.reset();
+    decryptionKeyRef.current = normalizedKey;
+    keySourceRef.current = 'manual';
+    setKeyEntryError(null);
+    setHasDecryptionKey(true);
+    setHasUserConfirmed(true);
+
+    if (isPasswordSet) {
+      setIsDialogOpen(true);
+    } else {
+      decryptMutation.mutate();
+    }
+  };
+
+  if (!hasDecryptionKey) {
+    return (
+      <DecryptionKeyPrompt
+        error={keyEntryError}
+        isPending={decryptMutation.isPending}
+        onSubmit={submitDecryptionKey}
+      />
+    );
+  }
 
   if (existsQuery.isLoading) {
     return <Loader />;
@@ -104,8 +196,12 @@ export function ViewPage() {
           <p className="text-muted-foreground mb-6">{t('view.connectionError.description')}</p>
           <Button
             onClick={() => {
-              if (existsFailed) existsQuery.refetch();
-              if (unexpectedDecryptError) decryptMutation.reset();
+              if (existsFailed) {
+                existsQuery.refetch();
+              } else {
+                decryptMutation.reset();
+                decryptMutation.mutate();
+              }
             }}
           >
             {t('view.connectionError.tryAgain')}
@@ -121,9 +217,14 @@ export function ViewPage() {
         <Card className="p-8">
           <h1 className="text-2xl font-semibold mb-4">{t('view.invalidLink.title')}</h1>
           <p className="text-muted-foreground mb-6">{t('view.invalidLink.description')}</p>
-          <Button asChild>
-            <Link to="/new">{t('view.invalidLink.createNew')}</Link>
-          </Button>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button variant="outline" onClick={() => promptForDifferentKey()}>
+              {t('view.key.change')}
+            </Button>
+            <Button asChild>
+              <Link to="/new">{t('view.invalidLink.createNew')}</Link>
+            </Button>
+          </div>
         </Card>
       </div>
     );
@@ -143,7 +244,8 @@ export function ViewPage() {
     );
   }
 
-  // Show initial confirmation screen to require user input before fetching the secret
+  // A fragment link still requires an explicit click before fetching a
+  // non-password-protected secret. Submitting a manual key is that confirmation.
   if (!hasUserConfirmed && !isPasswordSet) {
     return (
       <div className="max-w-3xl mx-auto mt-8 flex flex-col items-center justify-center">
@@ -276,40 +378,65 @@ export function ViewPage() {
     <div className="max-w-3xl mx-auto p-4 py-8">
       {content}
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            passwordRef.current = '';
+            if (passwordInputRef.current) passwordInputRef.current.value = '';
+            setPasswordError(null);
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t('view.password.title')}</DialogTitle>
           </DialogHeader>
           <form
             className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
+            onSubmit={(event) => {
+              event.preventDefault();
+              passwordRef.current = passwordInputRef.current?.value ?? '';
               decryptMutation.mutate();
             }}
           >
             <div className="space-y-2">
+              <Label htmlFor="secret-password">{t('view.password.title')}</Label>
               <Input
+                id="secret-password"
                 ref={passwordInputRef}
                 type="password"
                 placeholder={t('view.password.placeholder')}
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
+                onChange={(event) => {
+                  passwordRef.current = event.target.value;
                   setPasswordError(null);
                 }}
                 required
+                autoComplete="off"
                 autoFocus
+                aria-describedby="password-description"
+                aria-invalid={Boolean(passwordError)}
+                aria-errormessage={passwordError ? 'password-error' : undefined}
                 className={cn(
                   'text-lg',
                   passwordError && 'border-destructive focus-visible:ring-destructive',
                 )}
                 disabled={decryptMutation.isPending}
               />
-              {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
-              <p className="text-sm text-muted-foreground">{t('view.password.description')}</p>
+              {passwordError && (
+                <p id="password-error" role="alert" className="text-sm text-destructive">
+                  {passwordError}
+                </p>
+              )}
+              <p id="password-description" className="text-sm text-muted-foreground">
+                {t('view.password.description')}
+              </p>
             </div>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-wrap justify-end gap-3">
+              <Button type="button" variant="outline" onClick={() => promptForDifferentKey()}>
+                {t('view.key.change')}
+              </Button>
               <Button type="submit" isLoading={decryptMutation.isPending}>
                 {t('common.confirm')}
               </Button>
@@ -321,37 +448,109 @@ export function ViewPage() {
   );
 }
 
-// Outdated clients may use the `key` parameter in the URL search parameters to generate the secret.
-// This is deprecated and will be removed in the future.
-// This hook shows a toast to the user to let them know that the secret sender may be using an
-// outdated client to generate the secret.
-function useKeyInSearchParamsDeprecationToast() {
-  const search = useSearch({ from: '/$id' });
-  const searchKey = search.key;
+interface DecryptionKeyPromptProps {
+  error: string | null;
+  isPending: boolean;
+  onSubmit: (key: string) => void;
+}
+
+function DecryptionKeyPrompt({ error, isPending, onSubmit }: DecryptionKeyPromptProps) {
+  const { t } = useTranslation();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isKeyRevealed, setIsKeyRevealed] = useState(false);
+
+  return (
+    <div className="max-w-3xl mx-auto mt-8">
+      <Card className="p-8">
+        <h1 className="text-2xl font-semibold mb-2">{t('view.key.title')}</h1>
+        <p id="decryption-key-description" className="text-muted-foreground mb-6">
+          {t('view.key.description')}
+        </p>
+        <form
+          className="space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const input = inputRef.current;
+            if (!input) return;
+
+            const key = input.value;
+            input.value = '';
+            onSubmit(key);
+          }}
+        >
+          <div className="space-y-2">
+            <Label htmlFor="decryption-key">{t('view.key.label')}</Label>
+            <div className="flex gap-2">
+              <Input
+                id="decryption-key"
+                ref={inputRef}
+                type={isKeyRevealed ? 'text' : 'password'}
+                placeholder={t('view.key.placeholder')}
+                required
+                autoComplete="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                aria-describedby="decryption-key-description"
+                aria-invalid={Boolean(error)}
+                aria-errormessage={error ? 'decryption-key-error' : undefined}
+                disabled={isPending}
+                autoFocus
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setIsKeyRevealed(!isKeyRevealed)}
+                aria-label={isKeyRevealed ? t('view.key.hide') : t('view.key.show')}
+                aria-pressed={isKeyRevealed}
+              >
+                {isKeyRevealed ? <IconEyeOff /> : <IconEye />}
+              </Button>
+            </div>
+            {error && (
+              <p id="decryption-key-error" role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
+          </div>
+          <div className="flex justify-end">
+            <Button type="submit" isLoading={isPending}>
+              {t('view.key.submit')}
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </div>
+  );
+}
+
+// Outdated clients may put the key in the query string, where it can reach
+// servers and logs. The value is captured only for compatibility, removed from
+// browser history immediately, and never rendered in this warning.
+function useLegacyKeyWarning(hadLegacyQueryKey: boolean) {
+  const { t } = useTranslation();
+
   useEffect(() => {
-    if (searchKey) {
-      toast.warning(
-        <div className="space-y-2">
-          <p>
-            Using <code>key</code> in the URL search parameters is deprecated. The secret sender may
-            be using an outdated client to generate the secret.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            <a
-              href="https://github.com/osbytes/crypt.fyi/issues/100"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              See crypt.fyi/issues/100
-            </a>
-          </p>
-        </div>,
-        {
-          id: 'key-in-url-search-params-deprecated',
-          closeButton: true,
-          duration: Infinity,
-        },
-      );
-    }
-  }, [searchKey]);
+    if (!hadLegacyQueryKey) return;
+
+    toast.warning(
+      <div className="space-y-2">
+        <p>{t('view.legacyKey.warning')}</p>
+        <p className="text-sm text-muted-foreground">
+          <a
+            href="https://github.com/osbytes/crypt.fyi/issues/100"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t('view.legacyKey.learnMore')}
+          </a>
+        </p>
+      </div>,
+      {
+        id: 'key-in-url-search-params-deprecated',
+        closeButton: true,
+        duration: Infinity,
+      },
+    );
+  }, [hadLegacyQueryKey, t]);
 }

@@ -1,3 +1,5 @@
+// This side effect must run before the router reads the current location.
+import './lib/legacyKeyBootstrap';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import './i18n';

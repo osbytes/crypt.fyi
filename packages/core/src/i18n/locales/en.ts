@@ -147,16 +147,31 @@ export const en: TranslationKeys = {
     success: {
       title: 'Secret Created!',
       description: {
-        main: 'Your secret has been created and the URL has been copied to your clipboard',
-        password: 'Share the URL and password with the desired recipient',
+        main: 'Your secret has been created. Share the URL below with the intended recipient.',
+        password: 'Send the password through a separate channel.',
+        separateKey: 'Send the decryption key through a separate channel from the URL.',
       },
+      secretUrl: 'Secret URL',
+      decryptionKey: 'Decryption key',
       urlCopied: 'URL copied to clipboard',
+      keyCopied: 'Decryption key copied to clipboard',
       secretDeleted: 'Secret deleted',
       qrDownloaded: 'QR code downloaded',
       qrDownloadFailed: 'Failed to download QR code: {{error}}',
       qrCode: {
         title: 'Secret URL QR Code',
-        description: 'Download and share the secret URL QR Code',
+        description:
+          'This QR code contains only the secret URL. Send the decryption key separately.',
+      },
+      actions: {
+        showUrl: 'Show secret URL',
+        hideUrl: 'Hide secret URL',
+        showKey: 'Show decryption key',
+        hideKey: 'Hide decryption key',
+        shareUrl: 'Share secret URL',
+        copyUrl: 'Copy secret URL',
+        copyKey: 'Copy decryption key',
+        showQr: 'Show key-free QR code',
       },
       createAnother: 'Create Another',
       deleteSecret: 'Delete Secret',
@@ -184,6 +199,7 @@ export const en: TranslationKeys = {
       fileSizeExceeded: 'File is too large. Maximum size is {{max}}.',
       fileReadError: 'Failed to read file',
       fileReadAborted: 'File reading was aborted',
+      createFailed: 'Failed to create the secret. Please try again.',
     },
   },
   view: {
@@ -207,7 +223,25 @@ export const en: TranslationKeys = {
       title: 'Enter Password',
       placeholder: 'Enter the password',
       description: 'This secret is protected with a password - request from the sender',
-      error: 'Incorrect password',
+      error: 'Incorrect decryption key or password',
+    },
+    key: {
+      title: 'Enter Decryption Key',
+      label: 'Decryption key',
+      placeholder: 'Enter the key provided by the sender',
+      description:
+        'Ask the sender for the decryption key through a separate channel. The key is used only in this browser.',
+      required: 'Enter a decryption key.',
+      error: 'That decryption key could not unlock this secret. Check the key and try again.',
+      show: 'Show decryption key',
+      hide: 'Hide decryption key',
+      change: 'Enter a different key',
+      submit: 'Unlock secret',
+    },
+    legacyKey: {
+      warning:
+        'This outdated link put its decryption key in the query string, where it may have reached server logs. It has now been removed from browser history.',
+      learnMore: 'Learn about the safer link format',
     },
     content: {
       fileShared: 'A file has been shared with you',

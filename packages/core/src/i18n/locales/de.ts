@@ -149,16 +149,32 @@ export const de: TranslationKeys = {
     success: {
       title: 'Geheimnis erstellt!',
       description: {
-        main: 'Ihr Geheimnis wurde erstellt und die URL wurde in die Zwischenablage kopiert',
-        password: 'Teilen Sie die URL und das Passwort mit dem gewünschten Empfänger',
+        main: 'Ihr Geheimnis wurde erstellt. Teilen Sie die unten stehende URL mit dem gewünschten Empfänger.',
+        password: 'Senden Sie das Passwort über einen separaten Kanal.',
+        separateKey:
+          'Senden Sie den Entschlüsselungsschlüssel über einen anderen Kanal als die URL.',
       },
+      secretUrl: 'Geheimnis-URL',
+      decryptionKey: 'Entschlüsselungsschlüssel',
       urlCopied: 'URL in die Zwischenablage kopiert',
+      keyCopied: 'Entschlüsselungsschlüssel in die Zwischenablage kopiert',
       secretDeleted: 'Geheimnis gelöscht',
       qrDownloaded: 'QR-Code heruntergeladen',
       qrDownloadFailed: 'QR-Code konnte nicht heruntergeladen werden: {{error}}',
       qrCode: {
         title: 'Geheimnis-URL QR-Code',
-        description: 'Laden Sie den QR-Code der Geheimnis-URL herunter und teilen Sie ihn',
+        description:
+          'Dieser QR-Code enthält nur die Geheimnis-URL. Senden Sie den Entschlüsselungsschlüssel separat.',
+      },
+      actions: {
+        showUrl: 'Geheimnis-URL anzeigen',
+        hideUrl: 'Geheimnis-URL ausblenden',
+        showKey: 'Entschlüsselungsschlüssel anzeigen',
+        hideKey: 'Entschlüsselungsschlüssel ausblenden',
+        shareUrl: 'Geheimnis-URL teilen',
+        copyUrl: 'Geheimnis-URL kopieren',
+        copyKey: 'Entschlüsselungsschlüssel kopieren',
+        showQr: 'QR-Code ohne Schlüssel anzeigen',
       },
       createAnother: 'Weiteres erstellen',
       deleteSecret: 'Geheimnis löschen',
@@ -186,6 +202,7 @@ export const de: TranslationKeys = {
       fileSizeExceeded: 'Datei ist zu groß. Maximale Größe ist {{max}}.',
       fileReadError: 'Fehler beim Lesen der Datei',
       fileReadAborted: 'Dateilesen wurde abgebrochen',
+      createFailed: 'Das Geheimnis konnte nicht erstellt werden. Versuchen Sie es erneut.',
     },
   },
   view: {
@@ -210,7 +227,26 @@ export const de: TranslationKeys = {
       title: 'Passwort eingeben',
       placeholder: 'Geben Sie das Passwort ein',
       description: 'Dieses Geheimnis ist mit einem Passwort geschützt - fragen Sie den Absender',
-      error: 'Falsches Passwort',
+      error: 'Falscher Entschlüsselungsschlüssel oder falsches Passwort',
+    },
+    key: {
+      title: 'Entschlüsselungsschlüssel eingeben',
+      label: 'Entschlüsselungsschlüssel',
+      placeholder: 'Vom Absender erhaltenen Schlüssel eingeben',
+      description:
+        'Bitten Sie den Absender über einen separaten Kanal um den Entschlüsselungsschlüssel. Der Schlüssel wird nur in diesem Browser verwendet.',
+      required: 'Geben Sie einen Entschlüsselungsschlüssel ein.',
+      error:
+        'Dieser Entschlüsselungsschlüssel konnte das Geheimnis nicht öffnen. Prüfen Sie den Schlüssel und versuchen Sie es erneut.',
+      show: 'Entschlüsselungsschlüssel anzeigen',
+      hide: 'Entschlüsselungsschlüssel ausblenden',
+      change: 'Anderen Schlüssel eingeben',
+      submit: 'Geheimnis entsperren',
+    },
+    legacyKey: {
+      warning:
+        'Dieser veraltete Link enthielt den Entschlüsselungsschlüssel in der Abfragezeichenfolge, wodurch er in Serverprotokolle gelangt sein könnte. Er wurde jetzt aus dem Browserverlauf entfernt.',
+      learnMore: 'Mehr über das sicherere Linkformat erfahren',
     },
     content: {
       fileShared: 'Eine Datei wurde mit Ihnen geteilt',

@@ -139,14 +139,28 @@ export interface TranslationKeys {
       description: {
         main: string;
         password: string;
+        separateKey: string;
       };
+      secretUrl: string;
+      decryptionKey: string;
       urlCopied: string;
+      keyCopied: string;
       secretDeleted: string;
       qrDownloaded: string;
       qrDownloadFailed: string;
       qrCode: {
         title: string;
         description: string;
+      };
+      actions: {
+        showUrl: string;
+        hideUrl: string;
+        showKey: string;
+        hideKey: string;
+        shareUrl: string;
+        copyUrl: string;
+        copyKey: string;
+        showQr: string;
       };
       createAnother: string;
       deleteSecret: string;
@@ -173,6 +187,7 @@ export interface TranslationKeys {
       fileSizeExceeded: string;
       fileReadError: string;
       fileReadAborted: string;
+      createFailed: string;
     };
   };
   view: {
@@ -196,6 +211,22 @@ export interface TranslationKeys {
       placeholder: string;
       description: string;
       error: string;
+    };
+    key: {
+      title: string;
+      label: string;
+      placeholder: string;
+      description: string;
+      required: string;
+      error: string;
+      show: string;
+      hide: string;
+      change: string;
+      submit: string;
+    };
+    legacyKey: {
+      warning: string;
+      learnMore: string;
     };
     content: {
       fileShared: string;

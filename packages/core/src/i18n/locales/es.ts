@@ -149,16 +149,31 @@ export const es: TranslationKeys = {
     success: {
       title: '¡Secreto Creado!',
       description: {
-        main: 'Tu secreto ha sido creado y la URL ha sido copiada al portapapeles',
-        password: 'Comparte la URL y la contraseña con el destinatario deseado',
+        main: 'Tu secreto ha sido creado. Comparte la URL de abajo con el destinatario previsto.',
+        password: 'Envía la contraseña por un canal separado.',
+        separateKey: 'Envía la clave de descifrado por un canal diferente al de la URL.',
       },
+      secretUrl: 'URL del secreto',
+      decryptionKey: 'Clave de descifrado',
       urlCopied: 'URL copiada al portapapeles',
+      keyCopied: 'Clave de descifrado copiada al portapapeles',
       secretDeleted: 'Secreto eliminado',
       qrDownloaded: 'Código QR descargado',
       qrDownloadFailed: 'Error al descargar el código QR: {{error}}',
       qrCode: {
         title: 'Código QR de la URL del Secreto',
-        description: 'Descarga y comparte el código QR de la URL del secreto',
+        description:
+          'Este código QR contiene solo la URL del secreto. Envía la clave de descifrado por separado.',
+      },
+      actions: {
+        showUrl: 'Mostrar la URL del secreto',
+        hideUrl: 'Ocultar la URL del secreto',
+        showKey: 'Mostrar la clave de descifrado',
+        hideKey: 'Ocultar la clave de descifrado',
+        shareUrl: 'Compartir la URL del secreto',
+        copyUrl: 'Copiar la URL del secreto',
+        copyKey: 'Copiar la clave de descifrado',
+        showQr: 'Mostrar el código QR sin clave',
       },
       createAnother: 'Crear Otro',
       deleteSecret: 'Eliminar Secreto',
@@ -186,6 +201,7 @@ export const es: TranslationKeys = {
       fileSizeExceeded: 'El archivo es demasiado grande. El tamaño máximo es {{max}}.',
       fileReadError: 'Error al leer el archivo',
       fileReadAborted: 'La lectura del archivo fue interrumpida',
+      createFailed: 'No se pudo crear el secreto. Inténtalo de nuevo.',
     },
   },
   view: {
@@ -209,7 +225,26 @@ export const es: TranslationKeys = {
       title: 'Ingresar Contraseña',
       placeholder: 'Ingresa la contraseña',
       description: 'Este secreto está protegido con una contraseña - solicítala al remitente',
-      error: 'Contraseña incorrecta',
+      error: 'La clave de descifrado o la contraseña es incorrecta',
+    },
+    key: {
+      title: 'Ingresa la clave de descifrado',
+      label: 'Clave de descifrado',
+      placeholder: 'Ingresa la clave proporcionada por el remitente',
+      description:
+        'Pide al remitente la clave de descifrado por un canal separado. La clave se usa solo en este navegador.',
+      required: 'Ingresa una clave de descifrado.',
+      error:
+        'Esa clave de descifrado no pudo desbloquear el secreto. Comprueba la clave e inténtalo de nuevo.',
+      show: 'Mostrar la clave de descifrado',
+      hide: 'Ocultar la clave de descifrado',
+      change: 'Ingresar otra clave',
+      submit: 'Desbloquear secreto',
+    },
+    legacyKey: {
+      warning:
+        'Este enlace antiguo incluyó la clave de descifrado en la cadena de consulta, donde pudo llegar a los registros del servidor. Ya se ha eliminado del historial del navegador.',
+      learnMore: 'Más información sobre el formato de enlace más seguro',
     },
     content: {
       fileShared: 'Se ha compartido un archivo contigo',

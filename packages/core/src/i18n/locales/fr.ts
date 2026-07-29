@@ -149,16 +149,31 @@ export const fr: TranslationKeys = {
     success: {
       title: 'Secret Créé !',
       description: {
-        main: "Votre secret a été créé et l'URL a été copiée dans le presse-papiers",
-        password: "Partagez l'URL et le mot de passe avec le destinataire souhaité",
+        main: "Votre secret a été créé. Partagez l'URL ci-dessous avec le destinataire prévu.",
+        password: 'Envoyez le mot de passe par un canal séparé.',
+        separateKey: "Envoyez la clé de déchiffrement par un canal différent de celui de l'URL.",
       },
+      secretUrl: 'URL du secret',
+      decryptionKey: 'Clé de déchiffrement',
       urlCopied: 'URL copiée dans le presse-papiers',
+      keyCopied: 'Clé de déchiffrement copiée dans le presse-papiers',
       secretDeleted: 'Secret supprimé',
       qrDownloaded: 'Code QR téléchargé',
       qrDownloadFailed: 'Échec du téléchargement du code QR : {{error}}',
       qrCode: {
         title: "Code QR de l'URL du Secret",
-        description: "Téléchargez et partagez le code QR de l'URL du secret",
+        description:
+          "Ce code QR contient uniquement l'URL du secret. Envoyez la clé de déchiffrement séparément.",
+      },
+      actions: {
+        showUrl: "Afficher l'URL du secret",
+        hideUrl: "Masquer l'URL du secret",
+        showKey: 'Afficher la clé de déchiffrement',
+        hideKey: 'Masquer la clé de déchiffrement',
+        shareUrl: "Partager l'URL du secret",
+        copyUrl: "Copier l'URL du secret",
+        copyKey: 'Copier la clé de déchiffrement',
+        showQr: 'Afficher le code QR sans clé',
       },
       createAnother: 'Créer un Autre',
       deleteSecret: 'Supprimer le Secret',
@@ -187,6 +202,7 @@ export const fr: TranslationKeys = {
       fileSizeExceeded: 'Le fichier est trop volumineux. La taille maximale est {{max}}.',
       fileReadError: 'Échec de la lecture du fichier',
       fileReadAborted: 'La lecture du fichier a été interrompue',
+      createFailed: 'Impossible de créer le secret. Veuillez réessayer.',
     },
   },
   view: {
@@ -210,7 +226,26 @@ export const fr: TranslationKeys = {
       title: 'Saisir le Mot de Passe',
       placeholder: 'Saisissez le mot de passe',
       description: "Ce secret est protégé par un mot de passe - demandez-le à l'expéditeur",
-      error: 'Mot de passe incorrect',
+      error: 'Clé de déchiffrement ou mot de passe incorrect',
+    },
+    key: {
+      title: 'Saisir la clé de déchiffrement',
+      label: 'Clé de déchiffrement',
+      placeholder: "Saisissez la clé fournie par l'expéditeur",
+      description:
+        "Demandez la clé de déchiffrement à l'expéditeur par un canal séparé. La clé est utilisée uniquement dans ce navigateur.",
+      required: 'Saisissez une clé de déchiffrement.',
+      error:
+        'Cette clé de déchiffrement ne permet pas de déverrouiller le secret. Vérifiez-la et réessayez.',
+      show: 'Afficher la clé de déchiffrement',
+      hide: 'Masquer la clé de déchiffrement',
+      change: 'Saisir une autre clé',
+      submit: 'Déverrouiller le secret',
+    },
+    legacyKey: {
+      warning:
+        "Ce lien obsolète plaçait la clé de déchiffrement dans la chaîne de requête, où elle a pu atteindre les journaux du serveur. Elle a maintenant été supprimée de l'historique du navigateur.",
+      learnMore: 'En savoir plus sur le format de lien plus sûr',
     },
     content: {
       fileShared: 'Un fichier a été partagé avec vous',
