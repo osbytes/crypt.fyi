@@ -13,11 +13,12 @@ const useMutationMock = vi.hoisted(() =>
     reset: vi.fn(),
   })),
 );
+const useSearchMock = vi.hoisted(() => vi.fn(() => ({})));
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
   useParams: () => ({ id: 'vault-id' }),
-  useSearch: () => ({}),
+  useSearch: useSearchMock,
 }));
 
 vi.mock('@tanstack/react-query', () => ({
@@ -31,9 +32,7 @@ vi.mock('@tanstack/react-query', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
+  useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 vi.mock('@/context/client', () => ({
@@ -55,24 +54,18 @@ vi.mock('sonner', () => ({
   toast: {
     error: vi.fn(),
     success: vi.fn(),
-    warning: vi.fn(),
   },
 }));
 
 afterEach(() => {
   vi.unstubAllGlobals();
   useMutationMock.mockClear();
+  useSearchMock.mockClear();
 });
 
 describe('ViewPage decryption key entry', () => {
   it('renders an accessible key form when the URL has no key', () => {
-    vi.stubGlobal('window', {
-      location: {
-        hash: '',
-        pathname: '/vault-id',
-        search: '',
-      },
-    });
+    vi.stubGlobal('window', { location: { hash: '' } });
 
     const html = renderToStaticMarkup(<ViewPage />);
 
@@ -81,30 +74,32 @@ describe('ViewPage decryption key entry', () => {
     expect(html).toContain('type="password"');
     expect(html).toContain('autoComplete="off"');
     expect(html).toContain('aria-describedby="decryption-key-description"');
-    expect(html).toContain('view.key.description');
   });
 
   it('keeps a fragment key out of the React Query mutation key', () => {
     const rawKey = 'fragment-key-must-not-enter-cache-identity';
-    vi.stubGlobal('window', {
-      location: {
-        hash: `#${rawKey}`,
-        pathname: '/vault-id',
-        search: '',
-      },
-    });
+    vi.stubGlobal('window', { location: { hash: `#${rawKey}` } });
 
     const html = renderToStaticMarkup(<ViewPage />);
     const mutationOptions = useMutationMock.mock.calls.at(-1)?.[0];
 
     expect(html).toContain('view.actions.viewSecret');
     expect(mutationOptions).toEqual(
-      expect.objectContaining({
-        mutationKey: ['vault-id', 'decrypt'],
-        gcTime: 0,
-      }),
+      expect.objectContaining({ mutationKey: ['vault-id', 'decrypt'], gcTime: 0 }),
     );
     expect(JSON.stringify(mutationOptions)).not.toContain(rawKey);
+  });
+
+  it('never reads a legacy query-string key', () => {
+    const search = Object.defineProperty({}, 'key', {
+      get: () => {
+        throw new Error('legacy query key value was read');
+      },
+    });
+    useSearchMock.mockReturnValueOnce(search);
+    vi.stubGlobal('window', { location: { hash: '' } });
+
+    expect(() => renderToStaticMarkup(<ViewPage />)).not.toThrow();
   });
 
   it('offers manual recovery after a fragment key fails', () => {
@@ -115,13 +110,7 @@ describe('ViewPage decryption key entry', () => {
       mutate: vi.fn(),
       reset: vi.fn(),
     }));
-    vi.stubGlobal('window', {
-      location: {
-        hash: '#wrong-fragment-key',
-        pathname: '/vault-id',
-        search: '',
-      },
-    });
+    vi.stubGlobal('window', { location: { hash: '#wrong-fragment-key' } });
 
     const html = renderToStaticMarkup(<ViewPage />);
 

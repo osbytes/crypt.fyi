@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ClientProvider } from './context/client';
 import { ThemeProvider } from './theme';
 
@@ -23,7 +25,11 @@ declare module '@tanstack/react-router' {
   }
 }
 
-export default function App() {
+interface AppProps {
+  legacyQueryKeyRemoved?: boolean;
+}
+
+export default function App({ legacyQueryKeyRemoved = false }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
@@ -44,8 +50,23 @@ export default function App() {
               },
             }}
           />
+          {legacyQueryKeyRemoved && <LegacyQueryKeyWarning />}
         </ClientProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
+}
+
+function LegacyQueryKeyWarning() {
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    toast.warning(t('view.legacyKey.warning'), {
+      id: 'unsafe-query-key-removed',
+      closeButton: true,
+      duration: Infinity,
+    });
+  }, [t]);
+
+  return null;
 }

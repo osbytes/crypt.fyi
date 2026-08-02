@@ -91,46 +91,26 @@ Abstract
 
 ### 2.4. URL and Out-of-Band Key Security
 
-   A client MAY deliver the decryption key in either of these forms:
+   After creating a secret, the client MUST present all of the following:
 
-   1. A combined compatibility link using a URL fragment:
+   - A combined URL with the decryption key in the URL fragment
+   - A key-free URL
+   - The decryption key as a separate value
 
-      ```
-      https://crypt.fyi/{vaultId}#{base64-encoded-key}
-      ```
+   The combined URL supports one-step sharing while keeping the key in a
+   browser-only fragment. The key-free URL allows the sender to deliver the
+   URL and key through separate channels. QR codes currently encode the
+   combined URL.
 
-   2. A key-free URL, with the decryption key delivered out of band:
+   When a key-free URL is opened, the client MUST prompt for the decryption
+   key and MUST keep that key client-side. A `key` query parameter MUST NOT be
+   accepted as a decryption key. If one is present, the client MUST remove it
+   from the current browser-history entry before application initialization
+   and warn that the unsafe value may already have reached server logs.
 
-      ```
-      https://crypt.fyi/{vaultId}
-      ```
-
-   Retrieval clients MUST accept fragment keys and MUST provide an
-   accessible way to enter a missing key manually. A manually entered key
-   MUST NOT be written back to the URL.
-
-   URL fragments are not sent in HTTP requests, which protects a fragment
-   key from web-server access logs and network intermediaries. A combined
-   link is still a single bearer capability: anyone who obtains the full
-   link obtains both the vault identifier and key. Deployments that need
-   credential separation SHOULD generate key-free URLs and send the key
-   through a different channel.
-
-   Clients:
-
-   - MUST NOT generate a raw key in a URL query parameter or path
-   - MUST keep QR-code payloads key-free in every mode
-   - MUST NOT persist raw keys in browser storage, caches, analytics, or logs
-   - MUST NOT include raw keys in errors or client-cache identifiers
-   - SHOULD mask displayed keys by default and reveal or copy them only after
-     an explicit user action
-
-   For read-side compatibility only, a client MAY accept a deprecated
-   `key` query parameter. It MUST prefer a fragment key when both are
-   present, remove every `key` query parameter from browser history before
-   initializing client routing or analytics, warn the user that the initial
-   request may already have exposed the key, and never regenerate or share
-   the deprecated format.
+   URL fragments are processed entirely client-side by the browser and are
+   never sent in HTTP requests. This preserves the zero-knowledge architecture
+   for combined URLs while the key-free form supports out-of-band delivery.
 
 ### 2.5. Server Separation
 
@@ -140,15 +120,15 @@ Abstract
 #### 2.5.1. Web Server
 
    - MUST serve only static files (HTML, CSS, JS)
-   - MUST exclude or redact URL query parameters from request logging
-     (fragments are never present in HTTP requests)
+   - MUST be configured not to log URL query strings, because outdated or
+     unsafe links may contain sensitive values
    - MUST be configured with strict Content Security Policy (CSP)
    - SHOULD run on a separate server/hosting platform from API server
 
 #### 2.5.2. API Server
 
    - MUST handle only encrypted data operations
-   - MUST NOT receive or process raw decryption keys
+   - MUST NOT receive or process URLs containing decryption keys
    - MUST only receive hashed keys for verification (SHA-512)
    - MUST operate independently from web server
 
@@ -279,8 +259,8 @@ Abstract
    - Server MUST NOT be able to decrypt content under any circumstances
    - No user accounts or authentication MUST be required
    - Server MUST NOT log sensitive data or encryption keys
-   - Raw decryption keys MUST NOT be transmitted to the server, whether a
-     client obtains them from a fragment or out-of-band entry
+   - Decryption keys MUST NOT be transmitted to the server; combined links use
+     URL fragments and key-free links use out-of-band delivery
    - Client MUST prove key possession through cryptographic hash
      verification
    - Hash MUST NOT be reversible to obtain the original key or password

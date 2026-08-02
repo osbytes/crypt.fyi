@@ -2,7 +2,7 @@ import { config } from '@/config';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useParams, useSearch } from '@tanstack/react-router';
 import { Card } from '@/components/ui/card';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,45 +24,41 @@ import { ErrorInvalidKeyAndOrPassword, ErrorNotFound, sleep } from '@crypt.fyi/c
 import { useTranslation } from 'react-i18next';
 import { useClient } from '@/context/client';
 import { resolveDecryptionKey } from '@/lib/secretUrl';
-import type { DecryptionKeySource } from '@/lib/secretUrl';
-import { consumeLegacyQueryKey } from '@/lib/legacyKeyBootstrap';
 
 export function ViewPage() {
-  const { t } = useTranslation();
   const { id } = useParams({ from: '/$id' });
   const search = useSearch({ from: '/$id' });
-  const isPasswordSet = Boolean(search.p);
 
-  // Keep the raw key outside render state and React Query. It exists only in
-  // the URL/entry control and this short-lived ref until decryption succeeds.
-  const decryptionKeyRef = useRef('');
-  const keySourceRef = useRef<DecryptionKeySource>('missing');
-  const hadLegacyQueryKeyRef = useRef(false);
-  const hasReadInitialKeyRef = useRef(false);
-  if (!hasReadInitialKeyRef.current) {
-    const legacyCapture = consumeLegacyQueryKey();
-    const resolved = resolveDecryptionKey(window.location.hash, legacyCapture.legacyQueryKey);
-    decryptionKeyRef.current = resolved.key;
-    keySourceRef.current = resolved.source;
-    hadLegacyQueryKeyRef.current = legacyCapture.hadLegacyQueryKey || resolved.hadLegacyQueryKey;
-    hasReadInitialKeyRef.current = true;
+  // TanStack reuses this file-route component across vault IDs. Bound all
+  // key-bearing local state to the public vault ID without keying on the hash.
+  return <VaultView key={id} id={id} isPasswordSet={Boolean(search.p)} />;
+}
+
+interface VaultViewProps {
+  id: string;
+  isPasswordSet: boolean;
+}
+
+function VaultView({ id, isPasswordSet }: VaultViewProps) {
+  const { t } = useTranslation();
+
+  // Keep the raw key outside render state and React Query's cache identity.
+  const decryptionKeyRef = useRef<string | null>(null);
+  if (decryptionKeyRef.current === null) {
+    decryptionKeyRef.current = resolveDecryptionKey(window.location.hash);
   }
+  const keyWasEnteredManuallyRef = useRef(false);
 
-  const [hasDecryptionKey, setHasDecryptionKey] = useState(
-    () => decryptionKeyRef.current.length > 0,
-  );
+  const [password, setPassword] = useState('');
+  const [hasDecryptionKey, setHasDecryptionKey] = useState(() => Boolean(decryptionKeyRef.current));
   const [isDialogOpen, setIsDialogOpen] = useState(
-    () => isPasswordSet && decryptionKeyRef.current.length > 0,
+    () => isPasswordSet && Boolean(decryptionKeyRef.current),
   );
   const [isRevealed, setIsRevealed] = useState(false);
   const [hasUserConfirmed, setHasUserConfirmed] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [keyEntryError, setKeyEntryError] = useState<string | null>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef('');
-
-  const hadLegacyQueryKey = hadLegacyQueryKeyRef.current;
-  useLegacyKeyWarning(hadLegacyQueryKey);
 
   const { client } = useClient();
 
@@ -70,43 +66,33 @@ export function ViewPage() {
     queryKey: [id, 'exists'],
     queryFn: async () => {
       await sleep(500, { enabled: config.IS_DEV });
-      return client.exists(id);
+      const exists = await client.exists(id);
+      return exists;
     },
     retry: () => false,
     enabled: isPasswordSet && hasDecryptionKey,
   });
-  useEffect(() => {
-    if (existsQuery.data === false) {
-      decryptionKeyRef.current = '';
-      passwordRef.current = '';
-    }
-  }, [existsQuery.data]);
 
   const decryptMutation = useMutation({
     mutationKey: [id, 'decrypt'],
     mutationFn: async () => {
       const key = decryptionKeyRef.current;
-      if (!key) {
-        throw new Error('Decryption key is unavailable');
-      }
-      return client.read(id, key, passwordRef.current);
+      if (!key) throw new Error('Decryption key is unavailable');
+      return client.read(id, key, password);
     },
     retry: () => false,
     gcTime: 0,
     onSuccess() {
-      // JavaScript strings cannot be zeroed, but dropping our reference avoids
-      // retaining an additional key copy after it is no longer needed.
       decryptionKeyRef.current = '';
-      passwordRef.current = '';
-      if (passwordInputRef.current) passwordInputRef.current.value = '';
+      setPassword('');
       setIsDialogOpen(false);
       setPasswordError(null);
     },
     onError(error) {
       if (error instanceof ErrorInvalidKeyAndOrPassword) {
-        if (!isPasswordSet && keySourceRef.current === 'manual') {
+        if (!isPasswordSet && keyWasEnteredManuallyRef.current) {
           decryptionKeyRef.current = '';
-          keySourceRef.current = 'missing';
+          keyWasEnteredManuallyRef.current = false;
           setHasDecryptionKey(false);
           setHasUserConfirmed(false);
           setKeyEntryError(t('view.key.error'));
@@ -116,28 +102,28 @@ export function ViewPage() {
           decryptionKeyRef.current = '';
           return;
         }
-
         setPasswordError(t('view.password.error'));
         setTimeout(() => {
           passwordInputRef.current?.focus();
         }, 100);
       } else if (error instanceof ErrorNotFound) {
         decryptionKeyRef.current = '';
-        passwordRef.current = '';
+        setPassword('');
         setIsDialogOpen(false);
+      } else {
+        toast.error(error.message);
       }
     },
   });
 
   const promptForDifferentKey = (error: string | null = null) => {
     decryptionKeyRef.current = '';
-    keySourceRef.current = 'missing';
+    keyWasEnteredManuallyRef.current = false;
     decryptMutation.reset();
     setHasDecryptionKey(false);
     setHasUserConfirmed(false);
     setIsDialogOpen(false);
-    passwordRef.current = '';
-    if (passwordInputRef.current) passwordInputRef.current.value = '';
+    setPassword('');
     setPasswordError(null);
     setKeyEntryError(error);
   };
@@ -151,7 +137,7 @@ export function ViewPage() {
 
     decryptMutation.reset();
     decryptionKeyRef.current = normalizedKey;
-    keySourceRef.current = 'manual';
+    keyWasEnteredManuallyRef.current = true;
     setKeyEntryError(null);
     setHasDecryptionKey(true);
     setHasUserConfirmed(true);
@@ -196,12 +182,8 @@ export function ViewPage() {
           <p className="text-muted-foreground mb-6">{t('view.connectionError.description')}</p>
           <Button
             onClick={() => {
-              if (existsFailed) {
-                existsQuery.refetch();
-              } else {
-                decryptMutation.reset();
-                decryptMutation.mutate();
-              }
+              if (existsFailed) existsQuery.refetch();
+              if (unexpectedDecryptError) decryptMutation.reset();
             }}
           >
             {t('view.connectionError.tryAgain')}
@@ -383,8 +365,7 @@ export function ViewPage() {
         onOpenChange={(open) => {
           setIsDialogOpen(open);
           if (!open) {
-            passwordRef.current = '';
-            if (passwordInputRef.current) passwordInputRef.current.value = '';
+            setPassword('');
             setPasswordError(null);
           }
         }}
@@ -395,9 +376,8 @@ export function ViewPage() {
           </DialogHeader>
           <form
             className="space-y-4"
-            onSubmit={(event) => {
-              event.preventDefault();
-              passwordRef.current = passwordInputRef.current?.value ?? '';
+            onSubmit={(e) => {
+              e.preventDefault();
               decryptMutation.mutate();
             }}
           >
@@ -408,8 +388,9 @@ export function ViewPage() {
                 ref={passwordInputRef}
                 type="password"
                 placeholder={t('view.password.placeholder')}
-                onChange={(event) => {
-                  passwordRef.current = event.target.value;
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
                   setPasswordError(null);
                 }}
                 required
@@ -522,35 +503,4 @@ function DecryptionKeyPrompt({ error, isPending, onSubmit }: DecryptionKeyPrompt
       </Card>
     </div>
   );
-}
-
-// Outdated clients may put the key in the query string, where it can reach
-// servers and logs. The value is captured only for compatibility, removed from
-// browser history immediately, and never rendered in this warning.
-function useLegacyKeyWarning(hadLegacyQueryKey: boolean) {
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    if (!hadLegacyQueryKey) return;
-
-    toast.warning(
-      <div className="space-y-2">
-        <p>{t('view.legacyKey.warning')}</p>
-        <p className="text-sm text-muted-foreground">
-          <a
-            href="https://github.com/osbytes/crypt.fyi/issues/100"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t('view.legacyKey.learnMore')}
-          </a>
-        </p>
-      </div>,
-      {
-        id: 'key-in-url-search-params-deprecated',
-        closeButton: true,
-        duration: Infinity,
-      },
-    );
-  }, [hadLegacyQueryKey, t]);
 }

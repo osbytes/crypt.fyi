@@ -149,11 +149,13 @@ export const fr: TranslationKeys = {
     success: {
       title: 'Secret Créé !',
       description: {
-        main: "Votre secret a été créé. Partagez l'URL ci-dessous avec le destinataire prévu.",
+        main: 'Votre secret a été créé. Choisissez une option de partage ci-dessous.',
         password: 'Envoyez le mot de passe par un canal séparé.',
-        separateKey: "Envoyez la clé de déchiffrement par un canal différent de celui de l'URL.",
+        separateKey:
+          "Pour un envoi séparé, transmettez l'URL sans clé et la clé de déchiffrement par des canaux différents.",
       },
-      secretUrl: 'URL du secret',
+      combinedUrl: 'URL complète (avec la clé)',
+      keylessUrl: 'URL sans clé',
       decryptionKey: 'Clé de déchiffrement',
       urlCopied: 'URL copiée dans le presse-papiers',
       keyCopied: 'Clé de déchiffrement copiée dans le presse-papiers',
@@ -162,8 +164,7 @@ export const fr: TranslationKeys = {
       qrDownloadFailed: 'Échec du téléchargement du code QR : {{error}}',
       qrCode: {
         title: "Code QR de l'URL du Secret",
-        description:
-          "Ce code QR contient uniquement l'URL du secret. Envoyez la clé de déchiffrement séparément.",
+        description: "Téléchargez et partagez le code QR de l'URL du secret",
       },
       actions: {
         showUrl: "Afficher l'URL du secret",
@@ -173,7 +174,7 @@ export const fr: TranslationKeys = {
         shareUrl: "Partager l'URL du secret",
         copyUrl: "Copier l'URL du secret",
         copyKey: 'Copier la clé de déchiffrement',
-        showQr: 'Afficher le code QR sans clé',
+        showQr: "Afficher le code QR de l'URL complète",
       },
       createAnother: 'Créer un Autre',
       deleteSecret: 'Supprimer le Secret',
@@ -202,7 +203,6 @@ export const fr: TranslationKeys = {
       fileSizeExceeded: 'Le fichier est trop volumineux. La taille maximale est {{max}}.',
       fileReadError: 'Échec de la lecture du fichier',
       fileReadAborted: 'La lecture du fichier a été interrompue',
-      createFailed: 'Impossible de créer le secret. Veuillez réessayer.',
     },
   },
   view: {
@@ -244,8 +244,7 @@ export const fr: TranslationKeys = {
     },
     legacyKey: {
       warning:
-        "Ce lien obsolète plaçait la clé de déchiffrement dans la chaîne de requête, où elle a pu atteindre les journaux du serveur. Elle a maintenant été supprimée de l'historique du navigateur.",
-      learnMore: 'En savoir plus sur le format de lien plus sûr',
+        "Ce lien obsolète plaçait la clé de déchiffrement dans la chaîne de requête, où elle a pu atteindre les journaux du serveur. Elle a maintenant été supprimée de cette entrée de l'historique du navigateur.",
     },
     content: {
       fileShared: 'Un fichier a été partagé avec vous',

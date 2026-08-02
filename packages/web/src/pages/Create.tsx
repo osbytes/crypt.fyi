@@ -66,6 +66,7 @@ import { NumberInput } from '@/components/NumberInput';
 import { TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tooltip } from '@/components/ui/tooltip';
 import { buildSecretLinks } from '@/lib/secretUrl';
+import type { SecretLinks } from '@/lib/secretUrl';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
 const MAX_FILE_SIZE = 1 * 1024 * 1024;
@@ -423,9 +424,8 @@ export function CreatePage() {
   }, [watch]);
 
   const { client } = useClient();
-  // Combined compatibility URLs contain the raw key. Keep both values out of
-  // React Query mutation data so they never become cache entries.
-  const createdShareUrlRef = useRef('');
+  // Share URLs contain the raw key. Keep them out of React Query mutation data.
+  const createdLinksRef = useRef<SecretLinks | null>(null);
   const createdDecryptionKeyRef = useRef('');
 
   const createMutation = useMutation({
@@ -446,40 +446,25 @@ export function CreatePage() {
           : undefined,
       });
 
-      const links = buildSecretLinks({
+      createdLinksRef.current = buildSecretLinks({
         origin: window.location.origin,
         id: result.id,
         key: result.key,
         passwordProtected: Boolean(input.p),
-        separateDecryptionKey: config.SEPARATE_DECRYPTION_KEY,
       });
-      createdShareUrlRef.current = links.shareUrl;
       createdDecryptionKeyRef.current = result.key;
-
-      if (config.SEPARATE_DECRYPTION_KEY) {
-        try {
-          const copied = await clipboardCopy(links.shareUrl, { userInitiatedFallback: false });
-          if (copied) toast.info(t('create.success.urlCopied'));
-        } catch {
-          // Clipboard access can be denied. The explicit copy action remains
-          // available, and no secret material is included in the error path.
-        }
-      }
 
       return {
         id: result.id,
         dt: result.dt,
-        qrUrl: links.qrUrl,
       };
     },
-    onError() {
-      toast.error(t('create.errors.createFailed'));
+    onError(error) {
+      toast.error(error.message);
     },
     gcTime: 0,
   });
 
-  const [isUrlMasked, setIsUrlMasked] = useState(true);
-  const [isKeyMasked, setIsKeyMasked] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFiles = async (files: File[]) => {
@@ -573,10 +558,11 @@ export function CreatePage() {
     Object.entries(valuesToKeep).forEach(([field, value]) => {
       form.setValue(field as keyof FormValues, value);
     });
-    setIsUrlMasked(true);
+    setIsCombinedUrlMasked(true);
+    setIsKeylessUrlMasked(true);
     setIsKeyMasked(true);
     setIsQrDialogOpen(false);
-    createdShareUrlRef.current = '';
+    createdLinksRef.current = null;
     createdDecryptionKeyRef.current = '';
     createMutation.reset();
   };
@@ -588,7 +574,6 @@ export function CreatePage() {
         await client.delete(id, dt);
       } catch (error) {
         if (error instanceof ErrorNotFound) {
-          setIsUrlMasked(true);
           resetForNewSecret();
         }
         throw error;
@@ -599,27 +584,32 @@ export function CreatePage() {
     },
     onSuccess() {
       toast.success(t('create.success.secretDeleted'));
-      setIsUrlMasked(true);
       resetForNewSecret();
     },
   });
 
-  let maskedUrl = createdShareUrlRef.current;
+  const [isCombinedUrlMasked, setIsCombinedUrlMasked] = useState(true);
+  const [isKeylessUrlMasked, setIsKeylessUrlMasked] = useState(true);
+  const [isKeyMasked, setIsKeyMasked] = useState(true);
+  const createdLinks = createdLinksRef.current;
   const createdId = createMutation.data?.id;
-  if (isUrlMasked && createdShareUrlRef.current && createdId) {
-    const url = new URL(createdShareUrlRef.current);
-    const key = url.hash.slice(1); // Remove the # symbol
-
-    if (key) {
-      maskedUrl = `${url.origin}/${'*'.repeat(createdId.length)}${url.search}#${'*'.repeat(key.length)}`;
-    } else {
-      maskedUrl = `${url.origin}/${'*'.repeat(createdId.length)}${url.search}`;
-    }
-  }
-  const maskedKey =
-    isKeyMasked && createdDecryptionKeyRef.current
-      ? '*'.repeat(createdDecryptionKeyRef.current.length)
-      : createdDecryptionKeyRef.current;
+  const maskUrl = (value: string) => {
+    if (!createdId) return value;
+    const url = new URL(value);
+    const key = url.hash.slice(1);
+    return `${url.origin}/${'*'.repeat(createdId.length)}${url.search}${key ? `#${'*'.repeat(key.length)}` : ''}`;
+  };
+  const displayedCombinedUrl =
+    isCombinedUrlMasked && createdLinks
+      ? maskUrl(createdLinks.combinedUrl)
+      : createdLinks?.combinedUrl;
+  const displayedKeylessUrl =
+    isKeylessUrlMasked && createdLinks
+      ? maskUrl(createdLinks.keylessUrl)
+      : createdLinks?.keylessUrl;
+  const displayedDecryptionKey = isKeyMasked
+    ? '*'.repeat(createdDecryptionKeyRef.current.length)
+    : createdDecryptionKeyRef.current;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -633,13 +623,26 @@ export function CreatePage() {
     try {
       const dataUrl = await svgToImage(svg);
       const link = document.createElement('a');
-      const hash = sha256(createMutation.data?.qrUrl ?? '');
+      const hash = sha256(createdLinksRef.current?.qrUrl ?? '');
       link.download = `crypt.fyi-qr-${hash.slice(0, 8)}.png`;
       link.href = dataUrl;
       link.click();
       toast.success(t('create.success.qrDownloaded'));
     } catch (error) {
       toast.error(t('create.success.qrDownloadFailed', { error: String(error) }));
+    }
+  };
+
+  const shareOrCopyUrl = async (url: string) => {
+    if ('share' in navigator) {
+      try {
+        await navigator.share({ url });
+      } catch {
+        // Dismissing the native share sheet needs no follow-up.
+      }
+    } else {
+      await clipboardCopy(url);
+      toast.info(t('create.success.urlCopied'));
     }
   };
 
@@ -1169,11 +1172,9 @@ export function CreatePage() {
                   <p className="text-muted-foreground text-sm mb-1">
                     {t('create.success.description.main')}
                   </p>
-                  {config.SEPARATE_DECRYPTION_KEY && (
-                    <p className="text-muted-foreground text-sm mb-1">
-                      {t('create.success.description.separateKey')}
-                    </p>
-                  )}
+                  <p className="text-muted-foreground text-sm mb-1">
+                    {t('create.success.description.separateKey')}
+                  </p>
                   <p className="text-muted-foreground text-sm">
                     {form.watch('p') && t('create.success.description.password')}
                   </p>
@@ -1181,31 +1182,26 @@ export function CreatePage() {
 
                 <div className="space-y-4 p-4 bg-muted rounded-lg">
                   <div className="space-y-2">
-                    <Label htmlFor="secret-url">{t('create.success.secretUrl')}</Label>
+                    <Label htmlFor="combined-url">{t('create.success.combinedUrl')}</Label>
                     <div className="flex items-center gap-2">
-                      <Input
-                        id="secret-url"
-                        type="text"
-                        value={isUrlMasked ? maskedUrl : createdShareUrlRef.current}
-                        readOnly
-                      />
+                      <Input id="combined-url" value={displayedCombinedUrl ?? ''} readOnly />
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => setIsUrlMasked(!isUrlMasked)}
+                        onClick={() => setIsCombinedUrlMasked(!isCombinedUrlMasked)}
                         title={
-                          isUrlMasked
+                          isCombinedUrlMasked
                             ? t('create.success.actions.showUrl')
                             : t('create.success.actions.hideUrl')
                         }
                         aria-label={
-                          isUrlMasked
+                          isCombinedUrlMasked
                             ? t('create.success.actions.showUrl')
                             : t('create.success.actions.hideUrl')
                         }
-                        aria-pressed={!isUrlMasked}
+                        aria-pressed={!isCombinedUrlMasked}
                       >
-                        {isUrlMasked ? <IconEyeOff /> : <IconEye />}
+                        {isCombinedUrlMasked ? <IconEyeOff /> : <IconEye />}
                       </Button>
                       <Button
                         variant="outline"
@@ -1220,22 +1216,7 @@ export function CreatePage() {
                             ? t('create.success.actions.shareUrl')
                             : t('create.success.actions.copyUrl')
                         }
-                        onClick={async () => {
-                          const url = createdShareUrlRef.current;
-                          if (!url) return;
-
-                          if ('share' in navigator) {
-                            try {
-                              await navigator.share({ url });
-                            } catch {
-                              // Cancellation and platform share errors contain
-                              // no actionable information for this UI.
-                            }
-                          } else {
-                            await clipboardCopy(url);
-                            toast.info(t('create.success.urlCopied'));
-                          }
-                        }}
+                        onClick={() => createdLinks && shareOrCopyUrl(createdLinks.combinedUrl)}
                       >
                         {'share' in navigator ? <IconShare /> : <IconCopy />}
                       </Button>
@@ -1252,12 +1233,53 @@ export function CreatePage() {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="keyless-url">{t('create.success.keylessUrl')}</Label>
+                    <div className="flex items-center gap-2">
+                      <Input id="keyless-url" value={displayedKeylessUrl ?? ''} readOnly />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setIsKeylessUrlMasked(!isKeylessUrlMasked)}
+                        title={
+                          isKeylessUrlMasked
+                            ? t('create.success.actions.showUrl')
+                            : t('create.success.actions.hideUrl')
+                        }
+                        aria-label={
+                          isKeylessUrlMasked
+                            ? t('create.success.actions.showUrl')
+                            : t('create.success.actions.hideUrl')
+                        }
+                        aria-pressed={!isKeylessUrlMasked}
+                      >
+                        {isKeylessUrlMasked ? <IconEyeOff /> : <IconEye />}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        title={
+                          'share' in navigator
+                            ? t('create.success.actions.shareUrl')
+                            : t('create.success.actions.copyUrl')
+                        }
+                        aria-label={
+                          'share' in navigator
+                            ? t('create.success.actions.shareUrl')
+                            : t('create.success.actions.copyUrl')
+                        }
+                        onClick={() => createdLinks && shareOrCopyUrl(createdLinks.keylessUrl)}
+                      >
+                        {'share' in navigator ? <IconShare /> : <IconCopy />}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="decryption-key">{t('create.success.decryptionKey')}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="decryption-key"
-                        type="text"
-                        value={maskedKey}
+                        value={displayedDecryptionKey}
                         readOnly
                         autoComplete="off"
                         spellCheck={false}
@@ -1288,7 +1310,6 @@ export function CreatePage() {
                         onClick={async () => {
                           const key = createdDecryptionKeyRef.current;
                           if (!key) return;
-
                           await clipboardCopy(key);
                           toast.info(t('create.success.keyCopied'));
                         }}
@@ -1300,12 +1321,7 @@ export function CreatePage() {
                 </div>
 
                 <div className="flex justify-end flex-wrap gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      resetForNewSecret();
-                    }}
-                  >
+                  <Button variant="outline" onClick={resetForNewSecret}>
                     {t('create.success.createAnother')}
                   </Button>
                   {createMutation.data && (
@@ -1423,10 +1439,10 @@ export function CreatePage() {
           </DialogHeader>
           <div className="flex flex-col items-center space-y-4">
             <div className="qr-code p-4">
-              {createMutation.data?.qrUrl && (
+              {createdLinks?.qrUrl && (
                 <QRCodeSVG
                   ref={qrCodeRef}
-                  value={createMutation.data.qrUrl}
+                  value={createdLinks.qrUrl}
                   title={t('create.success.qrCode.title')}
                   size={256}
                   marginSize={4}

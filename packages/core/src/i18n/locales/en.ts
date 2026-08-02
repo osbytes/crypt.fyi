@@ -147,11 +147,13 @@ export const en: TranslationKeys = {
     success: {
       title: 'Secret Created!',
       description: {
-        main: 'Your secret has been created. Share the URL below with the intended recipient.',
+        main: 'Your secret has been created. Choose a sharing option below.',
         password: 'Send the password through a separate channel.',
-        separateKey: 'Send the decryption key through a separate channel from the URL.',
+        separateKey:
+          'For separate delivery, send the key-free URL and decryption key through different channels.',
       },
-      secretUrl: 'Secret URL',
+      combinedUrl: 'Combined URL (includes key)',
+      keylessUrl: 'Key-free URL',
       decryptionKey: 'Decryption key',
       urlCopied: 'URL copied to clipboard',
       keyCopied: 'Decryption key copied to clipboard',
@@ -160,8 +162,7 @@ export const en: TranslationKeys = {
       qrDownloadFailed: 'Failed to download QR code: {{error}}',
       qrCode: {
         title: 'Secret URL QR Code',
-        description:
-          'This QR code contains only the secret URL. Send the decryption key separately.',
+        description: 'Download and share the secret URL QR Code',
       },
       actions: {
         showUrl: 'Show secret URL',
@@ -171,7 +172,7 @@ export const en: TranslationKeys = {
         shareUrl: 'Share secret URL',
         copyUrl: 'Copy secret URL',
         copyKey: 'Copy decryption key',
-        showQr: 'Show key-free QR code',
+        showQr: 'Show combined URL QR code',
       },
       createAnother: 'Create Another',
       deleteSecret: 'Delete Secret',
@@ -199,7 +200,6 @@ export const en: TranslationKeys = {
       fileSizeExceeded: 'File is too large. Maximum size is {{max}}.',
       fileReadError: 'Failed to read file',
       fileReadAborted: 'File reading was aborted',
-      createFailed: 'Failed to create the secret. Please try again.',
     },
   },
   view: {
@@ -240,8 +240,7 @@ export const en: TranslationKeys = {
     },
     legacyKey: {
       warning:
-        'This outdated link put its decryption key in the query string, where it may have reached server logs. It has now been removed from browser history.',
-      learnMore: 'Learn about the safer link format',
+        'This outdated link put its decryption key in the query string, where it may have reached server logs. It has now been removed from this browser history entry.',
     },
     content: {
       fileShared: 'A file has been shared with you',

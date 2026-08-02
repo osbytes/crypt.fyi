@@ -149,12 +149,13 @@ export const de: TranslationKeys = {
     success: {
       title: 'Geheimnis erstellt!',
       description: {
-        main: 'Ihr Geheimnis wurde erstellt. Teilen Sie die unten stehende URL mit dem gewünschten Empfänger.',
+        main: 'Ihr Geheimnis wurde erstellt. Wählen Sie unten eine Freigabeoption aus.',
         password: 'Senden Sie das Passwort über einen separaten Kanal.',
         separateKey:
-          'Senden Sie den Entschlüsselungsschlüssel über einen anderen Kanal als die URL.',
+          'Senden Sie für eine getrennte Übermittlung die URL ohne Schlüssel und den Entschlüsselungsschlüssel über verschiedene Kanäle.',
       },
-      secretUrl: 'Geheimnis-URL',
+      combinedUrl: 'Komplette URL (mit Schlüssel)',
+      keylessUrl: 'URL ohne Schlüssel',
       decryptionKey: 'Entschlüsselungsschlüssel',
       urlCopied: 'URL in die Zwischenablage kopiert',
       keyCopied: 'Entschlüsselungsschlüssel in die Zwischenablage kopiert',
@@ -163,8 +164,7 @@ export const de: TranslationKeys = {
       qrDownloadFailed: 'QR-Code konnte nicht heruntergeladen werden: {{error}}',
       qrCode: {
         title: 'Geheimnis-URL QR-Code',
-        description:
-          'Dieser QR-Code enthält nur die Geheimnis-URL. Senden Sie den Entschlüsselungsschlüssel separat.',
+        description: 'Laden Sie den QR-Code der Geheimnis-URL herunter und teilen Sie ihn',
       },
       actions: {
         showUrl: 'Geheimnis-URL anzeigen',
@@ -174,7 +174,7 @@ export const de: TranslationKeys = {
         shareUrl: 'Geheimnis-URL teilen',
         copyUrl: 'Geheimnis-URL kopieren',
         copyKey: 'Entschlüsselungsschlüssel kopieren',
-        showQr: 'QR-Code ohne Schlüssel anzeigen',
+        showQr: 'QR-Code der kompletten URL anzeigen',
       },
       createAnother: 'Weiteres erstellen',
       deleteSecret: 'Geheimnis löschen',
@@ -202,7 +202,6 @@ export const de: TranslationKeys = {
       fileSizeExceeded: 'Datei ist zu groß. Maximale Größe ist {{max}}.',
       fileReadError: 'Fehler beim Lesen der Datei',
       fileReadAborted: 'Dateilesen wurde abgebrochen',
-      createFailed: 'Das Geheimnis konnte nicht erstellt werden. Versuchen Sie es erneut.',
     },
   },
   view: {
@@ -245,8 +244,7 @@ export const de: TranslationKeys = {
     },
     legacyKey: {
       warning:
-        'Dieser veraltete Link enthielt den Entschlüsselungsschlüssel in der Abfragezeichenfolge, wodurch er in Serverprotokolle gelangt sein könnte. Er wurde jetzt aus dem Browserverlauf entfernt.',
-      learnMore: 'Mehr über das sicherere Linkformat erfahren',
+        'Dieser veraltete Link enthielt den Entschlüsselungsschlüssel in der Abfragezeichenfolge, wodurch er in Serverprotokolle gelangt sein könnte. Er wurde jetzt aus diesem Browserverlaufseintrag entfernt.',
     },
     content: {
       fileShared: 'Eine Datei wurde mit Ihnen geteilt',

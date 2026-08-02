@@ -141,7 +141,8 @@ export interface TranslationKeys {
         password: string;
         separateKey: string;
       };
-      secretUrl: string;
+      combinedUrl: string;
+      keylessUrl: string;
       decryptionKey: string;
       urlCopied: string;
       keyCopied: string;
@@ -187,7 +188,6 @@ export interface TranslationKeys {
       fileSizeExceeded: string;
       fileReadError: string;
       fileReadAborted: string;
-      createFailed: string;
     };
   };
   view: {
@@ -226,7 +226,6 @@ export interface TranslationKeys {
     };
     legacyKey: {
       warning: string;
-      learnMore: string;
     };
     content: {
       fileShared: string;

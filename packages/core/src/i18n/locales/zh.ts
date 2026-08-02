@@ -143,11 +143,12 @@ export const zh: TranslationKeys = {
     success: {
       title: '密文已创建！',
       description: {
-        main: '您的密文已创建。请将下方 URL 分享给预期接收者。',
+        main: '您的密文已创建。请从下方选择分享方式。',
         password: '请通过单独的渠道发送密码。',
-        separateKey: '请通过与 URL 不同的渠道发送解密密钥。',
+        separateKey: '若要分开发送，请通过不同渠道发送无密钥 URL 和解密密钥。',
       },
-      secretUrl: '密文 URL',
+      combinedUrl: '完整 URL（含密钥）',
+      keylessUrl: '无密钥 URL',
       decryptionKey: '解密密钥',
       urlCopied: 'URL 已复制到剪贴板',
       keyCopied: '解密密钥已复制到剪贴板',
@@ -156,7 +157,7 @@ export const zh: TranslationKeys = {
       qrDownloadFailed: '下载二维码失败：{{error}}',
       qrCode: {
         title: '密文 URL 二维码',
-        description: '此二维码仅包含密文 URL。请单独发送解密密钥。',
+        description: '下载并分享密文 URL 二维码',
       },
       actions: {
         showUrl: '显示密文 URL',
@@ -166,7 +167,7 @@ export const zh: TranslationKeys = {
         shareUrl: '分享密文 URL',
         copyUrl: '复制密文 URL',
         copyKey: '复制解密密钥',
-        showQr: '显示不含密钥的二维码',
+        showQr: '显示完整 URL 二维码',
       },
       createAnother: '创建另一个',
       deleteSecret: '删除密文',
@@ -193,7 +194,6 @@ export const zh: TranslationKeys = {
       fileSizeExceeded: '文件过大。最大大小为 {{max}}。',
       fileReadError: '读取文件失败',
       fileReadAborted: '文件读取已中止',
-      createFailed: '创建密文失败，请重试。',
     },
   },
   view: {
@@ -232,8 +232,7 @@ export const zh: TranslationKeys = {
     },
     legacyKey: {
       warning:
-        '此旧版链接将解密密钥放在查询字符串中，密钥可能已进入服务器日志。现已从浏览器历史记录中移除。',
-      learnMore: '了解更安全的链接格式',
+        '此旧版链接将解密密钥放在查询字符串中，密钥可能已进入服务器日志。现已从当前浏览器历史记录条目中移除。',
     },
     content: {
       fileShared: '有人与您分享了一个文件',

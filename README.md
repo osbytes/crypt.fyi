@@ -62,9 +62,8 @@
 1. Password is optionally provided
 1. Encryption key and password are used to encrypt the secret
 1. Encryption key and password are **hashed** and stored along with the encrypted secret for verification on retrieval - the raw key and password are **never** stored or transmitted on/to the server
-1. A unique secret URL and decryption key are generated on the client
-1. Depending on deployment configuration, the key is either placed in the URL fragment for compatibility or shown separately for out-of-band sharing
-1. QR codes always contain only the key-free URL; share the decryption key, password, or both separately as needed
+1. The unique URL containing the decryption key is generated on the client
+1. Share the URL with your recipient and separately the password if specified
 1. When accessed, only when the decryption key and password match via server-side verification of the hashes, the encrypted secret is shared and decrypted in the recipient's browser
 1. Optionally, the secret is automatically destroyed after being read in an atomic read & delete operation guaranteeing only one person can access the secret
 1. If retrieval doesn't happen within the TTL, the secret is automatically destroyed
@@ -84,27 +83,7 @@ API_URL=https://{your-domain-here} docker compose up --build
 ```
 
 > [!IMPORTANT]
-> `--build` is required if `API_URL` or `SEPARATE_DECRYPTION_KEY` is changed because both values are compiled into the web client.
-
-Set `SEPARATE_DECRYPTION_KEY=true` to keep newly generated decryption keys out of
-share URLs:
-
-```bash
-API_URL=https://{your-domain-here} SEPARATE_DECRYPTION_KEY=true docker compose up --build
-```
-
-The default is `false` so existing deployments retain combined fragment links.
-In separated mode, recipients enter the key manually and should receive it
-through a different channel from the URL. QR codes omit the key in both modes
-because downloaded or screenshotted QR images commonly outlive the secret.
-Direct web builds can enable the same behavior with
-`VITE_SEPARATE_DECRYPTION_KEY=true`; only the exact value `true` enables it.
-
-Current `#key` links remain supported. Deprecated `?key=...` links are accepted
-only as a read-side compatibility fallback: the bootstrap removes the key from
-browser history before router initialization and the UI shows a warning. The
-initial HTTP request may already have exposed a query-string key to servers or
-intermediaries, so clients must never generate that format.
+> `--build` is required if `API_URL` is changed to ensure nginx and the web client are rebuilt with the correct configuration.
 
 ### Railway
 

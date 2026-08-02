@@ -2,4 +2,4 @@
 '@crypt.fyi/web': minor
 ---
 
-Add configurable out-of-band decryption keys, accessible manual key entry, and key-free QR codes while retaining legacy link compatibility.
+Show combined and key-free share URLs with the decryption key, and prompt recipients when a URL has no fragment key.

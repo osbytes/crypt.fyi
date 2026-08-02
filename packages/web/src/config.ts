@@ -1,6 +1,5 @@
 export const config = Object.freeze({
   API_URL: import.meta.env.VITE_API_URL ?? 'http://localhost:4321',
-  SEPARATE_DECRYPTION_KEY: import.meta.env.VITE_SEPARATE_DECRYPTION_KEY === 'true',
   IS_DEV: import.meta.env.DEV,
   IS_PROD: import.meta.env.PROD,
   CRYPT_FYI_GITHUB_URL: 'https://github.com/osbytes/crypt.fyi',

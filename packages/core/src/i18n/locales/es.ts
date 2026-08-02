@@ -149,11 +149,13 @@ export const es: TranslationKeys = {
     success: {
       title: '¡Secreto Creado!',
       description: {
-        main: 'Tu secreto ha sido creado. Comparte la URL de abajo con el destinatario previsto.',
+        main: 'Tu secreto ha sido creado. Elige una opción para compartirlo.',
         password: 'Envía la contraseña por un canal separado.',
-        separateKey: 'Envía la clave de descifrado por un canal diferente al de la URL.',
+        separateKey:
+          'Para enviarlos por separado, comparte la URL sin clave y la clave de descifrado por canales diferentes.',
       },
-      secretUrl: 'URL del secreto',
+      combinedUrl: 'URL completa (incluye la clave)',
+      keylessUrl: 'URL sin clave',
       decryptionKey: 'Clave de descifrado',
       urlCopied: 'URL copiada al portapapeles',
       keyCopied: 'Clave de descifrado copiada al portapapeles',
@@ -162,8 +164,7 @@ export const es: TranslationKeys = {
       qrDownloadFailed: 'Error al descargar el código QR: {{error}}',
       qrCode: {
         title: 'Código QR de la URL del Secreto',
-        description:
-          'Este código QR contiene solo la URL del secreto. Envía la clave de descifrado por separado.',
+        description: 'Descarga y comparte el código QR de la URL del secreto',
       },
       actions: {
         showUrl: 'Mostrar la URL del secreto',
@@ -173,7 +174,7 @@ export const es: TranslationKeys = {
         shareUrl: 'Compartir la URL del secreto',
         copyUrl: 'Copiar la URL del secreto',
         copyKey: 'Copiar la clave de descifrado',
-        showQr: 'Mostrar el código QR sin clave',
+        showQr: 'Mostrar el código QR de la URL completa',
       },
       createAnother: 'Crear Otro',
       deleteSecret: 'Eliminar Secreto',
@@ -201,7 +202,6 @@ export const es: TranslationKeys = {
       fileSizeExceeded: 'El archivo es demasiado grande. El tamaño máximo es {{max}}.',
       fileReadError: 'Error al leer el archivo',
       fileReadAborted: 'La lectura del archivo fue interrumpida',
-      createFailed: 'No se pudo crear el secreto. Inténtalo de nuevo.',
     },
   },
   view: {
@@ -243,8 +243,7 @@ export const es: TranslationKeys = {
     },
     legacyKey: {
       warning:
-        'Este enlace antiguo incluyó la clave de descifrado en la cadena de consulta, donde pudo llegar a los registros del servidor. Ya se ha eliminado del historial del navegador.',
-      learnMore: 'Más información sobre el formato de enlace más seguro',
+        'Este enlace antiguo incluyó la clave de descifrado en la cadena de consulta, donde pudo llegar a los registros del servidor. Ya se ha eliminado de esta entrada del historial del navegador.',
     },
     content: {
       fileShared: 'Se ha compartido un archivo contigo',
