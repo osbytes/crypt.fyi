@@ -66,3 +66,13 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Install Playwright Chromium
+        run: pnpm --filter @crypt.fyi/web exec playwright install chromium --with-deps
+
+      - name: E2E smoke (create + read)
+        run: pnpm test:e2e
+        env:
+          CI: true
+          VITE_API_URL: http://localhost:4321
+          REDIS_URL: redis://127.0.0.1:6379
