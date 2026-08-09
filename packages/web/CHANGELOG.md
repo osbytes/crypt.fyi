@@ -1,5 +1,14 @@
 # @crypt.fyi/web
 
+## 0.0.19
+
+### Patch Changes
+
+- [#142](https://github.com/osbytes/crypt.fyi/pull/142) [`14a33f1`](https://github.com/osbytes/crypt.fyi/commit/14a33f14d9b447a295303ac3817b6c7b65f08e65) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Add Playwright create/read CSP smoke coverage, include the missing sonner `style-src` hash in nginx CSP, and apply pnpm audit overrides for transitive CVEs. Core unit tests use fast KDF params so CI stays quick.
+
+- Updated dependencies []:
+  - @crypt.fyi/core@0.0.19
+
 ## 0.0.18
 
 ### Patch Changes
