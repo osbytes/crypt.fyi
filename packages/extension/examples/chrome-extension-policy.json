@@ -1,0 +1,32 @@
+{
+  "apiUrl": {
+    "Value": "https://api.example.com"
+  },
+  "webUrl": {
+    "Value": "https://secrets.example.com"
+  },
+  "ttl": {
+    "Value": 3600000
+  },
+  "burn": {
+    "Value": true
+  },
+  "ips": {
+    "Value": "203.0.113.0/24"
+  },
+  "fc": {
+    "Value": 3
+  },
+  "webhookUrl": {
+    "Value": "https://hooks.example.com/crypt"
+  },
+  "webhookName": {
+    "Value": "corp-vault"
+  },
+  "webhookOnRead": {
+    "Value": true
+  },
+  "webhookOnBurn": {
+    "Value": true
+  }
+}
