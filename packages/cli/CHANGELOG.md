@@ -1,5 +1,12 @@
 # @crypt.fyi/cli
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @crypt.fyi/core@0.0.19
+
 ## 0.0.18
 
 ### Patch Changes

@@ -2,7 +2,7 @@
   "name": "@crypt.fyi/web",
   "private": true,
   "license": "Apache-2.0",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "type": "module",
   "scripts": {
     "dev": "vite",
