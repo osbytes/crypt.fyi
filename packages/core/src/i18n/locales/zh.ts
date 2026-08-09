@@ -17,7 +17,7 @@ export const zh: TranslationKeys = {
     confirm: '确认',
     requestNewLanguage: '请求新语言或修正翻译',
     footer: {
-      tagline: '以安全和隐私为核心构建',
+      tagline: '以安全和隐私为设计理念，因为无知也是一种幸福',
     },
     time: {
       minute_one: '{{count}} 分钟',
@@ -165,6 +165,7 @@ export const zh: TranslationKeys = {
         showKey: '显示解密密钥',
         hideKey: '隐藏解密密钥',
         shareUrl: '分享密文 URL',
+        shareKey: '分享解密密钥',
         copyUrl: '复制密文 URL',
         copyKey: '复制解密密钥',
         showQr: '显示完整 URL 二维码',
@@ -212,11 +213,20 @@ export const zh: TranslationKeys = {
       description: '密文可能仍然存在。请检查您的网络连接后重试。',
       tryAgain: '重试',
     },
+    rateLimit: {
+      title: '请求过多',
+      description: '您的请求过于频繁。请稍等片刻后重试。',
+      tryAgain: '重试',
+    },
     password: {
       title: '输入密码',
+      label: '密码',
       placeholder: '输入密码',
       description: '此密文受密码保护 - 请向发送者索要密码',
       error: '解密密钥或密码错误',
+      required: '请输入密码。',
+      show: '显示密码',
+      hide: '隐藏密码',
     },
     key: {
       title: '输入解密密钥',
@@ -230,9 +240,14 @@ export const zh: TranslationKeys = {
       change: '输入其他密钥',
       submit: '解锁密文',
     },
+    credentials: {
+      title: '解锁密文',
+      description: '请输入发送者提供的解密密钥和密码。两者仅在此浏览器中使用。',
+      submit: '解锁密文',
+    },
     legacyKey: {
       warning:
-        '此旧版链接将解密密钥放在查询字符串中，密钥可能已进入服务器日志。现已从当前浏览器历史记录条目中移除。',
+        '此链接由过时的客户端创建，该客户端将解密密钥放在查询字符串中。请让发送者升级客户端，以便后续链接将密钥排除在服务器日志之外。',
     },
     content: {
       fileShared: '有人与您分享了一个文件',

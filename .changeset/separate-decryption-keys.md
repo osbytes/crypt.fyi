@@ -2,4 +2,4 @@
 '@crypt.fyi/web': minor
 ---
 
-Show combined and key-free share URLs with the decryption key, and prompt recipients when a URL has no fragment key.
+Support separate decryption-key delivery: always show combined URL, key-free URL, and decryption key after create; prompt for key and/or password on read when needed; migrate legacy `?key=` links into the URL fragment and warn that the sender should upgrade.

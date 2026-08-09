@@ -17,7 +17,8 @@ export const fr: TranslationKeys = {
     confirm: 'Confirmer',
     requestNewLanguage: 'Demander nouvelle langue ou corriger traductions',
     footer: {
-      tagline: 'Conçu avec la sécurité et la confidentialité au cœur',
+      tagline:
+        "Construit avec la sécurité et la confidentialité à l'esprit, parce que l'ignorance peut être une bénédiction",
     },
     time: {
       minute_one: '{{count}} minute',
@@ -172,6 +173,7 @@ export const fr: TranslationKeys = {
         showKey: 'Afficher la clé de déchiffrement',
         hideKey: 'Masquer la clé de déchiffrement',
         shareUrl: "Partager l'URL du secret",
+        shareKey: 'Partager la clé de déchiffrement',
         copyUrl: "Copier l'URL du secret",
         copyKey: 'Copier la clé de déchiffrement',
         showQr: "Afficher le code QR de l'URL complète",
@@ -222,11 +224,20 @@ export const fr: TranslationKeys = {
       description: 'Le secret existe peut-être encore. Vérifiez votre connexion et réessayez.',
       tryAgain: 'Réessayer',
     },
+    rateLimit: {
+      title: 'Trop de requêtes',
+      description: 'Vous avez effectué trop de requêtes. Attendez un moment et réessayez.',
+      tryAgain: 'Réessayer',
+    },
     password: {
       title: 'Saisir le Mot de Passe',
+      label: 'Mot de passe',
       placeholder: 'Saisissez le mot de passe',
       description: "Ce secret est protégé par un mot de passe - demandez-le à l'expéditeur",
       error: 'Clé de déchiffrement ou mot de passe incorrect',
+      required: 'Saisissez un mot de passe.',
+      show: 'Afficher le mot de passe',
+      hide: 'Masquer le mot de passe',
     },
     key: {
       title: 'Saisir la clé de déchiffrement',
@@ -242,9 +253,15 @@ export const fr: TranslationKeys = {
       change: 'Saisir une autre clé',
       submit: 'Déverrouiller le secret',
     },
+    credentials: {
+      title: 'Déverrouiller le secret',
+      description:
+        "Saisissez la clé de déchiffrement et le mot de passe fournis par l'expéditeur. Les deux sont utilisés uniquement dans ce navigateur.",
+      submit: 'Déverrouiller le secret',
+    },
     legacyKey: {
       warning:
-        "Ce lien obsolète plaçait la clé de déchiffrement dans la chaîne de requête, où elle a pu atteindre les journaux du serveur. Elle a maintenant été supprimée de cette entrée de l'historique du navigateur.",
+        "Ce lien a été créé avec un client obsolète qui place la clé de déchiffrement dans la chaîne de requête. Demandez à l'expéditeur de mettre à jour son client pour que les futurs liens gardent la clé hors des journaux du serveur.",
     },
     content: {
       fileShared: 'Un fichier a été partagé avec vous',

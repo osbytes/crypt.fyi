@@ -159,6 +159,7 @@ export interface TranslationKeys {
         showKey: string;
         hideKey: string;
         shareUrl: string;
+        shareKey: string;
         copyUrl: string;
         copyKey: string;
         showQr: string;
@@ -206,11 +207,20 @@ export interface TranslationKeys {
       description: string;
       tryAgain: string;
     };
+    rateLimit: {
+      title: string;
+      description: string;
+      tryAgain: string;
+    };
     password: {
       title: string;
+      label: string;
       placeholder: string;
       description: string;
       error: string;
+      required: string;
+      show: string;
+      hide: string;
     };
     key: {
       title: string;
@@ -222,6 +232,11 @@ export interface TranslationKeys {
       show: string;
       hide: string;
       change: string;
+      submit: string;
+    };
+    credentials: {
+      title: string;
+      description: string;
       submit: string;
     };
     legacyKey: {

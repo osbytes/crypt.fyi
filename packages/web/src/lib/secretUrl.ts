@@ -32,16 +32,23 @@ export function buildSecretLinks({
   };
 }
 
-/** Read a current fragment key. Missing keys are supplied through the prompt. */
-export function resolveDecryptionKey(fragment: string): string {
-  return fragment.replace(/^#/, '').trim();
-}
-
-/** Remove every legacy query-string key without reading its value. */
-export function removeLegacyQueryKey(url: URL): boolean {
+/**
+ * Legacy clients put the decryption key in `?key=`, which can reach server logs.
+ * Move it into the fragment (when the fragment is empty) and strip every query
+ * occurrence so the link remains usable without keeping the unsafe form around.
+ */
+export function migrateLegacyQueryKey(url: URL): boolean {
   const hadLegacyKey = url.searchParams.has('key');
-  if (hadLegacyKey) {
-    url.searchParams.delete('key');
+  if (!hadLegacyKey) {
+    return false;
   }
-  return hadLegacyKey;
+
+  const legacyKey = url.searchParams.get('key')?.trim() ?? '';
+  url.searchParams.delete('key');
+
+  if (legacyKey && !url.hash.slice(1).trim()) {
+    url.hash = legacyKey;
+  }
+
+  return true;
 }

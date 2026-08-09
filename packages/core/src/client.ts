@@ -272,8 +272,11 @@ export class ErrorNotFound extends Error {
 }
 
 export class ErrorUnexpectedStatus extends Error {
+  readonly status: number;
+
   constructor(status: number) {
     super(`unexpected status code ${status}`);
+    this.status = status;
   }
 }
 

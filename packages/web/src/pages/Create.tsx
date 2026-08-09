@@ -633,18 +633,38 @@ export function CreatePage() {
     }
   };
 
-  const shareOrCopyUrl = async (url: string) => {
-    if ('share' in navigator) {
-      try {
-        await navigator.share({ url });
-      } catch {
-        // Dismissing the native share sheet needs no follow-up.
-      }
-    } else {
-      await clipboardCopy(url);
-      toast.info(t('create.success.urlCopied'));
+  const copyUrl = async (url: string) => {
+    await clipboardCopy(url);
+    toast.info(t('create.success.urlCopied'));
+  };
+
+  const copyKey = async () => {
+    const key = createdDecryptionKeyRef.current;
+    if (!key) return;
+    await clipboardCopy(key);
+    toast.info(t('create.success.keyCopied'));
+  };
+
+  const shareUrl = async (url: string) => {
+    if (!('share' in navigator)) return;
+    try {
+      await navigator.share({ url });
+    } catch {
+      // Dismissing the native share sheet needs no follow-up.
     }
   };
+
+  const shareKey = async () => {
+    const key = createdDecryptionKeyRef.current;
+    if (!key || !('share' in navigator)) return;
+    try {
+      await navigator.share({ text: key });
+    } catch {
+      // Dismissing the native share sheet needs no follow-up.
+    }
+  };
+
+  const canShare = 'share' in navigator;
 
   const [dragState, setDragState] = useState<DragState>('none');
 
@@ -1180,8 +1200,8 @@ export function CreatePage() {
                   </p>
                 </div>
 
-                <div className="space-y-4 p-4 bg-muted rounded-lg">
-                  <div className="space-y-2">
+                <div className="space-y-4">
+                  <div className="space-y-2 p-4 bg-muted rounded-lg">
                     <Label htmlFor="combined-url">{t('create.success.combinedUrl')}</Label>
                     <div className="flex items-center gap-2">
                       <Input id="combined-url" value={displayedCombinedUrl ?? ''} readOnly />
@@ -1206,20 +1226,23 @@ export function CreatePage() {
                       <Button
                         variant="outline"
                         size="icon"
-                        title={
-                          'share' in navigator
-                            ? t('create.success.actions.shareUrl')
-                            : t('create.success.actions.copyUrl')
-                        }
-                        aria-label={
-                          'share' in navigator
-                            ? t('create.success.actions.shareUrl')
-                            : t('create.success.actions.copyUrl')
-                        }
-                        onClick={() => createdLinks && shareOrCopyUrl(createdLinks.combinedUrl)}
+                        title={t('create.success.actions.copyUrl')}
+                        aria-label={t('create.success.actions.copyUrl')}
+                        onClick={() => createdLinks && copyUrl(createdLinks.combinedUrl)}
                       >
-                        {'share' in navigator ? <IconShare /> : <IconCopy />}
+                        <IconCopy />
                       </Button>
+                      {canShare && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          title={t('create.success.actions.shareUrl')}
+                          aria-label={t('create.success.actions.shareUrl')}
+                          onClick={() => createdLinks && shareUrl(createdLinks.combinedUrl)}
+                        >
+                          <IconShare />
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="icon"
@@ -1232,90 +1255,101 @@ export function CreatePage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="keyless-url">{t('create.success.keylessUrl')}</Label>
-                    <div className="flex items-center gap-2">
-                      <Input id="keyless-url" value={displayedKeylessUrl ?? ''} readOnly />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setIsKeylessUrlMasked(!isKeylessUrlMasked)}
-                        title={
-                          isKeylessUrlMasked
-                            ? t('create.success.actions.showUrl')
-                            : t('create.success.actions.hideUrl')
-                        }
-                        aria-label={
-                          isKeylessUrlMasked
-                            ? t('create.success.actions.showUrl')
-                            : t('create.success.actions.hideUrl')
-                        }
-                        aria-pressed={!isKeylessUrlMasked}
-                      >
-                        {isKeylessUrlMasked ? <IconEyeOff /> : <IconEye />}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        title={
-                          'share' in navigator
-                            ? t('create.success.actions.shareUrl')
-                            : t('create.success.actions.copyUrl')
-                        }
-                        aria-label={
-                          'share' in navigator
-                            ? t('create.success.actions.shareUrl')
-                            : t('create.success.actions.copyUrl')
-                        }
-                        onClick={() => createdLinks && shareOrCopyUrl(createdLinks.keylessUrl)}
-                      >
-                        {'share' in navigator ? <IconShare /> : <IconCopy />}
-                      </Button>
+                  <div className="space-y-4 p-4 bg-muted rounded-lg">
+                    <div className="space-y-2">
+                      <Label htmlFor="keyless-url">{t('create.success.keylessUrl')}</Label>
+                      <div className="flex items-center gap-2">
+                        <Input id="keyless-url" value={displayedKeylessUrl ?? ''} readOnly />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setIsKeylessUrlMasked(!isKeylessUrlMasked)}
+                          title={
+                            isKeylessUrlMasked
+                              ? t('create.success.actions.showUrl')
+                              : t('create.success.actions.hideUrl')
+                          }
+                          aria-label={
+                            isKeylessUrlMasked
+                              ? t('create.success.actions.showUrl')
+                              : t('create.success.actions.hideUrl')
+                          }
+                          aria-pressed={!isKeylessUrlMasked}
+                        >
+                          {isKeylessUrlMasked ? <IconEyeOff /> : <IconEye />}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          title={t('create.success.actions.copyUrl')}
+                          aria-label={t('create.success.actions.copyUrl')}
+                          onClick={() => createdLinks && copyUrl(createdLinks.keylessUrl)}
+                        >
+                          <IconCopy />
+                        </Button>
+                        {canShare && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            title={t('create.success.actions.shareUrl')}
+                            aria-label={t('create.success.actions.shareUrl')}
+                            onClick={() => createdLinks && shareUrl(createdLinks.keylessUrl)}
+                          >
+                            <IconShare />
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="decryption-key">{t('create.success.decryptionKey')}</Label>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        id="decryption-key"
-                        value={displayedDecryptionKey}
-                        readOnly
-                        autoComplete="off"
-                        spellCheck={false}
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setIsKeyMasked(!isKeyMasked)}
-                        title={
-                          isKeyMasked
-                            ? t('create.success.actions.showKey')
-                            : t('create.success.actions.hideKey')
-                        }
-                        aria-label={
-                          isKeyMasked
-                            ? t('create.success.actions.showKey')
-                            : t('create.success.actions.hideKey')
-                        }
-                        aria-pressed={!isKeyMasked}
-                      >
-                        {isKeyMasked ? <IconEyeOff /> : <IconEye />}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        title={t('create.success.actions.copyKey')}
-                        aria-label={t('create.success.actions.copyKey')}
-                        onClick={async () => {
-                          const key = createdDecryptionKeyRef.current;
-                          if (!key) return;
-                          await clipboardCopy(key);
-                          toast.info(t('create.success.keyCopied'));
-                        }}
-                      >
-                        <IconCopy />
-                      </Button>
+                    <div className="space-y-2">
+                      <Label htmlFor="decryption-key">{t('create.success.decryptionKey')}</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          id="decryption-key"
+                          value={displayedDecryptionKey}
+                          readOnly
+                          autoComplete="off"
+                          spellCheck={false}
+                        />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setIsKeyMasked(!isKeyMasked)}
+                          title={
+                            isKeyMasked
+                              ? t('create.success.actions.showKey')
+                              : t('create.success.actions.hideKey')
+                          }
+                          aria-label={
+                            isKeyMasked
+                              ? t('create.success.actions.showKey')
+                              : t('create.success.actions.hideKey')
+                          }
+                          aria-pressed={!isKeyMasked}
+                        >
+                          {isKeyMasked ? <IconEyeOff /> : <IconEye />}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          title={t('create.success.actions.copyKey')}
+                          aria-label={t('create.success.actions.copyKey')}
+                          onClick={copyKey}
+                        >
+                          <IconCopy />
+                        </Button>
+                        {canShare && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            title={t('create.success.actions.shareKey')}
+                            aria-label={t('create.success.actions.shareKey')}
+                            onClick={shareKey}
+                          >
+                            <IconShare />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

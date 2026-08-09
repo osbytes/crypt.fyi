@@ -17,7 +17,7 @@ export const en: TranslationKeys = {
     confirm: 'Confirm',
     requestNewLanguage: 'Request new or fix translations',
     footer: {
-      tagline: 'Built with security and privacy at its core',
+      tagline: 'Built with security and privacy in mind, because ignorance can be bliss',
     },
     time: {
       minute_one: '{{count}} minute',
@@ -170,6 +170,7 @@ export const en: TranslationKeys = {
         showKey: 'Show decryption key',
         hideKey: 'Hide decryption key',
         shareUrl: 'Share secret URL',
+        shareKey: 'Share decryption key',
         copyUrl: 'Copy secret URL',
         copyKey: 'Copy decryption key',
         showQr: 'Show combined URL QR code',
@@ -219,11 +220,20 @@ export const en: TranslationKeys = {
       description: 'The secret may still exist. Check your connection and try again.',
       tryAgain: 'Try Again',
     },
+    rateLimit: {
+      title: 'Too many requests',
+      description: 'You have made too many requests. Wait a moment and try again.',
+      tryAgain: 'Try Again',
+    },
     password: {
       title: 'Enter Password',
+      label: 'Password',
       placeholder: 'Enter the password',
       description: 'This secret is protected with a password - request from the sender',
       error: 'Incorrect decryption key or password',
+      required: 'Enter a password.',
+      show: 'Show password',
+      hide: 'Hide password',
     },
     key: {
       title: 'Enter Decryption Key',
@@ -238,9 +248,15 @@ export const en: TranslationKeys = {
       change: 'Enter a different key',
       submit: 'Unlock secret',
     },
+    credentials: {
+      title: 'Unlock Secret',
+      description:
+        'Enter the decryption key and password provided by the sender. Both are used only in this browser.',
+      submit: 'Unlock secret',
+    },
     legacyKey: {
       warning:
-        'This outdated link put its decryption key in the query string, where it may have reached server logs. It has now been removed from this browser history entry.',
+        'This link was created with an outdated client that puts the decryption key in the query string. Ask the sender to upgrade so future links keep the key out of server logs.',
     },
     content: {
       fileShared: 'A file has been shared with you',

@@ -26,10 +26,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppProps {
-  legacyQueryKeyRemoved?: boolean;
+  legacyQueryKeyMigrated?: boolean;
 }
 
-export default function App({ legacyQueryKeyRemoved = false }: AppProps) {
+export default function App({ legacyQueryKeyMigrated = false }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
@@ -50,7 +50,7 @@ export default function App({ legacyQueryKeyRemoved = false }: AppProps) {
               },
             }}
           />
-          {legacyQueryKeyRemoved && <LegacyQueryKeyWarning />}
+          {legacyQueryKeyMigrated && <LegacyQueryKeyWarning />}
         </ClientProvider>
       </ThemeProvider>
     </QueryClientProvider>
@@ -62,7 +62,7 @@ function LegacyQueryKeyWarning() {
 
   useEffect(() => {
     toast.warning(t('view.legacyKey.warning'), {
-      id: 'unsafe-query-key-removed',
+      id: 'legacy-query-key-migrated',
       closeButton: true,
       duration: Infinity,
     });

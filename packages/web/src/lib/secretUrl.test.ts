@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildSecretLinks, removeLegacyQueryKey, resolveDecryptionKey } from './secretUrl';
+import { buildSecretLinks, migrateLegacyQueryKey } from './secretUrl';
 
 describe('buildSecretLinks', () => {
   it('returns both URL forms and keeps the combined QR behavior', () => {
@@ -30,32 +30,41 @@ describe('buildSecretLinks', () => {
   });
 });
 
-describe('resolveDecryptionKey', () => {
-  it('reads and trims a fragment key', () => {
-    expect(resolveDecryptionKey('# fragment-key ')).toBe('fragment-key');
+describe('migrateLegacyQueryKey', () => {
+  it('moves a legacy query key into the fragment and strips the query param', () => {
+    const url = new URL(
+      'https://crypt.example/vault-id?keep=first&key=legacy-key&keep=second',
+    );
+
+    expect(migrateLegacyQueryKey(url)).toBe(true);
+    expect(url.toString()).toBe(
+      'https://crypt.example/vault-id?keep=first&keep=second#legacy-key',
+    );
   });
 
-  it('reports a missing fragment without manufacturing a key', () => {
-    expect(resolveDecryptionKey('')).toBe('');
-  });
-});
+  it('preserves an existing fragment and still strips the query key', () => {
+    const url = new URL(
+      'https://crypt.example/vault-id?key=legacy-key#fragment-key',
+    );
 
-describe('removeLegacyQueryKey', () => {
+    expect(migrateLegacyQueryKey(url)).toBe(true);
+    expect(url.toString()).toBe('https://crypt.example/vault-id#fragment-key');
+  });
+
   it('removes every key parameter while preserving the rest of the URL', () => {
     const url = new URL(
-      'https://crypt.example/vault-id?keep=first&key=unsafe-one&key=unsafe-two&keep=second#fragment-key',
+      'https://crypt.example/vault-id?keep=first&key=unsafe-one&key=unsafe-two&keep=second',
     );
 
-    expect(removeLegacyQueryKey(url)).toBe(true);
-    expect(url.toString()).toBe(
-      'https://crypt.example/vault-id?keep=first&keep=second#fragment-key',
-    );
+    expect(migrateLegacyQueryKey(url)).toBe(true);
+    expect(url.searchParams.has('key')).toBe(false);
+    expect(url.hash).toBe('#unsafe-one');
   });
 
   it('is idempotent when no legacy key is present', () => {
     const url = new URL('https://crypt.example/vault-id?keep=true#fragment-key');
 
-    expect(removeLegacyQueryKey(url)).toBe(false);
+    expect(migrateLegacyQueryKey(url)).toBe(false);
     expect(url.toString()).toBe('https://crypt.example/vault-id?keep=true#fragment-key');
   });
 });

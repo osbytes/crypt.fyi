@@ -17,7 +17,8 @@ export const es: TranslationKeys = {
     confirm: 'Confirmar',
     requestNewLanguage: 'Solicitar nuevo o corregir traducciones',
     footer: {
-      tagline: 'Construido con la seguridad y la privacidad en su núcleo',
+      tagline:
+        'Construido con seguridad y privacidad en mente, porque la ignorancia puede ser una bendición',
     },
     time: {
       minute_one: '{{count}} minuto',
@@ -172,6 +173,7 @@ export const es: TranslationKeys = {
         showKey: 'Mostrar la clave de descifrado',
         hideKey: 'Ocultar la clave de descifrado',
         shareUrl: 'Compartir la URL del secreto',
+        shareKey: 'Compartir la clave de descifrado',
         copyUrl: 'Copiar la URL del secreto',
         copyKey: 'Copiar la clave de descifrado',
         showQr: 'Mostrar el código QR de la URL completa',
@@ -221,11 +223,20 @@ export const es: TranslationKeys = {
       description: 'El secreto puede seguir existiendo. Revisa tu conexión e inténtalo de nuevo.',
       tryAgain: 'Intentar de nuevo',
     },
+    rateLimit: {
+      title: 'Demasiadas solicitudes',
+      description: 'Has realizado demasiadas solicitudes. Espera un momento e inténtalo de nuevo.',
+      tryAgain: 'Intentar de nuevo',
+    },
     password: {
       title: 'Ingresar Contraseña',
+      label: 'Contraseña',
       placeholder: 'Ingresa la contraseña',
       description: 'Este secreto está protegido con una contraseña - solicítala al remitente',
       error: 'La clave de descifrado o la contraseña es incorrecta',
+      required: 'Ingresa una contraseña.',
+      show: 'Mostrar la contraseña',
+      hide: 'Ocultar la contraseña',
     },
     key: {
       title: 'Ingresa la clave de descifrado',
@@ -241,9 +252,15 @@ export const es: TranslationKeys = {
       change: 'Ingresar otra clave',
       submit: 'Desbloquear secreto',
     },
+    credentials: {
+      title: 'Desbloquear secreto',
+      description:
+        'Ingresa la clave de descifrado y la contraseña proporcionadas por el remitente. Ambas se usan solo en este navegador.',
+      submit: 'Desbloquear secreto',
+    },
     legacyKey: {
       warning:
-        'Este enlace antiguo incluyó la clave de descifrado en la cadena de consulta, donde pudo llegar a los registros del servidor. Ya se ha eliminado de esta entrada del historial del navegador.',
+        'Este enlace se creó con un cliente desactualizado que pone la clave de descifrado en la cadena de consulta. Pide al remitente que actualice para que los enlaces futuros mantengan la clave fuera de los registros del servidor.',
     },
     content: {
       fileShared: 'Se ha compartido un archivo contigo',
