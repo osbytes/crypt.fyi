@@ -2,7 +2,7 @@
   "name": "@crypt.fyi/server",
   "private": true,
   "license": "Apache-2.0",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
