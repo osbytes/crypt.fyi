@@ -17,7 +17,8 @@ export const fr: TranslationKeys = {
     confirm: 'Confirmer',
     requestNewLanguage: 'Demander nouvelle langue ou corriger traductions',
     footer: {
-      tagline: 'Conçu avec la sécurité et la confidentialité au cœur',
+      tagline:
+        "Construit avec la sécurité et la confidentialité à l'esprit, parce que l'ignorance peut être une bénédiction",
     },
     time: {
       minute_one: '{{count}} minute',
@@ -149,16 +150,33 @@ export const fr: TranslationKeys = {
     success: {
       title: 'Secret Créé !',
       description: {
-        main: "Votre secret a été créé et l'URL a été copiée dans le presse-papiers",
-        password: "Partagez l'URL et le mot de passe avec le destinataire souhaité",
+        main: 'Votre secret a été créé. Choisissez une option de partage ci-dessous.',
+        password: 'Envoyez le mot de passe par un canal séparé.',
+        separateKey:
+          "Pour un envoi séparé, transmettez l'URL sans clé et la clé de déchiffrement par des canaux différents.",
       },
+      combinedUrl: 'URL complète (avec la clé)',
+      keylessUrl: 'URL sans clé',
+      decryptionKey: 'Clé de déchiffrement',
       urlCopied: 'URL copiée dans le presse-papiers',
+      keyCopied: 'Clé de déchiffrement copiée dans le presse-papiers',
       secretDeleted: 'Secret supprimé',
       qrDownloaded: 'Code QR téléchargé',
       qrDownloadFailed: 'Échec du téléchargement du code QR : {{error}}',
       qrCode: {
         title: "Code QR de l'URL du Secret",
         description: "Téléchargez et partagez le code QR de l'URL du secret",
+      },
+      actions: {
+        showUrl: "Afficher l'URL du secret",
+        hideUrl: "Masquer l'URL du secret",
+        showKey: 'Afficher la clé de déchiffrement',
+        hideKey: 'Masquer la clé de déchiffrement',
+        shareUrl: "Partager l'URL du secret",
+        shareKey: 'Partager la clé de déchiffrement',
+        copyUrl: "Copier l'URL du secret",
+        copyKey: 'Copier la clé de déchiffrement',
+        showQr: "Afficher le code QR de l'URL complète",
       },
       createAnother: 'Créer un Autre',
       deleteSecret: 'Supprimer le Secret',
@@ -206,11 +224,44 @@ export const fr: TranslationKeys = {
       description: 'Le secret existe peut-être encore. Vérifiez votre connexion et réessayez.',
       tryAgain: 'Réessayer',
     },
+    rateLimit: {
+      title: 'Trop de requêtes',
+      description: 'Vous avez effectué trop de requêtes. Attendez un moment et réessayez.',
+      tryAgain: 'Réessayer',
+    },
     password: {
       title: 'Saisir le Mot de Passe',
+      label: 'Mot de passe',
       placeholder: 'Saisissez le mot de passe',
       description: "Ce secret est protégé par un mot de passe - demandez-le à l'expéditeur",
-      error: 'Mot de passe incorrect',
+      error: 'Clé de déchiffrement ou mot de passe incorrect',
+      required: 'Saisissez un mot de passe.',
+      show: 'Afficher le mot de passe',
+      hide: 'Masquer le mot de passe',
+    },
+    key: {
+      title: 'Saisir la clé de déchiffrement',
+      label: 'Clé de déchiffrement',
+      placeholder: "Saisissez la clé fournie par l'expéditeur",
+      description:
+        "Demandez la clé de déchiffrement à l'expéditeur par un canal séparé. La clé est utilisée uniquement dans ce navigateur.",
+      required: 'Saisissez une clé de déchiffrement.',
+      error:
+        'Cette clé de déchiffrement ne permet pas de déverrouiller le secret. Vérifiez-la et réessayez.',
+      show: 'Afficher la clé de déchiffrement',
+      hide: 'Masquer la clé de déchiffrement',
+      change: 'Saisir une autre clé',
+      submit: 'Déverrouiller le secret',
+    },
+    credentials: {
+      title: 'Déverrouiller le secret',
+      description:
+        "Saisissez la clé de déchiffrement et le mot de passe fournis par l'expéditeur. Les deux sont utilisés uniquement dans ce navigateur.",
+      submit: 'Déverrouiller le secret',
+    },
+    legacyKey: {
+      warning:
+        "Ce lien a été créé avec un client obsolète qui place la clé de déchiffrement dans la chaîne de requête. Demandez à l'expéditeur de mettre à jour son client pour que les futurs liens gardent la clé hors des journaux du serveur.",
     },
     content: {
       fileShared: 'Un fichier a été partagé avec vous',

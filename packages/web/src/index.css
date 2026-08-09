@@ -65,8 +65,9 @@
     --accent-foreground: 0 0% 98%;
     --destructive: 0 65% 58%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 17%;
-    --input: 0 0% 17%;
+    /* Keep a lightness gap from --muted (17%), matching light mode's muted/input delta. */
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
     --ring: 0 0% 83%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;

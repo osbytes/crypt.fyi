@@ -89,23 +89,28 @@ Abstract
    6. Server releases encrypted content only upon hash verification
    7. Client performs decryption locally using the original key/password
 
-### 2.4. URL Fragment Security
+### 2.4. URL and Out-of-Band Key Security
 
-   The decryption key MUST be passed in the URL fragment (after the #
-   symbol) to prevent transmission to the server:
+   After creating a secret, the client MUST present all of the following:
 
-   Example URL structure:
-   ```
-   https://crypt.fyi/v/{vaultId}#{base64-encoded-key}
-   ```
+   - A combined URL with the decryption key in the URL fragment
+   - A key-free URL
+   - The decryption key as a separate value
 
-   URL fragments are processed entirely client-side by the browser and
-   are never sent to the server in HTTP requests. This ensures that:
+   The combined URL supports one-step sharing while keeping the key in a
+   browser-only fragment. The key-free URL allows the sender to deliver the
+   URL and key through separate channels. QR codes currently encode the
+   combined URL.
 
-   - Web server logs never contain decryption keys
-   - Network intermediaries cannot observe keys
-   - Server-side code cannot accidentally log or process keys
-   - The zero-knowledge architecture is maintained
+   When a key-free URL is opened, the client MUST prompt for the decryption
+   key and MUST keep that key client-side. A `key` query parameter MUST NOT be
+   accepted as a decryption key. If one is present, the client MUST remove it
+   from the current browser-history entry before application initialization
+   and warn that the unsafe value may already have reached server logs.
+
+   URL fragments are processed entirely client-side by the browser and are
+   never sent in HTTP requests. This preserves the zero-knowledge architecture
+   for combined URLs while the key-free form supports out-of-band delivery.
 
 ### 2.5. Server Separation
 
@@ -115,8 +120,8 @@ Abstract
 #### 2.5.1. Web Server
 
    - MUST serve only static files (HTML, CSS, JS)
-   - MUST be configured to strip URL query parameters and fragments
-     from request logging
+   - MUST be configured not to log URL query strings, because outdated or
+     unsafe links may contain sensitive values
    - MUST be configured with strict Content Security Policy (CSP)
    - SHOULD run on a separate server/hosting platform from API server
 
@@ -254,8 +259,8 @@ Abstract
    - Server MUST NOT be able to decrypt content under any circumstances
    - No user accounts or authentication MUST be required
    - Server MUST NOT log sensitive data or encryption keys
-   - Decryption keys MUST NOT be transmitted to server due to URL
-     fragment usage
+   - Decryption keys MUST NOT be transmitted to the server; combined links use
+     URL fragments and key-free links use out-of-band delivery
    - Client MUST prove key possession through cryptographic hash
      verification
    - Hash MUST NOT be reversible to obtain the original key or password

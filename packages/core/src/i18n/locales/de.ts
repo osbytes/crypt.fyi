@@ -17,7 +17,7 @@ export const de: TranslationKeys = {
     confirm: 'Bestätigen',
     requestNewLanguage: 'Neue Sprache anfordern oder Übersetzungen korrigieren',
     footer: {
-      tagline: 'Mit Sicherheit und Privatsphäre als Kern',
+      tagline: 'Mit Sicherheit und Privatsphäre im Fokus, weil Unwissenheit ein Segen sein kann',
     },
     time: {
       minute_one: '{{count}} Minute',
@@ -149,16 +149,33 @@ export const de: TranslationKeys = {
     success: {
       title: 'Geheimnis erstellt!',
       description: {
-        main: 'Ihr Geheimnis wurde erstellt und die URL wurde in die Zwischenablage kopiert',
-        password: 'Teilen Sie die URL und das Passwort mit dem gewünschten Empfänger',
+        main: 'Ihr Geheimnis wurde erstellt. Wählen Sie unten eine Freigabeoption aus.',
+        password: 'Senden Sie das Passwort über einen separaten Kanal.',
+        separateKey:
+          'Senden Sie für eine getrennte Übermittlung die URL ohne Schlüssel und den Entschlüsselungsschlüssel über verschiedene Kanäle.',
       },
+      combinedUrl: 'Komplette URL (mit Schlüssel)',
+      keylessUrl: 'URL ohne Schlüssel',
+      decryptionKey: 'Entschlüsselungsschlüssel',
       urlCopied: 'URL in die Zwischenablage kopiert',
+      keyCopied: 'Entschlüsselungsschlüssel in die Zwischenablage kopiert',
       secretDeleted: 'Geheimnis gelöscht',
       qrDownloaded: 'QR-Code heruntergeladen',
       qrDownloadFailed: 'QR-Code konnte nicht heruntergeladen werden: {{error}}',
       qrCode: {
         title: 'Geheimnis-URL QR-Code',
         description: 'Laden Sie den QR-Code der Geheimnis-URL herunter und teilen Sie ihn',
+      },
+      actions: {
+        showUrl: 'Geheimnis-URL anzeigen',
+        hideUrl: 'Geheimnis-URL ausblenden',
+        showKey: 'Entschlüsselungsschlüssel anzeigen',
+        hideKey: 'Entschlüsselungsschlüssel ausblenden',
+        shareUrl: 'Geheimnis-URL teilen',
+        shareKey: 'Entschlüsselungsschlüssel teilen',
+        copyUrl: 'Geheimnis-URL kopieren',
+        copyKey: 'Entschlüsselungsschlüssel kopieren',
+        showQr: 'QR-Code der kompletten URL anzeigen',
       },
       createAnother: 'Weiteres erstellen',
       deleteSecret: 'Geheimnis löschen',
@@ -206,11 +223,45 @@ export const de: TranslationKeys = {
         'Das Geheimnis existiert möglicherweise noch. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
       tryAgain: 'Erneut versuchen',
     },
+    rateLimit: {
+      title: 'Zu viele Anfragen',
+      description:
+        'Sie haben zu viele Anfragen gestellt. Warten Sie einen Moment und versuchen Sie es erneut.',
+      tryAgain: 'Erneut versuchen',
+    },
     password: {
       title: 'Passwort eingeben',
+      label: 'Passwort',
       placeholder: 'Geben Sie das Passwort ein',
       description: 'Dieses Geheimnis ist mit einem Passwort geschützt - fragen Sie den Absender',
-      error: 'Falsches Passwort',
+      error: 'Falscher Entschlüsselungsschlüssel oder falsches Passwort',
+      required: 'Geben Sie ein Passwort ein.',
+      show: 'Passwort anzeigen',
+      hide: 'Passwort ausblenden',
+    },
+    key: {
+      title: 'Entschlüsselungsschlüssel eingeben',
+      label: 'Entschlüsselungsschlüssel',
+      placeholder: 'Vom Absender erhaltenen Schlüssel eingeben',
+      description:
+        'Bitten Sie den Absender über einen separaten Kanal um den Entschlüsselungsschlüssel. Der Schlüssel wird nur in diesem Browser verwendet.',
+      required: 'Geben Sie einen Entschlüsselungsschlüssel ein.',
+      error:
+        'Dieser Entschlüsselungsschlüssel konnte das Geheimnis nicht öffnen. Prüfen Sie den Schlüssel und versuchen Sie es erneut.',
+      show: 'Entschlüsselungsschlüssel anzeigen',
+      hide: 'Entschlüsselungsschlüssel ausblenden',
+      change: 'Anderen Schlüssel eingeben',
+      submit: 'Geheimnis entsperren',
+    },
+    credentials: {
+      title: 'Geheimnis entsperren',
+      description:
+        'Geben Sie den vom Absender erhaltenen Entschlüsselungsschlüssel und das Passwort ein. Beides wird nur in diesem Browser verwendet.',
+      submit: 'Geheimnis entsperren',
+    },
+    legacyKey: {
+      warning:
+        'Dieser Link wurde mit einem veralteten Client erstellt, der den Entschlüsselungsschlüssel in der Abfragezeichenfolge speichert. Bitten Sie den Absender um ein Upgrade, damit zukünftige Links den Schlüssel aus Serverprotokollen fernhalten.',
     },
     content: {
       fileShared: 'Eine Datei wurde mit Ihnen geteilt',

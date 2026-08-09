@@ -17,7 +17,8 @@ export const es: TranslationKeys = {
     confirm: 'Confirmar',
     requestNewLanguage: 'Solicitar nuevo o corregir traducciones',
     footer: {
-      tagline: 'Construido con la seguridad y la privacidad en su núcleo',
+      tagline:
+        'Construido con seguridad y privacidad en mente, porque la ignorancia puede ser una bendición',
     },
     time: {
       minute_one: '{{count}} minuto',
@@ -149,16 +150,33 @@ export const es: TranslationKeys = {
     success: {
       title: '¡Secreto Creado!',
       description: {
-        main: 'Tu secreto ha sido creado y la URL ha sido copiada al portapapeles',
-        password: 'Comparte la URL y la contraseña con el destinatario deseado',
+        main: 'Tu secreto ha sido creado. Elige una opción para compartirlo.',
+        password: 'Envía la contraseña por un canal separado.',
+        separateKey:
+          'Para enviarlos por separado, comparte la URL sin clave y la clave de descifrado por canales diferentes.',
       },
+      combinedUrl: 'URL completa (incluye la clave)',
+      keylessUrl: 'URL sin clave',
+      decryptionKey: 'Clave de descifrado',
       urlCopied: 'URL copiada al portapapeles',
+      keyCopied: 'Clave de descifrado copiada al portapapeles',
       secretDeleted: 'Secreto eliminado',
       qrDownloaded: 'Código QR descargado',
       qrDownloadFailed: 'Error al descargar el código QR: {{error}}',
       qrCode: {
         title: 'Código QR de la URL del Secreto',
         description: 'Descarga y comparte el código QR de la URL del secreto',
+      },
+      actions: {
+        showUrl: 'Mostrar la URL del secreto',
+        hideUrl: 'Ocultar la URL del secreto',
+        showKey: 'Mostrar la clave de descifrado',
+        hideKey: 'Ocultar la clave de descifrado',
+        shareUrl: 'Compartir la URL del secreto',
+        shareKey: 'Compartir la clave de descifrado',
+        copyUrl: 'Copiar la URL del secreto',
+        copyKey: 'Copiar la clave de descifrado',
+        showQr: 'Mostrar el código QR de la URL completa',
       },
       createAnother: 'Crear Otro',
       deleteSecret: 'Eliminar Secreto',
@@ -205,11 +223,44 @@ export const es: TranslationKeys = {
       description: 'El secreto puede seguir existiendo. Revisa tu conexión e inténtalo de nuevo.',
       tryAgain: 'Intentar de nuevo',
     },
+    rateLimit: {
+      title: 'Demasiadas solicitudes',
+      description: 'Has realizado demasiadas solicitudes. Espera un momento e inténtalo de nuevo.',
+      tryAgain: 'Intentar de nuevo',
+    },
     password: {
       title: 'Ingresar Contraseña',
+      label: 'Contraseña',
       placeholder: 'Ingresa la contraseña',
       description: 'Este secreto está protegido con una contraseña - solicítala al remitente',
-      error: 'Contraseña incorrecta',
+      error: 'La clave de descifrado o la contraseña es incorrecta',
+      required: 'Ingresa una contraseña.',
+      show: 'Mostrar la contraseña',
+      hide: 'Ocultar la contraseña',
+    },
+    key: {
+      title: 'Ingresa la clave de descifrado',
+      label: 'Clave de descifrado',
+      placeholder: 'Ingresa la clave proporcionada por el remitente',
+      description:
+        'Pide al remitente la clave de descifrado por un canal separado. La clave se usa solo en este navegador.',
+      required: 'Ingresa una clave de descifrado.',
+      error:
+        'Esa clave de descifrado no pudo desbloquear el secreto. Comprueba la clave e inténtalo de nuevo.',
+      show: 'Mostrar la clave de descifrado',
+      hide: 'Ocultar la clave de descifrado',
+      change: 'Ingresar otra clave',
+      submit: 'Desbloquear secreto',
+    },
+    credentials: {
+      title: 'Desbloquear secreto',
+      description:
+        'Ingresa la clave de descifrado y la contraseña proporcionadas por el remitente. Ambas se usan solo en este navegador.',
+      submit: 'Desbloquear secreto',
+    },
+    legacyKey: {
+      warning:
+        'Este enlace se creó con un cliente desactualizado que pone la clave de descifrado en la cadena de consulta. Pide al remitente que actualice para que los enlaces futuros mantengan la clave fuera de los registros del servidor.',
     },
     content: {
       fileShared: 'Se ha compartido un archivo contigo',

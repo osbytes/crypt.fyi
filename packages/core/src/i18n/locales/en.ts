@@ -17,7 +17,7 @@ export const en: TranslationKeys = {
     confirm: 'Confirm',
     requestNewLanguage: 'Request new or fix translations',
     footer: {
-      tagline: 'Built with security and privacy at its core',
+      tagline: 'Built with security and privacy in mind, because ignorance can be bliss',
     },
     time: {
       minute_one: '{{count}} minute',
@@ -147,16 +147,33 @@ export const en: TranslationKeys = {
     success: {
       title: 'Secret Created!',
       description: {
-        main: 'Your secret has been created and the URL has been copied to your clipboard',
-        password: 'Share the URL and password with the desired recipient',
+        main: 'Your secret has been created. Choose a sharing option below.',
+        password: 'Send the password through a separate channel.',
+        separateKey:
+          'For separate delivery, send the key-free URL and decryption key through different channels.',
       },
+      combinedUrl: 'Combined URL (includes key)',
+      keylessUrl: 'Key-free URL',
+      decryptionKey: 'Decryption key',
       urlCopied: 'URL copied to clipboard',
+      keyCopied: 'Decryption key copied to clipboard',
       secretDeleted: 'Secret deleted',
       qrDownloaded: 'QR code downloaded',
       qrDownloadFailed: 'Failed to download QR code: {{error}}',
       qrCode: {
         title: 'Secret URL QR Code',
         description: 'Download and share the secret URL QR Code',
+      },
+      actions: {
+        showUrl: 'Show secret URL',
+        hideUrl: 'Hide secret URL',
+        showKey: 'Show decryption key',
+        hideKey: 'Hide decryption key',
+        shareUrl: 'Share secret URL',
+        shareKey: 'Share decryption key',
+        copyUrl: 'Copy secret URL',
+        copyKey: 'Copy decryption key',
+        showQr: 'Show combined URL QR code',
       },
       createAnother: 'Create Another',
       deleteSecret: 'Delete Secret',
@@ -203,11 +220,43 @@ export const en: TranslationKeys = {
       description: 'The secret may still exist. Check your connection and try again.',
       tryAgain: 'Try Again',
     },
+    rateLimit: {
+      title: 'Too many requests',
+      description: 'You have made too many requests. Wait a moment and try again.',
+      tryAgain: 'Try Again',
+    },
     password: {
       title: 'Enter Password',
+      label: 'Password',
       placeholder: 'Enter the password',
       description: 'This secret is protected with a password - request from the sender',
-      error: 'Incorrect password',
+      error: 'Incorrect decryption key or password',
+      required: 'Enter a password.',
+      show: 'Show password',
+      hide: 'Hide password',
+    },
+    key: {
+      title: 'Enter Decryption Key',
+      label: 'Decryption key',
+      placeholder: 'Enter the key provided by the sender',
+      description:
+        'Ask the sender for the decryption key through a separate channel. The key is used only in this browser.',
+      required: 'Enter a decryption key.',
+      error: 'That decryption key could not unlock this secret. Check the key and try again.',
+      show: 'Show decryption key',
+      hide: 'Hide decryption key',
+      change: 'Enter a different key',
+      submit: 'Unlock secret',
+    },
+    credentials: {
+      title: 'Unlock Secret',
+      description:
+        'Enter the decryption key and password provided by the sender. Both are used only in this browser.',
+      submit: 'Unlock secret',
+    },
+    legacyKey: {
+      warning:
+        'This link was created with an outdated client that puts the decryption key in the query string. Ask the sender to upgrade so future links keep the key out of server logs.',
     },
     content: {
       fileShared: 'A file has been shared with you',

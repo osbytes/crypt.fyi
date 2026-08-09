@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -64,6 +65,8 @@ import { useClient } from '@/context/client';
 import { NumberInput } from '@/components/NumberInput';
 import { TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tooltip } from '@/components/ui/tooltip';
+import { buildSecretLinks } from '@/lib/secretUrl';
+import type { SecretLinks } from '@/lib/secretUrl';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
 const MAX_FILE_SIZE = 1 * 1024 * 1024;
@@ -421,6 +424,9 @@ export function CreatePage() {
   }, [watch]);
 
   const { client } = useClient();
+  // Share URLs contain the raw key. Keep them out of React Query mutation data.
+  const createdLinksRef = useRef<SecretLinks | null>(null);
+  const createdDecryptionKeyRef = useRef('');
 
   const createMutation = useMutation({
     mutationFn: async (input: FormValues) => {
@@ -440,18 +446,23 @@ export function CreatePage() {
           : undefined,
       });
 
-      const url = `${window.location.origin}/${result.id}${input.p ? '?p=true' : ''}#${result.key}`;
-      await clipboardCopy(url);
-      toast.info(t('create.success.urlCopied'));
+      createdLinksRef.current = buildSecretLinks({
+        origin: window.location.origin,
+        id: result.id,
+        key: result.key,
+        passwordProtected: Boolean(input.p),
+      });
+      createdDecryptionKeyRef.current = result.key;
 
       return {
-        ...result,
-        url,
+        id: result.id,
+        dt: result.dt,
       };
     },
     onError(error) {
       toast.error(error.message);
     },
+    gcTime: 0,
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -547,6 +558,13 @@ export function CreatePage() {
     Object.entries(valuesToKeep).forEach(([field, value]) => {
       form.setValue(field as keyof FormValues, value);
     });
+    setIsCombinedUrlMasked(true);
+    setIsKeylessUrlMasked(true);
+    setIsKeyMasked(true);
+    setIsQrDialogOpen(false);
+    createdLinksRef.current = null;
+    createdDecryptionKeyRef.current = '';
+    createMutation.reset();
   };
 
   const deleteMutation = useMutation({
@@ -556,7 +574,6 @@ export function CreatePage() {
         await client.delete(id, dt);
       } catch (error) {
         if (error instanceof ErrorNotFound) {
-          setIsUrlMasked(true);
           resetForNewSecret();
         }
         throw error;
@@ -567,23 +584,32 @@ export function CreatePage() {
     },
     onSuccess() {
       toast.success(t('create.success.secretDeleted'));
-      setIsUrlMasked(true);
       resetForNewSecret();
     },
   });
 
-  const [isUrlMasked, setIsUrlMasked] = useState(true);
-  let maskedUrl = createMutation.data?.url;
-  if (isUrlMasked && createMutation.data?.url) {
-    const url = new URL(createMutation.data.url);
-    const key = url.hash.slice(1); // Remove the # symbol
-
-    if (key) {
-      maskedUrl = `${url.origin}/${'*'.repeat(createMutation.data.id.length)}${url.search}#${'*'.repeat(key.length)}`;
-    } else {
-      maskedUrl = `${url.origin}/${'*'.repeat(createMutation.data.id.length)}${url.search}`;
-    }
-  }
+  const [isCombinedUrlMasked, setIsCombinedUrlMasked] = useState(true);
+  const [isKeylessUrlMasked, setIsKeylessUrlMasked] = useState(true);
+  const [isKeyMasked, setIsKeyMasked] = useState(true);
+  const createdLinks = createdLinksRef.current;
+  const createdId = createMutation.data?.id;
+  const maskUrl = (value: string) => {
+    if (!createdId) return value;
+    const url = new URL(value);
+    const key = url.hash.slice(1);
+    return `${url.origin}/${'*'.repeat(createdId.length)}${url.search}${key ? `#${'*'.repeat(key.length)}` : ''}`;
+  };
+  const displayedCombinedUrl =
+    isCombinedUrlMasked && createdLinks
+      ? maskUrl(createdLinks.combinedUrl)
+      : createdLinks?.combinedUrl;
+  const displayedKeylessUrl =
+    isKeylessUrlMasked && createdLinks
+      ? maskUrl(createdLinks.keylessUrl)
+      : createdLinks?.keylessUrl;
+  const displayedDecryptionKey = isKeyMasked
+    ? '*'.repeat(createdDecryptionKeyRef.current.length)
+    : createdDecryptionKeyRef.current;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -597,7 +623,7 @@ export function CreatePage() {
     try {
       const dataUrl = await svgToImage(svg);
       const link = document.createElement('a');
-      const hash = sha256(createMutation.data?.url ?? '');
+      const hash = sha256(createdLinksRef.current?.qrUrl ?? '');
       link.download = `crypt.fyi-qr-${hash.slice(0, 8)}.png`;
       link.href = dataUrl;
       link.click();
@@ -606,6 +632,39 @@ export function CreatePage() {
       toast.error(t('create.success.qrDownloadFailed', { error: String(error) }));
     }
   };
+
+  const copyUrl = async (url: string) => {
+    await clipboardCopy(url);
+    toast.info(t('create.success.urlCopied'));
+  };
+
+  const copyKey = async () => {
+    const key = createdDecryptionKeyRef.current;
+    if (!key) return;
+    await clipboardCopy(key);
+    toast.info(t('create.success.keyCopied'));
+  };
+
+  const shareUrl = async (url: string) => {
+    if (!('share' in navigator)) return;
+    try {
+      await navigator.share({ url });
+    } catch {
+      // Dismissing the native share sheet needs no follow-up.
+    }
+  };
+
+  const shareKey = async () => {
+    const key = createdDecryptionKeyRef.current;
+    if (!key || !('share' in navigator)) return;
+    try {
+      await navigator.share({ text: key });
+    } catch {
+      // Dismissing the native share sheet needs no follow-up.
+    }
+  };
+
+  const canShare = 'share' in navigator;
 
   const [dragState, setDragState] = useState<DragState>('none');
 
@@ -1133,55 +1192,170 @@ export function CreatePage() {
                   <p className="text-muted-foreground text-sm mb-1">
                     {t('create.success.description.main')}
                   </p>
+                  <p className="text-muted-foreground text-sm mb-1">
+                    {t('create.success.description.separateKey')}
+                  </p>
                   <p className="text-muted-foreground text-sm">
                     {form.watch('p') && t('create.success.description.password')}
                   </p>
                 </div>
 
-                <div className="flex items-center space-x-2 p-4 bg-muted rounded-lg">
-                  <Input
-                    type={isUrlMasked ? 'password' : 'text'}
-                    value={isUrlMasked ? maskedUrl : createMutation.data?.url}
-                    readOnly
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setIsUrlMasked(!isUrlMasked)}
-                  >
-                    {isUrlMasked ? <IconEyeOff /> : <IconEye />}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={async () => {
-                      if (createMutation.data?.url) {
-                        if ('share' in navigator) {
-                          await navigator.share({
-                            url: createMutation.data?.url,
-                          });
-                        } else {
-                          await clipboardCopy(createMutation.data.url);
-                          toast.info(t('create.success.urlCopied'));
+                <div className="space-y-4">
+                  <div className="space-y-2 p-4 bg-muted rounded-lg">
+                    <Label htmlFor="combined-url">{t('create.success.combinedUrl')}</Label>
+                    <div className="flex items-center gap-2">
+                      <Input id="combined-url" value={displayedCombinedUrl ?? ''} readOnly />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setIsCombinedUrlMasked(!isCombinedUrlMasked)}
+                        title={
+                          isCombinedUrlMasked
+                            ? t('create.success.actions.showUrl')
+                            : t('create.success.actions.hideUrl')
                         }
-                      }
-                    }}
-                  >
-                    {'share' in navigator ? <IconShare /> : <IconCopy />}
-                  </Button>
-                  <Button variant="outline" size="icon" onClick={() => setIsQrDialogOpen(true)}>
-                    <IconQrcode />
-                  </Button>
+                        aria-label={
+                          isCombinedUrlMasked
+                            ? t('create.success.actions.showUrl')
+                            : t('create.success.actions.hideUrl')
+                        }
+                        aria-pressed={!isCombinedUrlMasked}
+                      >
+                        {isCombinedUrlMasked ? <IconEyeOff /> : <IconEye />}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        title={t('create.success.actions.copyUrl')}
+                        aria-label={t('create.success.actions.copyUrl')}
+                        onClick={() => createdLinks && copyUrl(createdLinks.combinedUrl)}
+                      >
+                        <IconCopy />
+                      </Button>
+                      {canShare && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          title={t('create.success.actions.shareUrl')}
+                          aria-label={t('create.success.actions.shareUrl')}
+                          onClick={() => createdLinks && shareUrl(createdLinks.combinedUrl)}
+                        >
+                          <IconShare />
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setIsQrDialogOpen(true)}
+                        title={t('create.success.actions.showQr')}
+                        aria-label={t('create.success.actions.showQr')}
+                      >
+                        <IconQrcode />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 p-4 bg-muted rounded-lg">
+                    <div className="space-y-2">
+                      <Label htmlFor="keyless-url">{t('create.success.keylessUrl')}</Label>
+                      <div className="flex items-center gap-2">
+                        <Input id="keyless-url" value={displayedKeylessUrl ?? ''} readOnly />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setIsKeylessUrlMasked(!isKeylessUrlMasked)}
+                          title={
+                            isKeylessUrlMasked
+                              ? t('create.success.actions.showUrl')
+                              : t('create.success.actions.hideUrl')
+                          }
+                          aria-label={
+                            isKeylessUrlMasked
+                              ? t('create.success.actions.showUrl')
+                              : t('create.success.actions.hideUrl')
+                          }
+                          aria-pressed={!isKeylessUrlMasked}
+                        >
+                          {isKeylessUrlMasked ? <IconEyeOff /> : <IconEye />}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          title={t('create.success.actions.copyUrl')}
+                          aria-label={t('create.success.actions.copyUrl')}
+                          onClick={() => createdLinks && copyUrl(createdLinks.keylessUrl)}
+                        >
+                          <IconCopy />
+                        </Button>
+                        {canShare && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            title={t('create.success.actions.shareUrl')}
+                            aria-label={t('create.success.actions.shareUrl')}
+                            onClick={() => createdLinks && shareUrl(createdLinks.keylessUrl)}
+                          >
+                            <IconShare />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="decryption-key">{t('create.success.decryptionKey')}</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          id="decryption-key"
+                          value={displayedDecryptionKey}
+                          readOnly
+                          autoComplete="off"
+                          spellCheck={false}
+                        />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setIsKeyMasked(!isKeyMasked)}
+                          title={
+                            isKeyMasked
+                              ? t('create.success.actions.showKey')
+                              : t('create.success.actions.hideKey')
+                          }
+                          aria-label={
+                            isKeyMasked
+                              ? t('create.success.actions.showKey')
+                              : t('create.success.actions.hideKey')
+                          }
+                          aria-pressed={!isKeyMasked}
+                        >
+                          {isKeyMasked ? <IconEyeOff /> : <IconEye />}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          title={t('create.success.actions.copyKey')}
+                          aria-label={t('create.success.actions.copyKey')}
+                          onClick={copyKey}
+                        >
+                          <IconCopy />
+                        </Button>
+                        {canShare && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            title={t('create.success.actions.shareKey')}
+                            aria-label={t('create.success.actions.shareKey')}
+                            onClick={shareKey}
+                          >
+                            <IconShare />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex justify-end flex-wrap gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsUrlMasked(true);
-                      resetForNewSecret();
-                    }}
-                  >
+                  <Button variant="outline" onClick={resetForNewSecret}>
                     {t('create.success.createAnother')}
                   </Button>
                   {createMutation.data && (
@@ -1299,10 +1473,11 @@ export function CreatePage() {
           </DialogHeader>
           <div className="flex flex-col items-center space-y-4">
             <div className="qr-code p-4">
-              {createMutation.data?.url && (
+              {createdLinks?.qrUrl && (
                 <QRCodeSVG
                   ref={qrCodeRef}
-                  value={createMutation.data.url}
+                  value={createdLinks.qrUrl}
+                  title={t('create.success.qrCode.title')}
                   size={256}
                   marginSize={4}
                   level="H"
@@ -1310,7 +1485,12 @@ export function CreatePage() {
               )}
             </div>
             <div className="flex space-x-2">
-              <Button title={t('common.download')} variant="outline" onClick={handleDownloadQR}>
+              <Button
+                title={t('common.download')}
+                aria-label={t('common.download')}
+                variant="outline"
+                onClick={handleDownloadQR}
+              >
                 <IconDownload className="size-4" />
               </Button>
             </div>
