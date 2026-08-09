@@ -59,4 +59,8 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
   },
+  // Keep Playwright specs out of `pnpm test` (vitest); they run via `pnpm test:e2e`.
+  test: {
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+  },
 });
