@@ -19,7 +19,12 @@ import { cn } from '@/lib/utils';
 import { clipboardCopy } from '@/lib/clipboardCopy';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader } from '@/components/ui/loader';
-import { ErrorInvalidKeyAndOrPassword, ErrorNotFound, ErrorUnexpectedStatus, sleep } from '@crypt.fyi/core';
+import {
+  ErrorInvalidKeyAndOrPassword,
+  ErrorNotFound,
+  ErrorUnexpectedStatus,
+  sleep,
+} from '@crypt.fyi/core';
 import { useTranslation } from 'react-i18next';
 import { useClient } from '@/context/client';
 
@@ -217,8 +222,7 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
   }
 
   // Key and/or password entry stays on-page — no modal.
-  const showCredentialsForm =
-    (!hasDecryptionKey || isPasswordSet) && !decryptMutation.data;
+  const showCredentialsForm = (!hasDecryptionKey || isPasswordSet) && !decryptMutation.data;
   if (showCredentialsForm) {
     return (
       <CredentialsForm

@@ -225,7 +225,8 @@ export const de: TranslationKeys = {
     },
     rateLimit: {
       title: 'Zu viele Anfragen',
-      description: 'Sie haben zu viele Anfragen gestellt. Warten Sie einen Moment und versuchen Sie es erneut.',
+      description:
+        'Sie haben zu viele Anfragen gestellt. Warten Sie einen Moment und versuchen Sie es erneut.',
       tryAgain: 'Erneut versuchen',
     },
     password: {

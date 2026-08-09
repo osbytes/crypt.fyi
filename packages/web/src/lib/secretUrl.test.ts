@@ -32,20 +32,14 @@ describe('buildSecretLinks', () => {
 
 describe('migrateLegacyQueryKey', () => {
   it('moves a legacy query key into the fragment and strips the query param', () => {
-    const url = new URL(
-      'https://crypt.example/vault-id?keep=first&key=legacy-key&keep=second',
-    );
+    const url = new URL('https://crypt.example/vault-id?keep=first&key=legacy-key&keep=second');
 
     expect(migrateLegacyQueryKey(url)).toBe(true);
-    expect(url.toString()).toBe(
-      'https://crypt.example/vault-id?keep=first&keep=second#legacy-key',
-    );
+    expect(url.toString()).toBe('https://crypt.example/vault-id?keep=first&keep=second#legacy-key');
   });
 
   it('preserves an existing fragment and still strips the query key', () => {
-    const url = new URL(
-      'https://crypt.example/vault-id?key=legacy-key#fragment-key',
-    );
+    const url = new URL('https://crypt.example/vault-id?key=legacy-key#fragment-key');
 
     expect(migrateLegacyQueryKey(url)).toBe(true);
     expect(url.toString()).toBe('https://crypt.example/vault-id#fragment-key');
