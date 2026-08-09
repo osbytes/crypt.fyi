@@ -22,17 +22,13 @@ describe('encryption', () => {
   const testData = 'Hello, World!';
   const testPassword = 'test-password-123';
 
-  it.each(algorithms)('should successfully encrypt and decrypt data $name', async (algorithm) => {
-    const encrypted = await algorithm.encrypt(testData, testPassword);
-    expect(encrypted).not.toBe(testData);
-
-    const decrypted = await algorithm.decrypt(encrypted, testPassword);
-    expect(decrypted).toBe(testData);
-  });
-
-  it.each(algorithms)('should fail to decrypt with wrong password $name', async (algorithm) => {
-    const encrypted = await algorithm.encrypt(testData, testPassword);
-
-    await expect(algorithm.decrypt(encrypted, 'wrong-password')).rejects.toThrow();
-  });
+  it.each(algorithms)(
+    'should round-trip and fail decrypt with wrong password $name',
+    async (algorithm) => {
+      const encrypted = await algorithm.encrypt(testData, testPassword);
+      expect(encrypted).not.toBe(testData);
+      expect(await algorithm.decrypt(encrypted, testPassword)).toBe(testData);
+      await expect(algorithm.decrypt(encrypted, 'wrong-password')).rejects.toThrow();
+    },
+  );
 });

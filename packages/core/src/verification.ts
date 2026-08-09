@@ -3,6 +3,7 @@ import { sha256 as nobleSha256 } from '@noble/hashes/sha2';
 import { utf8ToBytes } from '@noble/hashes/utils';
 import { Buffer } from './buffer';
 import { sha512 } from './hash';
+import { getArgon2VerificationParams } from './kdf';
 
 // The server-stored verification hash `h` proves the reader possesses the URL
 // key without revealing it. The legacy scheme (`sha512(key + password)`) is fast
@@ -18,15 +19,9 @@ import { sha512 } from './hash';
 // The scheme is selected by a version prefix embedded in the URL-fragment key
 // itself (`2.<rawKey>`), so callers keep treating the key as an opaque string
 // and legacy links (bare `<rawKey>`) continue to verify with the old scheme.
+// Production Argon2id params live in kdf.ts.
 
 export const KEY_VERSION_2_PREFIX = '2.';
-
-const ARGON2_PARAMS = {
-  t: 2,
-  m: 19456, // 19 MiB
-  p: 1,
-  dkLen: 32,
-} as const;
 
 /** Splits a URL-fragment key into its verification scheme and the raw key used for content crypto. */
 export const parseKey = (key: string): { scheme: 'legacy' | 'v2'; rawKey: string } => {
@@ -47,6 +42,6 @@ export const deriveVerificationHash = async (
     return sha512(secret);
   }
   const salt = nobleSha256(utf8ToBytes(rawKey));
-  const derived = await argon2idAsync(utf8ToBytes(secret), salt, ARGON2_PARAMS);
+  const derived = await argon2idAsync(utf8ToBytes(secret), salt, getArgon2VerificationParams());
   return Buffer.from(derived).toString('hex');
 };

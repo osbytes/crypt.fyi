@@ -9,6 +9,7 @@
     "typecheck": "turbo typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test:e2e": "pnpm --filter @crypt.fyi/web test:e2e",
     "redis": "docker compose run --rm -p 6379:6379 -v ./redis-data:/data redis redis-server --save 1 1 --loglevel notice",
     "changeset": "changeset",
     "version-packages": "changeset version",

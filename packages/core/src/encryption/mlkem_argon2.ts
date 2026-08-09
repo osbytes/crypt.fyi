@@ -4,6 +4,7 @@ import { concatBytes, utf8ToBytes } from '@noble/hashes/utils';
 import { argon2idAsync } from '@noble/hashes/argon2';
 import { chacha20poly1305 } from '@noble/ciphers/chacha';
 import { Buffer } from '../buffer';
+import { getArgon2ContentParams } from '../kdf';
 import { Decrypt, Encrypt, DecryptError, EncryptError } from './encryption';
 
 // ml-kem-768-argon2: identical construction to ml-kem-768-2 (ML-KEM-768 KEM +
@@ -12,21 +13,13 @@ import { Decrypt, Encrypt, DecryptError, EncryptError } from './encryption';
 // memory-hard KDF materially raises the cost of offline brute-force.
 //
 // Argon2id parameters follow the OWASP minimum for interactive use, tuned to
-// stay usable in-browser with the pure-JS noble implementation.
+// stay usable in-browser with the pure-JS noble implementation. See kdf.ts.
 const IV_LENGTH = 12;
 const CIPHERTEXT_LENGTH = 1088;
 const SALT_LENGTH = 32;
-const SEED_LENGTH = 64; // ml_kem768.keygen expects a 64-byte seed
-
-const ARGON2_PARAMS = {
-  t: 2, // iterations (time cost)
-  m: 19456, // 19 MiB (memory cost, in KiB)
-  p: 1, // parallelism
-  dkLen: SEED_LENGTH,
-} as const;
 
 const deriveKey = async (password: string, salt: Uint8Array): Promise<Uint8Array> => {
-  return argon2idAsync(utf8ToBytes(password), salt, ARGON2_PARAMS);
+  return argon2idAsync(utf8ToBytes(password), salt, getArgon2ContentParams());
 };
 
 export const encrypt: Encrypt = async (content: string, password: string) => {

@@ -130,9 +130,10 @@ Publishable packages: `@crypt.fyi/core` and `@crypt.fyi/cli` (npm), plus the Chr
 
 ### Content Security Policy
 
-- The toast notification library (sonner) requires specific style-src hashes in the CSP configuration
-- These hashes are defined in `nginx/nginx.conf`
-- Updates to sonner may require updating these hashes
+- Production CSP (including `style-src` hashes for sonner/Radix inline styles) lives in `nginx/nginx.conf`
+- `vite preview` applies that same policy via `packages/web/csp.ts` so local/CI match production
+- `pnpm test:e2e` runs a Playwright create→read smoke under that CSP. It fails on `style-src` / `connect-src` violations; other console warnings/errors and non-style CSP noise (e.g. `script-src` eval fallback notes) are reported as non-blocking annotations
+- When the smoke fails on style-src, add the reported hash to `nginx/nginx.conf` (do not weaken to `'unsafe-inline'`)
 - Reference: [sonner#449](https://github.com/emilkowalski/sonner/issues/449)
 
 ### Development Environment

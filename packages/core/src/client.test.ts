@@ -61,21 +61,14 @@ describe('Client create -> read round trip', () => {
     expect(read.c).toBe('hello world');
   });
 
-  it('round-trips content with a password (versioned key + argon2 hash)', async () => {
+  it('round-trips with a password and rejects wrong / missing password', async () => {
     const created = await client.create({ c: 'the secret', p: 'hunter2', ttl: 1000, b: false });
     expect(created.key.startsWith('2.')).toBe(true);
 
     const read = await client.read(created.id, created.key, 'hunter2');
     expect(read.c).toBe('the secret');
-  });
 
-  it('rejects a read with the wrong password', async () => {
-    const created = await client.create({ c: 'the secret', p: 'hunter2', ttl: 1000, b: false });
     await expect(client.read(created.id, created.key, 'wrong')).rejects.toThrow();
-  });
-
-  it('rejects a read missing the required password', async () => {
-    const created = await client.create({ c: 'the secret', p: 'hunter2', ttl: 1000, b: false });
     await expect(client.read(created.id, created.key)).rejects.toThrow();
   });
 
