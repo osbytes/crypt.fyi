@@ -72,6 +72,9 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
       return client.exists(id);
     },
     retry: () => false,
+    // This is a one-time preflight. A background HEAD after a burn-after-read
+    // decrypt can return false and must not replace content already in memory.
+    staleTime: Infinity,
   });
 
   const decryptMutation = useMutation({
@@ -143,17 +146,28 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
   }
 
   const decryptError = decryptMutation.error;
-  const isWrongKeyWithoutPassword =
-    decryptError instanceof ErrorInvalidKeyAndOrPassword && !isPasswordSet;
-  const isRateLimited =
-    (existsQuery.error instanceof ErrorUnexpectedStatus && existsQuery.error.status === 429) ||
-    (decryptError instanceof ErrorUnexpectedStatus && decryptError.status === 429);
+  const isWrongFragmentKeyWithoutPassword =
+    decryptError instanceof ErrorInvalidKeyAndOrPassword && !isPasswordSet && keySource === 'url';
+  const isExistsRateLimited =
+    existsQuery.error instanceof ErrorUnexpectedStatus && existsQuery.error.status === 429;
+  const isDecryptRateLimited =
+    decryptError instanceof ErrorUnexpectedStatus && decryptError.status === 429;
+  const isRateLimited = isExistsRateLimited || isDecryptRateLimited;
   const existsFailed = existsQuery.isError && !isRateLimited;
   const unexpectedDecryptError =
     decryptError &&
     !(decryptError instanceof ErrorInvalidKeyAndOrPassword) &&
     !(decryptError instanceof ErrorNotFound) &&
     !(decryptError instanceof ErrorUnexpectedStatus && decryptError.status === 429);
+  const retryFailedRequest = (retryExists: boolean) => {
+    if (retryExists) {
+      void existsQuery.refetch();
+      return;
+    }
+    if (decryptError) {
+      decryptMutation.mutate(password);
+    }
+  };
 
   if (isRateLimited) {
     return (
@@ -161,12 +175,7 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
         <Card className="p-8">
           <h1 className="text-2xl font-semibold mb-4">{t('view.rateLimit.title')}</h1>
           <p className="text-muted-foreground mb-6">{t('view.rateLimit.description')}</p>
-          <Button
-            onClick={() => {
-              if (existsQuery.error) existsQuery.refetch();
-              if (decryptError) decryptMutation.reset();
-            }}
-          >
+          <Button onClick={() => retryFailedRequest(isExistsRateLimited)}>
             {t('view.rateLimit.tryAgain')}
           </Button>
         </Card>
@@ -180,12 +189,7 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
         <Card className="p-8">
           <h1 className="text-2xl font-semibold mb-4">{t('view.connectionError.title')}</h1>
           <p className="text-muted-foreground mb-6">{t('view.connectionError.description')}</p>
-          <Button
-            onClick={() => {
-              if (existsFailed) existsQuery.refetch();
-              if (unexpectedDecryptError) decryptMutation.reset();
-            }}
-          >
+          <Button onClick={() => retryFailedRequest(existsFailed)}>
             {t('view.connectionError.tryAgain')}
           </Button>
         </Card>
@@ -193,7 +197,7 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
     );
   }
 
-  if (isWrongKeyWithoutPassword) {
+  if (isWrongFragmentKeyWithoutPassword) {
     return (
       <div className="max-w-3xl mx-auto mt-8 text-center">
         <Card className="p-8">
