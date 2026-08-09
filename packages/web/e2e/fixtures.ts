@@ -27,7 +27,9 @@ type SmokeFixtures = {
  * the library-agnostic stand-in for hashing specific dependency payloads.
  */
 export const test = base.extend<SmokeFixtures>({
-  consoleEntries: async ({ page }, use, testInfo) => {
+  // Rename Playwright's fixture `use` callback — eslint-plugin-react-hooks
+  // otherwise treats it as React's `use` hook.
+  consoleEntries: async ({ page }, provide, testInfo) => {
     const entries: ConsoleEntry[] = [];
 
     const onConsole = (msg: ConsoleMessage) => {
@@ -46,7 +48,7 @@ export const test = base.extend<SmokeFixtures>({
     page.on('console', onConsole);
     page.on('pageerror', onPageError);
 
-    await use(entries);
+    await provide(entries);
 
     page.off('console', onConsole);
     page.off('pageerror', onPageError);
@@ -77,17 +79,17 @@ export const test = base.extend<SmokeFixtures>({
     }
   },
 
-  cspViolations: async ({ page }, use) => {
+  cspViolations: async ({ page }, provide) => {
     const violations: CspViolation[] = [];
     await installCspViolationListener(page, violations);
-    await use(violations);
+    await provide(violations);
   },
 });
 
 export { expect };
 
 async function installCspViolationListener(page: Page, sink: CspViolation[]) {
-  await page.exposeBinding('__cryptFyiReportCspViolation', ({}, violation: CspViolation) => {
+  await page.exposeBinding('__cryptFyiReportCspViolation', (_source, violation: CspViolation) => {
     sink.push(violation);
   });
 
