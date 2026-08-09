@@ -1,5 +1,14 @@
 # @crypt.fyi/web
 
+## 0.0.18
+
+### Patch Changes
+
+- [#139](https://github.com/osbytes/crypt.fyi/pull/139) [`2dbb6c5`](https://github.com/osbytes/crypt.fyi/commit/2dbb6c50bbc18a0c69f5ae47d81d0335b2f8d100) Thanks [@snowyukitty](https://github.com/snowyukitty)! - Support separate decryption-key delivery: always show combined URL, key-free URL, and decryption key after create; prompt for key and/or password on read when needed; migrate legacy `?key=` links into the URL fragment and warn that the sender should upgrade.
+
+- Updated dependencies []:
+  - @crypt.fyi/core@0.0.18
+
 ## 0.0.17
 
 ### Patch Changes
