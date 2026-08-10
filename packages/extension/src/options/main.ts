@@ -1,6 +1,7 @@
 import './styles.css';
-import { TTL_OPTIONS, type ConfigOverride, type ExtensionConfig } from '../config';
+import { findClosestTtl, TTL_OPTIONS, type ConfigOverride, type ExtensionConfig } from '../config';
 import { parseConfigOverride } from '../configSchema';
+import { toExportOverride } from '../configMerge';
 import { clearUserConfig, resolveConfig, saveUserConfig } from '../resolveConfig';
 
 const form = document.getElementById('settings-form') as HTMLFormElement;
@@ -45,19 +46,6 @@ function fillTtlOptions() {
     el.textContent = option.label;
     ttlSelect.append(el);
   }
-}
-
-function findClosestTtl(ttl: number): number {
-  let closest = TTL_OPTIONS[0].value;
-  let best = Math.abs(ttl - closest);
-  for (const option of TTL_OPTIONS) {
-    const distance = Math.abs(ttl - option.value);
-    if (distance < best) {
-      closest = option.value;
-      best = distance;
-    }
-  }
-  return closest;
 }
 
 function syncBurnUi() {
@@ -151,21 +139,8 @@ resetBtn.addEventListener('click', async () => {
 
 exportBtn.addEventListener('click', async () => {
   const resolved = await resolveConfig();
-  const payload = {
-    apiUrl: resolved.config.apiUrl,
-    webUrl: resolved.config.webUrl,
-    ttl: resolved.config.ttl,
-    burn: resolved.config.burn,
-    ...(resolved.config.ips ? { ips: resolved.config.ips } : {}),
-    ...(resolved.config.rc != null ? { rc: resolved.config.rc } : {}),
-    ...(resolved.config.fc != null ? { fc: resolved.config.fc } : {}),
-    ...(resolved.config.webhookUrl ? { webhookUrl: resolved.config.webhookUrl } : {}),
-    ...(resolved.config.webhookName ? { webhookName: resolved.config.webhookName } : {}),
-    webhookOnRead: resolved.config.webhookOnRead,
-    webhookOnFailPassword: resolved.config.webhookOnFailPassword,
-    webhookOnFailIp: resolved.config.webhookOnFailIp,
-    webhookOnBurn: resolved.config.webhookOnBurn,
-  };
+  // Include nulls for empty optionals so export → import preserves clears.
+  const payload = toExportOverride(resolved.config);
 
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -189,10 +164,11 @@ importInput.addEventListener('change', async () => {
       setErrors(errors.length > 0 ? errors : ['Import file contained no valid settings']);
       return;
     }
+    // Replace-all: omitted keys fall back to managed/build (same as Save).
     const saveErrors = await saveUserConfig(data);
     await refresh();
     setErrors([...errors, ...saveErrors]);
-    setStatus('Settings imported.');
+    setStatus('Settings imported (replaced all saved overrides).');
   } catch (error) {
     setErrors([error instanceof Error ? error.message : 'Failed to import JSON']);
   }

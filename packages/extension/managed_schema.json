@@ -3,12 +3,12 @@
   "properties": {
     "apiUrl": {
       "title": "API URL",
-      "description": "Base URL for the crypt.fyi API (e.g. https://api.crypt.fyi).",
+      "description": "Base URL for the crypt.fyi API (e.g. https://api.crypt.fyi). Must be a public http(s) URL — private/reserved literal IPs and internal hostnames are rejected.",
       "type": "string"
     },
     "webUrl": {
       "title": "Web URL",
-      "description": "Base URL used when building share links (e.g. https://crypt.fyi).",
+      "description": "Base URL used when building share links (e.g. https://crypt.fyi). Must be a public http(s) URL — private/reserved literal IPs and internal hostnames are rejected.",
       "type": "string"
     },
     "ttl": {

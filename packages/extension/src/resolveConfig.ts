@@ -5,16 +5,25 @@ import {
   buildDefaultsConfig,
   mergeConfigLayers,
   toCreateOptions,
+  toExportOverride,
+  validateMergedConfig,
   type ConfigSource,
   type MergedConfig,
 } from './configMerge';
 
 export type { ConfigSource };
-export { toCreateOptions, mergeConfigLayers, buildDefaultsConfig };
+export { toCreateOptions, toExportOverride, mergeConfigLayers, buildDefaultsConfig };
 
 export type ResolvedConfig = MergedConfig & {
   parseErrors: string[];
+  /**
+   * Errors that must block encryption (invalid endpoints that silently fell
+   * back to build defaults, or cross-layer webhook violations).
+   */
+  createBlockingErrors: string[];
 };
+
+const ENDPOINT_KEYS = ['apiUrl', 'webUrl'] as const;
 
 async function readStorageArea(
   area: 'sync' | 'managed',
@@ -32,6 +41,35 @@ async function readStorageArea(
   }
 }
 
+function errorsForKey(errors: string[], key: string): string[] {
+  return errors.filter((error) => error.startsWith(`${key}:`));
+}
+
+/**
+ * If a layer supplied an invalid endpoint and nothing higher replaced it, merge
+ * would fall through to the public build default — fail closed instead.
+ */
+function collectEndpointFailOpenErrors(
+  sources: MergedConfig['sources'],
+  managedErrors: string[],
+  userErrors: string[],
+): string[] {
+  const blocked: string[] = [];
+  for (const key of ENDPOINT_KEYS) {
+    if (sources[key] !== 'build') continue;
+    const fromUser = errorsForKey(userErrors, key);
+    const fromManaged = errorsForKey(managedErrors, key);
+    if (fromUser.length > 0 || fromManaged.length > 0) {
+      blocked.push(
+        ...fromUser,
+        ...fromManaged,
+        `${key}: refusing to fall back to the built-in default after an invalid configured value`,
+      );
+    }
+  }
+  return blocked;
+}
+
 export async function resolveConfig(): Promise<ResolvedConfig> {
   const [managedResult, userResult] = await Promise.all([
     readStorageArea('managed'),
@@ -39,10 +77,17 @@ export async function resolveConfig(): Promise<ResolvedConfig> {
   ]);
 
   const merged = mergeConfigLayers(buildDefaultsConfig(), managedResult.data, userResult.data);
+  const mergeErrors = validateMergedConfig(merged.config);
+  const parseErrors = [...managedResult.errors, ...userResult.errors, ...mergeErrors];
+  const createBlockingErrors = [
+    ...collectEndpointFailOpenErrors(merged.sources, managedResult.errors, userResult.errors),
+    ...mergeErrors,
+  ];
 
   return {
     ...merged,
-    parseErrors: [...managedResult.errors, ...userResult.errors],
+    parseErrors,
+    createBlockingErrors,
   };
 }
 

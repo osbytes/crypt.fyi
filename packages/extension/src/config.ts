@@ -20,10 +20,25 @@ export const TTL_OPTIONS = [
   { label: '7 days', value: 7 * DAY },
 ] as const;
 
+/** Snap an arbitrary duration to the nearest supported TTL (keeps UI + schema in sync). */
+export function findClosestTtl(ttl: number): number {
+  let closest = TTL_OPTIONS[0].value;
+  let best = Math.abs(ttl - closest);
+  for (const option of TTL_OPTIONS) {
+    const distance = Math.abs(ttl - option.value);
+    if (distance < best) {
+      closest = option.value;
+      best = distance;
+    }
+  }
+  return closest;
+}
+
 export const BUILD_DEFAULTS = {
   apiUrl: env.VITE_API_URL || 'https://api.crypt.fyi',
   webUrl: env.VITE_WEB_URL || 'https://crypt.fyi',
-  ttl: getEnvNumber(env.VITE_DEFAULT_TTL, 30 * MINUTE),
+  // Env may set a non-listed duration; snap so options Save never invents a new TTL.
+  ttl: findClosestTtl(getEnvNumber(env.VITE_DEFAULT_TTL, 30 * MINUTE)),
   burn: true,
   ips: undefined as string | undefined,
   rc: undefined as number | undefined,

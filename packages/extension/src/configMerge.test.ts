@@ -1,7 +1,12 @@
 import { describe, expect, it } from '@jest/globals';
-import { BUILD_DEFAULTS, type ExtensionConfig } from './config';
+import { BUILD_DEFAULTS, findClosestTtl, type ExtensionConfig } from './config';
 import { parseConfigOverride } from './configSchema';
-import { mergeConfigLayers, toCreateOptions } from './configMerge';
+import {
+  mergeConfigLayers,
+  toCreateOptions,
+  toExportOverride,
+  validateMergedConfig,
+} from './configMerge';
 
 const build: ExtensionConfig = {
   apiUrl: BUILD_DEFAULTS.apiUrl,
@@ -18,6 +23,16 @@ const build: ExtensionConfig = {
   webhookOnFailIp: BUILD_DEFAULTS.webhookOnFailIp,
   webhookOnBurn: BUILD_DEFAULTS.webhookOnBurn,
 };
+
+describe('findClosestTtl', () => {
+  it('returns an exact match unchanged', () => {
+    expect(findClosestTtl(30 * 60 * 1000)).toBe(30 * 60 * 1000);
+  });
+
+  it('snaps arbitrary durations to a supported option', () => {
+    expect(findClosestTtl(5 * 60 * 1000 + 1)).toBe(5 * 60 * 1000);
+  });
+});
 
 describe('mergeConfigLayers', () => {
   it('prefers user over managed over build', () => {
@@ -66,6 +81,18 @@ describe('parseConfigOverride', () => {
     expect(data.rc).toBeUndefined();
     expect(errors.length).toBeGreaterThan(0);
   });
+
+  it('rejects private apiUrl hosts', () => {
+    const { data, errors } = parseConfigOverride({ apiUrl: 'http://169.254.169.254' });
+    expect(data.apiUrl).toBeUndefined();
+    expect(errors.some((e) => e.startsWith('apiUrl:'))).toBe(true);
+  });
+
+  it('rejects localhost webUrl', () => {
+    const { data, errors } = parseConfigOverride({ webUrl: 'http://localhost:3000' });
+    expect(data.webUrl).toBeUndefined();
+    expect(errors.some((e) => e.startsWith('webUrl:'))).toBe(true);
+  });
 });
 
 describe('toCreateOptions', () => {
@@ -101,5 +128,38 @@ describe('toCreateOptions', () => {
         b: true,
       },
     });
+  });
+});
+
+describe('toExportOverride', () => {
+  it('encodes cleared optionals as null for round-trips', () => {
+    const exported = toExportOverride({ ...build, ips: undefined, webhookUrl: undefined });
+    expect(exported.ips).toBeNull();
+    expect(exported.webhookUrl).toBeNull();
+    expect(exported.apiUrl).toBe(build.apiUrl);
+  });
+});
+
+describe('validateMergedConfig', () => {
+  it('flags webhook URL with all events disabled across layers', () => {
+    const errors = validateMergedConfig({
+      ...build,
+      webhookUrl: 'https://hooks.example/crypt',
+      webhookOnRead: false,
+      webhookOnFailPassword: false,
+      webhookOnFailIp: false,
+      webhookOnBurn: false,
+    });
+    expect(errors.some((e) => e.startsWith('webhookUrl:'))).toBe(true);
+  });
+
+  it('allows webhook when at least one event is on', () => {
+    expect(
+      validateMergedConfig({
+        ...build,
+        webhookUrl: 'https://hooks.example/crypt',
+        webhookOnRead: true,
+      }),
+    ).toEqual([]);
   });
 });

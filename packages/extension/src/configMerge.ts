@@ -133,3 +133,46 @@ export function toCreateOptions(config: ExtensionConfig) {
       : undefined,
   };
 }
+
+/**
+ * Full user-layer snapshot suitable for export/import round-trips.
+ * Empty optionals are encoded as `null` so clears survive import (and do not
+ * fall back to managed/build again).
+ */
+export function toExportOverride(config: ExtensionConfig): ConfigOverride {
+  return {
+    apiUrl: config.apiUrl,
+    webUrl: config.webUrl,
+    ttl: config.ttl,
+    burn: config.burn,
+    ips: config.ips ?? null,
+    rc: config.rc ?? null,
+    fc: config.fc ?? null,
+    webhookUrl: config.webhookUrl ?? null,
+    webhookName: config.webhookName ?? null,
+    webhookOnRead: config.webhookOnRead,
+    webhookOnFailPassword: config.webhookOnFailPassword,
+    webhookOnFailIp: config.webhookOnFailIp,
+    webhookOnBurn: config.webhookOnBurn,
+  };
+}
+
+/** Cross-layer checks that per-field parse cannot see (managed URL + user event flags). */
+export function validateMergedConfig(config: ExtensionConfig): string[] {
+  const errors: string[] = [];
+  const webhookUrl = emptyOptional(config.webhookUrl);
+  if (
+    webhookUrl &&
+    !(
+      config.webhookOnRead ||
+      config.webhookOnFailPassword ||
+      config.webhookOnFailIp ||
+      config.webhookOnBurn
+    )
+  ) {
+    errors.push(
+      'webhookUrl: At least one webhook event must be enabled when a webhook URL is set',
+    );
+  }
+  return errors;
+}

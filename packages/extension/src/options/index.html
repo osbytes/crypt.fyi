@@ -174,11 +174,17 @@
           </button>
           <label
             class="file-btn inline-flex cursor-pointer items-center rounded-md border border-line bg-paper-elevated px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-muted"
+            title="Replaces all saved overrides with the file contents. Omitted keys fall back to organization/built-in defaults."
           >
-            Import JSON
+            Import JSON (replace)
             <input id="import-input" type="file" accept="application/json,.json" class="sr-only" />
           </label>
         </div>
+        <p class="text-xs leading-relaxed text-ink-muted">
+          Import replaces your saved overrides entirely (same as Save). Use Export to capture the
+          current effective settings, including cleared optional fields as
+          <code class="text-[0.7rem]">null</code>.
+        </p>
       </form>
     </main>
     <script type="module" src="./main.ts"></script>

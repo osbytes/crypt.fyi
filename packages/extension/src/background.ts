@@ -30,7 +30,13 @@ function isScriptableUrl(url: string): boolean {
 }
 
 async function createClient() {
-  const { config } = await resolveConfig();
+  const resolved = await resolveConfig();
+  // Prefer a hard failure over silently posting ciphertext to the public API
+  // (or firing a webhook with no events) when org/user endpoint policy is bad.
+  if (resolved.createBlockingErrors.length > 0) {
+    throw new Error(resolved.createBlockingErrors.join('\n'));
+  }
+  const { config } = resolved;
   const manifest = chrome.runtime.getManifest();
   return {
     config,

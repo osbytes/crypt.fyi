@@ -36,25 +36,30 @@ const ipsSchema = z
     }
   });
 
-const webhookUrlSchema = z
-  .union([z.string(), z.null()])
-  .optional()
-  .superRefine((val, ctx) => {
-    if (val == null || !String(val).trim()) return;
+function publicHttpUrlRefine(label: string) {
+  return (val: string, ctx: z.RefinementCtx) => {
     try {
-      if (!isValidWebhookUrl(String(val), { requireHttps: false })) {
+      if (!isValidWebhookUrl(val, { requireHttps: false })) {
         ctx.addIssue({
           code: 'custom',
-          message:
-            'Webhook URL must be a public http(s) URL and must not target a private or reserved address',
+          message: `${label} must be a public http(s) URL and must not target a private or reserved address`,
         });
       }
     } catch {
       ctx.addIssue({
         code: 'custom',
-        message: 'Invalid webhook URL',
+        message: `Invalid ${label}`,
       });
     }
+  };
+}
+
+const webhookUrlSchema = z
+  .union([z.string(), z.null()])
+  .optional()
+  .superRefine((val, ctx) => {
+    if (val == null || !String(val).trim()) return;
+    publicHttpUrlRefine('Webhook URL')(String(val), ctx);
   });
 
 const optionalNumber = z.union([z.number().int(), z.null()]).optional();
@@ -62,8 +67,9 @@ const optionalNumber = z.union([z.number().int(), z.null()]).optional();
 /** Partial overrides from storage.managed / storage.sync / import JSON. */
 export const configOverrideSchema = z
   .object({
-    apiUrl: z.string().url().optional(),
-    webUrl: z.string().url().optional(),
+    // Same public-host rules as webhooks — blocks literal private/metadata targets.
+    apiUrl: z.string().superRefine(publicHttpUrlRefine('API URL')).optional(),
+    webUrl: z.string().superRefine(publicHttpUrlRefine('Web URL')).optional(),
     ttl: z
       .number()
       .refine((n) => (ttlValues as number[]).includes(n), {

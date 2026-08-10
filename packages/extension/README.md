@@ -63,7 +63,9 @@ Precedence for each setting: **your saved options → organization managed polic
 | `webhookUrl` / `webhookName` | Webhook target and label |
 | `webhookOnRead` / `webhookOnFailPassword` / `webhookOnFailIp` / `webhookOnBurn` | Webhook events |
 
-Open settings from the extension toolbar icon, or via the browser’s extension details → Options. Use **Export / Import JSON** to share a config file with self-hosters who are not on managed browsers. **Reset to defaults** clears your overrides so managed/build values apply again.
+Open settings from the extension toolbar icon, or via the browser’s extension details → Options. Use **Export / Import JSON** to share a config file with self-hosters who are not on managed browsers. **Import replaces all saved overrides** (omitted keys fall back to managed/build). Export writes the full effective snapshot, including `null` for cleared optionals so round-trips keep those clears. **Reset to defaults** clears your overrides so managed/build values apply again.
+
+`apiUrl` / `webUrl` / `webhookUrl` must be public http(s) URLs (no private/reserved literal IPs or internal hostnames such as `localhost`). Self-host on a public hostname, or build a branded extension with `VITE_API_URL` / `VITE_WEB_URL`.
 
 ### Chrome enterprise (seed defaults)
 
@@ -97,6 +99,8 @@ Use `policies.json` `3rdparty.Extensions` as in [`examples/firefox-policies.json
 - The encrypted content is sent to the configured API host
 - Default create options burn after reading with a 30-minute TTL unless overridden
 - Pointing `apiUrl` / `webUrl` at non-default hosts changes who receives ciphertext and who hosts the share UI — only use hosts you trust
+- Invalid configured endpoints are not silently replaced by the public defaults during encrypt; fix the options/policy error first
+- Organization `storage.managed` values are **seed defaults**, not locks — users can override them in Options unless you ship a custom build
 
 ## License
 
