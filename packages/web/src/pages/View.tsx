@@ -65,18 +65,6 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
 
   const { client } = useClient();
 
-  const existsQuery = useQuery({
-    queryKey: [id, 'exists'],
-    queryFn: async () => {
-      await sleep(500, { enabled: config.IS_DEV });
-      return client.exists(id);
-    },
-    retry: () => false,
-    // This is a one-time preflight. A background HEAD after a burn-after-read
-    // decrypt can return false and must not replace content already in memory.
-    staleTime: Infinity,
-  });
-
   const decryptMutation = useMutation({
     mutationKey: [id, 'decrypt'],
     mutationFn: async (submittedPassword: string) => {
@@ -113,6 +101,18 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
         toast.error(error.message);
       }
     },
+  });
+
+  const existsQuery = useQuery({
+    queryKey: [id, 'exists'],
+    queryFn: async () => {
+      await sleep(500, { enabled: config.IS_DEV });
+      return client.exists(id);
+    },
+    retry: () => false,
+    // Network stop: once content is in memory, skip further HEADs so a
+    // post-burn false cannot race the UI. Remount re-enables (mutation gcTime: 0).
+    enabled: !decryptMutation.data,
   });
 
   const submitCredentials = ({ key, nextPassword }: { key?: string; nextPassword?: string }) => {
@@ -159,7 +159,11 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
     !(decryptError instanceof ErrorInvalidKeyAndOrPassword) &&
     !(decryptError instanceof ErrorNotFound) &&
     !(decryptError instanceof ErrorUnexpectedStatus && decryptError.status === 429);
+  const isRetryPending = existsQuery.isFetching || decryptMutation.isPending;
   const retryFailedRequest = (retryExists: boolean) => {
+    if (isRetryPending) {
+      return;
+    }
     if (retryExists) {
       void existsQuery.refetch();
       return;
@@ -175,7 +179,10 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
         <Card className="p-8">
           <h1 className="text-2xl font-semibold mb-4">{t('view.rateLimit.title')}</h1>
           <p className="text-muted-foreground mb-6">{t('view.rateLimit.description')}</p>
-          <Button onClick={() => retryFailedRequest(isExistsRateLimited)}>
+          <Button
+            isLoading={isRetryPending}
+            onClick={() => retryFailedRequest(isExistsRateLimited)}
+          >
             {t('view.rateLimit.tryAgain')}
           </Button>
         </Card>
@@ -189,7 +196,7 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
         <Card className="p-8">
           <h1 className="text-2xl font-semibold mb-4">{t('view.connectionError.title')}</h1>
           <p className="text-muted-foreground mb-6">{t('view.connectionError.description')}</p>
-          <Button onClick={() => retryFailedRequest(existsFailed)}>
+          <Button isLoading={isRetryPending} onClick={() => retryFailedRequest(existsFailed)}>
             {t('view.connectionError.tryAgain')}
           </Button>
         </Card>
@@ -211,7 +218,12 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
     );
   }
 
-  if (decryptError instanceof ErrorNotFound || existsQuery.data === false) {
+  // Render guard: a false exists result must not replace content already decrypted
+  // (e.g. burn-after-read). Complements enabled: !decryptMutation.data above.
+  if (
+    decryptError instanceof ErrorNotFound ||
+    (existsQuery.data === false && !decryptMutation.data)
+  ) {
     return (
       <div className="max-w-3xl mx-auto mt-8 text-center">
         <Card className="p-8">
