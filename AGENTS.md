@@ -28,7 +28,7 @@ pnpm dev               # Redis + turbo dev (API default: http://localhost:4321)
 pnpm lint
 pnpm typecheck
 pnpm test
-pnpm test:e2e          # Playwright create→read smoke under production CSP
+pnpm test:e2e          # Playwright product + CSP smoke (create/read/burn, password)
 pnpm format / pnpm format:check
 pnpm changeset         # version bumps for publishable packages
 ```
