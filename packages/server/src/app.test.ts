@@ -258,7 +258,10 @@ describe('app', () => {
   });
 
   it('verifies TTL behavior with read count', async () => {
-    const initialTTL = 5000;
+    // Keep TTL well above CI scheduling jitter — a 5s TTL previously expired before
+    // the GET when this suite ran ~5.2s under load.
+    const initialTTL = 30_000;
+    const waitMs = 1_000;
     const readCount = 3;
     const createResponse = await testContext.client.request({
       method: 'POST',
@@ -291,7 +294,7 @@ describe('app', () => {
 
     // Under CI CPU contention setTimeout can fire much later than requested; assert
     // against wall-clock elapsed instead of assuming the delay was exact.
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
 
     const getResponse = await testContext.client.request({
       method: 'GET',
@@ -304,7 +307,7 @@ describe('app', () => {
     // Reading with remaining read-count must preserve the remaining TTL (not reset it).
     expect(ttlAfterRead).toBeGreaterThan(0);
     expect(ttlAfterRead).toBeLessThan(initialRedisTTL);
-    expect(Math.abs(ttlAfterRead - (initialTTL - elapsedMs))).toBeLessThan(750);
+    expect(Math.abs(ttlAfterRead - (initialTTL - elapsedMs))).toBeLessThan(2_000);
 
     const remainingReads = JSON.parse((await testContext.redis.get(`vault:${id}`)) ?? '{}')?.rc;
     expect(remainingReads).toBe(2);

@@ -1,9 +1,98 @@
-export const config = {
-  apiUrl: (import.meta.env.VITE_API_URL as string | undefined) || 'https://api.crypt.fyi',
-  webUrl: (import.meta.env.VITE_WEB_URL as string | undefined) || 'https://crypt.fyi',
-  defaultTtl: getEnvNumber(import.meta.env.VITE_DEFAULT_TTL, 30 * 60 * 1000),
-  keyLength: getEnvNumber(import.meta.env.VITE_KEY_LENGTH, 32),
+/** Build-time fallbacks; runtime overrides come from storage (user > managed > build). */
+
+// Vite injects import.meta.env at build time; Node/Jest may not define `.env`.
+const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env ?? {};
+
+export const MINUTE = 1000 * 60;
+export const HOUR = MINUTE * 60;
+export const DAY = HOUR * 24;
+
+export const MAX_IP_RESTRICTIONS = 3;
+
+export const TTL_OPTIONS = [
+  { label: '5 minutes', value: 5 * MINUTE },
+  { label: '30 minutes', value: 30 * MINUTE },
+  { label: '1 hour', value: HOUR },
+  { label: '4 hours', value: 4 * HOUR },
+  { label: '12 hours', value: 12 * HOUR },
+  { label: '1 day', value: DAY },
+  { label: '3 days', value: 3 * DAY },
+  { label: '7 days', value: 7 * DAY },
+] as const;
+
+/** Snap an arbitrary duration to the nearest supported TTL (keeps UI + schema in sync). */
+export function findClosestTtl(ttl: number): number {
+  let closest = TTL_OPTIONS[0].value;
+  let best = Math.abs(ttl - closest);
+  for (const option of TTL_OPTIONS) {
+    const distance = Math.abs(ttl - option.value);
+    if (distance < best) {
+      closest = option.value;
+      best = distance;
+    }
+  }
+  return closest;
+}
+
+export const BUILD_DEFAULTS = {
+  apiUrl: env.VITE_API_URL || 'https://api.crypt.fyi',
+  webUrl: env.VITE_WEB_URL || 'https://crypt.fyi',
+  // Env may set a non-listed duration; snap so options Save never invents a new TTL.
+  ttl: findClosestTtl(getEnvNumber(env.VITE_DEFAULT_TTL, 30 * MINUTE)),
+  burn: true,
+  ips: undefined as string | undefined,
+  rc: undefined as number | undefined,
+  fc: undefined as number | undefined,
+  webhookUrl: undefined as string | undefined,
+  webhookName: undefined as string | undefined,
+  webhookOnRead: true,
+  webhookOnFailPassword: false,
+  webhookOnFailIp: false,
+  webhookOnBurn: false,
 } as const;
+
+/** Crypto key length stays build-time only — not a user/admin dial. */
+export const KEY_LENGTH = getEnvNumber(env.VITE_KEY_LENGTH, 32);
+
+export type ExtensionConfig = {
+  apiUrl: string;
+  webUrl: string;
+  ttl: number;
+  burn: boolean;
+  ips?: string;
+  rc?: number;
+  fc?: number;
+  webhookUrl?: string;
+  webhookName?: string;
+  webhookOnRead: boolean;
+  webhookOnFailPassword: boolean;
+  webhookOnFailIp: boolean;
+  webhookOnBurn: boolean;
+};
+
+/**
+ * Keys that can appear in storage.sync / storage.managed.
+ * `null` clears an optional so it does not fall back to a lower layer.
+ */
+export type ConfigOverride = {
+  [K in keyof ExtensionConfig]?: ExtensionConfig[K] | null;
+};
+
+export const CONFIG_KEYS = [
+  'apiUrl',
+  'webUrl',
+  'ttl',
+  'burn',
+  'ips',
+  'rc',
+  'fc',
+  'webhookUrl',
+  'webhookName',
+  'webhookOnRead',
+  'webhookOnFailPassword',
+  'webhookOnFailIp',
+  'webhookOnBurn',
+] as const satisfies ReadonlyArray<keyof ExtensionConfig>;
 
 function getEnvNumber(env: string | undefined, defaultValue: number): number {
   if (!env) {

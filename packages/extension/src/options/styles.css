@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+
+/* Match packages/web design tokens (neutral black/white brand). */
+@theme {
+  --font-sans: 'Segoe UI', 'Helvetica Neue', ui-sans-serif, sans-serif;
+  --color-ink: hsl(0 0% 5%);
+  --color-ink-muted: hsl(0 0% 47%);
+  --color-paper: hsl(0 0% 100%);
+  --color-paper-elevated: hsl(0 0% 100%);
+  --color-line: hsl(0 0% 91%);
+  --color-primary: hsl(0 0% 11%);
+  --color-primary-fg: hsl(0 0% 98%);
+  --color-muted: hsl(0 0% 96%);
+  --color-danger: hsl(0 84% 40%);
+  --color-danger-soft: hsl(0 84% 96%);
+  --color-ok-soft: hsl(0 0% 96%);
+}
+
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-ink: hsl(0 0% 98%);
+    --color-ink-muted: hsl(0 0% 65%);
+    --color-paper: hsl(0 0% 5%);
+    --color-paper-elevated: hsl(0 0% 5%);
+    --color-line: hsl(0 0% 25%);
+    --color-primary: hsl(0 0% 98%);
+    --color-primary-fg: hsl(0 0% 11%);
+    --color-muted: hsl(0 0% 17%);
+    --color-danger: hsl(0 65% 68%);
+    --color-danger-soft: hsl(0 40% 16%);
+    --color-ok-soft: hsl(0 0% 17%);
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    @apply m-0 min-h-screen bg-paper font-sans text-ink antialiased;
+  }
+
+  input[type='url'],
+  input[type='text'],
+  input[type='number'],
+  select {
+    @apply w-full rounded-md border border-line bg-paper-elevated px-3 py-2.5 text-ink shadow-sm outline-none transition;
+  }
+
+  input:focus,
+  select:focus,
+  button:focus-visible,
+  .file-btn:focus-within {
+    @apply ring-2 ring-primary/25 ring-offset-2 ring-offset-paper;
+  }
+
+  input:disabled,
+  select:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+}
