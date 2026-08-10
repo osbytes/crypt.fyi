@@ -1,5 +1,14 @@
 # @crypt.fyi/web
 
+## 0.0.20
+
+### Patch Changes
+
+- [#146](https://github.com/osbytes/crypt.fyi/pull/146) [`1298f4b`](https://github.com/osbytes/crypt.fyi/commit/1298f4be1fda69bf7bdefc63bfc58d1a34a71b68) Thanks [@snowyukitty](https://github.com/snowyukitty)! - Restore recoverable credential and request retry states in the secret view flow.
+
+- Updated dependencies []:
+  - @crypt.fyi/core@0.0.20
+
 ## 0.0.19
 
 ### Patch Changes
