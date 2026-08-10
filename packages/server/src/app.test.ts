@@ -16,6 +16,8 @@ const initAppTest = async () => {
     ...baseConfig,
     healthCheckEndpoint: '/some-health-check-endpoint',
     vaultEntryTTLMsDefault: 1000,
+    // Keep counters out of Redis so unit tests cannot poison e2e / local API limits.
+    rateLimiter: 'memory',
     rateLimitMax: Number.MAX_SAFE_INTEGER,
   } satisfies Config;
   const logger = pino({ enabled: false });

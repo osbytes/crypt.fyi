@@ -5,10 +5,12 @@ import { loadProductionCsp } from './csp';
 
 const webRoot = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(webRoot, '../..');
-const apiUrl = process.env.VITE_API_URL ?? 'http://localhost:4321';
+// Dedicated ports so local `pnpm dev` (API :4321 / Vite :5173) can stay up without
+// Playwright attaching to the wrong process or failing to bind.
+const apiUrl = process.env.VITE_API_URL ?? 'http://localhost:4322';
 const webPort = Number(process.env.PLAYWRIGHT_WEB_PORT ?? 4173);
 const webOrigin = `http://localhost:${webPort}`;
-const apiPort = new URL(apiUrl).port || '4321';
+const apiPort = new URL(apiUrl).port || '4322';
 const previewCsp = loadProductionCsp(apiUrl);
 
 export default defineConfig({
@@ -31,7 +33,8 @@ export default defineConfig({
     {
       command: `node "${path.join(repoRoot, 'packages/server/dist/index.js')}"`,
       url: `${apiUrl.replace(/\/$/, '')}/health`,
-      reuseExistingServer: !process.env.CI,
+      // Always spawn our own API so RATE_LIMITER / MAX / PORT cannot be silently ignored.
+      reuseExistingServer: false,
       timeout: 120_000,
       stdout: 'pipe',
       stderr: 'pipe',
@@ -41,16 +44,19 @@ export default defineConfig({
         REDIS_URL: process.env.REDIS_URL ?? 'redis://127.0.0.1:6379',
         CORS_ORIGIN: '*',
         PORT: apiPort,
-        // Smoke can re-run quickly; don't trip the default 10 req/min vault limit.
+        // Process-local counters: no shared Redis rate-limit keys with unit tests or `pnpm dev`.
+        RATE_LIMITER: process.env.RATE_LIMITER ?? 'memory',
         RATE_LIMIT_MAX: process.env.RATE_LIMIT_MAX ?? '1000',
       },
     },
     {
-      command: `pnpm exec vite preview --host localhost --port ${webPort}`,
+      // Rebuild so `import.meta.env.VITE_API_URL` matches the e2e API port/CSP
+      // (vite preview only serves already-baked assets).
+      command: `pnpm exec vite build && pnpm exec vite preview --host localhost --port ${webPort}`,
       cwd: webRoot,
       url: webOrigin,
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
+      reuseExistingServer: false,
+      timeout: 180_000,
       stdout: 'pipe',
       stderr: 'pipe',
       env: {

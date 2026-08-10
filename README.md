@@ -132,8 +132,9 @@ Publishable packages: `@crypt.fyi/core` and `@crypt.fyi/cli` (npm), plus the Chr
 
 - Production CSP (including `style-src` hashes for sonner/Radix inline styles) lives in `nginx/nginx.conf`
 - `vite preview` applies that same policy via `packages/web/csp.ts` so local/CI match production
-- `pnpm test:e2e` runs a Playwright create→read smoke under that CSP. It fails on `style-src` / `connect-src` violations; other console warnings/errors and non-style CSP noise (e.g. `script-src` eval fallback notes) are reported as non-blocking annotations
-- When the smoke fails on style-src, add the reported hash to `nginx/nginx.conf` (do not weaken to `'unsafe-inline'`)
+- `pnpm test:e2e` runs Playwright against `vite preview` under that CSP (default create→read→burn, password unlock). It fails on `style-src` / `connect-src` violations; other console warnings/errors and non-style CSP noise (e.g. `script-src` eval fallback notes) are reported as non-blocking annotations
+- The e2e API uses an in-memory rate limiter and dedicated ports (`:4322` API / `:4173` preview by default) so local `pnpm dev` and shared Redis rate-limit keys cannot poison the suite. Playwright rebuilds the web client with that API URL before preview so CSP `connect-src` matches the baked client config.
+- When a test fails on style-src, add the reported hash to `nginx/nginx.conf` (do not weaken to `'unsafe-inline'`)
 - Reference: [sonner#449](https://github.com/emilkowalski/sonner/issues/449)
 
 ### Development Environment
