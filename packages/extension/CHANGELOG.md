@@ -1,5 +1,14 @@
 # @crypt.fyi/extension
 
+## 0.0.20
+
+### Patch Changes
+
+- [#144](https://github.com/osbytes/crypt.fyi/pull/144) [`e161e1a`](https://github.com/osbytes/crypt.fyi/commit/e161e1ad01a04e909376d22c98df926be9e4638b) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Add an options page and managed-storage defaults for the browser extension so users and admins can configure create settings without rebuilding.
+
+- Updated dependencies []:
+  - @crypt.fyi/core@0.0.20
+
 ## 0.0.19
 
 ### Patch Changes
