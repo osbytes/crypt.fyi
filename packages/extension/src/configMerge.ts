@@ -170,9 +170,7 @@ export function validateMergedConfig(config: ExtensionConfig): string[] {
       config.webhookOnBurn
     )
   ) {
-    errors.push(
-      'webhookUrl: At least one webhook event must be enabled when a webhook URL is set',
-    );
+    errors.push('webhookUrl: At least one webhook event must be enabled when a webhook URL is set');
   }
   return errors;
 }
