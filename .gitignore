@@ -9,3 +9,4 @@ extension.zip
 **/test-results/
 **/playwright-report/
 **/blob-report/
+.yarn/
