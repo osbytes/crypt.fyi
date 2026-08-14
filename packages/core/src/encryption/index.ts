@@ -7,3 +7,4 @@ export * as stream from './stream';
 
 export * from './encryption';
 export * from './registry';
+export * from './compression';

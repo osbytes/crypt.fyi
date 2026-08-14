@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { sha256, ErrorNotFound, sleep } from '@crypt.fyi/core';
+import { sha256, ErrorNotFound, ErrorPayloadTooLarge, sleep } from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useMemo, DragEvent } from 'react';
 import {
@@ -470,7 +470,11 @@ export function CreatePage() {
       };
     },
     onError(error) {
-      toast.error(error.message);
+      // A server-side size rejection surfaced as "unexpected status code 413",
+      // which tells the user nothing they can act on.
+      toast.error(
+        error instanceof ErrorPayloadTooLarge ? t('create.errors.payloadTooLarge') : error.message,
+      );
     },
     gcTime: 0,
   });

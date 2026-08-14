@@ -204,6 +204,8 @@ export const de: TranslationKeys = {
       webhookConfigInvalid:
         'Webhook-Konfiguration ist ungültig - mindestens ein Webhook-Ereignistyp ist erforderlich',
       fileSizeExceeded: 'Datei ist zu groß. Maximale Größe ist {{max}}.',
+      payloadTooLarge:
+        'Dieses Geheimnis ist zu groß für diesen Server. Versuche eine kleinere Datei.',
       fileReadError: 'Fehler beim Lesen der Datei',
       fileReadAborted: 'Dateilesen wurde abgebrochen',
     },

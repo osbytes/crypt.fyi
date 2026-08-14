@@ -196,6 +196,7 @@ export const zh: TranslationKeys = {
       unexpectedStatus: '意外的状态码 {{code}}',
       webhookConfigInvalid: 'Webhook配置无效 - 至少需要一个Webhook事件类型',
       fileSizeExceeded: '文件过大。最大大小为 {{max}}。',
+      payloadTooLarge: '此密钥对该服务器来说太大。请尝试较小的文件。',
       fileReadError: '读取文件失败',
       fileReadAborted: '文件读取已中止',
     },

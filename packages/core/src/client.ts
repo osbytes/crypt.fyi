@@ -13,6 +13,7 @@ import {
   validateMetadata,
   isStreamAlgorithm,
 } from './encryption/registry';
+import { chooseCompressionAlgorithm } from './encryption/compression';
 import { ProcessingMetadata } from './vault';
 import { gcm } from './encryption';
 import { inflate } from 'pako';
@@ -134,7 +135,10 @@ export class Client {
     // the user-password layer, and only when a password is actually set.
     const metadata: ProcessingMetadata = input.m ?? {
       compression: {
-        algorithm: 'zlib:pako',
+        // Chosen per payload: deflate has to beat the base64 that follows it,
+        // which incompressible content (images, archives, encrypted files)
+        // never does. See encryption/compression.ts.
+        algorithm: chooseCompressionAlgorithm(input.c),
       },
       encryption: {
         algorithm: 'ml-kem-768-2',
@@ -192,6 +196,9 @@ export class Client {
       } satisfies CreateVaultRequest),
     });
     if (!response.ok) {
+      if (response.status === 413) {
+        throw new ErrorPayloadTooLarge();
+      }
       throw new ErrorUnexpectedStatus(response.status);
     }
 
@@ -286,6 +293,13 @@ function assertInlineAlgorithm(metadata: ProcessingMetadata) {
     );
   }
   return algorithm;
+}
+
+export class ErrorPayloadTooLarge extends Error {
+  constructor() {
+    super('secret is too large for this server');
+    this.name = 'ErrorPayloadTooLarge';
+  }
 }
 
 export class ErrorStreamedPayload extends Error {

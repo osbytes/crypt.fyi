@@ -206,6 +206,8 @@ export const fr: TranslationKeys = {
       webhookConfigInvalid:
         "La configuration du webhook est invalide - au moins un type d'événement webhook est requis",
       fileSizeExceeded: 'Le fichier est trop volumineux. La taille maximale est {{max}}.',
+      payloadTooLarge:
+        'Ce secret est trop volumineux pour ce serveur. Essayez un fichier plus petit.',
       fileReadError: 'Échec de la lecture du fichier',
       fileReadAborted: 'La lecture du fichier a été interrompue',
     },

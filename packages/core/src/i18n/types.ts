@@ -190,6 +190,7 @@ export interface TranslationKeys {
       unexpectedStatus: string;
       webhookConfigInvalid: string;
       fileSizeExceeded: string;
+      payloadTooLarge: string;
       fileReadError: string;
       fileReadAborted: string;
     };

@@ -219,7 +219,11 @@ export const config = (() => {
     vaultEntryTTLMsDefault: process.env.VAULT_ENTRY_TTL_MS_DEFAULT,
     vaultEntryIdentifierLength: process.env.VAULT_ENTRY_IDENTIFIER_LENGTH,
     vaultEntryDeleteTokenLength: process.env.VAULT_ENTRY_DELETE_TOKEN_LENGTH,
-    bodyLimit: parseBytes(process.env.BODY_LIMIT_BYTES ?? '100KB'),
+    // Inline payloads expand ~1.8x (no password) to ~2.4x (password) through
+    // compression + ML-KEM + base64, so 100KB only carried ~40KB of file while
+    // the UI offered 1MB. 3MB covers the 1 MiB inline threshold with headroom;
+    // anything larger belongs on the streamed path.
+    bodyLimit: parseBytes(process.env.BODY_LIMIT_BYTES ?? '3MB'),
     swaggerUIPath: process.env.SWAGGER_UI_PATH,
     corsOrigin: process.env.CORS_ORIGIN,
     corsMethods: process.env.CORS_METHODS,

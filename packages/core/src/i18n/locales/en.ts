@@ -202,6 +202,7 @@ export const en: TranslationKeys = {
       webhookConfigInvalid:
         'Webhook configuration is invalid - at least one webhook event type is required',
       fileSizeExceeded: 'File is too large. Maximum size is {{max}}.',
+      payloadTooLarge: 'This secret is too large for this server. Try a smaller file.',
       fileReadError: 'Failed to read file',
       fileReadAborted: 'File reading was aborted',
     },
