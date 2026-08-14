@@ -12,6 +12,7 @@ import { buildObjectKey } from './storage/index.js';
 import { MIN_PART_SIZE } from './storage/types.js';
 import { Redis } from 'ioredis';
 import { Client } from 'undici';
+import { StreamClient } from '@crypt.fyi/core';
 
 // Small enough to keep the suite quick, large enough that a payload still needs
 // several parts. The storage minimum is what forces the shape of these tests.
@@ -54,12 +55,14 @@ const initStreamTest = async (overrides: Partial<Config> = {}) => {
   await app.fastify.listen();
 
   const port = (app.fastify.server.address() as AddressInfo).port;
+  const baseUrl = `http://localhost:${port}`;
   return {
     config,
     app,
     redis,
     blobStorage,
-    client: new Client(`http://localhost:${port}`),
+    baseUrl,
+    client: new Client(baseUrl),
   };
 };
 
@@ -345,4 +348,88 @@ describe('object keys', () => {
     expect(buildObjectKey('/nested/prefix/', 'xyz', at)).toBe('nested/prefix/2026/01/02/xyz');
     expect(buildObjectKey('', 'xyz', at)).toBe('2026/01/02/xyz');
   });
+});
+
+describe('streamed payloads / end to end through StreamClient', () => {
+  let ctx: Ctx;
+
+  beforeEach(async () => {
+    ctx = await initStreamTest();
+  });
+
+  afterEach(async () => {
+    await ctx.app.shutdown();
+    await ctx.app.fastify.close();
+    await ctx.client.close();
+  });
+
+  // Large enough to span more than one part at the 4 MiB production frame size,
+  // which is the only way to exercise real part planning against the storage
+  // minimum the server enforces.
+  const payload = (size: number) => {
+    const out = new Uint8Array(size);
+    for (let i = 0; i < size; i++) out[i] = (i * 37 + 11) & 0xff;
+    return out;
+  };
+
+  it('encrypts, uploads in parts, downloads and decrypts back to the original', async () => {
+    const client = new StreamClient({ apiUrl: ctx.baseUrl });
+    const content = payload(14 * 1024 * 1024);
+    const phases = new Set<string>();
+
+    const created = await client.create({
+      content,
+      metadata: { name: 'holiday.mp4', type: 'video/mp4' },
+      b: true,
+      ttl: 60_000,
+      m: { encryption: { algorithm: 'ml-kem-768-stream' } },
+      onProgress: (event) => phases.add(event.phase),
+    });
+
+    expect(created.id).toBeTruthy();
+    expect(phases).toContain('encrypting');
+    expect(phases).toContain('uploading');
+
+    const read = await client.read(created.id, created.key);
+    expect(read.content.length).toBe(content.length);
+    expect(Buffer.from(read.content).equals(Buffer.from(content))).toBe(true);
+    // The filename travels inside the encrypted metadata frame, never in a key.
+    expect(read.metadata.name).toBe('holiday.mp4');
+    expect(read.metadata.type).toBe('video/mp4');
+    expect(read.burned).toBe(true);
+  }, 60_000);
+
+  it('round-trips a password-protected payload and rejects the wrong password', async () => {
+    const client = new StreamClient({ apiUrl: ctx.baseUrl });
+    const content = payload(64 * 1024);
+
+    const created = await client.create({
+      content,
+      metadata: { name: 'keys.txt', type: 'text/plain' },
+      password: 'correct horse battery staple',
+      b: false,
+      rc: 3,
+      ttl: 60_000,
+      m: { encryption: { algorithm: 'ml-kem-768-stream' } },
+    });
+
+    const read = await client.read(created.id, created.key, 'correct horse battery staple');
+    expect(Buffer.from(read.content).equals(Buffer.from(content))).toBe(true);
+
+    await expect(client.read(created.id, created.key, 'wrong password')).rejects.toThrow();
+  }, 60_000);
+
+  it('reports 404 once the payload has been burned', async () => {
+    const client = new StreamClient({ apiUrl: ctx.baseUrl });
+    const created = await client.create({
+      content: payload(4096),
+      metadata: { name: 'once.bin', type: 'application/octet-stream' },
+      b: true,
+      ttl: 60_000,
+      m: { encryption: { algorithm: 'ml-kem-768-stream' } },
+    });
+
+    await client.read(created.id, created.key);
+    await expect(client.read(created.id, created.key)).rejects.toThrow(/not found/i);
+  }, 60_000);
 });
