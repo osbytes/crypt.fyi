@@ -1,6 +1,21 @@
 services:
   redis:
     image: redis:latest
+    # Bound memory so a flood of secrets can't exhaust the host. Secrets are
+    # TTL'd and must never be silently dropped, so use noeviction: once the cap
+    # is hit, new writes are rejected (surfacing pressure) rather than evicting
+    # live secrets. Tune REDIS_MAXMEMORY to the host.
+    command:
+      - redis-server
+      - --maxmemory
+      - ${REDIS_MAXMEMORY:-256mb}
+      - --maxmemory-policy
+      - noeviction
+      - --save
+      - '900'
+      - '1'
+      - --loglevel
+      - warning
     volumes:
       - redis_data:/data
 
@@ -22,6 +37,11 @@ services:
       dockerfile: Dockerfile.web
       args:
         - VITE_API_URL=${API_URL:-http://localhost:${SERVER_PORT:-4321}}
+        # Password policy. Defaults to optional; set REQUIRE_PASSWORD=true (and
+        # optionally PASSWORD_MIN_LENGTH) in .env, then rebuild — these are
+        # compiled into the static bundle, so `--build` is required to change them.
+        - VITE_REQUIRE_PASSWORD=${REQUIRE_PASSWORD:-false}
+        - VITE_PASSWORD_MIN_LENGTH=${PASSWORD_MIN_LENGTH:-5}
     environment:
       - API_URL=${API_URL:-http://localhost:${SERVER_PORT:-4321}}
     ports:

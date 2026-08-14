@@ -3,27 +3,27 @@ FROM node:22-alpine AS build
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL}
 
+# Password policy is baked into the static bundle at build time, so it must be a
+# build arg — changing it requires a rebuild (same as VITE_API_URL).
+ARG VITE_REQUIRE_PASSWORD
+ENV VITE_REQUIRE_PASSWORD=${VITE_REQUIRE_PASSWORD}
+ARG VITE_PASSWORD_MIN_LENGTH
+ENV VITE_PASSWORD_MIN_LENGTH=${VITE_PASSWORD_MIN_LENGTH}
+
 WORKDIR /app
 
-# Enable Corepack
 RUN corepack enable
 
-# Copy root workspace files and Yarn configuration
-COPY package.json yarn.lock .yarnrc.yml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 
-# Copy package directories structure first
 COPY packages/ ./packages/
-# Remove everything except package.json files
 RUN find packages -type f ! -name "package.json" -delete
 
-# Use --immutable to ensure yarn.lock is respected
-RUN yarn install --immutable
+RUN pnpm install --frozen-lockfile
 
-# Then copy all source files
 COPY . .
 
-# Build the application
-RUN yarn build --filter @crypt.fyi/web
+RUN pnpm build --filter @crypt.fyi/web
 
 FROM nginx:alpine
 

@@ -17,11 +17,7 @@ export const de: TranslationKeys = {
     confirm: 'Bestätigen',
     requestNewLanguage: 'Neue Sprache anfordern oder Übersetzungen korrigieren',
     footer: {
-      tagline: 'Mit Sicherheit und Privatsphäre im Fokus - weil Unwissenheit ein Segen sein kann',
-    },
-    header: {
-      tagline:
-        'Kurzlebiger Datenaustausch mit Zero-Knowledge <aesLink>ML-KEM</aesLink> <e2eLink>Post-Quanten Ende-zu-Ende-Verschlüsselung</e2eLink>',
+      tagline: 'Mit Sicherheit und Privatsphäre im Fokus, weil Unwissenheit ein Segen sein kann',
     },
     time: {
       minute_one: '{{count}} Minute',
@@ -35,81 +31,50 @@ export const de: TranslationKeys = {
   landing: {
     title: 'Zero-Knowledge Geheimnis-Sharing',
     subtitle:
-      'Sicheres einmaliges Teilen sensibler Informationen mit ML-KEM Post-Quanten Ende-zu-Ende-Verschlüsselung. Ihre Geheimnisse werden in Ihrem Browser verschlüsselt, sind für unsere Server nie zugänglich und werden nach dem Ansehen automatisch gelöscht.',
-    features: {
-      encryption: {
-        title: 'ML-KEM Post-Quanten-Verschlüsselung',
-        description:
-          'State-of-the-art ML-KEM Post-Quanten-Verschlüsselung stellt sicher, dass Ihre Daten auch gegen zukünftige Quantencomputer-Bedrohungen sicher bleiben. Die gesamte Verschlüsselung erfolgt in Ihrem Browser vor der Übertragung.',
-      },
-      security: {
-        title: 'Erweiterte Sicherheit',
-        description:
-          'Mehrere Schutzebenen einschließlich strikter Content Security Policy (CSP), Ratenbegrenzung und IP-Beschränkungen. Quantenresistente Verschlüsselung mit automatischer Löschung nach der Ansicht.',
-      },
+      'Im Browser verschlüsseln. Einmal teilen. Für immer weg. Post-Quanten Ende-zu-Ende-Verschlüsselung — unsere Server sehen Ihre Geheimnisse nie.',
+    pillars: {
+      title: 'Für Vertrauen gebaut',
       zeroKnowledge: {
-        title: 'Echte Zero-Knowledge-Architektur',
+        title: 'Echtes Zero-Knowledge',
         description:
-          'Unsere Server sehen Ihre unverschlüsselten Daten nie. Der Verschlüsselungsschlüssel verlässt Ihr Gerät nie, und die gesamte Entschlüsselung erfolgt in Ihrem Browser. Absolute Privatsphäre durch Ende-zu-Ende-Verschlüsselung.',
+          'Verschlüsselungsschlüssel verlassen Ihr Gerät nie. Die Entschlüsselung erfolgt nur im Browser des Empfängers — der Server sieht niemals Klartext.',
       },
-      burn: {
-        title: 'Einmaliges Geheimnis-Sharing',
+      ephemeral: {
+        title: 'Standardmäßig flüchtig',
         description:
-          'Geheimnisse werden nach der Ansicht automatisch gelöscht, sodass sie nur einmal zugänglich sind. Perfekt für sensible Informationen, die niemals bestehen bleiben sollten.',
+          'Löschen nach dem Lesen, individuelle TTLs und Leselimits, damit sensible Daten nicht länger als nötig bestehen.',
       },
-      failedAttempts: {
-        title: 'Löschen nach fehlgeschlagenen Versuchen',
+      defense: {
+        title: 'Mehrschichtiger Schutz',
         description:
-          'Geheimnisse werden nach einer Anzahl fehlgeschlagener Zugriffsversuche automatisch gelöscht für erhöhte Sicherheit',
+          'ML-KEM Post-Quanten-Verschlüsselung, strikte CSP, Ratenbegrenzung und optionale IP-Allow-Lists — Schutz in Schichten, nicht als einzelne Checkbox.',
       },
-      expiration: {
-        title: 'Auto-Ablauf',
+      open: {
+        title: 'Offen und prüfbar',
         description:
-          'Legen Sie benutzerdefinierte Ablaufzeiten fest, damit Geheimnisse nicht länger als nötig bestehen',
+          'Vollständig Open Source und für Self-Hosting ausgelegt. Code prüfen, eigene Instanz betreiben oder mitwirken.',
       },
-      password: {
-        title: 'Passwortschutz',
-        description:
-          'Fügen Sie eine zusätzliche Sicherheitsebene mit optionalem Passwortschutz hinzu',
-      },
-      files: {
-        title: 'Datei-Sharing',
-        description: 'Teilen Sie Dateien sicher mit einfacher Drag-and-Drop-Funktionalität',
-      },
-      webhooks: {
-        title: 'Webhooks',
-        description:
-          'Erhalten Sie Benachrichtigungen, wenn Ihre Geheimnisse gelesen, gelöscht oder nicht gelesen werden können',
-      },
-      ipControl: {
-        title: 'IP-Beschränkungen',
-        description:
-          'Steuern Sie den Zugriff durch Einschränkung der IP-Adressen oder CIDR-Bereiche',
-      },
-      readLimits: {
-        title: 'Lesebeschränkungen',
-        description:
-          'Legen Sie maximale Ansichtszahlen fest, um zu begrenzen, wie oft ein Geheimnis abgerufen werden kann',
-      },
-      qrCode: {
-        title: 'QR-Codes',
-        description:
-          'Generieren Sie QR-Codes für einfaches Teilen Ihrer geheimen URLs auf Mobilgeräten',
-      },
-      cli: {
-        title: 'CLI-Tool',
-        description:
-          'Automatisieren Sie das Teilen von Geheimnissen mit unserer Kommandozeilen-Schnittstelle',
-      },
-      chromeExtension: {
-        title: 'Chrome-Erweiterung',
-        description:
-          'Teilen Sie Geheimnisse direkt aus Ihrem Browser mit unserer Chrome-Erweiterung',
-      },
-      docker: {
-        title: 'Docker-Support',
-        description: 'Stellen Sie Ihre eigene Instanz mit unseren offiziellen Docker-Images bereit',
-      },
+    },
+    alsoIncludes: {
+      label: 'Außerdem',
+      password: 'Passwortschutz',
+      files: 'Datei-Sharing',
+      webhooks: 'Webhooks',
+      qrCode: 'QR-Codes',
+      ipControl: 'IP-Allow-Lists',
+      readLimits: 'Leselimits',
+    },
+    selfHost: {
+      title: 'Eigene Instanz betreiben',
+      description:
+        'Denselben Zero-Knowledge-Stack auf Ihrer Infrastruktur bereitstellen — mit einem Klick auf Railway oder per Docker Compose überall.',
+      deployOnRailway: 'Auf Railway bereitstellen',
+      dockerCompose: 'Docker Compose',
+    },
+    ecosystem: {
+      cli: 'CLI',
+      chromeExtension: 'Chrome-Erweiterung',
+      github: 'GitHub',
     },
     steps: {
       encrypt: {
@@ -131,12 +96,15 @@ export const de: TranslationKeys = {
       content: {
         label: 'Geheimer Inhalt',
         placeholder: 'Geben Sie hier Ihren geheimen Inhalt ein...',
-        fileHint: 'Datei per Drag & Drop hinzufügen oder hier klicken',
+        fileHint: 'Datei per Drag & Drop hinzufügen oder hier klicken (max. 1 MB)',
         fileSelected: 'Datei ausgewählt: {{name}} ({{size}} KB)',
+        dropFile: 'Datei hier ablegen',
+        invalidFileType: 'Ungültiger Dateityp',
       },
       password: {
         label: 'Passwort',
-        placeholder: 'Passwort eingeben (mindestens 5 Zeichen)',
+        placeholder: 'Optional (aber empfohlen)',
+        placeholderRequired: 'Passwort eingeben (mindestens {{min}} Zeichen)',
       },
       ttl: {
         label: 'Gültigkeitsdauer',
@@ -144,7 +112,8 @@ export const de: TranslationKeys = {
       },
       burn: {
         label: 'Nach dem Lesen löschen',
-        description: 'Garantiert, dass nur ein Empfänger auf das Geheimnis zugreifen kann',
+        description:
+          'Garantiert, dass das Geheimnis nur einmal gelesen werden kann — von der ersten Person, die den Link öffnet',
       },
       advanced: {
         toggle: 'erweiterte Konfiguration',
@@ -181,13 +150,33 @@ export const de: TranslationKeys = {
     success: {
       title: 'Geheimnis erstellt!',
       description: {
-        main: 'Ihr Geheimnis wurde erstellt und die URL wurde in die Zwischenablage kopiert',
-        password: 'Teilen Sie die URL und das Passwort mit dem gewünschten Empfänger',
+        main: 'Ihr Geheimnis wurde erstellt. Wählen Sie unten eine Freigabeoption aus.',
+        password: 'Senden Sie das Passwort über einen separaten Kanal.',
+        separateKey:
+          'Senden Sie für eine getrennte Übermittlung die URL ohne Schlüssel und den Entschlüsselungsschlüssel über verschiedene Kanäle.',
       },
+      combinedUrl: 'Komplette URL (mit Schlüssel)',
+      keylessUrl: 'URL ohne Schlüssel',
+      decryptionKey: 'Entschlüsselungsschlüssel',
       urlCopied: 'URL in die Zwischenablage kopiert',
+      keyCopied: 'Entschlüsselungsschlüssel in die Zwischenablage kopiert',
+      secretDeleted: 'Geheimnis gelöscht',
+      qrDownloaded: 'QR-Code heruntergeladen',
+      qrDownloadFailed: 'QR-Code konnte nicht heruntergeladen werden: {{error}}',
       qrCode: {
         title: 'Geheimnis-URL QR-Code',
         description: 'Laden Sie den QR-Code der Geheimnis-URL herunter und teilen Sie ihn',
+      },
+      actions: {
+        showUrl: 'Geheimnis-URL anzeigen',
+        hideUrl: 'Geheimnis-URL ausblenden',
+        showKey: 'Entschlüsselungsschlüssel anzeigen',
+        hideKey: 'Entschlüsselungsschlüssel ausblenden',
+        shareUrl: 'Geheimnis-URL teilen',
+        shareKey: 'Entschlüsselungsschlüssel teilen',
+        copyUrl: 'Geheimnis-URL kopieren',
+        copyKey: 'Entschlüsselungsschlüssel kopieren',
+        showQr: 'QR-Code der kompletten URL anzeigen',
       },
       createAnother: 'Weiteres erstellen',
       deleteSecret: 'Geheimnis löschen',
@@ -203,7 +192,7 @@ export const de: TranslationKeys = {
     },
     errors: {
       contentRequired: 'Inhalt ist erforderlich',
-      passwordMinLength: 'Passwort muss mindestens 5 Zeichen lang sein',
+      passwordMinLength: 'Passwort muss mindestens {{min}} Zeichen lang sein',
       passwordTooSimple: 'Passwort ist zu einfach',
       readCountWithBurn: 'Lesezähler kann nicht mit "Nach dem Lesen löschen" kombiniert werden',
       tooManyIps: 'Zu viele IP-Beschränkungen (maximal {{max}})',
@@ -214,7 +203,7 @@ export const de: TranslationKeys = {
       unexpectedStatus: 'Unerwarteter Statuscode {{code}}',
       webhookConfigInvalid:
         'Webhook-Konfiguration ist ungültig - mindestens ein Webhook-Ereignistyp ist erforderlich',
-      fileSizeExceeded: 'Dateigröße überschreitet die maximal zulässige Größe',
+      fileSizeExceeded: 'Datei ist zu groß. Maximale Größe ist {{max}}.',
       fileReadError: 'Fehler beim Lesen der Datei',
       fileReadAborted: 'Dateilesen wurde abgebrochen',
     },
@@ -225,11 +214,57 @@ export const de: TranslationKeys = {
       description: 'Dieses Geheimnis ist möglicherweise abgelaufen oder wurde gelöscht.',
       createNew: 'Neues Geheimnis erstellen',
     },
+    invalidLink: {
+      title: 'Dieser Link ist ungültig',
+      description:
+        'Der Link ist unvollständig oder wurde bei der Übertragung verändert, sodass das Geheimnis nicht entschlüsselt werden kann. Bitten Sie den Absender, den vollständigen Link erneut zu senden.',
+      createNew: 'Neues Geheimnis erstellen',
+    },
+    connectionError: {
+      title: 'Server nicht erreichbar',
+      description:
+        'Das Geheimnis existiert möglicherweise noch. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+      tryAgain: 'Erneut versuchen',
+    },
+    rateLimit: {
+      title: 'Zu viele Anfragen',
+      description:
+        'Sie haben zu viele Anfragen gestellt. Warten Sie einen Moment und versuchen Sie es erneut.',
+      tryAgain: 'Erneut versuchen',
+    },
     password: {
       title: 'Passwort eingeben',
+      label: 'Passwort',
       placeholder: 'Geben Sie das Passwort ein',
       description: 'Dieses Geheimnis ist mit einem Passwort geschützt - fragen Sie den Absender',
-      error: 'Falsches Passwort',
+      error: 'Falscher Entschlüsselungsschlüssel oder falsches Passwort',
+      required: 'Geben Sie ein Passwort ein.',
+      show: 'Passwort anzeigen',
+      hide: 'Passwort ausblenden',
+    },
+    key: {
+      title: 'Entschlüsselungsschlüssel eingeben',
+      label: 'Entschlüsselungsschlüssel',
+      placeholder: 'Vom Absender erhaltenen Schlüssel eingeben',
+      description:
+        'Bitten Sie den Absender über einen separaten Kanal um den Entschlüsselungsschlüssel. Der Schlüssel wird nur in diesem Browser verwendet.',
+      required: 'Geben Sie einen Entschlüsselungsschlüssel ein.',
+      error:
+        'Dieser Entschlüsselungsschlüssel konnte das Geheimnis nicht öffnen. Prüfen Sie den Schlüssel und versuchen Sie es erneut.',
+      show: 'Entschlüsselungsschlüssel anzeigen',
+      hide: 'Entschlüsselungsschlüssel ausblenden',
+      change: 'Anderen Schlüssel eingeben',
+      submit: 'Geheimnis entsperren',
+    },
+    credentials: {
+      title: 'Geheimnis entsperren',
+      description:
+        'Geben Sie den vom Absender erhaltenen Entschlüsselungsschlüssel und das Passwort ein. Beides wird nur in diesem Browser verwendet.',
+      submit: 'Geheimnis entsperren',
+    },
+    legacyKey: {
+      warning:
+        'Dieser Link wurde mit einem veralteten Client erstellt, der den Entschlüsselungsschlüssel in der Abfragezeichenfolge speichert. Bitten Sie den Absender um ein Upgrade, damit zukünftige Links den Schlüssel aus Serverprotokollen fernhalten.',
     },
     content: {
       fileShared: 'Eine Datei wurde mit Ihnen geteilt',
@@ -241,7 +276,7 @@ export const de: TranslationKeys = {
       clickToReveal: 'Klicken Sie auf das Augensymbol oben, um das Geheimnis anzuzeigen',
       passwordProtected:
         'Dieses Geheimnis ist passwortgeschützt. Klicken Sie, um das Passwort einzugeben.',
-      clickToEnterPassword: 'Klicken Sie, um das Passwort einzugeben',
+      ariaLabel: 'Geheimer Inhalt',
     },
     info: {
       burnedAfterReading:
@@ -258,100 +293,27 @@ export const de: TranslationKeys = {
   },
   about: {
     title: 'Über',
-    intro:
-      'crypt.fyi ist eine sichere, Open-Source-Plattform mit Zero-Knowledge-Architektur, die es Ihnen ermöglicht, sensible Informationen sicher mit Post-Quanten Ende-zu-Ende-Verschlüsselung zu teilen. Ob Passwörter, API-Schlüssel oder vertrauliche Nachrichten - crypt.fyi stellt sicher, dass Ihre Daten privat bleiben, für unsere Server nie zugänglich sind und nach dem Zugriff automatisch gelöscht werden.',
-    whyCryptFyi: {
-      title: 'Warum crypt.fyi?',
-      commonPractices: {
-        title: 'Das Problem mit gängigen Praktiken',
-        description:
-          'Täglich werden sensible Informationen wie Passwörter, API-Schlüssel und private Daten über unsichere Kanäle im Klartext geteilt:',
-        problems: {
-          email:
-            'E-Mail - kann abgefangen, unbegrenzt gespeichert und unkontrolliert weitergeleitet werden',
-          slack: 'Slack/Teams-Nachrichten - bleiben im Chatverlauf und Firmenprotokollen',
-          sms: 'SMS/Textnachrichten - auf mehreren Geräten und Carrier-Servern gespeichert',
-          messaging: 'Instant Messaging - oft ohne angemessene Verschlüsselung und Datenlöschung',
-        },
-      },
-      existingSolutions: {
-        title: 'Bestehende Lösungen und ihre Einschränkungen',
-        description:
-          'Während es andere Tools in diesem Bereich gibt, hat jedes seine Einschränkungen:',
-        limitations: {
-          onePassword: '1Password - ausgezeichnet für Team-Passwortverwaltung, aber',
-          onePasswordLink: 'unterstützt keine interne Freigabe für externe Nicht-Benutzer',
-          otherTools:
-            'PrivateBin/PwPush/OneTimeSecret - ähnliche Kernfunktionalität, aber veraltete Benutzeroberflächen und Technologie-Stacks, und oft fehlt',
-          otherToolsConfigLink: 'Zero-Knowledge-Architektur',
-          otherToolsSecurityLink: 'Post-Quanten-Verschlüsselung',
-        },
-      },
-      approach: {
-        title: 'Der crypt.fyi Ansatz',
-        description:
-          'crypt.fyi wurde entwickelt, um diese Herausforderungen zu bewältigen und dabei moderne Webtechnologien und Sicherheitsstandards zu nutzen. Wir kombinieren Zero-Knowledge-Architektur mit ML-KEM Post-Quanten-Verschlüsselung und stellen sicher, dass Ihre Daten privat und sicher bleiben. Das Ergebnis ist ein Tool, das sowohl hochsicher als auch benutzerfreundlich ist.',
-      },
+    what: {
+      description:
+        'crypt.fyi ist ein Zero-Knowledge-Weg, sensible Informationen — Passwörter, API-Schlüssel, Dateien — per Link zu teilen. Die Verschlüsselung erfolgt in Ihrem Browser, unsere Server sehen nie den Klartext, und Geheimnisse können nach dem Lesen verschwinden.',
+      traditionalTitle: 'Warum nicht einfach per E-Mail oder SMS?',
+      traditionalDescription:
+        'E-Mail, SMS, Slack und Chat behalten Kopien: in Postfächern, Nachrichtenverläufen, Anbieter-Logs und auf jedem synchronisierten Gerät. Sobald Sie ein Passwort in diese Kanäle einfügen, verlieren Sie die Kontrolle darüber, wer es später finden kann. crypt.fyi ist für eine bewusste, einmalige Übergabe — Link teilen, optional Passwort oder IP-Allow-List setzen, und das Geheimnis verschwinden lassen, wenn es erledigt ist.',
     },
-    howItWorks: {
-      title: 'Wie es funktioniert',
-      steps: {
-        encrypt: {
-          title: '1. Verschlüsseln',
-          description:
-            'Ihr Geheimnis wird in Ihrem Browser mit ML-KEM Post-Quanten-Verschlüsselung verschlüsselt, bevor es Ihr Gerät verlässt. Die Verschlüsselung erfolgt vollständig clientseitig und gewährleistet Zero-Knowledge Ihrer Daten.',
-        },
-        share: {
-          title: '2. Teilen',
-          description:
-            'Teilen Sie den sicheren Link mit Ihrem Empfänger. Der Link enthält alles, was zum Entschlüsseln der Nachricht benötigt wird, aber unsere Server sehen den unverschlüsselten Inhalt nie.',
-        },
-        burn: {
-          title: '3. Nach dem Lesen löschen',
-          description:
-            'Nach dem Zugriff wird das Geheimnis, wenn "Nach dem Lesen löschen" aktiviert ist, dauerhaft von unseren Servern gelöscht. Keine Spuren bleiben zurück, was vollständiges Zero-Knowledge Ihrer Daten gewährleistet.',
-        },
-      },
-    },
-    security: {
-      title: 'Sicherheitsimplementierung',
-      encryption: {
-        title: 'Zero-Knowledge Post-Quanten-Verschlüsselung',
-        description:
-          'Alle Geheimnisse werden mit ML-KEM Post-Quanten-Verschlüsselung in Ihrem Browser verschlüsselt, bevor sie übertragen werden. Der Verschlüsselungsschlüssel verlässt Ihr Gerät nie, was echte Zero-Knowledge Ende-zu-Ende-Verschlüsselung gewährleistet.',
-        features: {
-          key: 'Der Verschlüsselungsschlüssel wird aus einer kryptographisch sicheren Zufallsgenerierung abgeleitet',
-          derivation: 'Schlüsselableitung verwendet PBKDF2 mit SHA-256',
-          vector: 'Jedes Geheimnis hat einen eindeutigen Initialisierungsvektor (IV)',
-        },
-      },
-      zeroKnowledge: {
-        title: 'Echte Zero-Knowledge-Architektur',
-        description:
-          'Unsere Server sehen nie Ihre unverschlüsselten Daten. Wir verwenden eine Zero-Knowledge-Architektur, bei der:',
-        features: {
-          clientSide: 'Alle Verschlüsselung/Entschlüsselung erfolgt clientseitig in Ihrem Browser',
-          storage: 'Server speichern nur verschlüsselte Daten, die sie nicht entschlüsseln können',
-          keys: 'Verschlüsselungsschlüssel werden über URL-Fragmente übertragen, die nie den Backend-API-Server erreichen',
-        },
-      },
-      protection: {
-        title: 'Datenschutz',
-        description: 'Mehrere Sicherheitsebenen stellen sicher, dass Ihre Daten geschützt bleiben:',
-        features: {
-          encryption:
-            'Alle Verschlüsselung/Entschlüsselung erfolgt in Ihrem Browser mit ML-KEM Post-Quanten-Verschlüsselung',
-          tls: 'TLS-Verschlüsselung für alle API-Kommunikation',
-          destruction: 'Automatische Geheimnislöschung nach Zugriff',
-          logging: 'Keine serverseitige Protokollierung sensibler Daten',
-          password: 'Optionale Passwortschutz für zusätzliche Sicherheit',
-        },
-      },
+    letter: {
+      title: 'Eine Notiz vom Autor',
+      p1: 'Ich habe crypt.fyi gebaut, weil die Tools, nach denen ich bereits griff, immer wieder zu kurz kamen, wenn ich etwas Sensibles teilen musste — besonders mit jemandem außerhalb meines Passwort-Managers — mit Kontrollen, die zu meiner tatsächlichen Arbeit passten.',
+      p2: 'Bestehende Lösungen vermissten oft die UX-Details, die im Alltag zählen: umfangreiche Einschränkungen wie IP-Allow-Lists, Leselimits, Löschen nach fehlgeschlagenen Versuchen und Webhooks; ein CLI und eine Browser-Erweiterung; gespeicherte und vorgefüllte Konfiguration. Technisch lagen manche auch hinter modernen Verschlüsselungsstandards zurück, oder ihnen fehlte echte atomare Read-and-Burn-Logik, sodass ein Geheimnis nicht per Race Condition mehrfach gelesen werden konnte.',
+      p3: 'Also habe ich etwas Neues gebaut: Open Source, self-hostbar und klar in den Kryptografie- und Kontrollentscheidungen, die ich für mich selbst wollte.',
+      signOff: '— Dillon',
     },
     openSource: {
-      title: 'Open Source',
       description:
-        'crypt.fyi ist Open Source und überprüfbar. Sie können unsere Zero-Knowledge-Implementierung, Post-Quanten-Verschlüsselung überprüfen und auf',
+        'crypt.fyi ist Open Source und prüfbar. Sie können die Implementierung einsehen, selbst hosten oder mitwirken auf',
+    },
+    technical: {
+      prompt: 'Mehr technische Details?',
+      specLink: 'Zur Protokollspezifikation',
     },
   },
   privacy: {

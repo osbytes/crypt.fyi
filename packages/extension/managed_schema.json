@@ -1,0 +1,70 @@
+{
+  "type": "object",
+  "properties": {
+    "apiUrl": {
+      "title": "API URL",
+      "description": "Base URL for the crypt.fyi API (e.g. https://api.crypt.fyi). Must be a public http(s) URL — private/reserved literal IPs and internal hostnames are rejected.",
+      "type": "string"
+    },
+    "webUrl": {
+      "title": "Web URL",
+      "description": "Base URL used when building share links (e.g. https://crypt.fyi). Must be a public http(s) URL — private/reserved literal IPs and internal hostnames are rejected.",
+      "type": "string"
+    },
+    "ttl": {
+      "title": "Default TTL (milliseconds)",
+      "description": "Secret time-to-live in milliseconds. Must be one of: 300000, 1800000, 3600000, 14400000, 43200000, 86400000, 259200000, 604800000.",
+      "type": "integer"
+    },
+    "burn": {
+      "title": "Burn after reading",
+      "description": "When true, secrets are deleted after the first successful read. Incompatible with read count (rc).",
+      "type": "boolean"
+    },
+    "ips": {
+      "title": "IP / CIDR allow-list",
+      "description": "Comma-separated IP addresses or CIDR blocks allowed to read the secret (max 3).",
+      "type": "string"
+    },
+    "rc": {
+      "title": "Read count",
+      "description": "Maximum number of successful reads (2–10). Only used when burn is false.",
+      "type": "integer"
+    },
+    "fc": {
+      "title": "Failure count",
+      "description": "Burn after this many failed read attempts (1–10).",
+      "type": "integer"
+    },
+    "webhookUrl": {
+      "title": "Webhook URL",
+      "description": "Public http(s) URL for vault event notifications. Must not target private/reserved addresses.",
+      "type": "string"
+    },
+    "webhookName": {
+      "title": "Webhook name",
+      "description": "Optional label included in webhook notifications (max 50 characters).",
+      "type": "string"
+    },
+    "webhookOnRead": {
+      "title": "Webhook on read",
+      "description": "Notify when the secret is read successfully.",
+      "type": "boolean"
+    },
+    "webhookOnFailPassword": {
+      "title": "Webhook on password/key failure",
+      "description": "Notify when a read fails due to password or key.",
+      "type": "boolean"
+    },
+    "webhookOnFailIp": {
+      "title": "Webhook on IP failure",
+      "description": "Notify when a read fails due to IP allow-list.",
+      "type": "boolean"
+    },
+    "webhookOnBurn": {
+      "title": "Webhook on burn",
+      "description": "Notify when the secret is burned.",
+      "type": "boolean"
+    }
+  }
+}

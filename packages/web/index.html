@@ -2,11 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fonts are self-hosted (see index.css @font-face). A third-party font CDN
+         would leak a request per page view and is blocked by our CSP anyway. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/roboto-condensed-700-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     <link rel="icon" type="image/svg+xml" href="/logo-light.svg" />
     <link rel="icon" href="/favicon.ico" />
@@ -47,7 +50,7 @@
     <meta property="twitter:image:alt" content="crypt.fyi - Secure Sensitive Data Sharing" />
     <meta
       name="keywords"
-      content="open source, zero-knowledge encryption, post-quantum encryption, ML-KEM, end-to-end encryption, one-time secret sharing, secure file sharing, ephemeral data, secure messaging, privacy-focused, auditable encryption, secure data transfer, encrypted file sharing, secure password sharing, secure API key sharing, secure document sharing, secure link sharing, secure communication, secure collaboration, secure data exchange, secure information sharing, secure content sharing, secure file transfer, secure data sharing, secure message sharing, secure document transfer, secure link transfer, secure content transfer, secure information transfer, secure collaboration tool, secure sharing platform, secure messaging platform, secure file sharing platform, secure document sharing platform, secure link sharing platform, secure content sharing platform, secure information sharing platform, secure data sharing platform, secure message sharing platform, secure document transfer platform, secure link transfer platform, secure content transfer platform, secure information transfer platform, secure collaboration platform, secure sharing tool, secure messaging tool, secure file sharing tool, secure document sharing tool, secure link sharing tool, secure content sharing tool, secure information sharing tool, secure data sharing tool, secure message sharing tool, secure document transfer tool, secure link transfer tool, secure content transfer tool, secure information transfer tool, secure collaboration tool"
+      content="zero-knowledge secret sharing, end-to-end encryption, one-time secret, post-quantum encryption, ML-KEM, ephemeral secret sharing, secure password sharing, self-destructing links, open source"
     />
     <meta name="author" content="crypt.fyi" />
     <meta name="robots" content="index, follow" />

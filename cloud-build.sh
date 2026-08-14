@@ -3,6 +3,10 @@
 # Cloud build script for Docker images
 # Usage: ./cloud-build.sh [API_URL] [VERSION]
 # Example: ./cloud-build.sh https://api.crypt.fyi v1.0.0
+#
+# Password policy is compiled into the web bundle, so it is set here at build
+# time via the environment:
+#   REQUIRE_PASSWORD=true PASSWORD_MIN_LENGTH=8 ./cloud-build.sh https://api.example.com v1.0.0
 
 set -e
 
@@ -14,6 +18,8 @@ PLATFORMS="linux/amd64,linux/arm64"
 # Arguments with defaults
 API_URL="${1:-https://api.crypt.fyi}"
 VERSION="${2:-latest}"
+REQUIRE_PASSWORD="${REQUIRE_PASSWORD:-false}"
+PASSWORD_MIN_LENGTH="${PASSWORD_MIN_LENGTH:-5}"
 
 echo "========================================="
 echo "Cloud Build Configuration"
@@ -22,6 +28,7 @@ echo "Builder:   $BUILDER"
 echo "Registry:  $REGISTRY"
 echo "Platforms: $PLATFORMS"
 echo "API URL:   $API_URL"
+echo "Password:  required=$REQUIRE_PASSWORD min=$PASSWORD_MIN_LENGTH"
 echo "Tags:      $VERSION, latest"
 echo "========================================="
 echo ""
@@ -47,6 +54,8 @@ docker buildx build \
   --platform "$PLATFORMS" \
   -f Dockerfile.web \
   --build-arg VITE_API_URL="$API_URL" \
+  --build-arg VITE_REQUIRE_PASSWORD="$REQUIRE_PASSWORD" \
+  --build-arg VITE_PASSWORD_MIN_LENGTH="$PASSWORD_MIN_LENGTH" \
   -t "$REGISTRY/crypt-web:$VERSION" \
   -t "$REGISTRY/crypt-web:latest" \
   --push .

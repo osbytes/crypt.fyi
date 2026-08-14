@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -63,9 +64,12 @@ import { useClient } from '@/context/client';
 import { NumberInput } from '@/components/NumberInput';
 import { TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tooltip } from '@/components/ui/tooltip';
+import { buildSecretLinks } from '@/lib/secretUrl';
+import type { SecretLinks } from '@/lib/secretUrl';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
 const MAX_FILE_SIZE = 1 * 1024 * 1024;
+const MAX_FILE_SIZE_LABEL = '1 MB';
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -109,11 +113,19 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
     .object({
       c: z.string().default('').describe('encrypted content'),
       b: z.boolean().default(true).describe('burn after reading'),
-      p: z
-        .string()
-        .min(5, t('create.errors.passwordMinLength'))
-        .refine((val) => val !== '12345', t('create.errors.passwordTooSimple'))
-        .describe('password'),
+      // Gated on the deployment's password policy (config.REQUIRE_PASSWORD).
+      // When it's off we keep the field entirely unconstrained so an empty
+      // password still produces a plain, non-password-protected link.
+      p: config.REQUIRE_PASSWORD
+        ? z
+            .string()
+            .min(
+              config.PASSWORD_MIN_LENGTH,
+              t('create.errors.passwordMinLength', { min: config.PASSWORD_MIN_LENGTH }),
+            )
+            .refine((val) => val !== '12345', t('create.errors.passwordTooSimple'))
+            .describe('password')
+        : z.string().default('').describe('password'),
       ttl: z.coerce.number().default(HOUR).describe('time to live (TTL) in milliseconds'),
       ips: z
         .string()
@@ -139,10 +151,7 @@ const createFormSchema = (t: (key: string, options?: Record<string, unknown>) =>
           for (const ip of ips) {
             const trimmed = ip.trim();
             const isValidIP = z.union([z.ipv4(), z.ipv6()]).safeParse(trimmed).success;
-            const isValidCIDR = z
-              .string()
-              .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
-              .safeParse(trimmed).success;
+            const isValidCIDR = z.union([z.cidrv4(), z.cidrv6()]).safeParse(trimmed).success;
 
             if (!isValidIP && !isValidCIDR) {
               ctx.addIssue({
@@ -375,7 +384,11 @@ export function CreatePage() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema) as Resolver<FormValues>,
     defaultValues: useMemo(() => getInitialValues(ttlOptions), [ttlOptions]),
-    mode: 'onTouched',
+    // Validate only on submit so blurring an empty field (e.g. tabbing/clicking
+    // away from the content textarea toward the file button) doesn't surface the
+    // "content required" error and shift layout.
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
   });
   const { watch } = form;
 
@@ -421,6 +434,9 @@ export function CreatePage() {
   }, [watch]);
 
   const { client } = useClient();
+  // Share URLs contain the raw key. Keep them out of React Query mutation data.
+  const createdLinksRef = useRef<SecretLinks | null>(null);
+  const createdDecryptionKeyRef = useRef('');
 
   const createMutation = useMutation({
     mutationFn: async (input: FormValues) => {
@@ -440,18 +456,23 @@ export function CreatePage() {
           : undefined,
       });
 
-      const url = `${window.location.origin}/${result.id}${input.p ? '?p=true' : ''}#${result.key}`;
-      await clipboardCopy(url);
-      toast.info(t('create.success.urlCopied'));
+      createdLinksRef.current = buildSecretLinks({
+        origin: window.location.origin,
+        id: result.id,
+        key: result.key,
+        passwordProtected: Boolean(input.p),
+      });
+      createdDecryptionKeyRef.current = result.key;
 
       return {
-        ...result,
-        url,
+        id: result.id,
+        dt: result.dt,
       };
     },
     onError(error) {
       toast.error(error.message);
     },
+    gcTime: 0,
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -461,7 +482,7 @@ export function CreatePage() {
       const file = files[0];
 
       if (file.size > MAX_FILE_SIZE) {
-        toast.error(t('create.errors.fileSizeExceeded'));
+        toast.error(t('create.errors.fileSizeExceeded', { max: MAX_FILE_SIZE_LABEL }));
         setSelectedFile(null);
         form.resetField('c');
         return;
@@ -483,7 +504,7 @@ export function CreatePage() {
 
     if (content instanceof File) {
       if (content.size > MAX_FILE_SIZE) {
-        toast.error(t('create.errors.fileSizeExceeded'));
+        toast.error(t('create.errors.fileSizeExceeded', { max: MAX_FILE_SIZE_LABEL }));
         setSelectedFile(null);
         form.resetField('c');
         return;
@@ -547,6 +568,13 @@ export function CreatePage() {
     Object.entries(valuesToKeep).forEach(([field, value]) => {
       form.setValue(field as keyof FormValues, value);
     });
+    setIsCombinedUrlMasked(true);
+    setIsKeylessUrlMasked(true);
+    setIsKeyMasked(true);
+    setIsQrDialogOpen(false);
+    createdLinksRef.current = null;
+    createdDecryptionKeyRef.current = '';
+    createMutation.reset();
   };
 
   const deleteMutation = useMutation({
@@ -556,7 +584,6 @@ export function CreatePage() {
         await client.delete(id, dt);
       } catch (error) {
         if (error instanceof ErrorNotFound) {
-          setIsUrlMasked(true);
           resetForNewSecret();
         }
         throw error;
@@ -566,24 +593,33 @@ export function CreatePage() {
       toast.error(error.message);
     },
     onSuccess() {
-      toast.success('Secret deleted');
-      setIsUrlMasked(true);
+      toast.success(t('create.success.secretDeleted'));
       resetForNewSecret();
     },
   });
 
-  const [isUrlMasked, setIsUrlMasked] = useState(true);
-  let maskedUrl = createMutation.data?.url;
-  if (isUrlMasked && createMutation.data?.url) {
-    const url = new URL(createMutation.data.url);
-    const key = url.hash.slice(1); // Remove the # symbol
-
-    if (key) {
-      maskedUrl = `${url.origin}/${'*'.repeat(createMutation.data.id.length)}${url.search}#${'*'.repeat(key.length)}`;
-    } else {
-      maskedUrl = `${url.origin}/${'*'.repeat(createMutation.data.id.length)}${url.search}`;
-    }
-  }
+  const [isCombinedUrlMasked, setIsCombinedUrlMasked] = useState(true);
+  const [isKeylessUrlMasked, setIsKeylessUrlMasked] = useState(true);
+  const [isKeyMasked, setIsKeyMasked] = useState(true);
+  const createdLinks = createdLinksRef.current;
+  const createdId = createMutation.data?.id;
+  const maskUrl = (value: string) => {
+    if (!createdId) return value;
+    const url = new URL(value);
+    const key = url.hash.slice(1);
+    return `${url.origin}/${'*'.repeat(createdId.length)}${url.search}${key ? `#${'*'.repeat(key.length)}` : ''}`;
+  };
+  const displayedCombinedUrl =
+    isCombinedUrlMasked && createdLinks
+      ? maskUrl(createdLinks.combinedUrl)
+      : createdLinks?.combinedUrl;
+  const displayedKeylessUrl =
+    isKeylessUrlMasked && createdLinks
+      ? maskUrl(createdLinks.keylessUrl)
+      : createdLinks?.keylessUrl;
+  const displayedDecryptionKey = isKeyMasked
+    ? '*'.repeat(createdDecryptionKeyRef.current.length)
+    : createdDecryptionKeyRef.current;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -597,15 +633,48 @@ export function CreatePage() {
     try {
       const dataUrl = await svgToImage(svg);
       const link = document.createElement('a');
-      const hash = sha256(createMutation.data?.url ?? '');
+      const hash = sha256(createdLinksRef.current?.qrUrl ?? '');
       link.download = `crypt.fyi-qr-${hash.slice(0, 8)}.png`;
       link.href = dataUrl;
       link.click();
-      toast.success('QR code downloaded');
+      toast.success(t('create.success.qrDownloaded'));
     } catch (error) {
-      toast.error(`Failed to download QR code: ${error}`);
+      toast.error(t('create.success.qrDownloadFailed', { error: String(error) }));
     }
   };
+
+  const copyUrl = async (url: string) => {
+    await clipboardCopy(url);
+    toast.info(t('create.success.urlCopied'));
+  };
+
+  const copyKey = async () => {
+    const key = createdDecryptionKeyRef.current;
+    if (!key) return;
+    await clipboardCopy(key);
+    toast.info(t('create.success.keyCopied'));
+  };
+
+  const shareUrl = async (url: string) => {
+    if (!('share' in navigator)) return;
+    try {
+      await navigator.share({ url });
+    } catch {
+      // Dismissing the native share sheet needs no follow-up.
+    }
+  };
+
+  const shareKey = async () => {
+    const key = createdDecryptionKeyRef.current;
+    if (!key || !('share' in navigator)) return;
+    try {
+      await navigator.share({ text: key });
+    } catch {
+      // Dismissing the native share sheet needs no follow-up.
+    }
+  };
+
+  const canShare = 'share' in navigator;
 
   const [dragState, setDragState] = useState<DragState>('none');
 
@@ -656,7 +725,9 @@ export function CreatePage() {
                 dragState === 'dragging' ? 'text-primary' : 'text-destructive',
               )}
             >
-              {dragState === 'dragging' ? 'Drop file here' : 'Invalid file type'}
+              {dragState === 'dragging'
+                ? t('create.form.content.dropFile')
+                : t('create.form.content.invalidFileType')}
             </p>
           </motion.div>
         )}
@@ -675,7 +746,7 @@ export function CreatePage() {
               <Form {...form}>
                 <form
                   onKeyDown={(e) => {
-                    if (e.metaKey && e.key === 'Enter') {
+                    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                       form.handleSubmit(onSubmit)(e);
                     }
                   }}
@@ -699,14 +770,25 @@ export function CreatePage() {
                         <FormMessage />
                         <div className="flex items-center gap-2 text-[0.8rem] text-muted-foreground">
                           <p
+                            role="button"
+                            tabIndex={createMutation.isPending ? -1 : 0}
                             className={cn(
-                              'flex items-center justify-between cursor-pointer',
+                              'flex items-center justify-between cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                               createMutation.isPending && 'pointer-events-none',
                             )}
                             aria-disabled={createMutation.isPending}
                             onClick={() =>
                               !createMutation.isPending && fileInputRef.current?.click()
                             }
+                            onKeyDown={(e) => {
+                              if (
+                                !createMutation.isPending &&
+                                (e.key === 'Enter' || e.key === ' ')
+                              ) {
+                                e.preventDefault();
+                                fileInputRef.current?.click();
+                              }
+                            }}
                           >
                             <IconFile size={18} className="mr-1" />
                             {selectedFile ? (
@@ -763,12 +845,20 @@ export function CreatePage() {
                         <FormLabel>{t('create.form.password.label')}</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder={t('create.form.password.placeholder')}
+                            placeholder={
+                              config.REQUIRE_PASSWORD
+                                ? t('create.form.password.placeholderRequired', {
+                                    min: config.PASSWORD_MIN_LENGTH,
+                                  })
+                                : t('create.form.password.placeholder')
+                            }
                             {...field}
                             disabled={createMutation.isPending || field.disabled}
-                            type="new-password"
+                            type="password"
+                            autoComplete="new-password"
                           />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -782,7 +872,12 @@ export function CreatePage() {
                             <Checkbox
                               {...rest}
                               checked={value}
-                              onCheckedChange={onChange}
+                              onCheckedChange={(checked) => {
+                                onChange(checked);
+                                if (checked) {
+                                  form.setValue('rc', undefined);
+                                }
+                              }}
                               disabled={createMutation.isPending || rest.disabled}
                             />
                           </FormControl>
@@ -852,7 +947,7 @@ export function CreatePage() {
                                         {t('create.form.advanced.readCount.label')}
                                         <Tooltip>
                                           <TooltipTrigger asChild>
-                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
                                           </TooltipTrigger>
                                           <TooltipContent>
                                             {t('create.form.advanced.readCount.description')}
@@ -884,7 +979,7 @@ export function CreatePage() {
                                         {t('create.form.advanced.failedAttempts.label')}
                                         <Tooltip>
                                           <TooltipTrigger asChild>
-                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
                                           </TooltipTrigger>
                                           <TooltipContent>
                                             {t('create.form.advanced.failedAttempts.description')}
@@ -916,7 +1011,7 @@ export function CreatePage() {
                                       {t('create.form.advanced.ip.label')}
                                       <Tooltip>
                                         <TooltipTrigger asChild>
-                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
                                         </TooltipTrigger>
                                         <TooltipContent>
                                           {t('create.form.advanced.ip.description')}
@@ -944,7 +1039,7 @@ export function CreatePage() {
                                       {t('create.form.advanced.webhook.label')}
                                       <Tooltip>
                                         <TooltipTrigger asChild>
-                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
                                         </TooltipTrigger>
                                         <TooltipContent>
                                           {t('create.form.advanced.webhook.description')}
@@ -974,7 +1069,7 @@ export function CreatePage() {
                                           {t('create.form.advanced.webhook.nameLabel')}
                                           <Tooltip>
                                             <TooltipTrigger asChild>
-                                              <IconInfoCircle className="w-3 h-3 text-muted-foreground hidden group-hover:block" />
+                                              <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
                                             </TooltipTrigger>
                                             <TooltipContent>
                                               {t('create.form.advanced.webhook.nameDescription')}
@@ -1114,55 +1209,170 @@ export function CreatePage() {
                   <p className="text-muted-foreground text-sm mb-1">
                     {t('create.success.description.main')}
                   </p>
+                  <p className="text-muted-foreground text-sm mb-1">
+                    {t('create.success.description.separateKey')}
+                  </p>
                   <p className="text-muted-foreground text-sm">
                     {form.watch('p') && t('create.success.description.password')}
                   </p>
                 </div>
 
-                <div className="flex items-center space-x-2 p-4 bg-muted rounded-lg">
-                  <Input
-                    type={isUrlMasked ? 'password' : 'text'}
-                    value={isUrlMasked ? maskedUrl : createMutation.data?.url}
-                    readOnly
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setIsUrlMasked(!isUrlMasked)}
-                  >
-                    {isUrlMasked ? <IconEyeOff /> : <IconEye />}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={async () => {
-                      if (createMutation.data?.url) {
-                        if ('share' in navigator) {
-                          await navigator.share({
-                            url: createMutation.data?.url,
-                          });
-                        } else {
-                          await clipboardCopy(createMutation.data.url);
-                          toast.info(t('create.success.urlCopied'));
+                <div className="space-y-4">
+                  <div className="space-y-2 p-4 bg-muted rounded-lg">
+                    <Label htmlFor="combined-url">{t('create.success.combinedUrl')}</Label>
+                    <div className="flex items-center gap-2">
+                      <Input id="combined-url" value={displayedCombinedUrl ?? ''} readOnly />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setIsCombinedUrlMasked(!isCombinedUrlMasked)}
+                        title={
+                          isCombinedUrlMasked
+                            ? t('create.success.actions.showUrl')
+                            : t('create.success.actions.hideUrl')
                         }
-                      }
-                    }}
-                  >
-                    {'share' in navigator ? <IconShare /> : <IconCopy />}
-                  </Button>
-                  <Button variant="outline" size="icon" onClick={() => setIsQrDialogOpen(true)}>
-                    <IconQrcode />
-                  </Button>
+                        aria-label={
+                          isCombinedUrlMasked
+                            ? t('create.success.actions.showUrl')
+                            : t('create.success.actions.hideUrl')
+                        }
+                        aria-pressed={!isCombinedUrlMasked}
+                      >
+                        {isCombinedUrlMasked ? <IconEyeOff /> : <IconEye />}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        title={t('create.success.actions.copyUrl')}
+                        aria-label={t('create.success.actions.copyUrl')}
+                        onClick={() => createdLinks && copyUrl(createdLinks.combinedUrl)}
+                      >
+                        <IconCopy />
+                      </Button>
+                      {canShare && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          title={t('create.success.actions.shareUrl')}
+                          aria-label={t('create.success.actions.shareUrl')}
+                          onClick={() => createdLinks && shareUrl(createdLinks.combinedUrl)}
+                        >
+                          <IconShare />
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setIsQrDialogOpen(true)}
+                        title={t('create.success.actions.showQr')}
+                        aria-label={t('create.success.actions.showQr')}
+                      >
+                        <IconQrcode />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 p-4 bg-muted rounded-lg">
+                    <div className="space-y-2">
+                      <Label htmlFor="keyless-url">{t('create.success.keylessUrl')}</Label>
+                      <div className="flex items-center gap-2">
+                        <Input id="keyless-url" value={displayedKeylessUrl ?? ''} readOnly />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setIsKeylessUrlMasked(!isKeylessUrlMasked)}
+                          title={
+                            isKeylessUrlMasked
+                              ? t('create.success.actions.showUrl')
+                              : t('create.success.actions.hideUrl')
+                          }
+                          aria-label={
+                            isKeylessUrlMasked
+                              ? t('create.success.actions.showUrl')
+                              : t('create.success.actions.hideUrl')
+                          }
+                          aria-pressed={!isKeylessUrlMasked}
+                        >
+                          {isKeylessUrlMasked ? <IconEyeOff /> : <IconEye />}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          title={t('create.success.actions.copyUrl')}
+                          aria-label={t('create.success.actions.copyUrl')}
+                          onClick={() => createdLinks && copyUrl(createdLinks.keylessUrl)}
+                        >
+                          <IconCopy />
+                        </Button>
+                        {canShare && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            title={t('create.success.actions.shareUrl')}
+                            aria-label={t('create.success.actions.shareUrl')}
+                            onClick={() => createdLinks && shareUrl(createdLinks.keylessUrl)}
+                          >
+                            <IconShare />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="decryption-key">{t('create.success.decryptionKey')}</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          id="decryption-key"
+                          value={displayedDecryptionKey}
+                          readOnly
+                          autoComplete="off"
+                          spellCheck={false}
+                        />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setIsKeyMasked(!isKeyMasked)}
+                          title={
+                            isKeyMasked
+                              ? t('create.success.actions.showKey')
+                              : t('create.success.actions.hideKey')
+                          }
+                          aria-label={
+                            isKeyMasked
+                              ? t('create.success.actions.showKey')
+                              : t('create.success.actions.hideKey')
+                          }
+                          aria-pressed={!isKeyMasked}
+                        >
+                          {isKeyMasked ? <IconEyeOff /> : <IconEye />}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          title={t('create.success.actions.copyKey')}
+                          aria-label={t('create.success.actions.copyKey')}
+                          onClick={copyKey}
+                        >
+                          <IconCopy />
+                        </Button>
+                        {canShare && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            title={t('create.success.actions.shareKey')}
+                            aria-label={t('create.success.actions.shareKey')}
+                            onClick={shareKey}
+                          >
+                            <IconShare />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex justify-end flex-wrap gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsUrlMasked(true);
-                      resetForNewSecret();
-                    }}
-                  >
+                  <Button variant="outline" onClick={resetForNewSecret}>
                     {t('create.success.createAnother')}
                   </Button>
                   {createMutation.data && (
@@ -1269,10 +1479,11 @@ export function CreatePage() {
           </DialogHeader>
           <div className="flex flex-col items-center space-y-4">
             <div className="qr-code p-4">
-              {createMutation.data?.url && (
+              {createdLinks?.qrUrl && (
                 <QRCodeSVG
                   ref={qrCodeRef}
-                  value={createMutation.data.url}
+                  value={createdLinks.qrUrl}
+                  title={t('create.success.qrCode.title')}
                   size={256}
                   marginSize={4}
                   level="H"
@@ -1280,7 +1491,12 @@ export function CreatePage() {
               )}
             </div>
             <div className="flex space-x-2">
-              <Button title={t('common.download')} variant="outline" onClick={handleDownloadQR}>
+              <Button
+                title={t('common.download')}
+                aria-label={t('common.download')}
+                variant="outline"
+                onClick={handleDownloadQR}
+              >
                 <IconDownload className="size-4" />
               </Button>
             </div>

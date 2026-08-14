@@ -1,14 +1,7 @@
 import browser, { Menus } from 'webextension-polyfill';
 import { Client } from '@crypt.fyi/core';
-import { config } from './config';
-
-const manifest = chrome.runtime.getManifest();
-
-const client = new Client({
-  apiUrl: config.apiUrl,
-  keyLength: config.keyLength,
-  xClient: `@crypt.fyi/extension:${manifest.version}`,
-});
+import { KEY_LENGTH } from './config';
+import { resolveConfig, toCreateOptions } from './resolveConfig';
 
 const contextMenuId = '@crypt.fyi/encrypt-selection';
 
@@ -27,8 +20,32 @@ browser.contextMenus.create(
   },
 );
 
+// No default_popup — toolbar click opens the options page for discoverability.
+chrome.action.onClicked.addListener(() => {
+  void chrome.runtime.openOptionsPage();
+});
+
 function isScriptableUrl(url: string): boolean {
   return url.startsWith('http://') || url.startsWith('https://');
+}
+
+async function createClient() {
+  const resolved = await resolveConfig();
+  // Prefer a hard failure over silently posting ciphertext to the public API
+  // (or firing a webhook with no events) when org/user endpoint policy is bad.
+  if (resolved.createBlockingErrors.length > 0) {
+    throw new Error(resolved.createBlockingErrors.join('\n'));
+  }
+  const { config } = resolved;
+  const manifest = chrome.runtime.getManifest();
+  return {
+    config,
+    client: new Client({
+      apiUrl: config.apiUrl,
+      keyLength: KEY_LENGTH,
+      xClient: `@crypt.fyi/extension:${manifest.version}`,
+    }),
+  };
 }
 
 browser.contextMenus.onClicked.addListener(async (info: Menus.OnClickData, tab) => {
@@ -42,13 +59,11 @@ browser.contextMenus.onClicked.addListener(async (info: Menus.OnClickData, tab) 
     return;
   }
 
-  // TODO: add an inline popover form w/ content script to capture relevant inputs
-
   try {
+    const { config, client } = await createClient();
     const result = await client.create({
       c: info.selectionText,
-      b: true,
-      ttl: config.defaultTtl,
+      ...toCreateOptions(config),
     });
     const url = `${config.webUrl}/${result.id}#${result.key}`;
 

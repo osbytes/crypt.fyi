@@ -62,6 +62,6 @@ export default [
   },
   // Ignore patterns
   {
-    ignores: ['**/dist/**', '**/build/**', '**/node_modules/**'],
+    ignores: ['**/dist/**', '**/build/**', '**/node_modules/**', '**/*.gen.ts'],
   },
 ];

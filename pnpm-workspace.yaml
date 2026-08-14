@@ -1,0 +1,86 @@
+packages:
+  - 'packages/*'
+
+# --- Supply-chain / install security (pnpm 11+) ---
+# Delay installing freshly published versions so malicious releases can be yanked.
+# https://pnpm.io/settings#minimumreleaseage
+minimumReleaseAge: 1440 # 1 day
+minimumReleaseAgeExclude:
+  - '@crypt.fyi/*'
+  - brace-expansion@1.1.18 || 2.1.4 || 5.0.9
+  - fast-uri@3.1.5 || 4.1.2
+  - js-yaml@3.15.1 || 4.3.1
+  - nanoid@3.3.17
+  - '@playwright/test'
+
+# Block transitive git/http/file/link/portal dependencies from external packages.
+blockExoticSubdeps: true
+
+# Reject trust-level downgrades on recently published versions.
+trustPolicy: no-downgrade
+# Older packages often predate trusted-publisher metadata; ignore after 30 days.
+trustPolicyIgnoreAfter: 43200
+
+# Lifecycle scripts are denied unless explicitly allowed below.
+strictDepBuilds: true
+allowBuilds:
+  esbuild: true
+  '@swc/core': true
+  unrs-resolver: true
+  msgpackr-extract: true
+  protobufjs: true
+  spawn-sync: true
+
+# Keep peer dependency resolution strict.
+strictPeerDependencies: true
+autoInstallPeers: false
+
+# Verify deps before script runs in local/CI.
+verifyDepsBeforeRun: install
+
+# Pin newly added dependencies to exact versions (no ^/~).
+savePrefix: ''
+
+# Fail when Node/pnpm engines don't match.
+engineStrict: true
+
+# Prefer the committed lockfile; CI also passes --frozen-lockfile.
+preferFrozenLockfile: true
+lockfile: true
+
+# Security-related version pins (migrated from Yarn resolutions).
+# Keep these aligned with Dependabot patched versions for transitive deps.
+overrides:
+  esbuild: 0.25.0
+  tmp: 0.2.7
+  '@babel/runtime': ^7.28.3
+  shell-quote: 1.9.0
+  vite: 8.0.16
+  # propagator-jaeger@>=2.9.0 depends on matching @opentelemetry/core
+  '@opentelemetry/core': 2.9.0
+  '@opentelemetry/propagator-jaeger': 2.9.0
+  '@babel/core': 7.29.6
+  # swagger-ui still declares ^9.x; 10.1.2 is the first line with the path-bypass fixes
+  '@fastify/static': 10.1.2
+  adm-zip: 0.6.0
+  # node-notifier / web-ext-run still declare uuid@8; CJS named exports remain compatible
+  uuid: 11.1.1
+  # Selective overrides for vulnerable ranges previously pinned under Yarn.
+  'glob@>=10.2.0 <10.5.0': '>=10.5.0'
+  'glob@>=11.0.0 <11.1.0': '>=11.1.0'
+  'undici@>=6.25.0 <6.27.0': 6.27.0
+  # Prefer exact patched majors; range overrides below catch other semver shapes.
+  'js-yaml@3': 3.15.1
+  'js-yaml@4': 4.3.1
+  # GHSA-mh99-v99m-4gvg / GHSA-rgw5-rvv9-x895 (brace-expansion DoS)
+  brace-expansion@<1.1.18: ^1.1.18
+  brace-expansion@>=2.0.0 <2.1.4: ^2.1.4
+  brace-expansion@>=4.0.0 <5.0.9: ^5.0.9
+  # GHSA-7p8r-x3mc-p8w7 (fast-uri host confusion)
+  fast-uri@>=3.0.0 <3.1.5: ^3.1.5
+  fast-uri@>=4.0.0 <4.1.2: ^4.1.2
+  # GHSA-5p4m-2wfm-xmqj (js-yaml !!omap DoS) — covers non-major selectors too
+  js-yaml@>=3.0.0 <3.15.1: ^3.15.1
+  js-yaml@>=4.0.0 <4.3.1: ^4.3.1
+  # GHSA-2v37-7h3g-55p8 (nanoid infinite loop on size 0)
+  nanoid@<3.3.17: ^3.3.17

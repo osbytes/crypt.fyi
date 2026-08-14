@@ -4,8 +4,26 @@ export const config = Object.freeze({
   IS_PROD: import.meta.env.PROD,
   CRYPT_FYI_GITHUB_URL: 'https://github.com/osbytes/crypt.fyi',
   CRYPT_FYI_API_DOCS_URL: 'https://api.crypt.fyi/docs',
+  CRYPT_FYI_CLI_URL: 'https://www.npmjs.com/package/@crypt.fyi/cli',
+  CRYPT_FYI_CHROME_EXTENSION_URL:
+    'https://chromewebstore.google.com/detail/cryptfyi/hkmbmkjfjfdbpohlllleaacjkacfhald',
+  // Referral + UTM params match the README deploy badge for attribution.
+  CRYPT_FYI_RAILWAY_DEPLOY_URL:
+    'https://railway.com/deploy/Pmkrsc?referralCode=ToZEjF&utm_medium=integration&utm_source=template&utm_campaign=generic',
+  CRYPT_FYI_DOCKER_DOCS_URL: 'https://github.com/osbytes/crypt.fyi#docker',
+  CRYPT_FYI_SPEC_URL: 'https://github.com/osbytes/crypt.fyi/blob/main/SPECIFICATION.md',
   MAX_IP_RESTRICTIONS: 3,
   KEY_LENGTH: 32,
+  // Password policy is a deployment decision, not a product one: a public
+  // instance wants it optional, an internal one may want it mandatory. Baked in
+  // at build time like VITE_API_URL, so set it as a build arg (see Dockerfile.web).
+  REQUIRE_PASSWORD: import.meta.env.VITE_REQUIRE_PASSWORD === 'true',
+  PASSWORD_MIN_LENGTH: parsePositiveInt(import.meta.env.VITE_PASSWORD_MIN_LENGTH, 5),
   VERSION: __APP_VERSION__,
   GIT_HASH: __GIT_HASH__,
 } as const);
+
+function parsePositiveInt(value: string | undefined, defaultValue: number): number {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : defaultValue;
+}

@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto';
 import { Redis } from 'ioredis';
 import type { TokenGenerator } from './tokens.js';
 import {
@@ -5,20 +6,19 @@ import {
   type Vault,
   type VaultValue,
   vaultValueSchema,
-  gcm,
+  machine,
 } from '@crypt.fyi/core';
-import { isDefined } from '../util.js';
 import { isIpAllowed } from './ips.js';
 import type { WebhookSender } from '../webhook.js';
 
 const parseResult = async (result: string, encryptionKey: string) => {
   const jsonParsed = JSON.parse(result);
   if ('wh' in jsonParsed && jsonParsed.wh.u) {
-    jsonParsed.wh.u = await gcm.decrypt(jsonParsed.wh.u, encryptionKey);
+    jsonParsed.wh.u = await machine.decrypt(jsonParsed.wh.u, encryptionKey);
   }
   if (jsonParsed.ips) {
     try {
-      const ips = await gcm.decrypt(jsonParsed.ips, encryptionKey);
+      const ips = await machine.decrypt(jsonParsed.ips, encryptionKey);
       jsonParsed.ips = ips;
     } catch {
       // ignore - this maintains backward compatibility with existing vault entries that don't have ips encrypted
@@ -43,12 +43,14 @@ export const createRedisVault = (
       const key = getKey(id);
 
       const [encryptedIps, encryptedWhU] = await Promise.all([
-        ips ? gcm.encrypt(ips, encryptionKey) : undefined,
-        wh ? gcm.encrypt(wh.u, encryptionKey) : undefined,
+        ips ? machine.encrypt(ips, encryptionKey) : undefined,
+        wh ? machine.encrypt(wh.u, encryptionKey) : undefined,
       ]);
 
-      const tx = redis.multi();
-      tx.setnx(
+      // Single atomic SET with NX + PX: only creates the key if absent AND sets
+      // its TTL in the same command, so a (astronomically unlikely) ID collision
+      // can never overwrite or re-expire an existing entry.
+      const result = await redis.set(
         key,
         JSON.stringify({
           c,
@@ -63,20 +65,12 @@ export const createRedisVault = (
           rc,
           wh: wh && encryptedWhU ? { ...wh, u: encryptedWhU } : undefined,
         } satisfies VaultValue),
+        'PX',
+        ttl,
+        'NX',
       );
-      tx.pexpire(key, ttl);
-      const result = await tx.exec();
-      if (!result) {
-        throw new Error('unexpected null result');
-      }
-
-      if (result[0][1] !== 1) {
-        throw new Error('something went wrong');
-      }
-
-      const errors = result.map((v) => v[0]).filter(isDefined);
-      if (errors.length > 0) {
-        throw new Error(errors.map((e) => e.message).join(', '));
+      if (result !== 'OK') {
+        throw new Error('vault id collision, please retry');
       }
 
       return { id, dt };
@@ -251,7 +245,9 @@ export const createRedisVault = (
       }
 
       const { dt: actualDt } = await parseResult(result, encryptionKey);
-      if (dt !== actualDt) {
+      const dtBuf = Buffer.from(dt);
+      const actualDtBuf = Buffer.from(actualDt);
+      if (dtBuf.length !== actualDtBuf.length || !timingSafeEqual(dtBuf, actualDtBuf)) {
         return false;
       }
 

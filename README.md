@@ -9,6 +9,14 @@
 </p>
 
 <p align="center">
+   <a href="https://www.osbytes.io" target="_blank" rel="noopener noreferrer" title="osbytes — open source bytes">
+     <img
+       src="https://www.osbytes.io/badge.svg"
+       alt="osbytes — open source bytes"
+       width="24"
+       height="24"
+     />
+  </a>
   <a href="https://github.com/osbytes/crypt.fyi/actions/workflows/ci.yml" target="_blank">
     <img src="https://github.com/osbytes/crypt.fyi/actions/workflows/ci.yml/badge.svg" alt="CI" />
   </a>
@@ -79,24 +87,34 @@ API_URL=https://{your-domain-here} docker compose up --build
 
 ### Railway
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/Pmkrsc?referralCode=ToZEjF)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/Pmkrsc?referralCode=ToZEjF&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 ## Development
 
 1. Clone the repository
-2. Enable Corepack:
+2. Enable Corepack (uses the `packageManager` field → pnpm):
    ```bash
    corepack enable
    ```
 3. Install dependencies:
    ```bash
-   yarn install
+   pnpm install
    ```
 4. Set up environment variables (see `.env.example`)
 5. Start the development server:
    ```bash
-   yarn run dev
+   pnpm dev
    ```
+
+### Releasing packages
+
+Publishable packages: `@crypt.fyi/core` and `@crypt.fyi/cli` (npm), plus the Chrome extension.
+
+1. Record changes: `pnpm changeset`
+2. Merge to `main` — the Release workflow opens a Version Packages PR (or publishes when that PR is merged)
+3. Required GitHub secrets for publishing:
+   - `NPM_TOKEN`
+   - `CHROME_EXTENSION_ID`, `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN`, `CHROME_PUBLISHER_ID`
 
 ## Technical Stack
 
@@ -112,9 +130,11 @@ API_URL=https://{your-domain-here} docker compose up --build
 
 ### Content Security Policy
 
-- The toast notification library (sonner) requires specific style-src hashes in the CSP configuration
-- These hashes are defined in `nginx/nginx.conf`
-- Updates to sonner may require updating these hashes
+- Production CSP (including `style-src` hashes for sonner/Radix inline styles) lives in `nginx/nginx.conf`
+- `vite preview` applies that same policy via `packages/web/csp.ts` so local/CI match production
+- `pnpm test:e2e` runs Playwright against `vite preview` under that CSP (default create→read→burn, password unlock). It fails on `style-src` / `connect-src` violations; other console warnings/errors and non-style CSP noise (e.g. `script-src` eval fallback notes) are reported as non-blocking annotations
+- The e2e API uses an in-memory rate limiter and dedicated ports (`:4322` API / `:4173` preview by default) so local `pnpm dev` and shared Redis rate-limit keys cannot poison the suite. Playwright rebuilds the web client with that API URL before preview so CSP `connect-src` matches the baked client config.
+- When a test fails on style-src, add the reported hash to `nginx/nginx.conf` (do not weaken to `'unsafe-inline'`)
 - Reference: [sonner#449](https://github.com/emilkowalski/sonner/issues/449)
 
 ### Development Environment
