@@ -6,6 +6,8 @@ import gracefulShutdown from 'http-graceful-shutdown';
 import { Redis } from 'ioredis';
 import { createRedisVault } from './vault/redis.js';
 import { createTokenGenerator } from './vault/tokens.js';
+import { createRedisUploadStore } from './vault/uploads.js';
+import { createBlobStorage } from './storage/index.js';
 import {
   createBullMQWebhookSender,
   createHTTPWebhookSender,
@@ -61,10 +63,20 @@ const main = async () => {
 
   const vault = createRedisVault(redis, tokenGenerator, webhookSender, config.encryptionKey);
 
+  const blobStorage = createBlobStorage(config);
+  if (blobStorage) {
+    logger.info(
+      { backend: blobStorage.kind, retention: config.allowPersistence },
+      'streamed payloads enabled',
+    );
+  }
+
   const app = await initApp(config, {
     logger,
     vault,
     redis,
+    blobStorage,
+    uploadStore: blobStorage ? createRedisUploadStore(redis) : undefined,
   });
 
   app.fastify.listen(

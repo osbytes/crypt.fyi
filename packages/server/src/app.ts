@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import Fastify, { type FastifyError } from 'fastify';
+import Fastify, { type FastifyError, type FastifyReply } from 'fastify';
 import helmet from '@fastify/helmet';
 import compression from '@fastify/compress';
 import {
@@ -17,9 +17,16 @@ import type { Config } from './config.js';
 import type { Logger } from './logging.js';
 import {
   createVaultResponseSchema,
-  readVaultResponseSchema,
+  createStreamRequestSchema,
+  createStreamResponseSchema,
+  uploadPartParamsSchema,
+  uploadPartQuerySchema,
+  completeStreamParamsSchema,
+  completeStreamRequestSchema,
+  generateRandomString,
   ErrorInvalidKeyAndOrPassword,
   type Vault,
+  type VaultReadResult,
   createVaultRequestSchema,
   readVaultQuerySchema,
   readVaultParamsSchema,
@@ -31,6 +38,9 @@ import { Redis } from 'ioredis';
 import { assertWebhookUrlAllowed } from './ssrf.js';
 import { BASE_OTEL_ATTRIBUTES } from './telemetry.js';
 import { readFileSync } from 'node:fs';
+import { Readable } from 'node:stream';
+import { buildObjectKey, MAX_PARTS, MIN_PART_SIZE, type BlobStorage } from './storage/index.js';
+import { validatePart, type UploadStore } from './vault/uploads.js';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -56,10 +66,13 @@ export type AppDeps = {
   logger: Logger;
   vault: Vault;
   redis: Redis;
+  /** Present only when streamed payloads are enabled. */
+  blobStorage?: BlobStorage;
+  uploadStore?: UploadStore;
 };
 
 export const initApp = async (config: Config, deps: AppDeps) => {
-  const { logger, vault, redis } = deps;
+  const { logger, vault, redis, blobStorage, uploadStore } = deps;
 
   const app = Fastify({
     loggerInstance: logger,
@@ -314,7 +327,10 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       params: readVaultParamsSchema,
       querystring: readVaultQuerySchema,
       response: {
-        200: readVaultResponseSchema,
+        // Deliberately unconstrained: inline entries answer with JSON, streamed
+        // entries answer with `application/octet-stream` carrying container
+        // bytes. One schema cannot describe both, and serializing a multi-GB
+        // stream through one would defeat the purpose.
         404: z.null().describe('Vault entry not found'),
         400: z.null().describe('Invalid key and/or password'),
       },
@@ -326,7 +342,21 @@ export const initApp = async (config: Config, deps: AppDeps) => {
           return res.status(404).send(null);
         }
 
-        return res.send(result);
+        // This route answers with JSON or with raw container bytes, so no 200
+        // response schema is declared and the typed reply cannot describe both.
+        const reply = res as unknown as FastifyReply;
+
+        if (result.blob) {
+          return streamBlob(req.params.vaultId, result, reply);
+        }
+
+        return reply.send({
+          c: result.c,
+          b: result.b,
+          ttl: result.ttl,
+          cd: result.cd,
+          m: result.m,
+        });
       } catch (error) {
         if (error instanceof ErrorInvalidKeyAndOrPassword) {
           return res.status(400).send(null);
@@ -377,14 +407,263 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       },
     },
     async handler(req, res) {
-      const result = await vault.del(req.params.vaultId, req.body.dt);
-      if (!result) {
+      const { deleted, blob } = await vault.del(req.params.vaultId, req.body.dt);
+      if (!deleted) {
         return res.status(404).send(null);
+      }
+
+      // An explicit delete always releases the bytes, even where the deployment
+      // allows retention — retention means surviving a burn, not a delete.
+      if (blob && blobStorage) {
+        await blobStorage.delete(blob.k).catch((error) => {
+          logger.error({ error, key: blob.k }, 'failed to delete stored object');
+        });
       }
 
       return res.status(200).send(null);
     },
   });
+
+  /**
+   * Relays a blob-backed entry from storage. The client never learns the
+   * storage endpoint, and nothing is buffered — memory stays proportional to
+   * the socket rather than to the payload.
+   */
+  const streamBlob = async (vaultId: string, result: VaultReadResult, res: FastifyReply) => {
+    const blob = result.blob;
+    if (!blob) {
+      return res.status(404).send(null);
+    }
+    if (!blobStorage) {
+      logger.error({ id: vaultId }, 'entry references stored bytes but no storage is configured');
+      return res.status(404).send(null);
+    }
+
+    const stored = await blobStorage.getStream({ key: blob.k });
+    if (!stored) {
+      logger.error({ id: vaultId, key: blob.k }, 'vault entry points at a missing object');
+      return res.status(404).send(null);
+    }
+
+    // What the inline path returns as JSON fields travels in headers here, so
+    // the body stays pure ciphertext.
+    res.header('Content-Type', 'application/octet-stream');
+    res.header('Content-Length', String(stored.contentLength));
+    res.header('X-Crypt-Burned', result.burned ? 'true' : 'false');
+    res.header('X-Crypt-Created', String(result.cd));
+    res.header('X-Crypt-Ttl', String(result.ttl));
+    res.header('X-Crypt-Frames', String(blob.n));
+    // Ciphertext is incompressible; compressing it spends CPU for nothing.
+    res.header('Content-Encoding', 'identity');
+
+    // The entry is already gone from Redis. Release the bytes only once the
+    // transfer has landed, so a download that dies at 95% does not destroy a
+    // payload that was never delivered.
+    if (result.burned && !blob.r) {
+      stored.body.once('end', () => {
+        void blobStorage.delete(blob.k).catch((error) => {
+          logger.error({ error, key: blob.k }, 'failed to delete burned object');
+        });
+      });
+    }
+
+    return res.send(stored.body);
+  };
+
+  if (blobStorage && uploadStore) {
+    // A part is buffered while it is relayed — bounded by maxUploadPartBytes,
+    // which is what keeps per-request memory O(part) rather than O(payload).
+    // S3 UploadPart needs an exact ContentLength, which a raw stream cannot give
+    // without trusting a client-supplied header.
+    app.addContentTypeParser(
+      'application/octet-stream',
+      { parseAs: 'buffer', bodyLimit: config.maxUploadPartBytes },
+      (_req, body, done) => done(null, body),
+    );
+
+    app.withTypeProvider<ZodTypeProvider>().route({
+      method: 'POST',
+      url: '/vault/stream',
+      schema: {
+        description:
+          'Opens a streamed upload for a payload too large to send inline. Returns the vault id, its delete token, and an upload token used to send parts and complete the upload. The entry does not exist, and cannot be read, until completion.',
+        tags: ['vault'],
+        summary: 'Open a streamed upload',
+        body: createStreamRequestSchema.extend({
+          ttl: z
+            .number()
+            .min(config.vaultEntryTTLMsMin)
+            .max(config.vaultEntryTTLMsMax)
+            .default(config.vaultEntryTTLMsDefault)
+            .describe('time to live (TTL) in milliseconds'),
+          size: z
+            .number()
+            .int()
+            .positive()
+            .max(config.maxBlobBytes)
+            .describe('total ciphertext byte length'),
+        }),
+        response: { 201: createStreamResponseSchema },
+      },
+      async handler(req, res) {
+        if (req.body.wh) {
+          await assertWebhookUrlAllowed(req.body.wh.u, {
+            requireHttps: config.webhookRequireHttps,
+          });
+        }
+
+        const [id, dt, ut, blobId] = await Promise.all([
+          generateRandomString(config.vaultEntryIdentifierLength),
+          generateRandomString(config.vaultEntryDeleteTokenLength),
+          generateRandomString(config.uploadTokenLength),
+          generateRandomString(config.blobIdLength),
+        ]);
+
+        const objectKey = buildObjectKey(config.blobKeyPrefix, blobId, new Date());
+        const storageUploadId = await blobStorage.createUpload(objectKey);
+
+        const { size, frames, ...vaultFields } = req.body;
+        await uploadStore.create({
+          id,
+          uploadToken: ut,
+          storageUploadId,
+          objectKey,
+          expectedBytes: size,
+          frames,
+          deleteToken: dt,
+          vaultRecord: JSON.stringify(vaultFields),
+          windowMs: config.uploadWindowMs,
+        });
+
+        return res
+          .status(201)
+          .send({ id, dt, ut, minPartSize: MIN_PART_SIZE, maxParts: MAX_PARTS });
+      },
+    });
+
+    app.withTypeProvider<ZodTypeProvider>().route({
+      method: 'PUT',
+      url: '/vault/stream/:vaultId/parts/:partNumber',
+      bodyLimit: config.maxUploadPartBytes,
+      config: {
+        // One request per part, so uploads must not share the vault API budget —
+        // a single large payload would otherwise exhaust it immediately.
+        rateLimit: { max: MAX_PARTS, timeWindow: config.uploadWindowMs },
+      },
+      schema: {
+        description:
+          'Uploads one part of a streamed payload. Parts may be any size the client chooses, provided every part except the one completing the payload is at least the advertised minimum.',
+        tags: ['vault'],
+        summary: 'Upload one part',
+        params: uploadPartParamsSchema,
+        querystring: uploadPartQuerySchema,
+        response: {
+          204: z.null(),
+          404: z.null().describe('No open upload for this id and token'),
+          409: z.null().describe('Part rejected'),
+        },
+      },
+      async handler(req, res) {
+        const pending = await uploadStore.authorize(req.params.vaultId, req.query.ut);
+        if (!pending) {
+          return res.status(404).send(null);
+        }
+
+        const body = req.body as Buffer;
+        const parts = await uploadStore.listParts(req.params.vaultId);
+        if (parts.some((part) => part.partNumber === req.params.partNumber)) {
+          return res.status(409).send(null);
+        }
+
+        const validation = validatePart({
+          partNumber: req.params.partNumber,
+          contentLength: body.length,
+          receivedBytes: parts.reduce((total, part) => total + part.size, 0),
+          expectedBytes: pending.e,
+        });
+        if (!validation.ok) {
+          logger.info(
+            { id: req.params.vaultId, part: req.params.partNumber, reason: validation.reason },
+            'rejected upload part',
+          );
+          return res.status(409).send(null);
+        }
+
+        const etag = await blobStorage.uploadPart({
+          key: pending.k,
+          uploadId: pending.s,
+          partNumber: req.params.partNumber,
+          body: Readable.from(body),
+          contentLength: body.length,
+        });
+
+        await uploadStore.addPart(
+          req.params.vaultId,
+          { partNumber: req.params.partNumber, etag, size: body.length },
+          config.uploadWindowMs,
+        );
+
+        return res.status(204).send(null);
+      },
+    });
+
+    app.withTypeProvider<ZodTypeProvider>().route({
+      method: 'POST',
+      url: '/vault/stream/:vaultId/complete',
+      schema: {
+        description:
+          'Finalises a streamed upload and publishes the vault entry. The entry becomes readable, and its TTL starts, only at this point.',
+        tags: ['vault'],
+        summary: 'Complete a streamed upload',
+        params: completeStreamParamsSchema,
+        body: completeStreamRequestSchema,
+        response: {
+          201: createVaultResponseSchema,
+          404: z.null().describe('No open upload for this id and token'),
+          409: z.null().describe('Uploaded bytes do not match the declared size'),
+        },
+      },
+      async handler(req, res) {
+        const pending = await uploadStore.authorize(req.params.vaultId, req.body.ut);
+        if (!pending) {
+          return res.status(404).send(null);
+        }
+
+        const parts = await uploadStore.listParts(req.params.vaultId);
+        const receivedBytes = parts.reduce((total, part) => total + part.size, 0);
+        if (parts.length === 0 || receivedBytes !== pending.e) {
+          logger.info(
+            { id: req.params.vaultId, receivedBytes, expected: pending.e },
+            'refused to complete an upload with a size mismatch',
+          );
+          return res.status(409).send(null);
+        }
+
+        await blobStorage.completeUpload({
+          key: pending.k,
+          uploadId: pending.s,
+          parts: parts.map(({ partNumber, etag }) => ({ partNumber, etag })),
+        });
+
+        const vaultFields = JSON.parse(pending.v) as Omit<
+          z.infer<typeof createStreamRequestSchema>,
+          'size' | 'frames'
+        >;
+
+        const result = await vault.set(
+          {
+            ...vaultFields,
+            blob: { k: pending.k, s: receivedBytes, n: pending.n, r: config.allowPersistence },
+          },
+          { id: req.params.vaultId, dt: pending.dt },
+        );
+
+        await uploadStore.discard(req.params.vaultId);
+
+        return res.status(201).send(result);
+      },
+    });
+  }
 
   app.setErrorHandler(function (error: FastifyError, req, res) {
     req.log.error(error);

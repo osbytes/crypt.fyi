@@ -149,6 +149,49 @@ const configSchema = z.object({
     .default(false)
     .describe('require webhook target URLs to use https (SSRF hardening)'),
   rateLimiter: z.enum(['redis', 'memory']).default('redis').describe('rate limiter type'),
+
+  // --- streamed payloads (object storage) ---
+  blobStorageEnabled: z.coerce
+    .boolean()
+    .default(false)
+    .describe('accept payloads above the inline threshold via object storage'),
+  blobStorageType: z
+    .enum(['s3', 'memory'])
+    .default('s3')
+    .describe('object storage backend; "memory" is for development and tests only'),
+  blobKeyPrefix: z.string().default('secrets').describe('object key prefix'),
+  // Off by default: burning a link deletes the object, matching the inline path
+  // and the ephemeral guarantee in SPECIFICATION.md.
+  allowPersistence: z.coerce
+    .boolean()
+    .default(false)
+    .describe('allow stored objects to be retained after their link is burned'),
+  maxBlobBytes: z.coerce
+    .number()
+    .default(2 * 1024 * 1024 * 1024)
+    .describe('maximum ciphertext bytes for a single streamed payload'),
+  // Grace on top of the TTL so a slow upload cannot expire mid-transfer.
+  uploadWindowMs: z.coerce
+    .number()
+    .default(1000 * 60 * 60 * 6)
+    .describe('how long an incomplete upload may stay open, in milliseconds'),
+  maxUploadPartBytes: z.coerce
+    .number()
+    .default(16 * 1024 * 1024)
+    .describe(
+      'maximum bytes accepted in a single upload part. A part is held in memory while it is relayed, so this bounds per-request memory; keep it at or below any proxy body limit (Cloudflare: 100 MB).',
+    ),
+  uploadTokenLength: z.coerce.number().default(32).describe('upload token length'),
+  blobIdLength: z.coerce.number().default(20).describe('storage object id length'),
+  s3Bucket: z.string().optional().describe('S3 bucket name'),
+  s3Region: z.string().default('us-east-1').describe('S3 region'),
+  s3Endpoint: z.string().optional().describe('S3-compatible endpoint (MinIO, R2, …)'),
+  s3AccessKeyId: z.string().optional().describe('S3 access key id'),
+  s3SecretAccessKey: z.string().optional().describe('S3 secret access key'),
+  s3ForcePathStyle: z.coerce
+    .boolean()
+    .default(true)
+    .describe('use path-style addressing; required by MinIO'),
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -204,5 +247,22 @@ export const config = (() => {
     webhookSender: process.env.WEBHOOK_SENDER,
     webhookRequireHttps: process.env.WEBHOOK_REQUIRE_HTTPS,
     rateLimiter: process.env.RATE_LIMITER,
+    blobStorageEnabled: process.env.BLOB_STORAGE_ENABLED,
+    blobStorageType: process.env.BLOB_STORAGE_TYPE,
+    blobKeyPrefix: process.env.BLOB_KEY_PREFIX,
+    allowPersistence: process.env.ALLOW_PERSISTENCE,
+    maxBlobBytes: process.env.MAX_BLOB_BYTES ? parseBytes(process.env.MAX_BLOB_BYTES) : undefined,
+    uploadWindowMs: process.env.UPLOAD_WINDOW_MS,
+    maxUploadPartBytes: process.env.MAX_UPLOAD_PART_BYTES
+      ? parseBytes(process.env.MAX_UPLOAD_PART_BYTES)
+      : undefined,
+    uploadTokenLength: process.env.UPLOAD_TOKEN_LENGTH,
+    blobIdLength: process.env.BLOB_ID_LENGTH,
+    s3Bucket: process.env.S3_BUCKET,
+    s3Region: process.env.S3_REGION,
+    s3Endpoint: process.env.S3_ENDPOINT,
+    s3AccessKeyId: process.env.S3_ACCESS_KEY_ID,
+    s3SecretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+    s3ForcePathStyle: process.env.S3_FORCE_PATH_STYLE,
   });
 })();

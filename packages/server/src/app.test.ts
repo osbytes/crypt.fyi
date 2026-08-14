@@ -25,7 +25,7 @@ const initAppTest = async () => {
     vaultEntryIdentifierLength: config.vaultEntryIdentifierLength,
     vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
   });
-  const redis = new Redis();
+  const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379');
   const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender(), 'foobar');
   const app = await initApp(config, {
     logger,
@@ -348,7 +348,7 @@ describe('app', () => {
     const { id } = (await createResponse.body.json()) as Record<string, unknown>;
     expect(typeof id).toBe('string');
 
-    const redis = new Redis();
+    const redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379');
     afterEach(async () => {
       await redis.quit();
     });

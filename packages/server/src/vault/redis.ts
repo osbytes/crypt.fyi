@@ -36,9 +36,11 @@ export const createRedisVault = (
   const getKey = (id: string) => `vault:${id}`;
 
   return {
-    async set(value) {
-      const { c, h, b, ttl, ips, rc, wh, fc, m } = value;
-      const { id, dt } = await tokenGenerator.generate();
+    async set(value, tokens) {
+      const { c, blob, h, b, ttl, ips, rc, wh, fc, m } = value;
+      // A completed streamed upload reuses the id and delete token issued when
+      // the upload was opened, so the link handed to the creator stays valid.
+      const { id, dt } = tokens ?? (await tokenGenerator.generate());
 
       const key = getKey(id);
 
@@ -54,6 +56,7 @@ export const createRedisVault = (
         key,
         JSON.stringify({
           c,
+          blob,
           h,
           b,
           fc,
@@ -84,7 +87,7 @@ export const createRedisVault = (
         return undefined;
       }
 
-      const { ips, c, b, ttl, cd, dt, wh, m } = await parseResult(result, encryptionKey);
+      const { ips, c, blob, b, ttl, cd, dt, wh, m } = await parseResult(result, encryptionKey);
       if (!isIpAllowed(ip, ips)) {
         if (wh?.fip) {
           void webhookSender.send({
@@ -231,29 +234,31 @@ export const createRedisVault = (
 
       return {
         c,
+        blob,
         b,
         ttl,
         cd,
         m,
+        burned: redisOutcome.burned === true,
       };
     },
     async del(id, dt) {
       const key = getKey(id);
       const result = await redis.get(key);
       if (!result) {
-        return false;
+        return { deleted: false };
       }
 
-      const { dt: actualDt } = await parseResult(result, encryptionKey);
+      const { dt: actualDt, blob } = await parseResult(result, encryptionKey);
       const dtBuf = Buffer.from(dt);
       const actualDtBuf = Buffer.from(actualDt);
       if (dtBuf.length !== actualDtBuf.length || !timingSafeEqual(dtBuf, actualDtBuf)) {
-        return false;
+        return { deleted: false };
       }
 
       const delResult = await redis.del(key);
 
-      return delResult === 1;
+      return { deleted: delResult === 1, blob };
     },
     async exists(id) {
       const key = getKey(id);
