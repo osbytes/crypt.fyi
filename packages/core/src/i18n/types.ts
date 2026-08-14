@@ -17,9 +17,6 @@ export interface TranslationKeys {
     footer: {
       tagline: string;
     };
-    header: {
-      tagline: string;
-    };
     time: {
       minute_one: string;
       minute_other: string;
@@ -32,67 +29,44 @@ export interface TranslationKeys {
   landing: {
     title: string;
     subtitle: string;
-    features: {
-      encryption: {
-        title: string;
-        description: string;
-      };
-      security: {
-        title: string;
-        description: string;
-      };
+    pillars: {
+      title: string;
       zeroKnowledge: {
         title: string;
         description: string;
       };
-      burn: {
+      ephemeral: {
         title: string;
         description: string;
       };
-      expiration: {
+      defense: {
         title: string;
         description: string;
       };
-      password: {
+      open: {
         title: string;
         description: string;
       };
-      files: {
-        title: string;
-        description: string;
-      };
-      webhooks: {
-        title: string;
-        description: string;
-      };
-      ipControl: {
-        title: string;
-        description: string;
-      };
-      readLimits: {
-        title: string;
-        description: string;
-      };
-      qrCode: {
-        title: string;
-        description: string;
-      };
-      cli: {
-        title: string;
-        description: string;
-      };
-      chromeExtension: {
-        title: string;
-        description: string;
-      };
-      docker: {
-        title: string;
-        description: string;
-      };
-      failedAttempts: {
-        title: string;
-        description: string;
-      };
+    };
+    alsoIncludes: {
+      label: string;
+      password: string;
+      files: string;
+      webhooks: string;
+      qrCode: string;
+      ipControl: string;
+      readLimits: string;
+    };
+    selfHost: {
+      title: string;
+      description: string;
+      deployOnRailway: string;
+      dockerCompose: string;
+    };
+    ecosystem: {
+      cli: string;
+      chromeExtension: string;
+      github: string;
     };
     steps: {
       encrypt: {
@@ -116,10 +90,13 @@ export interface TranslationKeys {
         placeholder: string;
         fileHint: string;
         fileSelected: string;
+        dropFile: string;
+        invalidFileType: string;
       };
       password: {
         label: string;
         placeholder: string;
+        placeholderRequired: string;
       };
       ttl: {
         label: string;
@@ -163,11 +140,30 @@ export interface TranslationKeys {
       description: {
         main: string;
         password: string;
+        separateKey: string;
       };
+      combinedUrl: string;
+      keylessUrl: string;
+      decryptionKey: string;
       urlCopied: string;
+      keyCopied: string;
+      secretDeleted: string;
+      qrDownloaded: string;
+      qrDownloadFailed: string;
       qrCode: {
         title: string;
         description: string;
+      };
+      actions: {
+        showUrl: string;
+        hideUrl: string;
+        showKey: string;
+        hideKey: string;
+        shareUrl: string;
+        shareKey: string;
+        copyUrl: string;
+        copyKey: string;
+        showQr: string;
       };
       createAnother: string;
       deleteSecret: string;
@@ -204,11 +200,50 @@ export interface TranslationKeys {
       description: string;
       createNew: string;
     };
+    invalidLink: {
+      title: string;
+      description: string;
+      createNew: string;
+    };
+    connectionError: {
+      title: string;
+      description: string;
+      tryAgain: string;
+    };
+    rateLimit: {
+      title: string;
+      description: string;
+      tryAgain: string;
+    };
     password: {
       title: string;
+      label: string;
       placeholder: string;
       description: string;
       error: string;
+      required: string;
+      show: string;
+      hide: string;
+    };
+    key: {
+      title: string;
+      label: string;
+      placeholder: string;
+      description: string;
+      required: string;
+      error: string;
+      show: string;
+      hide: string;
+      change: string;
+      submit: string;
+    };
+    credentials: {
+      title: string;
+      description: string;
+      submit: string;
+    };
+    legacyKey: {
+      warning: string;
     };
     content: {
       fileShared: string;
@@ -219,7 +254,7 @@ export interface TranslationKeys {
       copiedToClipboard: string;
       clickToReveal: string;
       passwordProtected: string;
-      clickToEnterPassword: string;
+      ariaLabel: string;
     };
     info: {
       burnedAfterReading: string;
@@ -235,87 +270,24 @@ export interface TranslationKeys {
   };
   about: {
     title: string;
-    intro: string;
-    whyCryptFyi: {
-      title: string;
-      commonPractices: {
-        title: string;
-        description: string;
-        problems: {
-          email: string;
-          slack: string;
-          sms: string;
-          messaging: string;
-        };
-      };
-      existingSolutions: {
-        title: string;
-        description: string;
-        limitations: {
-          onePassword: string;
-          onePasswordLink: string;
-          otherTools: string;
-          otherToolsConfigLink: string;
-          otherToolsSecurityLink: string;
-        };
-      };
-      approach: {
-        title: string;
-        description: string;
-      };
+    what: {
+      description: string;
+      traditionalTitle: string;
+      traditionalDescription: string;
     };
-    howItWorks: {
+    letter: {
       title: string;
-      steps: {
-        encrypt: {
-          title: string;
-          description: string;
-        };
-        share: {
-          title: string;
-          description: string;
-        };
-        burn: {
-          title: string;
-          description: string;
-        };
-      };
-    };
-    security: {
-      title: string;
-      encryption: {
-        title: string;
-        description: string;
-        features: {
-          key: string;
-          derivation: string;
-          vector: string;
-        };
-      };
-      zeroKnowledge: {
-        title: string;
-        description: string;
-        features: {
-          clientSide: string;
-          storage: string;
-          keys: string;
-        };
-      };
-      protection: {
-        title: string;
-        description: string;
-        features: {
-          encryption: string;
-          tls: string;
-          destruction: string;
-          logging: string;
-          password: string;
-        };
-      };
+      p1: string;
+      p2: string;
+      p3: string;
+      signOff: string;
     };
     openSource: {
-      title: string;
       description: string;
+    };
+    technical: {
+      prompt: string;
+      specLink: string;
     };
   };
   privacy: {

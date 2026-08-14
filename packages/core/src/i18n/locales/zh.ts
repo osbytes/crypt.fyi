@@ -17,11 +17,7 @@ export const zh: TranslationKeys = {
     confirm: '确认',
     requestNewLanguage: '请求新语言或修正翻译',
     footer: {
-      tagline: '以安全和隐私为设计理念 - 因为无知也是一种幸福',
-    },
-    header: {
-      tagline:
-        '使用零知识<aesLink>ML-KEM</aesLink><e2eLink>后量子端到端加密</e2eLink>的临时数据分享',
+      tagline: '以安全和隐私为设计理念，因为无知也是一种幸福',
     },
     time: {
       minute_one: '{{count}} 分钟',
@@ -35,72 +31,48 @@ export const zh: TranslationKeys = {
   landing: {
     title: '零知识秘密共享',
     subtitle:
-      '使用ML-KEM后量子端到端加密安全地一次性共享敏感信息。您的秘密在浏览器中加密，我们的服务器永远无法访问，并在查看后自动删除。',
-    features: {
-      encryption: {
-        title: 'ML-KEM后量子加密',
-        description:
-          '最先进的ML-KEM后量子加密确保您的数据即使面对未来的量子计算威胁也能保持安全。所有加密都在传输前在您的浏览器中完成。',
-      },
-      security: {
-        title: '增强安全',
-        description:
-          '多层保护包括严格的内容安全策略(CSP)、速率限制和IP限制。量子抗性加密，查看后自动删除。',
-      },
+      '在浏览器中加密。分享一次。永久消失。后量子端到端加密——我们的服务器永远看不到您的秘密。',
+    pillars: {
+      title: '为信任而构建',
       zeroKnowledge: {
-        title: '真正的零知识架构',
+        title: '真正的零知识',
         description:
-          '我们的服务器永远看不到您的未加密数据。加密密钥永远不会离开您的设备，所有解密都在您的浏览器中进行。通过端到端加密实现完全隐私。',
+          '加密密钥永远不会离开您的设备。解密仅在接收者的浏览器中进行——服务器永远看不到明文。',
       },
-      burn: {
-        title: '一次性秘密共享',
+      ephemeral: {
+        title: '默认即用即焚',
+        description: '阅后即焚、自定义 TTL 和阅读限制，确保敏感数据不会存留超过必要时间。',
+      },
+      defense: {
+        title: '纵深防御',
         description:
-          '秘密在查看后自动删除，确保只能访问一次。完美适用于永远不应该持久存在的敏感信息。',
+          'ML-KEM 后量子加密、严格 CSP、速率限制和可选 IP 白名单——分层保护，而非单一勾选项。',
       },
-      failedAttempts: {
-        title: '失败尝试后销毁',
-        description: '在多次访问失败尝试后自动销毁密文以增强安全性',
+      open: {
+        title: '开放且可审计',
+        description: '完全开源，专为自托管设计。检查代码、运行自己的实例或参与贡献。',
       },
-      expiration: {
-        title: '自动过期',
-        description: '设置自定义过期时间，确保密文不会持续超过所需时间',
-      },
-      password: {
-        title: '密码保护',
-        description: '通过可选的密码保护添加额外的安全层',
-      },
-      files: {
-        title: '文件共享',
-        description: '使用简单的拖放功能安全地共享文件',
-      },
-      webhooks: {
-        title: 'Webhook 通知',
-        description: '当您的密文被访问、销毁或无法读取时获得通知',
-      },
-      ipControl: {
-        title: 'IP 限制',
-        description: '通过限制可以查看密文的 IP 地址或 CIDR 范围来控制访问',
-      },
-      readLimits: {
-        title: '阅读限制',
-        description: '设置最大查看次数以限制密文可被访问的次数',
-      },
-      qrCode: {
-        title: '二维码',
-        description: '生成二维码以便在移动设备上轻松共享您的密文 URL',
-      },
-      cli: {
-        title: 'CLI 工具',
-        description: '使用我们的命令行界面自动化密文共享',
-      },
-      chromeExtension: {
-        title: 'Chrome 扩展',
-        description: '使用我们的 Chrome 扩展直接从浏览器共享密文',
-      },
-      docker: {
-        title: 'Docker 支持',
-        description: '使用我们的官方 Docker 镜像部署您自己的实例',
-      },
+    },
+    alsoIncludes: {
+      label: '还包括',
+      password: '密码保护',
+      files: '文件共享',
+      webhooks: 'Webhook',
+      qrCode: '二维码',
+      ipControl: 'IP 白名单',
+      readLimits: '阅读限制',
+    },
+    selfHost: {
+      title: '运行您自己的实例',
+      description:
+        '在您的基础设施上部署相同的零知识技术栈——一键部署到 Railway，或使用 Docker Compose 随处部署。',
+      deployOnRailway: '部署到 Railway',
+      dockerCompose: 'Docker Compose',
+    },
+    ecosystem: {
+      cli: 'CLI',
+      chromeExtension: 'Chrome 扩展',
+      github: 'GitHub',
     },
     steps: {
       encrypt: {
@@ -122,12 +94,15 @@ export const zh: TranslationKeys = {
       content: {
         label: '密文内容',
         placeholder: '在此输入您的密文内容...',
-        fileHint: '拖放或点击此处添加文件',
+        fileHint: '拖放或点击此处添加文件（最大 1 MB）',
         fileSelected: '已选择文件：{{name}}（{{size}} KB）',
+        dropFile: '拖放文件到此处',
+        invalidFileType: '无效的文件类型',
       },
       password: {
         label: '密码',
-        placeholder: '输入密码（至少5个字符）',
+        placeholder: '可选（但建议使用）',
+        placeholderRequired: '输入密码（至少{{min}}个字符）',
       },
       ttl: {
         label: '有效期',
@@ -135,7 +110,7 @@ export const zh: TranslationKeys = {
       },
       burn: {
         label: '阅后即焚',
-        description: '确保只有一个接收者可以访问密文',
+        description: '确保密文只能被读取一次——由第一个打开链接的人',
       },
       advanced: {
         toggle: '高级配置',
@@ -169,13 +144,32 @@ export const zh: TranslationKeys = {
     success: {
       title: '密文已创建！',
       description: {
-        main: '您的密文已创建，URL 已复制到剪贴板',
-        password: '与预期接收者分享 URL 和密码',
+        main: '您的密文已创建。请从下方选择分享方式。',
+        password: '请通过单独的渠道发送密码。',
+        separateKey: '若要分开发送，请通过不同渠道发送无密钥 URL 和解密密钥。',
       },
+      combinedUrl: '完整 URL（含密钥）',
+      keylessUrl: '无密钥 URL',
+      decryptionKey: '解密密钥',
       urlCopied: 'URL 已复制到剪贴板',
+      keyCopied: '解密密钥已复制到剪贴板',
+      secretDeleted: '密文已删除',
+      qrDownloaded: '二维码已下载',
+      qrDownloadFailed: '下载二维码失败：{{error}}',
       qrCode: {
         title: '密文 URL 二维码',
         description: '下载并分享密文 URL 二维码',
+      },
+      actions: {
+        showUrl: '显示密文 URL',
+        hideUrl: '隐藏密文 URL',
+        showKey: '显示解密密钥',
+        hideKey: '隐藏解密密钥',
+        shareUrl: '分享密文 URL',
+        shareKey: '分享解密密钥',
+        copyUrl: '复制密文 URL',
+        copyKey: '复制解密密钥',
+        showQr: '显示完整 URL 二维码',
       },
       createAnother: '创建另一个',
       deleteSecret: '删除密文',
@@ -191,7 +185,7 @@ export const zh: TranslationKeys = {
     },
     errors: {
       contentRequired: '内容为必填项',
-      passwordMinLength: '密码必须至少5个字符',
+      passwordMinLength: '密码必须至少{{min}}个字符',
       passwordTooSimple: '密码太简单',
       readCountWithBurn: '阅后即焚模式下不能设置阅读次数',
       tooManyIps: 'IP 限制过多（最大 {{max}}）',
@@ -201,7 +195,7 @@ export const zh: TranslationKeys = {
       secretNotFound: '未找到密文',
       unexpectedStatus: '意外的状态码 {{code}}',
       webhookConfigInvalid: 'Webhook配置无效 - 至少需要一个Webhook事件类型',
-      fileSizeExceeded: '文件大小超过最大允许大小',
+      fileSizeExceeded: '文件过大。最大大小为 {{max}}。',
       fileReadError: '读取文件失败',
       fileReadAborted: '文件读取已中止',
     },
@@ -212,11 +206,51 @@ export const zh: TranslationKeys = {
       description: '此密文可能已过期或被删除。',
       createNew: '创建新密文',
     },
+    invalidLink: {
+      title: '此链接无效',
+      description: '链接不完整或在传输过程中被更改，因此无法解密密文。请让发送者重新分享完整链接。',
+      createNew: '创建新密文',
+    },
+    connectionError: {
+      title: '无法连接服务器',
+      description: '密文可能仍然存在。请检查您的网络连接后重试。',
+      tryAgain: '重试',
+    },
+    rateLimit: {
+      title: '请求过多',
+      description: '您的请求过于频繁。请稍等片刻后重试。',
+      tryAgain: '重试',
+    },
     password: {
       title: '输入密码',
+      label: '密码',
       placeholder: '输入密码',
       description: '此密文受密码保护 - 请向发送者索要密码',
-      error: '密码错误',
+      error: '解密密钥或密码错误',
+      required: '请输入密码。',
+      show: '显示密码',
+      hide: '隐藏密码',
+    },
+    key: {
+      title: '输入解密密钥',
+      label: '解密密钥',
+      placeholder: '输入发送者提供的密钥',
+      description: '请通过单独的渠道向发送者索取解密密钥。该密钥仅在此浏览器中使用。',
+      required: '请输入解密密钥。',
+      error: '此解密密钥无法解锁密文。请检查密钥后重试。',
+      show: '显示解密密钥',
+      hide: '隐藏解密密钥',
+      change: '输入其他密钥',
+      submit: '解锁密文',
+    },
+    credentials: {
+      title: '解锁密文',
+      description: '请输入发送者提供的解密密钥和密码。两者仅在此浏览器中使用。',
+      submit: '解锁密文',
+    },
+    legacyKey: {
+      warning:
+        '此链接由过时的客户端创建，该客户端将解密密钥放在查询字符串中。请让发送者升级客户端，以便后续链接将密钥排除在服务器日志之外。',
     },
     content: {
       fileShared: '有人与您分享了一个文件',
@@ -227,7 +261,7 @@ export const zh: TranslationKeys = {
       copiedToClipboard: '密文已复制到剪贴板',
       clickToReveal: '点击上方的眼睛图标显示密文',
       passwordProtected: '此密文受密码保护。点击输入密码。',
-      clickToEnterPassword: '点击输入密码',
+      ariaLabel: '密文内容',
     },
     info: {
       burnedAfterReading: '此密文在您查看后已被删除，离开页面后将无法再次访问。',
@@ -243,94 +277,26 @@ export const zh: TranslationKeys = {
   },
   about: {
     title: '关于',
-    intro:
-      'crypt.fyi是一个安全的开源平台，采用零知识架构，让您能够安全地共享敏感信息，使用后量子端到端加密。无论是密码、API密钥还是机密消息 - crypt.fyi确保您的数据保持私密，永远不会被我们的服务器访问，并在访问后自动删除。',
-    whyCryptFyi: {
-      title: '为什么选择crypt.fyi？',
-      commonPractices: {
-        title: '常见做法的问题',
-        description: '每天，密码、API密钥和私人数据等敏感信息通过不安全的渠道以明文形式共享：',
-        problems: {
-          email: '电子邮件 - 可能被拦截、无限期存储和不受控制地转发',
-          slack: 'Slack/Teams消息 - 保留在聊天历史和公司日志中',
-          sms: '短信/文本 - 存储在多个设备和运营商服务器上',
-          messaging: '即时通讯 - 通常缺乏适当的加密和数据删除',
-        },
-      },
-      existingSolutions: {
-        title: '现有解决方案及其局限性',
-        description: '虽然该领域有其他工具，但每个都有其局限性：',
-        limitations: {
-          onePassword: '1Password - 团队密码管理的优秀选择，但',
-          onePasswordLink: '不支持与外部非用户的内部共享',
-          otherTools:
-            'PrivateBin/PwPush/OneTimeSecret - 类似的核心功能，但用户界面和技术栈过时，且通常缺乏',
-          otherToolsConfigLink: '零知识架构',
-          otherToolsSecurityLink: '后量子加密',
-        },
-      },
-      approach: {
-        title: 'crypt.fyi的方法',
-        description:
-          'crypt.fyi旨在应对这些挑战，同时利用现代Web技术和安全标准。我们结合零知识架构和ML-KEM后量子加密，确保您的数据保持私密和安全。结果是一个既高度安全又用户友好的工具。',
-      },
+    what: {
+      description:
+        'crypt.fyi 是一种零知识方式，通过链接分享敏感信息——密码、API 密钥、文件。加密在您的浏览器中完成，我们的服务器永远看不到明文，秘密可在被读取后消失。',
+      traditionalTitle: '为什么不直接发邮件或短信？',
+      traditionalDescription:
+        '邮件、短信、Slack 和聊天都会留下副本：收件箱、消息记录、运营商日志，以及每台同步过的设备。一旦把密码粘贴到这些渠道，你就失去了对谁能事后找到它的控制。crypt.fyi 用于一次刻意的交接——分享链接，可选添加密码或 IP 白名单，并在用完后让秘密消失。',
     },
-    howItWorks: {
-      title: '工作原理',
-      steps: {
-        encrypt: {
-          title: '1. 加密',
-          description:
-            '您的秘密在离开设备之前在浏览器中使用ML-KEM后量子加密进行加密。加密完全在客户端进行，确保您的数据零知识。',
-        },
-        share: {
-          title: '2. 共享',
-          description:
-            '与您的接收者共享安全链接。链接包含解密消息所需的一切，但我们的服务器永远看不到未加密的内容。',
-        },
-        burn: {
-          title: '3. 阅后即焚',
-          description:
-            '如果启用了"阅后即焚"，访问后秘密将从我们的服务器永久删除。不留任何痕迹，确保您的数据完全零知识。',
-        },
-      },
-    },
-    security: {
-      title: '安全实现',
-      encryption: {
-        title: '零知识后量子加密',
-        description:
-          '所有秘密在传输前都在您的浏览器中使用ML-KEM后量子加密进行加密。加密密钥永远不会离开您的设备，确保真正的零知识端到端加密。',
-        features: {
-          key: '加密密钥来自密码学安全的随机生成',
-          derivation: '密钥派生使用PBKDF2和SHA-256',
-          vector: '每个秘密都有唯一的初始化向量(IV)',
-        },
-      },
-      zeroKnowledge: {
-        title: '真正的零知识架构',
-        description: '我们的服务器永远看不到您的未加密数据。我们使用零知识架构，其中：',
-        features: {
-          clientSide: '所有加密/解密都在您的浏览器中客户端进行',
-          storage: '服务器只存储它们无法解密的加密数据',
-          keys: '加密密钥通过URL片段传输，永远不会到达后端API服务器',
-        },
-      },
-      protection: {
-        title: '数据保护',
-        description: '多层安全确保您的数据保持受保护：',
-        features: {
-          encryption: '所有加密/解密都在您的浏览器中使用ML-KEM后量子加密进行',
-          tls: '所有API通信的TLS加密',
-          destruction: '访问后自动删除秘密',
-          logging: '服务器端不记录敏感数据',
-          password: '可选的密码保护以增加安全性',
-        },
-      },
+    letter: {
+      title: '作者的一封短笺',
+      p1: '我创建 crypt.fyi，是因为我已经在用的工具，在我需要分享敏感内容时——尤其是对密码管理器之外的人——往往缺少真正符合我工作方式的控制能力。',
+      p2: '现有方案常常缺少日常真正重要的体验细节：丰富的限制能力（如 IP 白名单、阅读次数、失败尝试后销毁、Webhook）；CLI 与浏览器扩展；已保存/预填配置。技术上，有些也落后于现代加密标准，或缺少真正的原子读后即焚，从而无法避免竞态条件下被多次读取。',
+      p3: '于是我做了新的东西：开源、可自托管，并在我自己想要的密码学与控制能力上旗帜鲜明。',
+      signOff: '— Dillon',
     },
     openSource: {
-      title: '开源',
-      description: 'crypt.fyi是开源且可验证的。您可以检查我们的零知识实现、后量子加密并在',
+      description: 'crypt.fyi 开源且可审计。你可以审查实现、自行托管，或在此贡献：',
+    },
+    technical: {
+      prompt: '想了解更多技术细节？',
+      specLink: '阅读协议规范',
     },
   },
   privacy: {

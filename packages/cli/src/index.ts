@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { readFileSync, writeFileSync } from 'fs';
-import { Client } from '@crypt.fyi/core';
+import { Client, vaultValueSchema } from '@crypt.fyi/core';
 import chalk from 'chalk';
 import ora from 'ora';
-import { config } from './config';
+import { config } from './config.js';
+import { parseWhEvents, trimmedWhName } from './webhook.js';
 
 const program = new Command();
 
@@ -32,10 +33,27 @@ program
   .option('-b, --burn', 'Burn after reading', true)
   .option('--ip <ip>', 'Restrict access to specific IP address')
   .option('-r, --reads <count>', 'Number of times the secret can be read', undefined)
+  .option('--wh-url <url>', 'Webhook URL for notifications')
+  .option('--wh-events <list>', 'Comma-separated events: read, burn, failed-key, failed-ip', 'read')
+  .option('--wh-name <name>', 'Optional label for this secret in webhook payloads (max 50 chars)')
   .action(async (content, options) => {
     if (options.file && content) {
       console.error(chalk.red('Cannot provide both content and file'));
       process.exit(1);
+    }
+
+    const whUrl = options.whUrl?.trim();
+
+    // Webhook options only apply with a non-empty `--wh-url`; reject dangling options
+    if (!whUrl) {
+      if (options.whName) {
+        console.error(chalk.red('--wh-name requires --wh-url'));
+        process.exit(1);
+      }
+      if (options.whEvents !== 'read') {
+        console.error(chalk.red('--wh-events requires --wh-url'));
+        process.exit(1);
+      }
     }
 
     if (options.file) {
@@ -45,6 +63,21 @@ program
         console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
         process.exit(1);
       }
+    }
+
+    let whConfig;
+    try {
+      if (whUrl) {
+        const eventFlags = parseWhEvents(options.whEvents);
+        whConfig = vaultValueSchema.shape.wh.unwrap().parse({
+          u: whUrl,
+          n: trimmedWhName(options.whName),
+          ...eventFlags,
+        });
+      }
+    } catch (e) {
+      console.error(chalk.red(e instanceof Error ? e.message : 'Unknown error'));
+      process.exit(1);
     }
 
     const spinner = ora('Encrypting content...').start();
@@ -57,6 +90,7 @@ program
         ttl: parseDuration(options.ttl),
         ips: options.ip,
         rc: options.reads ? parseInt(options.reads, 10) : undefined,
+        ...(whConfig ? { wh: whConfig } : {}),
       });
 
       spinner.succeed('Secret encrypted and stored successfully!');

@@ -1,6 +1,6 @@
 {
   "name": "@crypt.fyi/cli",
-  "version": "0.0.14",
+  "version": "0.0.20",
   "type": "module",
   "bin": {
     "cfyi": "./dist/index.js"
@@ -19,21 +19,30 @@
     "build": "ncc build src/index.ts -o dist",
     "lint": "eslint \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "jest --verbose"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "dependencies": {
-    "@crypt.fyi/core": "*",
+    "@crypt.fyi/core": "workspace:*",
     "chalk": "^5.6.0",
     "commander": "^14.0.0",
     "ora": "^8.2.0",
     "zod": "^4.1.5"
   },
   "devDependencies": {
+    "@jest/globals": "^30.4.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.18.0",
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "@vercel/ncc": "^0.38.3",
     "eslint": "^9.34.0",
+    "jest": "^30.1.1",
+    "ts-jest": "^29.4.1",
     "typescript": "^5.9.2"
   }
 }

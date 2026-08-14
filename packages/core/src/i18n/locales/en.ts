@@ -17,11 +17,7 @@ export const en: TranslationKeys = {
     confirm: 'Confirm',
     requestNewLanguage: 'Request new or fix translations',
     footer: {
-      tagline: 'Built with security and privacy in mind - because ignorance can be bliss',
-    },
-    header: {
-      tagline:
-        'Ephemeral data sharing with zero-knowledge <aesLink>ML-KEM</aesLink> <e2eLink>post-quantum end-to-end encryption</e2eLink>',
+      tagline: 'Built with security and privacy in mind, because ignorance can be bliss',
     },
     time: {
       minute_one: '{{count}} minute',
@@ -35,76 +31,50 @@ export const en: TranslationKeys = {
   landing: {
     title: 'Open-Source Zero-Knowledge Secret Sharing',
     subtitle:
-      'Secure one-time sharing of sensitive information with ML-KEM post-quantum end-to-end encryption. Your secrets are encrypted in your browser, never accessible to our servers, and automatically deleted after viewing. Fully auditable open-source codebase.',
-    features: {
-      encryption: {
-        title: 'ML-KEM Post-Quantum Encryption',
-        description:
-          'State-of-the-art ML-KEM post-quantum encryption ensures your data remains secure even against future quantum computing threats. All encryption happens in your browser before transmission.',
-      },
-      security: {
-        title: 'Enhanced Security',
-        description:
-          'Multiple layers of protection including strict Content Security Policy (CSP), rate limiting, and IP restrictions. Quantum-resistant encryption with automatic deletion after viewing.',
-      },
+      'Encrypt in your browser. Share once. Gone forever. Post-quantum end-to-end encryption — our servers never see your secrets.',
+    pillars: {
+      title: 'Built for trust',
       zeroKnowledge: {
-        title: 'True Zero-Knowledge Architecture',
+        title: 'True zero-knowledge',
         description:
-          'Our servers never see your unencrypted data. The encryption key never leaves your device, and all decryption happens in your browser. Complete privacy through end-to-end encryption.',
+          "Encryption keys never leave your device. Decryption happens only in the recipient's browser — the server never sees plaintext.",
       },
-      burn: {
-        title: 'One-Time Secret Sharing',
+      ephemeral: {
+        title: 'Ephemeral by default',
         description:
-          'Secrets are automatically destroyed after viewing, ensuring they can only be accessed once. Perfect for sharing sensitive information that should never persist.',
+          'Burn after reading, custom TTLs, and read limits so sensitive data does not linger longer than it should.',
       },
-      failedAttempts: {
-        title: 'Burn After Failed Attempts',
+      defense: {
+        title: 'Defense in depth',
         description:
-          'Automatically destroy secrets after a number of failed access attempts for enhanced security',
+          'ML-KEM post-quantum encryption, strict CSP, rate limits, and optional IP allow-lists — layered protection, not a single checkbox.',
       },
-      expiration: {
-        title: 'Auto-Expiration',
+      open: {
+        title: 'Open and auditable',
         description:
-          "Set custom expiration times to ensure secrets don't persist longer than needed",
+          'Fully open-source and designed to be self-hosted. Inspect the code, run your own instance, or contribute.',
       },
-      password: {
-        title: 'Password Protection',
-        description: 'Add an extra layer of security with optional password protection',
-      },
-      files: {
-        title: 'File Sharing',
-        description: 'Securely share files with simple drag and drop functionality',
-      },
-      webhooks: {
-        title: 'Webhooks',
-        description: 'Get notified when your secrets are accessed, burned, or fail to be read',
-      },
-      ipControl: {
-        title: 'IP Restrictions',
-        description:
-          'Control access by limiting which IP addresses or CIDR ranges can view your secrets',
-      },
-      readLimits: {
-        title: 'Read Limits',
-        description: 'Set maximum view counts to restrict how many times a secret can be accessed',
-      },
-      qrCode: {
-        title: 'QR Codes',
-        description: 'Generate QR codes for easy mobile sharing of your secret URLs',
-      },
-      cli: {
-        title: 'CLI Tool',
-        description: 'Automate secret sharing with our command-line interface',
-      },
-      chromeExtension: {
-        title: 'Chrome Extension',
-        description:
-          'Share secrets directly from your browser in-context with our Chrome extension',
-      },
-      docker: {
-        title: 'Docker Support',
-        description: 'Deploy your own instance using our official Docker images',
-      },
+    },
+    alsoIncludes: {
+      label: 'Also includes',
+      password: 'password protection',
+      files: 'file sharing',
+      webhooks: 'webhooks',
+      qrCode: 'QR codes',
+      ipControl: 'IP allow-lists',
+      readLimits: 'read limits',
+    },
+    selfHost: {
+      title: 'Run your own instance',
+      description:
+        'Deploy the same zero-knowledge stack on your infrastructure — one click on Railway, or Docker Compose anywhere.',
+      deployOnRailway: 'Deploy on Railway',
+      dockerCompose: 'Docker Compose',
+    },
+    ecosystem: {
+      cli: 'CLI',
+      chromeExtension: 'Chrome Extension',
+      github: 'GitHub',
     },
     steps: {
       encrypt: {
@@ -126,12 +96,15 @@ export const en: TranslationKeys = {
       content: {
         label: 'Secret content',
         placeholder: 'Enter your secret content or file here...',
-        fileHint: 'add a file by drag-n-drop or clicking here',
+        fileHint: 'add a file by drag-n-drop or clicking here (max 1 MB)',
         fileSelected: 'File selected: {{name}} ({{size}} KB)',
+        dropFile: 'Drop file here',
+        invalidFileType: 'Invalid file type',
       },
       password: {
         label: 'Password',
-        placeholder: 'Enter a password (minimum 5 characters)',
+        placeholder: 'Optional (but recommended)',
+        placeholderRequired: 'Enter a password (minimum {{min}} characters)',
       },
       ttl: {
         label: 'Time to live',
@@ -139,7 +112,8 @@ export const en: TranslationKeys = {
       },
       burn: {
         label: 'Burn after reading',
-        description: 'Guarantees only one recipient can access the secret',
+        description:
+          'Guarantees the secret can be read only once — the first person to open the link',
       },
       advanced: {
         toggle: 'advanced configuration',
@@ -174,13 +148,33 @@ export const en: TranslationKeys = {
     success: {
       title: 'Secret Created!',
       description: {
-        main: 'Your secret has been created and the URL has been copied to your clipboard',
-        password: 'Share the URL and password with the desired recipient',
+        main: 'Your secret has been created. Choose a sharing option below.',
+        password: 'Send the password through a separate channel.',
+        separateKey:
+          'For separate delivery, send the key-free URL and decryption key through different channels.',
       },
+      combinedUrl: 'Combined URL (includes key)',
+      keylessUrl: 'Key-free URL',
+      decryptionKey: 'Decryption key',
       urlCopied: 'URL copied to clipboard',
+      keyCopied: 'Decryption key copied to clipboard',
+      secretDeleted: 'Secret deleted',
+      qrDownloaded: 'QR code downloaded',
+      qrDownloadFailed: 'Failed to download QR code: {{error}}',
       qrCode: {
         title: 'Secret URL QR Code',
         description: 'Download and share the secret URL QR Code',
+      },
+      actions: {
+        showUrl: 'Show secret URL',
+        hideUrl: 'Hide secret URL',
+        showKey: 'Show decryption key',
+        hideKey: 'Hide decryption key',
+        shareUrl: 'Share secret URL',
+        shareKey: 'Share decryption key',
+        copyUrl: 'Copy secret URL',
+        copyKey: 'Copy decryption key',
+        showQr: 'Show combined URL QR code',
       },
       createAnother: 'Create Another',
       deleteSecret: 'Delete Secret',
@@ -196,7 +190,7 @@ export const en: TranslationKeys = {
     },
     errors: {
       contentRequired: 'Content is required',
-      passwordMinLength: 'Password must be at least 5 characters',
+      passwordMinLength: 'Password must be at least {{min}} characters',
       passwordTooSimple: 'Password is too simple',
       readCountWithBurn: 'Read count cannot be used with burn after reading',
       tooManyIps: 'Too many IP restrictions (max {{max}})',
@@ -207,7 +201,7 @@ export const en: TranslationKeys = {
       unexpectedStatus: 'unexpected status code {{code}}',
       webhookConfigInvalid:
         'Webhook configuration is invalid - at least one webhook event type is required',
-      fileSizeExceeded: 'File size exceeded maximum allowed size',
+      fileSizeExceeded: 'File is too large. Maximum size is {{max}}.',
       fileReadError: 'Failed to read file',
       fileReadAborted: 'File reading was aborted',
     },
@@ -218,11 +212,54 @@ export const en: TranslationKeys = {
       description: 'This secret may have expired or been deleted.',
       createNew: 'Create New Secret',
     },
+    invalidLink: {
+      title: 'This link is invalid',
+      description:
+        'The link is incomplete or was altered in transit, so the secret cannot be decrypted. Ask the sender to share the full link again.',
+      createNew: 'Create New Secret',
+    },
+    connectionError: {
+      title: "Couldn't reach the server",
+      description: 'The secret may still exist. Check your connection and try again.',
+      tryAgain: 'Try Again',
+    },
+    rateLimit: {
+      title: 'Too many requests',
+      description: 'You have made too many requests. Wait a moment and try again.',
+      tryAgain: 'Try Again',
+    },
     password: {
       title: 'Enter Password',
+      label: 'Password',
       placeholder: 'Enter the password',
       description: 'This secret is protected with a password - request from the sender',
-      error: 'Incorrect password',
+      error: 'Incorrect decryption key or password',
+      required: 'Enter a password.',
+      show: 'Show password',
+      hide: 'Hide password',
+    },
+    key: {
+      title: 'Enter Decryption Key',
+      label: 'Decryption key',
+      placeholder: 'Enter the key provided by the sender',
+      description:
+        'Ask the sender for the decryption key through a separate channel. The key is used only in this browser.',
+      required: 'Enter a decryption key.',
+      error: 'That decryption key could not unlock this secret. Check the key and try again.',
+      show: 'Show decryption key',
+      hide: 'Hide decryption key',
+      change: 'Enter a different key',
+      submit: 'Unlock secret',
+    },
+    credentials: {
+      title: 'Unlock Secret',
+      description:
+        'Enter the decryption key and password provided by the sender. Both are used only in this browser.',
+      submit: 'Unlock secret',
+    },
+    legacyKey: {
+      warning:
+        'This link was created with an outdated client that puts the decryption key in the query string. Ask the sender to upgrade so future links keep the key out of server logs.',
     },
     content: {
       fileShared: 'A file has been shared with you',
@@ -233,11 +270,11 @@ export const en: TranslationKeys = {
       copiedToClipboard: 'Secret copied to clipboard',
       clickToReveal: 'Click the eye icon above to reveal the secret',
       passwordProtected: 'This secret is password protected. Click to enter password.',
-      clickToEnterPassword: 'Click to enter password',
+      ariaLabel: 'Secret content',
     },
     info: {
       burnedAfterReading:
-        'This secret was deleted after your viewing and is no longer available after leaving the page.',
+        'This secret has been permanently deleted. Once you leave this page, it cannot be viewed again.',
       expiresIn: 'Expires {{time}}',
     },
     errors: {
@@ -250,98 +287,27 @@ export const en: TranslationKeys = {
   },
   about: {
     title: 'About',
-    intro:
-      "crypt.fyi is a secure, open-source, zero-knowledge data-sharing platform that enables you to share sensitive information safely with post-quantum end-to-end encryption. Whether it's passwords, API keys, or confidential messages, crypt.fyi ensures your data remains private, never accessible to our servers, and automatically disappears after being accessed.",
-    whyCryptFyi: {
-      title: 'Why crypt.fyi?',
-      commonPractices: {
-        title: 'The Problem with Common Practices',
-        description:
-          'Every day, sensitive information like passwords, API keys, and private data is shared through insecure channels in plain text:',
-        problems: {
-          email: 'Email - can be intercepted, stored indefinitely, and forwarded without control',
-          slack: 'Slack/Teams messages - remain in chat history and company logs',
-          sms: 'SMS/Text messages - stored on multiple devices and carrier servers',
-          messaging: 'Instant messaging - often lacks proper encryption and data deletion',
-        },
-      },
-      existingSolutions: {
-        title: 'Existing Solutions and Their Limitations',
-        description: 'While there are other tools in this space, each has its limitations:',
-        limitations: {
-          onePassword: '1Password - excellent for team password management, but',
-          onePasswordLink: "doesn't support external non-users sharing internally",
-          otherTools:
-            'PrivateBin/PwPush/OneTimeSecret - similar core functionality, but dated user interfaces, technology stacks, and often lack',
-          otherToolsConfigLink: 'zero-knowledge architecture',
-          otherToolsSecurityLink: 'post-quantum encryption',
-        },
-      },
-      approach: {
-        title: 'The crypt.fyi Approach',
-        description:
-          "crypt.fyi was built to address these challenges while embracing modern web technologies and security standards. We combine zero-knowledge architecture with ML-KEM post-quantum encryption, ensuring your data remains private and secure. The result is a tool that's both highly secure and pleasant to use.",
-      },
+    what: {
+      description:
+        'crypt.fyi is a zero-knowledge way to share sensitive information — passwords, API keys, files — with a link. Encryption happens in your browser, our servers never see the plaintext, and secrets can vanish after they are read.',
+      traditionalTitle: 'Why not just email or text it?',
+      traditionalDescription:
+        'Email, SMS, Slack, and chat keep copies: in inboxes, message history, carrier logs, and every synced device. Once you paste a password into those channels, you lose control over who can find it later. crypt.fyi is for a deliberate, one-time handoff — share the link, optionally add a password or IP allow-list, and let the secret disappear when it is done.',
     },
-    howItWorks: {
-      title: 'How It Works',
-      steps: {
-        encrypt: {
-          title: '1. Encrypt',
-          description:
-            'Your secret is encrypted in your browser using ML-KEM post-quantum encryption before it ever leaves your device. The encryption happens entirely client-side, ensuring zero-knowledge of your data.',
-        },
-        share: {
-          title: '2. Share',
-          description:
-            'Share the secure link with your intended recipient. The link contains everything needed to decrypt the message, but our servers never see the unencrypted content.',
-        },
-        burn: {
-          title: '3. Burn after read',
-          description:
-            "Once accessed, if 'burn after read' is checked, the secret is permanently deleted from our servers. No traces left behind, maintaining complete zero-knowledge of your data.",
-        },
-      },
-    },
-    security: {
-      title: 'Security Implementation',
-      encryption: {
-        title: 'Zero-Knowledge Post-Quantum Encryption',
-        description:
-          'All secrets are encrypted using ML-KEM post-quantum encryption in your browser before transmission. The encryption key never leaves your device, ensuring true zero-knowledge end-to-end encryption.',
-        features: {
-          key: 'Encryption key is derived from a cryptographically secure random generation',
-          derivation: 'Key derivation uses PBKDF2 with SHA-256',
-          vector: 'Each secret has a unique initialization vector (IV)',
-        },
-      },
-      zeroKnowledge: {
-        title: 'True Zero-Knowledge Architecture',
-        description:
-          'Our servers never see your unencrypted data. We employ a zero-knowledge architecture where:',
-        features: {
-          clientSide: 'All encryption/decryption happens client-side in your browser',
-          storage: 'Servers only store encrypted data they cannot decrypt',
-          keys: 'Encryption keys are transmitted via URL fragments, which never reach the backend api server',
-        },
-      },
-      protection: {
-        title: 'Data Protection',
-        description: 'Multiple layers of security ensure your data remains protected:',
-        features: {
-          encryption:
-            'All encryption/decryption occurs in your browser using ML-KEM post-quantum encryption',
-          tls: 'TLS encryption for all API communications',
-          destruction: 'Automatic secret destruction after access',
-          logging: 'No server-side logging of sensitive data',
-          password: 'Optional password protection for additional security',
-        },
-      },
+    letter: {
+      title: 'A note from the author',
+      p1: 'I built crypt.fyi because the tools I already reached for kept falling short when I needed to share something sensitive — especially with someone outside my password manager — with controls that matched how I actually work.',
+      p2: 'Incumbents often missed the UX details that matter day to day: expansive restrictions like IP allow-lists, read counts, burn after failed attempts, and webhooks; a CLI and browser extension; saved and pre-fill configuration. Technically, some were also behind on modern encryption standards, or lacked true atomic read-and-burn so a secret could not be race-conditioned into multiple reads.',
+      p3: 'So I built something new: open source, self-hostable, and opinionated about the cryptography and controls I wanted for myself.',
+      signOff: '— Dillon',
     },
     openSource: {
-      title: 'Open Source',
       description:
-        'crypt.fyi is open source and auditable. You can review our zero-knowledge implementation, post-quantum encryption, and contribute on',
+        'crypt.fyi is open source and auditable. You can review the implementation, self-host it, or contribute on',
+    },
+    technical: {
+      prompt: 'Want to get more technical?',
+      specLink: 'Read the protocol specification',
     },
   },
   privacy: {

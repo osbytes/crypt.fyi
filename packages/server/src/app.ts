@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import Fastify from 'fastify';
+import Fastify, { type FastifyError } from 'fastify';
 import helmet from '@fastify/helmet';
 import compression from '@fastify/compress';
 import {
@@ -26,7 +26,9 @@ import {
   deleteVaultParamsSchema,
   deleteVaultRequestSchema,
 } from '@crypt.fyi/core';
+import { SsrfError } from '@crypt.fyi/core';
 import { Redis } from 'ioredis';
+import { assertWebhookUrlAllowed } from './ssrf.js';
 import { BASE_OTEL_ATTRIBUTES } from './telemetry.js';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -95,22 +97,30 @@ export const initApp = async (config: Config, deps: AppDeps) => {
 
   await app.after();
 
-  app.addHook('onRequest', async (req, res) => {
-    const origins = config.corsOrigin
-      .split(',')
-      .map((o) => o.trim())
-      .filter(Boolean);
+  const allowedOrigins = config.corsOrigin
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+  const allowAnyOrigin = allowedOrigins.length === 0 || allowedOrigins.includes('*');
 
-    if (origins.length > 0 && !origins.includes('*')) {
-      res.header('Access-Control-Allow-Origin', origins.join(','));
-    } else {
+  app.addHook('onRequest', async (req, res) => {
+    // Access-Control-Allow-Origin must be a single origin or "*" — never a
+    // comma-joined list. Reflect the request's Origin when it is allow-listed.
+    if (allowAnyOrigin) {
       res.header('Access-Control-Allow-Origin', '*');
+    } else {
+      const requestOrigin = req.headers.origin;
+      if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+        res.header('Access-Control-Allow-Origin', requestOrigin);
+      }
+      // Response varies by Origin, so caches must key on it.
+      res.header('Vary', 'Origin');
     }
     res.header('Access-Control-Allow-Methods', config.corsMethods);
     res.header('Access-Control-Allow-Headers', config.corsHeaders);
 
     if (req.method === 'OPTIONS') {
-      return res.send();
+      return res.send('');
     }
 
     const ac = new AbortController();
@@ -129,13 +139,30 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     description: 'Number of entries in Redis',
     unit: 'entries',
   });
-  const memoryGauge = meter.createObservableCounter('system.memory.usage', {
+  const memoryGauge = meter.createObservableGauge('system.memory.usage', {
     description: 'Process memory usage',
     unit: 'bytes',
   });
   const cpuGauge = meter.createObservableGauge('system.cpu.usage', {
     description: 'Process CPU usage',
     unit: 'percentage',
+  });
+
+  // Register metric callbacks once at init. Registering them inside a request
+  // handler (e.g. /health) leaks a new callback per request and multiplies the
+  // Redis dbsize() calls on every collection.
+  redisEntriesGauge.addCallback(async (result) => {
+    const count = await redis.dbsize();
+    result.observe(count, BASE_OTEL_ATTRIBUTES);
+  });
+  memoryGauge.addCallback((result) => {
+    const memoryUsage = process.memoryUsage();
+    result.observe(memoryUsage.heapUsed, BASE_OTEL_ATTRIBUTES);
+  });
+  cpuGauge.addCallback((result) => {
+    const cpuUsage = process.cpuUsage();
+    const totalCPUTime = cpuUsage.user + cpuUsage.system;
+    result.observe(totalCPUTime / 1000000, BASE_OTEL_ATTRIBUTES);
   });
 
   app.route({
@@ -159,20 +186,6 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       summary: 'Health check',
     },
     handler: async (_, res) => {
-      redisEntriesGauge.addCallback(async (result) => {
-        const count = await redis.dbsize();
-        result.observe(count, BASE_OTEL_ATTRIBUTES);
-      });
-      memoryGauge.addCallback((result) => {
-        const memoryUsage = process.memoryUsage();
-        result.observe(memoryUsage.heapUsed, BASE_OTEL_ATTRIBUTES);
-      });
-      cpuGauge.addCallback((result) => {
-        const cpuUsage = process.cpuUsage();
-        const totalCPUTime = cpuUsage.user + cpuUsage.system;
-        result.observe(totalCPUTime / 1000000, BASE_OTEL_ATTRIBUTES);
-      });
-
       let redisOK = false;
       try {
         await redis.ping();
@@ -181,12 +194,12 @@ export const initApp = async (config: Config, deps: AppDeps) => {
         logger.error(error);
       }
 
-      res.status(200).send({
-        //version: config.serviceVersion,
-        //name: "cfcrypt", //config.serviceName,
-        //redis: redisOK,
-        status: "ok",
-        kv: "ok"
+      // The body is intentionally generic — it must not disclose the service
+      // name, version, or dependency topology to unauthenticated callers.
+      // Liveness is carried by the status code so probes still work.
+      res.status(redisOK ? 200 : 503).send({
+        status: redisOK ? 'ok' : 'error',
+        kv: redisOK ? 'ok' : 'error',
       });
     },
   });
@@ -237,10 +250,7 @@ export const initApp = async (config: Config, deps: AppDeps) => {
             for (const ip of ips) {
               const trimmed = ip.trim();
               const isValidIP = z.union([z.ipv4(), z.ipv6()]).safeParse(trimmed).success;
-              const isValidCIDR = z
-                .string()
-                .regex(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
-                .safeParse(trimmed).success;
+              const isValidCIDR = z.union([z.cidrv4(), z.cidrv6()]).safeParse(trimmed).success;
 
               if (!isValidIP && !isValidCIDR) {
                 ctx.addIssue({
@@ -269,9 +279,23 @@ export const initApp = async (config: Config, deps: AppDeps) => {
         }),
       response: {
         201: createVaultResponseSchema,
+        400: z.object({ msg: z.string() }).describe('Invalid request'),
       },
     },
     async handler(req, res) {
+      if (req.body.wh?.u) {
+        try {
+          await assertWebhookUrlAllowed(req.body.wh.u, {
+            requireHttps: config.webhookRequireHttps,
+          });
+        } catch (error) {
+          if (error instanceof SsrfError) {
+            return res.status(400).send({ msg: error.message });
+          }
+          throw error;
+        }
+      }
+
       const result = await vault.set(req.body);
 
       res.status(201).send(result);
@@ -299,13 +323,13 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       try {
         const result = await vault.get(req.params.vaultId, req.query.h, req.ip);
         if (!result) {
-          return res.status(404).send();
+          return res.status(404).send(null);
         }
 
         return res.send(result);
       } catch (error) {
         if (error instanceof ErrorInvalidKeyAndOrPassword) {
-          return res.status(400).send();
+          return res.status(400).send(null);
         }
 
         throw error;
@@ -330,10 +354,10 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     async handler(req, res) {
       const exists = await vault.exists(req.params.vaultId);
       if (!exists) {
-        return res.status(404).send();
+        return res.status(404).send(null);
       }
 
-      return res.status(200).send();
+      return res.status(200).send(null);
     },
   });
 
@@ -355,14 +379,14 @@ export const initApp = async (config: Config, deps: AppDeps) => {
     async handler(req, res) {
       const result = await vault.del(req.params.vaultId, req.body.dt);
       if (!result) {
-        return res.status(404).send();
+        return res.status(404).send(null);
       }
 
-      return res.status(200).send();
+      return res.status(200).send(null);
     },
   });
 
-  app.setErrorHandler(function (error, req, res) {
+  app.setErrorHandler(function (error: FastifyError, req, res) {
     req.log.error(error);
 
     if (res.sent) return;

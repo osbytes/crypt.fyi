@@ -9,13 +9,15 @@ import { createTokenGenerator } from './vault/tokens.js';
 import { createNopWebhookSender } from './webhook.js';
 import { Redis } from 'ioredis';
 import { Client } from 'undici';
-import { gcm, type CreateVaultRequest } from '@crypt.fyi/core';
+import { machine, type CreateVaultRequest } from '@crypt.fyi/core';
 
 const initAppTest = async () => {
   const config = {
     ...baseConfig,
     healthCheckEndpoint: '/some-health-check-endpoint',
     vaultEntryTTLMsDefault: 1000,
+    // Keep counters out of Redis so unit tests cannot poison e2e / local API limits.
+    rateLimiter: 'memory',
     rateLimitMax: Number.MAX_SAFE_INTEGER,
   } satisfies Config;
   const logger = pino({ enabled: false });
@@ -258,7 +260,10 @@ describe('app', () => {
   });
 
   it('verifies TTL behavior with read count', async () => {
-    const initialTTL = 5000;
+    // Keep TTL well above CI scheduling jitter — a 5s TTL previously expired before
+    // the GET when this suite ran ~5.2s under load.
+    const initialTTL = 30_000;
+    const waitMs = 1_000;
     const readCount = 3;
     const createResponse = await testContext.client.request({
       method: 'POST',
@@ -284,11 +289,14 @@ describe('app', () => {
     const { id } = (await createResponse.body.json()) as Record<string, unknown>;
     expect(typeof id).toBe('string');
 
+    const createdAt = Date.now();
     const initialRedisTTL = await testContext.redis.pttl(`vault:${id}`);
-    expect(initialRedisTTL).toBeGreaterThan(4975);
-    expect(initialRedisTTL).toBeLessThanOrEqual(5000);
+    expect(initialRedisTTL).toBeGreaterThan(initialTTL - 250);
+    expect(initialRedisTTL).toBeLessThanOrEqual(initialTTL);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Under CI CPU contention setTimeout can fire much later than requested; assert
+    // against wall-clock elapsed instead of assuming the delay was exact.
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
 
     const getResponse = await testContext.client.request({
       method: 'GET',
@@ -297,8 +305,11 @@ describe('app', () => {
     expect(getResponse.statusCode).toBe(200);
 
     const ttlAfterRead = await testContext.redis.pttl(`vault:${id}`);
-    expect(ttlAfterRead).toBeGreaterThanOrEqual(3950);
-    expect(ttlAfterRead).toBeLessThanOrEqual(4000);
+    const elapsedMs = Date.now() - createdAt;
+    // Reading with remaining read-count must preserve the remaining TTL (not reset it).
+    expect(ttlAfterRead).toBeGreaterThan(0);
+    expect(ttlAfterRead).toBeLessThan(initialRedisTTL);
+    expect(Math.abs(ttlAfterRead - (initialTTL - elapsedMs))).toBeLessThan(2_000);
 
     const remainingReads = JSON.parse((await testContext.redis.get(`vault:${id}`)) ?? '{}')?.rc;
     expect(remainingReads).toBe(2);
@@ -359,8 +370,8 @@ describe('app', () => {
     expect(parsedValue.wh.u.length).toBeGreaterThan(0);
 
     const [decryptedIps, decryptedWhU] = await Promise.all([
-      gcm.decrypt(parsedValue.ips, testContext.config.encryptionKey),
-      gcm.decrypt(parsedValue.wh.u, testContext.config.encryptionKey),
+      machine.decrypt(parsedValue.ips, testContext.config.encryptionKey),
+      machine.decrypt(parsedValue.wh.u, testContext.config.encryptionKey),
     ]);
 
     expect(decryptedIps).toBe('192.168.1.1,10.0.0.0/24');

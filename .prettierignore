@@ -4,3 +4,7 @@ dist
 coverage
 *.md
 *.gen.ts
+pnpm-lock.yaml
+**/test-results/
+**/playwright-report/
+**/blob-report/

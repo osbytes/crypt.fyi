@@ -6,7 +6,7 @@ import {
   ReadVaultResponse,
 } from './api';
 import { generateRandomString } from './random';
-import { sha512 } from './hash';
+import { KEY_VERSION_2_PREFIX, deriveVerificationHash, parseKey } from './verification';
 import { encryptionRegistry, compressionRegistry, validateMetadata } from './encryption/registry';
 import { ProcessingMetadata } from './vault';
 import { gcm } from './encryption';
@@ -63,6 +63,25 @@ export class Client {
     return processed;
   }
 
+  // Metadata for the inner (URL key) layer: carries compression + the primary
+  // encryption algorithm.
+  private keyLayerMetadata(metadata: ProcessingMetadata): ProcessingMetadata {
+    return {
+      compression: metadata.compression,
+      encryption: { algorithm: metadata.encryption.algorithm },
+    };
+  }
+
+  // Metadata for the outer (user password) layer: encryption only, no
+  // compression (compression happens once, on the inner layer).
+  private passwordLayerMetadata(metadata: ProcessingMetadata): ProcessingMetadata {
+    return {
+      encryption: {
+        algorithm: metadata.encryption.passwordAlgorithm ?? metadata.encryption.algorithm,
+      },
+    };
+  }
+
   private async recoverContent(
     encoded: string,
     key: string,
@@ -103,21 +122,45 @@ export class Client {
   async create(
     input: Omit<CreateVaultRequest, 'h' | 'm'> & { p?: string; m?: ProcessingMetadata },
   ): Promise<CreateVaultResponse & { key: string; hash: string }> {
-    const key = await generateRandomString(this.keyLength);
+    const rawKey = await generateRandomString(this.keyLength);
+    const hasPassword = input.p !== undefined && input.p !== '';
 
+    // Fast KDF for the high-entropy URL key layer; memory-hard Argon2id only for
+    // the user-password layer, and only when a password is actually set.
     const metadata: ProcessingMetadata = input.m ?? {
       compression: {
         algorithm: 'zlib:pako',
       },
       encryption: {
         algorithm: 'ml-kem-768-2',
+        passwordAlgorithm: hasPassword ? 'ml-kem-768-argon2' : undefined,
       },
     };
 
-    const processed = await this.processContent(input.c, metadata, key).then((r) =>
-      !input.p ? r : this.processContent(r, metadata, input.p),
-    );
-    const hash = sha512(key + (input.p ?? ''));
+    let processed: string;
+    if (!hasPassword) {
+      processed = await this.processContent(input.c, metadata, rawKey);
+    } else if (metadata.encryption.passwordAlgorithm) {
+      // Asymmetric: compress + key-encrypt inner, then password-encrypt outer.
+      const inner = await this.processContent(input.c, this.keyLayerMetadata(metadata), rawKey);
+      processed = await this.processContent(
+        inner,
+        this.passwordLayerMetadata(metadata),
+        input.p as string,
+      );
+    } else {
+      // Legacy symmetric pipeline (custom metadata without passwordAlgorithm).
+      const inner = await this.processContent(input.c, metadata, rawKey);
+      processed = await this.processContent(inner, metadata, input.p as string);
+    }
+
+    // Only password-protected secrets need the Argon2id (v2) verification hash;
+    // a bare high-entropy key is not brute-forceable, so it keeps the fast hash.
+    // The version prefix on the shared key tells the reader which scheme to use.
+    const key = hasPassword ? `${KEY_VERSION_2_PREFIX}${rawKey}` : rawKey;
+    const hash = hasPassword
+      ? await deriveVerificationHash('v2', rawKey, input.p)
+      : await deriveVerificationHash('legacy', rawKey);
 
     const response = await fetch(`${this.apiUrl}/vault`, {
       method: 'POST',
@@ -156,7 +199,8 @@ export class Client {
   }
 
   async read(id: string, key: string, password?: string) {
-    const h = sha512(key + (password ?? ''));
+    const { scheme, rawKey } = parseKey(key);
+    const h = await deriveVerificationHash(scheme, rawKey, password);
     const res = await fetch(`${this.apiUrl}/vault/${id}?h=${h}`, {
       headers: this.getHeaders(),
     });
@@ -170,11 +214,18 @@ export class Client {
     }
 
     const data = await (res.json() as Promise<ReadVaultResponse>);
-    const decrypted = password
-      ? await this.recoverContent(data.c, password, data.m).then((d) =>
-          this.recoverContent(d, key, data.m),
-        )
-      : await this.recoverContent(data.c, key, data.m);
+    let decrypted: string;
+    if (!password) {
+      decrypted = await this.recoverContent(data.c, rawKey, data.m);
+    } else if (data.m?.encryption?.passwordAlgorithm) {
+      // Asymmetric: password-decrypt outer, then key-decrypt + decompress inner.
+      const tmp = await this.recoverContent(data.c, password, this.passwordLayerMetadata(data.m));
+      decrypted = await this.recoverContent(tmp, rawKey, this.keyLayerMetadata(data.m));
+    } else {
+      // Legacy symmetric pipeline.
+      const tmp = await this.recoverContent(data.c, password, data.m);
+      decrypted = await this.recoverContent(tmp, rawKey, data.m);
+    }
 
     return {
       c: decrypted,
@@ -221,8 +272,11 @@ export class ErrorNotFound extends Error {
 }
 
 export class ErrorUnexpectedStatus extends Error {
+  readonly status: number;
+
   constructor(status: number) {
     super(`unexpected status code ${status}`);
+    this.status = status;
   }
 }
 

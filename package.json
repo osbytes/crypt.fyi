@@ -1,41 +1,39 @@
 {
   "private": true,
   "license": "Apache-2.0",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "concurrently \"yarn redis\" \"turbo dev\"",
+    "dev": "concurrently \"pnpm redis\" \"turbo dev\"",
     "build": "turbo build",
     "lint": "turbo lint",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "redis": "docker compose run -p 6379:6379 -v ./redis-data:/data redis redis-server --save 1 1 --loglevel warning"
+    "test:e2e": "pnpm --filter @crypt.fyi/web test:e2e",
+    "redis": "docker compose run --rm -p 6379:6379 -v ./redis-data:/data redis redis-server --save 1 1 --loglevel notice",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "node ./scripts/release.mjs",
+    "release:extension": "node ./scripts/publish-extension.mjs"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@typescript-eslint/eslint-plugin": "^8.41.0",
-    "@typescript-eslint/parser": "^8.41.0",
-    "concurrently": "^9.2.1",
-    "eslint": "^9.39.2",
-    "globals": "^16.3.0",
+    "@changesets/changelog-github": "0.7.0",
+    "@changesets/cli": "2.31.1",
+    "@eslint/js": "9.39.2",
+    "@typescript-eslint/eslint-plugin": "8.41.0",
+    "@typescript-eslint/parser": "8.41.0",
+    "chrome-webstore-upload-cli": "4.0.1",
+    "concurrently": "10.0.4",
+    "eslint": "9.39.2",
+    "globals": "16.3.0",
     "prettier": "3.6.2",
-    "turbo": "^2.5.6",
-    "typescript": "^5.9.2"
+    "turbo": "2.9.14",
+    "typescript": "5.9.2"
   },
-  "packageManager": "yarn@4.6.0",
-  "resolutions": {
-    "esbuild": "0.25.0",
-    "tmp": "0.2.5",
-    "@babel/runtime": "^7.28.3",
-    "glob@^10.2.0": ">=10.5.0",
-    "glob@^11.0.0": ">=11.1.0"
-  },
+  "packageManager": "pnpm@11.17.0",
   "version": "0.0.0",
   "engines": {
     "node": ">=22.0.0",
-    "yarn": ">=4.6.0"
+    "pnpm": ">=11.17.0"
   }
 }

@@ -5,17 +5,17 @@ import { randomBytes } from '@noble/hashes/utils';
 import { concatBytes, utf8ToBytes } from '@noble/hashes/utils';
 import { Decrypt, Encrypt, DecryptError, EncryptError } from './encryption';
 import { Buffer } from '../buffer';
+import { getPbkdf2Iterations } from '../kdf';
 
 const SALT_LENGTH = 16;
 const IV_LENGTH = 12;
 const KEY_LENGTH = 32;
-const ITERATIONS = 2 ** 19;
 
 export const encrypt: Encrypt = async (content, password) => {
   try {
     const salt = randomBytes(SALT_LENGTH);
     const key = await pbkdf2Async(nobleSha256, utf8ToBytes(password), salt, {
-      c: ITERATIONS,
+      c: getPbkdf2Iterations(),
       dkLen: KEY_LENGTH,
     });
     const iv = randomBytes(IV_LENGTH);
@@ -37,7 +37,7 @@ export const decrypt: Decrypt = async (encryptedContent, password) => {
     const ciphertext = data.subarray(SALT_LENGTH + IV_LENGTH);
 
     const key = await pbkdf2Async(nobleSha256, utf8ToBytes(password), salt, {
-      c: ITERATIONS,
+      c: getPbkdf2Iterations(),
       dkLen: KEY_LENGTH,
     });
 

@@ -1,6 +1,6 @@
 {
   "name": "@crypt.fyi/core",
-  "version": "0.0.14",
+  "version": "0.0.20",
   "license": "Apache-2.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -13,6 +13,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/osbytes/crypt.fyi.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "sideEffects": false,
   "scripts": {
@@ -28,10 +32,12 @@
     "@noble/hashes": "^1.8.0",
     "@noble/post-quantum": "^0.4.1",
     "buffer": "^6.0.3",
+    "ipaddr.js": "^2.4.0",
     "pako": "^2.1.0",
     "zod": "^4.1.5"
   },
   "devDependencies": {
+    "@jest/globals": "^30.4.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.18.0",
     "@types/pako": "^2.0.4",
