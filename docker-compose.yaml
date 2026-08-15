@@ -24,39 +24,18 @@ services:
     volumes:
       - redis_data:/data
 
-  # Object storage for payloads above the inline threshold. Only needed when
-  # BLOB_STORAGE_ENABLED=true; leave the profile off and nothing starts.
-  minio:
-    image: minio/minio:latest
-    profiles: ['blob']
-    command: server /data --console-address ':9001'
-    environment:
-      - MINIO_ROOT_USER=${S3_ACCESS_KEY_ID:-crypt}
-      - MINIO_ROOT_PASSWORD=${S3_SECRET_ACCESS_KEY:-crypt-secret}
-    ports:
-      - '${MINIO_PORT:-9000}:9000'
-      - '${MINIO_CONSOLE_PORT:-9001}:9001'
-    volumes:
-      - minio_data:/data
-
   server:
     build:
       context: .
       dockerfile: Dockerfile.server
     environment:
       - REDIS_URL=redis://redis:6379
+      # Without these the server falls back to development mode and the
+      # well-known key 'foobar', which encrypts webhook URLs and IP allow-lists
+      # at rest. Compose fails fast rather than starting an insecure instance.
+      - NODE_ENV=${NODE_ENV:-production}
+      - 'ENCRYPTION_KEY=${ENCRYPTION_KEY:?required - copy .env.example to .env and run openssl rand -base64 32}'
       - PORT=${SERVER_PORT:-4321}
-      # Streamed payloads. Off by default: the server accepts inline secrets
-      # only, exactly as before.
-      - BLOB_STORAGE_ENABLED=${BLOB_STORAGE_ENABLED:-false}
-      - BLOB_STORAGE_TYPE=${BLOB_STORAGE_TYPE:-s3}
-      - ALLOW_PERSISTENCE=${ALLOW_PERSISTENCE:-false}
-      - S3_BUCKET=${S3_BUCKET:-crypt-secrets}
-      - S3_ENDPOINT=${S3_ENDPOINT:-http://minio:9000}
-      - S3_REGION=${S3_REGION:-us-east-1}
-      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID:-crypt}
-      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY:-crypt-secret}
-      - S3_FORCE_PATH_STYLE=${S3_FORCE_PATH_STYLE:-true}
     ports:
       - '${SERVER_PORT:-4321}:${SERVER_PORT:-4321}'
     depends_on:
@@ -82,4 +61,3 @@ services:
 
 volumes:
   redis_data:
-  minio_data:

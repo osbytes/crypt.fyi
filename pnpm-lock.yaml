@@ -241,6 +241,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: 3.1110.0
         version: 3.1110.0
+      '@crypt.fyi/core':
+        specifier: workspace:*
+        version: link:../core
       '@fastify/compress':
         specifier: ^8.1.0
         version: 8.3.1
@@ -317,9 +320,6 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.27.1
         version: 7.29.7(@babel/core@7.29.6(supports-color@10.2.2))(supports-color@10.2.2)
-      '@crypt.fyi/core':
-        specifier: workspace:*
-        version: link:../core
       '@types/bytes':
         specifier: ^3.1.5
         version: 3.1.5

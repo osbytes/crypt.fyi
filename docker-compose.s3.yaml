@@ -24,11 +24,9 @@ services:
     volumes:
       - redis_data:/data
 
-  # Object storage for payloads above the inline threshold. Only needed when
-  # BLOB_STORAGE_ENABLED=true; leave the profile off and nothing starts.
+  # Object storage for payloads above the 128 KiB inline threshold.
   minio:
     image: minio/minio:latest
-    profiles: ['blob']
     command: server /data --console-address ':9001'
     environment:
       - MINIO_ROOT_USER=${S3_ACCESS_KEY_ID:-crypt}
@@ -45,7 +43,6 @@ services:
   # reliable backstop against orphaned objects.
   minio-init:
     image: minio/mc:latest
-    profiles: ['blob']
     depends_on:
       - minio
     volumes:
@@ -67,6 +64,11 @@ services:
       dockerfile: Dockerfile.server
     environment:
       - REDIS_URL=redis://redis:6379
+      # Without these the server falls back to development mode and the
+      # well-known key 'foobar', which encrypts webhook URLs and IP allow-lists
+      # at rest. Compose fails fast rather than starting an insecure instance.
+      - NODE_ENV=${NODE_ENV:-production}
+      - 'ENCRYPTION_KEY=${ENCRYPTION_KEY:?required - copy .env.example to .env and run openssl rand -base64 32}'
       - PORT=${SERVER_PORT:-4321}
       # Streamed payloads. Off by default: the server accepts inline secrets
       # only, exactly as before.

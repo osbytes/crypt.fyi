@@ -86,6 +86,7 @@ program
 
       const result = await client.create({
         c: content,
+        p: options.password,
         b: options.burn,
         ttl: parseDuration(options.ttl),
         ips: options.ip,
