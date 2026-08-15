@@ -101,6 +101,7 @@ export const en: TranslationKeys = {
         dropFile: 'Drop file here',
         invalidFileType: 'Invalid file type',
       },
+      uploadProgress: 'Upload progress',
       password: {
         label: 'Password',
         placeholder: 'Optional (but recommended)',
@@ -265,6 +266,10 @@ export const en: TranslationKeys = {
     content: {
       fileShared: 'A file has been shared with you',
       downloadFile: 'Download File',
+      downloadComplete: 'Download complete',
+      streamedDescription:
+        'This file is decrypted in your browser and written straight to disk. Choose where to save it.',
+      downloadProgress: 'Download progress',
       hideContent: 'Hide content',
       showContent: 'Show content',
       copyToClipboard: 'Copy to clipboard',

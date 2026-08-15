@@ -12,7 +12,7 @@ import { buildObjectKey } from './storage/index.js';
 import { MIN_PART_SIZE } from './storage/types.js';
 import { Redis } from 'ioredis';
 import { Client } from 'undici';
-import { StreamClient } from '@crypt.fyi/core';
+import { StreamClient, blobToSource } from '@crypt.fyi/core';
 
 // Small enough to keep the suite quick, large enough that a payload still needs
 // several parts. The storage minimum is what forces the shape of these tests.
@@ -431,5 +431,155 @@ describe('streamed payloads / end to end through StreamClient', () => {
 
     await client.read(created.id, created.key);
     await expect(client.read(created.id, created.key)).rejects.toThrow(/not found/i);
+  }, 60_000);
+});
+
+describe('streamed payloads / streaming download', () => {
+  let ctx: Ctx;
+
+  beforeEach(async () => {
+    ctx = await initStreamTest();
+  });
+
+  afterEach(async () => {
+    await ctx.app.shutdown();
+    await ctx.app.fastify.close();
+    await ctx.client.close();
+  });
+
+  const payload = (size: number) => {
+    const out = new Uint8Array(size);
+    for (let i = 0; i < size; i++) out[i] = (i * 53 + 17) & 0xff;
+    return out;
+  };
+
+  it('decrypts into a sink without holding the payload', async () => {
+    const client = new StreamClient({ apiUrl: ctx.baseUrl });
+    const content = payload(14 * 1024 * 1024);
+
+    const created = await client.create({
+      content,
+      metadata: { name: 'archive.zip', type: 'application/zip' },
+      b: true,
+      ttl: 60_000,
+      m: { encryption: { algorithm: 'ml-kem-768-stream' } },
+    });
+
+    // Count and hash on the fly rather than accumulating, so this asserts the
+    // sink really is fed incrementally.
+    const received: number[] = [];
+    let total = 0;
+    let checksum = 0;
+    const sink = new WritableStream<Uint8Array>({
+      write(chunk) {
+        received.push(chunk.length);
+        for (let i = 0; i < chunk.length; i++) checksum = (checksum + chunk[i]) % 2147483647;
+        total += chunk.length;
+      },
+    });
+
+    const progress: number[] = [];
+    const result = await client.readToSink(created.id, created.key, undefined, {
+      sink,
+      onProgress: (event) => progress.push(event.bytes),
+    });
+
+    let expected = 0;
+    for (let i = 0; i < content.length; i++) expected = (expected + content[i]) % 2147483647;
+
+    expect(total).toBe(content.length);
+    expect(checksum).toBe(expected);
+    expect(result.metadata.name).toBe('archive.zip');
+    expect(result.burned).toBe(true);
+
+    // One write per frame: the payload arrives in pieces, never in one buffer.
+    expect(received.length).toBe(Math.ceil(content.length / (4 * 1024 * 1024)));
+    expect(Math.max(...received)).toBeLessThanOrEqual(4 * 1024 * 1024);
+    expect(progress[progress.length - 1]).toBe(content.length);
+  }, 60_000);
+
+  it('uploads from a Blob without materialising it', async () => {
+    const client = new StreamClient({ apiUrl: ctx.baseUrl });
+    const content = payload(6 * 1024 * 1024);
+    const blob = new Blob([content as BlobPart]);
+
+    const sliceSizes: number[] = [];
+    const source = blobToSource(blob);
+    const instrumented = {
+      size: source.size,
+      slice: async (start: number, end: number) => {
+        sliceSizes.push(end - start);
+        return source.slice(start, end);
+      },
+    };
+
+    const created = await client.create({
+      content: instrumented,
+      metadata: { name: 'from-blob.bin', type: 'application/octet-stream' },
+      b: true,
+      ttl: 60_000,
+      m: { encryption: { algorithm: 'ml-kem-768-stream' } },
+    });
+
+    // Read in frame-sized slices, never all at once.
+    expect(sliceSizes.length).toBeGreaterThan(1);
+    expect(Math.max(...sliceSizes)).toBeLessThanOrEqual(4 * 1024 * 1024);
+
+    const read = await client.read(created.id, created.key);
+    expect(Buffer.from(read.content).equals(Buffer.from(content))).toBe(true);
+  }, 60_000);
+
+  it('never touches the sink when the server rejects the key', async () => {
+    const client = new StreamClient({ apiUrl: ctx.baseUrl });
+    const created = await client.create({
+      content: payload(8192),
+      metadata: { name: 'x.bin', type: 'application/octet-stream' },
+      b: false,
+      rc: 3,
+      ttl: 60_000,
+      m: { encryption: { algorithm: 'ml-kem-768-stream' } },
+    });
+
+    let written = false;
+    const sink = new WritableStream<Uint8Array>({
+      write() {
+        written = true;
+      },
+    });
+
+    // The hash check fails server-side, so nothing is ever handed to the sink.
+    await expect(
+      client.readToSink(created.id, 'x'.repeat(32), undefined, { sink }),
+    ).rejects.toThrow();
+    expect(written).toBe(false);
+  }, 60_000);
+
+  it('aborts the sink instead of delivering a corrupted payload', async () => {
+    const client = new StreamClient({ apiUrl: ctx.baseUrl });
+    const created = await client.create({
+      // Two frames, so corruption lands in the second and the first has already
+      // reached the sink when authentication fails.
+      content: payload(6 * 1024 * 1024),
+      metadata: { name: 'corrupt.bin', type: 'application/octet-stream' },
+      b: false,
+      rc: 3,
+      ttl: 60_000,
+      m: { encryption: { algorithm: 'ml-kem-768-stream' } },
+    });
+
+    const [objectKey] = ctx.blobStorage.keys();
+    ctx.blobStorage.patch(objectKey, 5 * 1024 * 1024, 0x00);
+
+    let aborted = false;
+    const sink = new WritableStream<Uint8Array>({
+      write() {},
+      abort() {
+        aborted = true;
+      },
+    });
+
+    await expect(client.readToSink(created.id, created.key, undefined, { sink })).rejects.toThrow();
+    // A truncated or corrupted file must never be presented as a finished one.
+    expect(aborted).toBe(true);
   }, 60_000);
 });

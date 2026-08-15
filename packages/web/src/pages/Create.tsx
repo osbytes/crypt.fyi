@@ -1,7 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { sha256, ErrorNotFound, ErrorPayloadTooLarge, sleep } from '@crypt.fyi/core';
+import {
+  sha256,
+  ErrorNotFound,
+  ErrorPayloadTooLarge,
+  INLINE_PAYLOAD_MAX_BYTES,
+  StreamClient,
+  sleep,
+} from '@crypt.fyi/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useMemo, DragEvent } from 'react';
 import {
@@ -68,8 +75,18 @@ import { buildSecretLinks } from '@/lib/secretUrl';
 import type { SecretLinks } from '@/lib/secretUrl';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
-const MAX_FILE_SIZE = 1 * 1024 * 1024;
-const MAX_FILE_SIZE_LABEL = '1 MB';
+const MAX_FILE_SIZE = config.MAX_FILE_SIZE;
+const formatBytes = (bytes: number) => {
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  return `${value % 1 === 0 ? value : value.toFixed(1)} ${units[unit]}`;
+};
+const MAX_FILE_SIZE_LABEL = formatBytes(MAX_FILE_SIZE);
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -438,29 +455,63 @@ export function CreatePage() {
   const createdLinksRef = useRef<SecretLinks | null>(null);
   const createdDecryptionKeyRef = useRef('');
 
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+
   const createMutation = useMutation({
     mutationFn: async (input: FormValues) => {
       await sleep(500, { enabled: config.IS_DEV });
-      const result = await client.create({
-        ...input,
-        p: input.p,
-        wh: input.whu
-          ? {
-              u: input.whu,
-              n: input.whn,
-              r: input.whr,
-              fpk: input.whfpk,
-              fip: input.whfip,
-              b: input.whb,
+
+      const webhook = input.whu
+        ? {
+            u: input.whu,
+            n: input.whn,
+            r: input.whr,
+            fpk: input.whfpk,
+            fip: input.whfip,
+            b: input.whb,
+          }
+        : undefined;
+
+      // Anything past the inline threshold is framed and uploaded in parts to
+      // object storage; the file is read from disk a frame at a time and never
+      // held whole. Small secrets keep the original single-request path.
+      const streamed = Boolean(selectedFile) && selectedFile!.size > INLINE_PAYLOAD_MAX_BYTES;
+
+      let result: { id: string; dt: string; key: string };
+      if (streamed && selectedFile) {
+        const streamClient = new StreamClient({
+          apiUrl: config.API_URL,
+          keyLength: config.KEY_LENGTH,
+          xClient: `@crypt.fyi/web:${config.GIT_HASH?.substring(0, 8) || config.VERSION}`,
+        });
+        setUploadProgress(0);
+        result = await streamClient.create({
+          content: selectedFile,
+          metadata: { name: selectedFile.name, type: selectedFile.type || '' },
+          password: input.p || undefined,
+          b: input.b,
+          ttl: input.ttl,
+          ips: input.ips,
+          rc: input.rc,
+          fc: input.fc,
+          wh: webhook,
+          m: { encryption: { algorithm: 'ml-kem-768-stream' } },
+          onProgress: ({ phase, bytes, total }) => {
+            if (phase === 'uploading' && total > 0) {
+              setUploadProgress(Math.min(100, Math.round((bytes / total) * 100)));
             }
-          : undefined,
-      });
+          },
+        });
+      } else {
+        result = await client.create({ ...input, p: input.p, wh: webhook });
+      }
 
       createdLinksRef.current = buildSecretLinks({
         origin: window.location.origin,
         id: result.id,
         key: result.key,
         passwordProtected: Boolean(input.p),
+        streamed,
       });
       createdDecryptionKeyRef.current = result.key;
 
@@ -475,6 +526,9 @@ export function CreatePage() {
       toast.error(
         error instanceof ErrorPayloadTooLarge ? t('create.errors.payloadTooLarge') : error.message,
       );
+    },
+    onSettled() {
+      setUploadProgress(null);
     },
     gcTime: 0,
   });
@@ -524,6 +578,12 @@ export function CreatePage() {
 
   async function onSubmit(data: FormValues) {
     let content = data.c;
+
+    if (selectedFile && selectedFile.size > INLINE_PAYLOAD_MAX_BYTES) {
+      // Read lazily by the stream client; `c` is unused on that path.
+      await createMutation.mutateAsync({ ...data, c: content });
+      return;
+    }
 
     if (selectedFile) {
       try {
@@ -1188,7 +1248,27 @@ export function CreatePage() {
                       </AnimatePresence>
                     </Collapsible>
                   </div>
-                  <div className="flex justify-end">
+                  <div className="flex items-center justify-end gap-4">
+                    {uploadProgress !== null && (
+                      <div
+                        className="flex flex-1 items-center gap-3"
+                        role="progressbar"
+                        aria-valuenow={uploadProgress}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label={t('create.form.uploadProgress')}
+                      >
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-full bg-primary transition-[width] duration-200"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                        <span className="text-xs tabular-nums text-muted-foreground">
+                          {uploadProgress}%
+                        </span>
+                      </div>
+                    )}
                     <Button type="submit" isLoading={createMutation.isPending}>
                       <IconLock />
                       {t('common.create')}

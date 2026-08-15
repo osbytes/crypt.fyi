@@ -99,6 +99,7 @@ export const zh: TranslationKeys = {
         dropFile: '拖放文件到此处',
         invalidFileType: '无效的文件类型',
       },
+      uploadProgress: '上传进度',
       password: {
         label: '密码',
         placeholder: '可选（但建议使用）',
@@ -256,6 +257,9 @@ export const zh: TranslationKeys = {
     content: {
       fileShared: '有人与您分享了一个文件',
       downloadFile: '下载文件',
+      downloadComplete: '下载完成',
+      streamedDescription: '该文件在您的浏览器中解密并直接写入磁盘。请选择保存位置。',
+      downloadProgress: '下载进度',
       hideContent: '隐藏内容',
       showContent: '显示内容',
       copyToClipboard: '复制到剪贴板',

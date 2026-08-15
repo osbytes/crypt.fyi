@@ -16,7 +16,12 @@ import {
  * also a usable single-node development backend. It is not a production
  * backend: everything is lost on restart and bounded by heap.
  */
-export const createMemoryBlobStorage = (): BlobStorage & { size(): number; clear(): void } => {
+export const createMemoryBlobStorage = (): BlobStorage & {
+  size(): number;
+  clear(): void;
+  patch(key: string, offset: number, value: number): void;
+  keys(): string[];
+} => {
   const objects = new Map<string, Buffer>();
   const uploads = new Map<string, { key: string; parts: Map<number, Buffer> }>();
 
@@ -109,6 +114,22 @@ export const createMemoryBlobStorage = (): BlobStorage & { size(): number; clear
 
     size() {
       return objects.size;
+    },
+
+    /**
+     * Test affordance: flip a byte in a stored object so a reader has to
+     * detect it. There is no production path that mutates stored bytes.
+     */
+    patch(key: string, offset: number, value: number) {
+      const object = objects.get(key);
+      if (!object) {
+        throw new BlobNotFoundError(key);
+      }
+      object[offset] = value;
+    },
+
+    keys() {
+      return [...objects.keys()];
     },
 
     clear() {

@@ -3,6 +3,13 @@ interface SecretLinksInput {
   id: string;
   key: string;
   passwordProtected: boolean;
+  /**
+   * Marks a payload stored in object storage. The viewer needs this before it
+   * fetches: `showSaveFilePicker` requires user activation, which does not
+   * survive an await, so the save location must be chosen on the click that
+   * starts the download.
+   */
+  streamed?: boolean;
 }
 
 export interface SecretLinks {
@@ -17,10 +24,14 @@ export function buildSecretLinks({
   id,
   key,
   passwordProtected,
+  streamed,
 }: SecretLinksInput): SecretLinks {
   const url = new URL(`/${encodeURIComponent(id)}`, origin);
   if (passwordProtected) {
     url.searchParams.set('p', 'true');
+  }
+  if (streamed) {
+    url.searchParams.set('s', 'true');
   }
 
   const keylessUrl = url.toString();

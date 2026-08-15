@@ -250,3 +250,109 @@ export const createSaveSink = async (options: SaveSinkOptions): Promise<SaveSink
     },
   };
 };
+
+/**
+ * A sink that can be created before the filename is known.
+ *
+ * The name lives inside the container's encrypted metadata frame, so it is only
+ * available after the header authenticates — by which point the click's user
+ * activation is gone. The File System Access picker therefore has to run
+ * immediately (the user names the file themselves), while the service worker
+ * and blob sinks can wait and use the real name.
+ */
+export type PendingSaveSink = {
+  kind: SaveSinkKind;
+  writable: WritableStream<Uint8Array>;
+  /** Call once the container's metadata is known. */
+  arm(info: { filename: string; size: number }): Promise<void>;
+  done: Promise<void>;
+  abort(reason?: unknown): Promise<void>;
+};
+
+export const createPendingSaveSink = async (suggestedName: string): Promise<PendingSaveSink> => {
+  const picker = getSaveFilePicker();
+  if (picker) {
+    // Must happen synchronously enough to keep transient activation.
+    const handle = await picker({ suggestedName });
+    const writable = await handle.createWritable();
+    return {
+      kind: 'file-system-access',
+      writable,
+      arm: async () => {},
+      done: Promise.resolve(),
+      abort: async (reason) => {
+        await writable.abort?.(reason);
+      },
+    };
+  }
+
+  if (supportsServiceWorkerSink()) {
+    const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();
+    let closeFrame: (() => void) | undefined;
+
+    return {
+      kind: 'service-worker',
+      writable,
+      arm: async ({ filename, size }) => {
+        const id = newDownloadId();
+        activeDownloads += 1;
+        try {
+          await armWorker(id, readable, { filename, size });
+        } catch (error) {
+          await releaseWorker();
+          throw error;
+        }
+        closeFrame = openDownloadFrame(id);
+      },
+      done: Promise.resolve().then(async () => {
+        closeFrame?.();
+        await releaseWorker();
+      }),
+      abort: async (reason) => {
+        closeFrame?.();
+        await writable.abort?.(reason).catch(() => undefined);
+        await releaseWorker();
+      },
+    };
+  }
+
+  const chunks: Uint8Array[] = [];
+  let name = suggestedName;
+  let settled: () => void = () => {};
+  const done = new Promise<void>((resolve) => {
+    settled = resolve;
+  });
+
+  const writable = new WritableStream<Uint8Array>({
+    write(chunk) {
+      chunks.push(chunk);
+    },
+    close() {
+      const blob = new Blob(chunks as BlobPart[], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = name;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      settled();
+    },
+  });
+
+  return {
+    kind: 'blob',
+    writable,
+    arm: async ({ filename, size }) => {
+      if (size > BLOB_SINK_LIMIT) {
+        throw new Error(
+          'This browser cannot save a file this large. Try Chrome or Edge, which support streaming downloads.',
+        );
+      }
+      name = filename;
+    },
+    done,
+    abort: async (reason) => {
+      await writable.abort?.(reason).catch(() => undefined);
+    },
+  };
+};

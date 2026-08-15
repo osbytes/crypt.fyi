@@ -3,6 +3,8 @@ import {
   openStream,
   frameCountFor,
   parseStreamHeader,
+  readWrappedKeyLength,
+  HEADER_FIXED_LENGTH,
   TAG_LENGTH,
   DEFAULT_FRAME_SIZE_LOG2,
   type StreamMetadata,
@@ -25,8 +27,104 @@ export type ProgressEvent = {
   total: number;
 };
 
+/**
+ * Payloads above the inline threshold take the streamed path. Kept here so the
+ * client, the UI, and the CLI all route on the same number.
+ */
+export const INLINE_PAYLOAD_MAX_BYTES = 1024 * 1024;
+
+/**
+ * A payload the client can read piecewise. A `File` never has to be resident:
+ * only the frames currently being encrypted are in memory.
+ */
+export type ByteSource = {
+  size: number;
+  slice(start: number, end: number): Promise<Uint8Array>;
+};
+
+export const bytesToSource = (bytes: Uint8Array): ByteSource => ({
+  size: bytes.length,
+  slice: async (start, end) => bytes.subarray(start, end),
+});
+
+/** Backs a source with a Blob or File, which reads lazily from disk. */
+export const blobToSource = (blob: Blob): ByteSource => ({
+  size: blob.size,
+  slice: async (start, end) => new Uint8Array(await blob.slice(start, end).arrayBuffer()),
+});
+
+// Blob is absent in some runtimes, so probe before testing against it — an
+// inline `typeof` guard also stops TypeScript narrowing the union.
+const isBlob = (value: unknown): value is Blob =>
+  typeof Blob !== 'undefined' && value instanceof Blob;
+
+const toByteSource = (input: Uint8Array | Blob | ByteSource): ByteSource => {
+  if (input instanceof Uint8Array) return bytesToSource(input);
+  if (isBlob(input)) return blobToSource(input);
+  return input;
+};
+
+/**
+ * Reads an exact number of bytes at a time from a response stream.
+ *
+ * Chunks are held in a list and only assembled when a caller asks for them, so
+ * filling a 4 MiB frame from 64 KB network chunks costs one copy rather than
+ * one per chunk.
+ */
+const createByteReader = (stream: ReadableStream<Uint8Array>) => {
+  const reader = stream.getReader();
+  let chunks: Uint8Array[] = [];
+  let buffered = 0;
+  let exhausted = false;
+
+  const pull = async (): Promise<boolean> => {
+    if (exhausted) return false;
+    const { value, done } = await reader.read();
+    if (done) {
+      exhausted = true;
+      return false;
+    }
+    if (value?.length) {
+      chunks.push(value);
+      buffered += value.length;
+    }
+    return true;
+  };
+
+  return {
+    async readExactly(length: number): Promise<Uint8Array> {
+      while (buffered < length) {
+        if (!(await pull())) {
+          throw new Error(`stream ended after ${buffered} bytes, expected ${length}`);
+        }
+      }
+
+      const out = new Uint8Array(length);
+      let offset = 0;
+      while (offset < length) {
+        const chunk = chunks[0];
+        const take = Math.min(chunk.length, length - offset);
+        out.set(chunk.subarray(0, take), offset);
+        offset += take;
+        if (take === chunk.length) {
+          chunks.shift();
+        } else {
+          chunks[0] = chunk.subarray(take);
+        }
+      }
+      buffered -= length;
+      return out;
+    },
+    async cancel(reason?: unknown) {
+      chunks = [];
+      buffered = 0;
+      await reader.cancel(reason).catch(() => undefined);
+    },
+  };
+};
+
 export type StreamUploadInput = Omit<CreateStreamRequest, 'h' | 'size' | 'frames'> & {
-  content: Uint8Array;
+  content: Uint8Array | Blob | ByteSource;
   metadata: Omit<StreamMetadata, 'size'>;
   password?: string;
   frameSizeLog2?: number;
@@ -128,20 +226,21 @@ export class StreamClient {
       ...vaultFields
     } = input;
 
+    const source = toByteSource(content);
     const rawKey = await generateRandomString(this.keyLength);
     const hasPassword = password !== undefined && password !== '';
 
     const encryptor = await createStreamEncryptor({
       key: rawKey,
       password: hasPassword ? password : undefined,
-      plaintextLength: content.length,
-      metadata: { ...metadata, size: content.length },
+      plaintextLength: source.size,
+      metadata: { ...metadata, size: source.size },
       frameSizeLog2,
     });
 
     const frameSize = encryptor.frameSize;
     const frameCount = encryptor.frameCount;
-    const lastFrameSize = content.length - (frameCount - 1) * frameSize;
+    const lastFrameSize = source.size - (frameCount - 1) * frameSize;
     const parts = planParts({
       headerLength: encryptor.header.length,
       frameCount,
@@ -177,16 +276,13 @@ export class StreamClient {
 
       for (let frame = part.firstFrame; frame <= part.lastFrame; frame++) {
         const start = (frame - 1) * frameSize;
-        chunks.push(
-          await encryptor.encryptFrame(
-            frame,
-            content.subarray(start, Math.min(start + frameSize, content.length)),
-          ),
-        );
+        // Only this frame is resident; a File is read from disk on demand.
+        const plaintext = await source.slice(start, Math.min(start + frameSize, source.size));
+        chunks.push(await encryptor.encryptFrame(frame, plaintext));
         onProgress?.({
           phase: 'encrypting',
-          bytes: Math.min(frame * frameSize, content.length),
-          total: content.length,
+          bytes: Math.min(frame * frameSize, source.size),
+          total: source.size,
         });
       }
 
@@ -220,17 +316,128 @@ export class StreamClient {
     };
   }
 
+  /**
+   * Streams a payload straight into a sink, decrypting frame by frame.
+   *
+   * Nothing larger than one frame is ever resident, so this is what a
+   * multi-gigabyte download has to use — `read` below buffers the whole
+   * container and is only appropriate for payloads that fit in memory.
+   *
+   * The sink applies backpressure through its writer, so a slow disk throttles
+   * the network rather than filling the heap.
+   */
+  /** The shared key is version-prefixed when a password is required. */
+  private async credentials(key: string, password: string | undefined) {
+    const hasVersionPrefix = key.startsWith(KEY_VERSION_2_PREFIX);
+    const rawKey = hasVersionPrefix ? key.slice(KEY_VERSION_2_PREFIX.length) : key;
+    return {
+      rawKey,
+      h: hasVersionPrefix
+        ? await deriveVerificationHash('v2', rawKey, password)
+        : await deriveVerificationHash('legacy', rawKey),
+    };
+  }
+
+  async readToSink(
+    id: string,
+    key: string,
+    password: string | undefined,
+    options: {
+      sink: WritableStream<Uint8Array>;
+      /**
+       * Fires once the header authenticates and before any payload byte is
+       * written. The filename lives inside the encrypted container, so this is
+       * the earliest a caller can name the download.
+       */
+      onMetadata?: (metadata: StreamMetadata) => void | Promise<void>;
+      onProgress?: (event: ProgressEvent) => void;
+      signal?: AbortSignal;
+    },
+  ): Promise<{ metadata: StreamMetadata; burned: boolean }> {
+    const { rawKey, h } = await this.credentials(key, password);
+
+    const res = await fetch(`${this.apiUrl}/vault/${id}?h=${h}`, {
+      headers: this.headers(),
+      signal: options.signal,
+    });
+    if (!res.ok) {
+      if (res.status === 400) throw new ErrorInvalidKeyAndOrPassword();
+      if (res.status === 404) throw new ErrorNotFound();
+      throw new ErrorUnexpectedStatus(res.status);
+    }
+    if (!res.body) {
+      throw new Error('response carried no body');
+    }
+    if (res.headers.get('content-type')?.includes('application/json')) {
+      throw new Error('this secret is stored inline; use read() instead');
+    }
+
+    const burned = res.headers.get('x-crypt-burned') === 'true';
+    const reader = createByteReader(res.body);
+    const writer = options.sink.getWriter();
+
+    try {
+      // The header is variable length: read the fixed head, learn the wrapped
+      // key length, then the rest of the prefix and the metadata frame.
+      const head = await reader.readExactly(HEADER_FIXED_LENGTH);
+      const wrappedKeyLength = readWrappedKeyLength(head);
+      const rest = await reader.readExactly(28 + wrappedKeyLength - HEADER_FIXED_LENGTH);
+
+      const prefix = new Uint8Array(head.length + rest.length);
+      prefix.set(head, 0);
+      prefix.set(rest, head.length);
+
+      const parsed = parseStreamHeader(prefix);
+      const metaFrame = await reader.readExactly(parsed.metaLength);
+
+      const headerBytes = new Uint8Array(prefix.length + metaFrame.length);
+      headerBytes.set(prefix, 0);
+      headerBytes.set(metaFrame, prefix.length);
+
+      const decryptor = await openStream(headerBytes, rawKey, password);
+      const { header } = decryptor;
+      await options.onMetadata?.(decryptor.metadata);
+      let written = 0;
+
+      for (let frame = 1; frame <= header.frameCount; frame++) {
+        const isFinal = frame === header.frameCount;
+        const plaintextLength = isFinal
+          ? header.plaintextLength - (header.frameCount - 1) * header.frameSize
+          : header.frameSize;
+
+        const sealed = await reader.readExactly(plaintextLength + TAG_LENGTH);
+        const opened = await decryptor.decryptFrame(frame, sealed);
+
+        // Backpressure lives here: a slow sink slows the whole pipeline.
+        await writer.write(opened);
+        written += opened.length;
+        options.onProgress?.({
+          phase: 'downloading',
+          bytes: written,
+          total: header.plaintextLength,
+        });
+      }
+
+      if (written !== header.plaintextLength) {
+        throw new Error(`recovered ${written} bytes, header declares ${header.plaintextLength}`);
+      }
+
+      await writer.close();
+      return { metadata: decryptor.metadata, burned };
+    } catch (error) {
+      await reader.cancel(error);
+      await writer.abort(error).catch(() => undefined);
+      throw error;
+    }
+  }
+
   async read(
     id: string,
     key: string,
     password?: string,
     options: { onProgress?: (event: ProgressEvent) => void; signal?: AbortSignal } = {},
   ): Promise<{ content: Uint8Array; metadata: StreamMetadata; burned: boolean }> {
-    const hasVersionPrefix = key.startsWith(KEY_VERSION_2_PREFIX);
-    const rawKey = hasVersionPrefix ? key.slice(KEY_VERSION_2_PREFIX.length) : key;
-    const h = hasVersionPrefix
-      ? await deriveVerificationHash('v2', rawKey, password)
-      : await deriveVerificationHash('legacy', rawKey);
+    const { rawKey, h } = await this.credentials(key, password);
 
     const res = await fetch(`${this.apiUrl}/vault/${id}?h=${h}`, {
       headers: this.headers(),
