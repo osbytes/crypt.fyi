@@ -94,7 +94,7 @@ export const zh: TranslationKeys = {
       content: {
         label: '密文内容',
         placeholder: '在此输入您的密文内容...',
-        fileHint: '拖放或点击此处添加文件（最大 1 MB）',
+        fileHint: '拖放或点击此处添加文件（最大 {{max}}）',
         fileSelected: '已选择文件：{{name}}（{{size}} KB）',
         dropFile: '拖放文件到此处',
         invalidFileType: '无效的文件类型',

@@ -96,7 +96,7 @@ export const en: TranslationKeys = {
       content: {
         label: 'Secret content',
         placeholder: 'Enter your secret content or file here...',
-        fileHint: 'add a file by drag-n-drop or clicking here (max 1 MB)',
+        fileHint: 'add a file by drag-n-drop or clicking here (max {{max}})',
         fileSelected: 'File selected: {{name}} ({{size}} KB)',
         dropFile: 'Drop file here',
         invalidFileType: 'Invalid file type',

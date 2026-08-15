@@ -863,7 +863,7 @@ export function CreatePage() {
                                 })}
                               </span>
                             ) : (
-                              t('create.form.content.fileHint')
+                              t('create.form.content.fileHint', { max: MAX_FILE_SIZE_LABEL })
                             )}
                           </p>
                           {selectedFile && (
