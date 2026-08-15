@@ -47,6 +47,11 @@ export default defineConfig({
         // Process-local counters: no shared Redis rate-limit keys with unit tests or `pnpm dev`.
         RATE_LIMITER: process.env.RATE_LIMITER ?? 'memory',
         RATE_LIMIT_MAX: process.env.RATE_LIMIT_MAX ?? '1000',
+        // Streamed payloads, backed by the in-process store: enough to drive
+        // the real browser path (service worker, iframe, native download)
+        // without standing up MinIO.
+        BLOB_STORAGE_ENABLED: process.env.BLOB_STORAGE_ENABLED ?? 'true',
+        BLOB_STORAGE_TYPE: process.env.BLOB_STORAGE_TYPE ?? 'memory',
       },
     },
     {

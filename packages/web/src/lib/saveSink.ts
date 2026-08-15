@@ -112,17 +112,24 @@ const armWorker = async (
   options: SaveSinkOptions,
 ): Promise<void> => {
   const registration = await navigator.serviceWorker.register(SW_URL);
-  // register() resolves before the worker is necessarily active.
-  await navigator.serviceWorker.ready.catch(() => undefined);
 
+  // Deliberately NOT navigator.serviceWorker.ready: that resolves only once the
+  // *current page* has a controlling worker, and this worker is scoped to
+  // /_download/ precisely so it never controls the app. Awaiting it hangs
+  // forever. The worker's own state is the signal that matters here.
   const worker = registration.active ?? registration.waiting ?? registration.installing;
   if (!worker) {
     throw new Error('download worker failed to start');
   }
   if (worker.state !== 'activated') {
-    await new Promise<void>((resolve) => {
+    await new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(new Error('download worker did not activate')),
+        10_000,
+      );
       const onChange = () => {
         if (worker.state === 'activated') {
+          clearTimeout(timeout);
           worker.removeEventListener('statechange', onChange);
           resolve();
         }

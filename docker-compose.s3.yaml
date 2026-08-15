@@ -104,7 +104,7 @@ services:
         # compiled into the static bundle, so `--build` is required to change them.
         - VITE_REQUIRE_PASSWORD=${REQUIRE_PASSWORD:-false}
         - VITE_PASSWORD_MIN_LENGTH=${PASSWORD_MIN_LENGTH:-5}
-        - VITE_APP_NAME=${APP_NAME:-CyberForce Crypt}
+        - VITE_APP_NAME=${APP_NAME:-FPM-CY Vault}
         # Without this the UI caps uploads at the inline threshold and the
         # streamed path is unreachable, even though this stack can store it.
         - VITE_MAX_FILE_SIZE=${VITE_MAX_FILE_SIZE:-2147483648}
