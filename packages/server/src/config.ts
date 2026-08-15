@@ -33,6 +33,24 @@ const env = getEnv();
 
 const logLevels = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const;
 
+/**
+ * Booleans from the environment.
+ *
+ * `z.coerce.boolean()` is `Boolean(value)`, so every non-empty string is true —
+ * `OTEL_ENABLED=false` enables telemetry and `ALLOW_PERSISTENCE=false` allows
+ * retention. Parse the words people actually write instead.
+ */
+export const envBoolean = (defaultValue: boolean) =>
+  z.preprocess((value) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value !== 'string') return undefined;
+    const normalized = value.trim().toLowerCase();
+    if (normalized === '') return undefined;
+    if (['true', '1', 'yes', 'y', 'on'].includes(normalized)) return true;
+    if (['false', '0', 'no', 'n', 'off'].includes(normalized)) return false;
+    return undefined;
+  }, z.boolean().default(defaultValue));
+
 const configSchema = z.object({
   shutdownTimeoutMs: z.coerce
     .number()
@@ -90,7 +108,7 @@ const configSchema = z.object({
       'allowed CORS headers (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers',
     ),
   encryptionKey: z.string().describe('encryption key'),
-  otelEnabled: z.coerce.boolean().default(false).describe('enable OpenTelemetry tracing'),
+  otelEnabled: envBoolean(false).describe('enable OpenTelemetry tracing'),
   otelExporterOtlpEndpoint: z.string().describe('OpenTelemetry collector endpoint').optional(),
   otelExporterOtlpHeaders: z
     .record(z.string(), z.string())
@@ -126,14 +144,10 @@ const configSchema = z.object({
     .number()
     .default(5_000)
     .describe('webhook retry backoff delay in milliseconds'),
-  webhookRemoveOnComplete: z.coerce
-    .boolean()
-    .default(true)
-    .describe('remove webhook jobs from queue when complete'),
-  webhookRemoveOnFail: z.coerce
-    .boolean()
-    .default(true)
-    .describe('remove webhook jobs from queue when failed'),
+  webhookRemoveOnComplete: envBoolean(true).describe(
+    'remove webhook jobs from queue when complete',
+  ),
+  webhookRemoveOnFail: envBoolean(true).describe('remove webhook jobs from queue when failed'),
   webhookConcurrency: z.coerce.number().default(50).describe('number of concurrent webhook jobs'),
   webhookDrainDelayMs: z.coerce
     .number()
@@ -144,17 +158,15 @@ const configSchema = z.object({
     .default(100)
     .describe('maximum length of webhook events stream'),
   webhookSender: z.enum(['bullmq', 'http']).default('bullmq').describe('webhook sender type'),
-  webhookRequireHttps: z.coerce
-    .boolean()
-    .default(false)
-    .describe('require webhook target URLs to use https (SSRF hardening)'),
+  webhookRequireHttps: envBoolean(false).describe(
+    'require webhook target URLs to use https (SSRF hardening)',
+  ),
   rateLimiter: z.enum(['redis', 'memory']).default('redis').describe('rate limiter type'),
 
   // --- streamed payloads (object storage) ---
-  blobStorageEnabled: z.coerce
-    .boolean()
-    .default(false)
-    .describe('accept payloads above the inline threshold via object storage'),
+  blobStorageEnabled: envBoolean(false).describe(
+    'accept payloads above the inline threshold via object storage',
+  ),
   blobStorageType: z
     .enum(['s3', 'memory'])
     .default('s3')
@@ -162,10 +174,9 @@ const configSchema = z.object({
   blobKeyPrefix: z.string().default('secrets').describe('object key prefix'),
   // Off by default: burning a link deletes the object, matching the inline path
   // and the ephemeral guarantee in SPECIFICATION.md.
-  allowPersistence: z.coerce
-    .boolean()
-    .default(false)
-    .describe('allow stored objects to be retained after their link is burned'),
+  allowPersistence: envBoolean(false).describe(
+    'allow stored objects to be retained after their link is burned',
+  ),
   maxBlobBytes: z.coerce
     .number()
     .default(2 * 1024 * 1024 * 1024)
@@ -188,10 +199,14 @@ const configSchema = z.object({
   s3Endpoint: z.string().optional().describe('S3-compatible endpoint (MinIO, R2, …)'),
   s3AccessKeyId: z.string().optional().describe('S3 access key id'),
   s3SecretAccessKey: z.string().optional().describe('S3 secret access key'),
-  s3ForcePathStyle: z.coerce
-    .boolean()
-    .default(true)
-    .describe('use path-style addressing; required by MinIO'),
+  s3ForcePathStyle: envBoolean(true).describe('use path-style addressing; required by MinIO'),
+  // Defence in depth only — payloads are already end-to-end encrypted. Off by
+  // default because AWS S3 accepts AES256 natively while MinIO rejects any SSE
+  // unless a KMS is configured, so an unconditional default breaks self-hosting.
+  s3ServerSideEncryption: z
+    .enum(['none', 'AES256', 'aws:kms'])
+    .default('none')
+    .describe('server-side encryption for stored objects'),
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -268,5 +283,6 @@ export const config = (() => {
     s3AccessKeyId: process.env.S3_ACCESS_KEY_ID,
     s3SecretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
     s3ForcePathStyle: process.env.S3_FORCE_PATH_STYLE,
+    s3ServerSideEncryption: process.env.S3_SERVER_SIDE_ENCRYPTION,
   });
 })();

@@ -1,0 +1,16 @@
+{
+  "Rules": [
+    {
+      "ID": "rotate-everything-after-5-years",
+      "Status": "Enabled",
+      "Expiration": { "Days": 1825 },
+      "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+    },
+    {
+      "ID": "expire-ephemeral-objects",
+      "Status": "Enabled",
+      "Filter": { "Tag": { "Key": "retain", "Value": "false" } },
+      "Expiration": { "Days": 8 }
+    }
+  ]
+}

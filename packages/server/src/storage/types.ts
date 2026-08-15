@@ -15,8 +15,15 @@ import type { Readable } from 'node:stream';
 export interface BlobStorage {
   readonly kind: string;
 
-  /** Opens a multipart upload and returns the storage-side upload id. */
-  createUpload(key: string): Promise<string>;
+  /**
+   * Opens a multipart upload and returns the storage-side upload id.
+   *
+   * `retain` is written as an object tag so lifecycle rules can distinguish
+   * ephemeral objects — reapable days after their TTL — from ones deliberately
+   * kept past a burn. Redis key expiry is silent, so lifecycle rules are the
+   * only reliable backstop against orphans.
+   */
+  createUpload(key: string, options?: { retain?: boolean }): Promise<string>;
 
   /**
    * Relays one part. `contentLength` is required because S3 cannot size a

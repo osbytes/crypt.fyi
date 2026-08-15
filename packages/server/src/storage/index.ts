@@ -49,5 +49,6 @@ export const createBlobStorage = (config: Config): BlobStorage | undefined => {
     secretAccessKey: config.s3SecretAccessKey,
     forcePathStyle: config.s3ForcePathStyle,
     prefix: config.blobKeyPrefix,
+    serverSideEncryption: config.s3ServerSideEncryption,
   });
 };

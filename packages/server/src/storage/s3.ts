@@ -22,6 +22,8 @@ export type S3BlobStorageOptions = {
   forcePathStyle: boolean;
   /** Object key prefix, e.g. `secrets`. */
   prefix: string;
+  /** 'none' unless the backend is known to support it — MinIO needs a KMS. */
+  serverSideEncryption: 'none' | 'AES256' | 'aws:kms';
 };
 
 const isNotFound = (error: unknown): boolean => {
@@ -31,7 +33,8 @@ const isNotFound = (error: unknown): boolean => {
   );
 };
 
-export const createS3BlobStorage = (options: S3BlobStorageOptions): BlobStorage => {
+export const createS3BlobStorage = (options_: S3BlobStorageOptions): BlobStorage => {
+  const options = options_;
   const client = new S3Client({
     region: options.region,
     endpoint: options.endpoint,
@@ -49,14 +52,18 @@ export const createS3BlobStorage = (options: S3BlobStorageOptions): BlobStorage 
   return {
     kind: 's3',
 
-    async createUpload(key) {
+    async createUpload(key, options) {
       const result = await client.send(
         new CreateMultipartUploadCommand({
           Bucket,
           Key: key,
-          // The payload is already end-to-end encrypted; this is defence in
-          // depth for the bytes at rest, and costs nothing.
-          ServerSideEncryption: 'AES256',
+          // Opt-in: the payload is already end-to-end encrypted, and MinIO
+          // rejects any SSE unless a KMS is configured.
+          ...(options_.serverSideEncryption === 'none'
+            ? {}
+            : { ServerSideEncryption: options_.serverSideEncryption }),
+          // Drives lifecycle expiry — see docs/streaming-format.md §5.3.
+          Tagging: `retain=${options?.retain ? 'true' : 'false'}`,
         }),
       );
       if (!result.UploadId) {

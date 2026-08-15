@@ -1,0 +1,105 @@
+services:
+  redis:
+    image: redis:latest
+    # Bound memory so a flood of secrets can't exhaust the host. Secrets are
+    # TTL'd and must never be silently dropped, so use noeviction: once the cap
+    # is hit, new writes are rejected (surfacing pressure) rather than evicting
+    # live secrets. Tune REDIS_MAXMEMORY to the host.
+    command:
+      - redis-server
+      - --maxmemory
+      - ${REDIS_MAXMEMORY:-256mb}
+      - --maxmemory-policy
+      - noeviction
+      - --save
+      - '900'
+      - '1'
+      - --loglevel
+      - warning
+    volumes:
+      - redis_data:/data
+
+  # Object storage for payloads above the inline threshold. Only needed when
+  # BLOB_STORAGE_ENABLED=true; leave the profile off and nothing starts.
+  minio:
+    image: minio/minio:latest
+    profiles: ['blob']
+    command: server /data --console-address ':9001'
+    environment:
+      - MINIO_ROOT_USER=${S3_ACCESS_KEY_ID:-crypt}
+      - MINIO_ROOT_PASSWORD=${S3_SECRET_ACCESS_KEY:-crypt-secret}
+    ports:
+      - '${MINIO_PORT:-9000}:9000'
+      - '${MINIO_CONSOLE_PORT:-9001}:9001'
+    volumes:
+      - minio_data:/data
+
+  # Creates the bucket and installs the lifecycle policy, then exits. The API
+  # does neither, so without this the bucket never exists and nothing is ever
+  # reaped — Redis key expiry is silent, so lifecycle rules are the only
+  # reliable backstop against orphaned objects.
+  minio-init:
+    image: minio/mc:latest
+    profiles: ['blob']
+    depends_on:
+      - minio
+    volumes:
+      - ./deploy/minio/lifecycle.json:/lifecycle.json:ro
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set crypt http://minio:9000 '${S3_ACCESS_KEY_ID:-crypt}' '${S3_SECRET_ACCESS_KEY:-crypt-secret}' >/dev/null 2>&1; do
+        echo 'waiting for minio...'; sleep 2;
+      done;
+      mc mb --ignore-existing crypt/${S3_BUCKET:-crypt-secrets};
+      mc anonymous set none crypt/${S3_BUCKET:-crypt-secrets};
+      mc ilm import crypt/${S3_BUCKET:-crypt-secrets} < /lifecycle.json;
+      echo 'lifecycle policy applied:'; mc ilm rule ls crypt/${S3_BUCKET:-crypt-secrets};
+      "
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - PORT=${SERVER_PORT:-4321}
+      # Streamed payloads. Off by default: the server accepts inline secrets
+      # only, exactly as before.
+      - BLOB_STORAGE_ENABLED=${BLOB_STORAGE_ENABLED:-true}
+      - BLOB_STORAGE_TYPE=${BLOB_STORAGE_TYPE:-s3}
+      - ALLOW_PERSISTENCE=${ALLOW_PERSISTENCE:-true}
+      - S3_BUCKET=${S3_BUCKET:-crypt-secrets}
+      - S3_ENDPOINT=${S3_ENDPOINT:-http://minio:9000}
+      - S3_REGION=${S3_REGION:-us-east-1}
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID:-crypt}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY:-crypt-secret}
+      - S3_FORCE_PATH_STYLE=${S3_FORCE_PATH_STYLE:-true}
+      # MinIO rejects SSE without a KMS; AWS S3 accepts AES256.
+      - S3_SERVER_SIDE_ENCRYPTION=${S3_SERVER_SIDE_ENCRYPTION:-none}
+    ports:
+      - '${SERVER_PORT:-4321}:${SERVER_PORT:-4321}'
+    depends_on:
+      - redis
+      - minio-init
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        - VITE_API_URL=${API_URL:-http://localhost:${SERVER_PORT:-4321}}
+        # Password policy. Defaults to optional; set REQUIRE_PASSWORD=true (and
+        # optionally PASSWORD_MIN_LENGTH) in .env, then rebuild — these are
+        # compiled into the static bundle, so `--build` is required to change them.
+        - VITE_REQUIRE_PASSWORD=${REQUIRE_PASSWORD:-false}
+        - VITE_PASSWORD_MIN_LENGTH=${PASSWORD_MIN_LENGTH:-5}
+    environment:
+      - API_URL=${API_URL:-http://localhost:${SERVER_PORT:-4321}}
+    ports:
+      - '${WEB_PORT:-80}:80'
+    depends_on:
+      - server
+
+volumes:
+  redis_data:
+  minio_data:

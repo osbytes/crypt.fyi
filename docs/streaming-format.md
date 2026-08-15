@@ -242,15 +242,27 @@ uploads otherwise accrue storage charges invisibly.
 ### 5.3. Lifecycle and orphans
 
 Redis key expiry is silent — no notification fires — so explicit deletes cannot
-be the only reaping mechanism. Object lifecycle rules MUST be the backstop,
-scoped by object tag:
+be the only reaping mechanism. Object lifecycle rules MUST be the backstop.
+Objects are tagged `retain=true|false` at upload, from `ALLOW_PERSISTENCE`.
 
-| Tag | Rule |
-| --- | --- |
-| `retain=false` | Expire after max TTL + margin (8 days) |
-| `retain=true` | No expiry |
+The shipped policy is `deploy/minio/lifecycle.json`:
+
+| Rule | Scope | Action |
+| --- | --- | --- |
+| `rotate-everything-after-5-years` | all objects | Expire after 1825 days; abort incomplete multipart uploads after 1 day |
+| `expire-ephemeral-objects` | `retain=false` | Expire after 8 days |
 
 Deletes issued on burn are an optimisation, not a correctness requirement.
+
+Two implementation notes for S3-compatible backends:
+
+- A rule carrying only `AbortIncompleteMultipartUpload` is rejected by MinIO;
+  the action must accompany an `Expiration`. An empty or prefix-only `Filter`
+  is likewise rejected — omit `Filter` entirely for an unscoped rule.
+- Server-side encryption is off by default (`S3_SERVER_SIDE_ENCRYPTION`).
+  AWS S3 accepts `AES256` natively, but MinIO rejects any SSE unless a KMS is
+  configured. Payloads are already end-to-end encrypted, so this is defence in
+  depth rather than a requirement.
 
 ## 6. Vault record changes
 

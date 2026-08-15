@@ -520,7 +520,9 @@ export const initApp = async (config: Config, deps: AppDeps) => {
         ]);
 
         const objectKey = buildObjectKey(config.blobKeyPrefix, blobId, new Date());
-        const storageUploadId = await blobStorage.createUpload(objectKey);
+        const storageUploadId = await blobStorage.createUpload(objectKey, {
+          retain: config.allowPersistence,
+        });
 
         const { size, frames, ...vaultFields } = req.body;
         await uploadStore.create({

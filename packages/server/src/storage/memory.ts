@@ -23,7 +23,7 @@ export const createMemoryBlobStorage = (): BlobStorage & {
   keys(): string[];
 } => {
   const objects = new Map<string, Buffer>();
-  const uploads = new Map<string, { key: string; parts: Map<number, Buffer> }>();
+  const uploads = new Map<string, { key: string; parts: Map<number, Buffer>; retain: boolean }>();
 
   const drain = async (stream: Readable): Promise<Buffer> => {
     const chunks: Buffer[] = [];
@@ -36,9 +36,9 @@ export const createMemoryBlobStorage = (): BlobStorage & {
   return {
     kind: 'memory',
 
-    async createUpload(key) {
+    async createUpload(key, options) {
       const uploadId = randomUUID();
-      uploads.set(uploadId, { key, parts: new Map() });
+      uploads.set(uploadId, { key, parts: new Map(), retain: options?.retain ?? false });
       return uploadId;
     },
 
