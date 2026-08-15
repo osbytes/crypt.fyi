@@ -20,6 +20,8 @@ API_URL="${1:-https://api.crypt.fyi}"
 VERSION="${2:-latest}"
 REQUIRE_PASSWORD="${REQUIRE_PASSWORD:-false}"
 PASSWORD_MIN_LENGTH="${PASSWORD_MIN_LENGTH:-5}"
+# Inline threshold by default; raise where object storage is enabled.
+MAX_FILE_SIZE="${MAX_FILE_SIZE:-131072}"
 
 echo "========================================="
 echo "Cloud Build Configuration"
@@ -56,6 +58,7 @@ docker buildx build \
   --build-arg VITE_API_URL="$API_URL" \
   --build-arg VITE_REQUIRE_PASSWORD="$REQUIRE_PASSWORD" \
   --build-arg VITE_PASSWORD_MIN_LENGTH="$PASSWORD_MIN_LENGTH" \
+  --build-arg VITE_MAX_FILE_SIZE="$MAX_FILE_SIZE" \
   -t "$REGISTRY/crypt-web:$VERSION" \
   -t "$REGISTRY/crypt-web:latest" \
   --push .

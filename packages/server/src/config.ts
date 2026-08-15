@@ -107,7 +107,10 @@ const configSchema = z.object({
     .describe(
       'allowed CORS headers (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers',
     ),
-  encryptionKey: z.string().describe('encryption key'),
+  encryptionKey: z
+    .string()
+    .min(1, 'ENCRYPTION_KEY must be set')
+    .describe('encryption key for webhook URLs and IP allow-lists at rest'),
   otelEnabled: envBoolean(false).describe('enable OpenTelemetry tracing'),
   otelExporterOtlpEndpoint: z.string().describe('OpenTelemetry collector endpoint').optional(),
   otelExporterOtlpHeaders: z

@@ -99,6 +99,10 @@ export const createRedisUploadStore = (redis: Redis): UploadStore => ({
     const tx = redis.multi();
     tx.hset(partsKey(id), String(part.partNumber), `${part.etag}:${part.size}`);
     tx.pexpire(partsKey(id), windowMs);
+    // Refresh the upload record too. Extending only the parts hash let the
+    // record expire underneath an upload that was still running, so a transfer
+    // longer than UPLOAD_WINDOW_MS started 404ing while parts were in flight.
+    tx.pexpire(uploadKey(id), windowMs);
     await tx.exec();
   },
 

@@ -273,6 +273,7 @@ export const fr: TranslationKeys = {
       fileShared: 'Un fichier a été partagé avec vous',
       downloadFile: 'Télécharger le Fichier',
       downloadComplete: 'Téléchargement terminé',
+      stillAvailable: 'Ce secret reste disponible jusqu’à son expiration ou sa limite de lectures.',
       streamedDescription:
         'Ce fichier est déchiffré dans votre navigateur et écrit directement sur le disque. Choisissez où l’enregistrer.',
       downloadProgress: 'Progression du téléchargement',

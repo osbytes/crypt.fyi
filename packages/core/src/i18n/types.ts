@@ -251,6 +251,7 @@ export interface TranslationKeys {
       fileShared: string;
       downloadFile: string;
       downloadComplete: string;
+      stillAvailable: string;
       streamedDescription: string;
       downloadProgress: string;
       hideContent: string;

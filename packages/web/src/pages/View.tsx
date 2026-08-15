@@ -55,13 +55,23 @@ function StreamedVaultView({ id, isPasswordSet }: VaultViewProps) {
   const [password, setPassword] = useState('');
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [finished, setFinished] = useState(false);
+  const [outcome, setOutcome] = useState<{ burned: boolean } | null>(null);
 
-  const key = typeof window === 'undefined' ? '' : window.location.hash.slice(1).trim();
+  // Share links come in two forms: combined, with the key in the fragment, and
+  // keyless, where the key is sent separately. Support both, as the inline view
+  // does — otherwise a keyless streamed link is unopenable.
+  const fragmentKey = typeof window === 'undefined' ? '' : window.location.hash.slice(1).trim();
+  const [manualKey, setManualKey] = useState('');
+  const key = fragmentKey || manualKey.trim();
 
   const download = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
+
+    if (!key) {
+      setError(t('view.key.error'));
+      return;
+    }
 
     // The save location must be chosen on this click: the picker needs the
     // transient user activation, which will not survive the fetch.
@@ -80,7 +90,7 @@ function StreamedVaultView({ id, isPasswordSet }: VaultViewProps) {
         xClient: `@crypt.fyi/web:${config.GIT_HASH?.substring(0, 8) || config.VERSION}`,
       });
 
-      await client.readToSink(id, key, isPasswordSet ? password : undefined, {
+      const result = await client.readToSink(id, key, isPasswordSet ? password : undefined, {
         sink: sink.writable,
         onMetadata: (metadata) => sink.arm({ filename: metadata.name, size: metadata.size }),
         onProgress: ({ bytes, total }) => {
@@ -88,12 +98,15 @@ function StreamedVaultView({ id, isPasswordSet }: VaultViewProps) {
         },
       });
       await sink.done;
-      setFinished(true);
+      setOutcome({ burned: result.burned });
     } catch (caught) {
       await sink.abort(caught).catch(() => undefined);
       setProgress(null);
       if (caught instanceof ErrorInvalidKeyAndOrPassword) {
-        setError(t('view.password.error'));
+        // Only blame the password when there is one; otherwise the key is what
+        // failed, and telling the user to check a password they never had is
+        // just misleading.
+        setError(isPasswordSet ? t('view.password.error') : t('view.key.error'));
       } else if (caught instanceof ErrorNotFound) {
         setError(t('view.notFound.description'));
       } else {
@@ -102,13 +115,17 @@ function StreamedVaultView({ id, isPasswordSet }: VaultViewProps) {
     }
   };
 
-  if (finished) {
+  if (outcome) {
     return (
       <div className="mx-auto w-full max-w-3xl p-4">
         <Card className="space-y-3 p-8 text-center">
           <IconDownload className="mx-auto h-8 w-8 text-muted-foreground" />
           <h1 className="text-xl font-semibold">{t('view.content.downloadComplete')}</h1>
-          <p className="text-sm text-muted-foreground">{t('view.info.burnedAfterReading')}</p>
+          {/* Only say it is destroyed when it actually was — read-count and
+              non-burn secrets remain readable. */}
+          <p className="text-sm text-muted-foreground">
+            {outcome.burned ? t('view.info.burnedAfterReading') : t('view.content.stillAvailable')}
+          </p>
         </Card>
       </div>
     );
@@ -122,6 +139,23 @@ function StreamedVaultView({ id, isPasswordSet }: VaultViewProps) {
             <h1 className="text-xl font-semibold">{t('view.content.fileShared')}</h1>
             <p className="text-sm text-muted-foreground">{t('view.content.streamedDescription')}</p>
           </div>
+
+          {!fragmentKey && (
+            <div className="space-y-2">
+              <Label htmlFor="secret-key">{t('view.key.label')}</Label>
+              <Input
+                id="secret-key"
+                type="text"
+                autoComplete="off"
+                spellCheck={false}
+                value={manualKey}
+                onChange={(event) => setManualKey(event.target.value)}
+                placeholder={t('view.key.placeholder')}
+                required
+                disabled={progress !== null}
+              />
+            </div>
+          )}
 
           {isPasswordSet && (
             <div className="space-y-2">

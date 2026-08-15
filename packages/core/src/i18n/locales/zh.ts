@@ -258,6 +258,7 @@ export const zh: TranslationKeys = {
       fileShared: '有人与您分享了一个文件',
       downloadFile: '下载文件',
       downloadComplete: '下载完成',
+      stillAvailable: '在过期或达到读取上限之前，此密钥仍然可用。',
       streamedDescription: '该文件在您的浏览器中解密并直接写入磁盘。请选择保存位置。',
       downloadProgress: '下载进度',
       hideContent: '隐藏内容',

@@ -34,7 +34,7 @@ services:
       # well-known key 'foobar', which encrypts webhook URLs and IP allow-lists
       # at rest. Compose fails fast rather than starting an insecure instance.
       - NODE_ENV=${NODE_ENV:-production}
-      - 'ENCRYPTION_KEY=${ENCRYPTION_KEY:?required - copy .env.example to .env and run openssl rand -base64 32}'
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY} # ! required - copy .env.example to .env and run openssl rand -base64 32
       - PORT=${SERVER_PORT:-4321}
     ports:
       - '${SERVER_PORT:-4321}:${SERVER_PORT:-4321}'

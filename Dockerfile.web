@@ -10,6 +10,12 @@ ENV VITE_REQUIRE_PASSWORD=${VITE_REQUIRE_PASSWORD}
 ARG VITE_PASSWORD_MIN_LENGTH
 ENV VITE_PASSWORD_MIN_LENGTH=${VITE_PASSWORD_MIN_LENGTH}
 
+# Largest file the UI accepts. Defaults to the inline threshold, so a build that
+# does not set this caps uploads at what the server can store inline and the
+# streamed path stays unreachable. Raise it wherever object storage is enabled.
+ARG VITE_MAX_FILE_SIZE
+ENV VITE_MAX_FILE_SIZE=${VITE_MAX_FILE_SIZE}
+
 WORKDIR /app
 
 RUN corepack enable

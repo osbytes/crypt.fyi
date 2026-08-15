@@ -267,6 +267,8 @@ export const en: TranslationKeys = {
       fileShared: 'A file has been shared with you',
       downloadFile: 'Download File',
       downloadComplete: 'Download complete',
+      stillAvailable:
+        'This secret is still available until it expires or its read limit is reached.',
       streamedDescription:
         'This file is decrypted in your browser and written straight to disk. Choose where to save it.',
       downloadProgress: 'Download progress',

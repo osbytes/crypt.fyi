@@ -273,6 +273,8 @@ export const de: TranslationKeys = {
       fileShared: 'Eine Datei wurde mit Ihnen geteilt',
       downloadFile: 'Datei herunterladen',
       downloadComplete: 'Download abgeschlossen',
+      stillAvailable:
+        'Dieses Geheimnis bleibt verfügbar, bis es abläuft oder sein Leselimit erreicht ist.',
       streamedDescription:
         'Diese Datei wird in deinem Browser entschlüsselt und direkt auf die Festplatte geschrieben. Wähle einen Speicherort.',
       downloadProgress: 'Download-Fortschritt',

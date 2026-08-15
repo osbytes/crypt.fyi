@@ -583,3 +583,67 @@ describe('streamed payloads / streaming download', () => {
     expect(aborted).toBe(true);
   }, 60_000);
 });
+
+describe('streamed payloads / regressions', () => {
+  let ctx: Ctx;
+
+  beforeEach(async () => {
+    ctx = await initStreamTest();
+  });
+
+  afterEach(async () => {
+    await ctx.app.shutdown();
+    await ctx.app.fastify.close();
+    await ctx.client.close();
+  });
+
+  it('refreshes the upload record TTL with each part, not just the parts hash', async () => {
+    const redis = ctx.redis;
+    const store = createRedisUploadStore(redis);
+    const id = `ttl-test-${Date.now()}`;
+
+    await store.create({
+      id,
+      uploadToken: 'token',
+      storageUploadId: 'storage-upload',
+      objectKey: 'secrets/2026/08/15/abc',
+      expectedBytes: 1024,
+      frames: 1,
+      vaultRecord: '{}',
+      deleteToken: 'dt',
+      windowMs: 1000,
+    });
+    expect(await redis.pttl(`upload:${id}`)).toBeLessThanOrEqual(1000);
+
+    // A part arriving must push the record's expiry out too. Extending only the
+    // parts hash let the record die underneath an upload still in progress.
+    await store.addPart(id, { partNumber: 1, etag: '"e"', size: 512 }, 60_000);
+
+    expect(await redis.pttl(`upload:${id}`)).toBeGreaterThan(30_000);
+    expect(await redis.pttl(`upload:${id}:parts`)).toBeGreaterThan(30_000);
+
+    await store.discard(id);
+  });
+
+  it('rejects a webhook URL with 400, not 500', async () => {
+    const res = await ctx.client.request({
+      method: 'POST',
+      path: '/vault/stream',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        h: 'hash-abc',
+        b: true,
+        ttl: 60_000,
+        size: 4096,
+        frames: 1,
+        m: { encryption: { algorithm: 'ml-kem-768-stream' } },
+        // Loopback: the SSRF guard must refuse it the same way the inline
+        // create route does, as a client error rather than a server fault.
+        wh: { u: 'http://127.0.0.1:8080/hook', r: true, fpk: false, fip: false, b: false },
+      }),
+    });
+    expect(res.statusCode).toBe(400);
+    const payload = (await res.body.json()) as { msg?: string };
+    expect(typeof payload.msg).toBe('string');
+  });
+});

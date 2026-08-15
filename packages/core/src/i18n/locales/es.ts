@@ -272,6 +272,8 @@ export const es: TranslationKeys = {
       fileShared: 'Se ha compartido un archivo contigo',
       downloadFile: 'Descargar Archivo',
       downloadComplete: 'Descarga completada',
+      stillAvailable:
+        'Este secreto sigue disponible hasta que caduque o alcance su límite de lecturas.',
       streamedDescription:
         'Este archivo se descifra en tu navegador y se escribe directamente en el disco. Elige dónde guardarlo.',
       downloadProgress: 'Progreso de descarga',

@@ -503,13 +503,25 @@ export const initApp = async (config: Config, deps: AppDeps) => {
             .max(config.maxBlobBytes)
             .describe('total ciphertext byte length'),
         }),
-        response: { 201: createStreamResponseSchema },
+        response: {
+          201: createStreamResponseSchema,
+          400: z.object({ msg: z.string() }).describe('Webhook URL rejected'),
+        },
       },
       async handler(req, res) {
         if (req.body.wh) {
-          await assertWebhookUrlAllowed(req.body.wh.u, {
-            requireHttps: config.webhookRequireHttps,
-          });
+          try {
+            await assertWebhookUrlAllowed(req.body.wh.u, {
+              requireHttps: config.webhookRequireHttps,
+            });
+          } catch (error) {
+            // Match the inline create route: a rejected webhook URL is a client
+            // error the caller can act on, not a server fault.
+            if (error instanceof SsrfError) {
+              return res.status(400).send({ msg: error.message });
+            }
+            throw error;
+          }
         }
 
         const [id, dt, ut, blobId] = await Promise.all([

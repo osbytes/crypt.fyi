@@ -68,12 +68,16 @@ services:
       # well-known key 'foobar', which encrypts webhook URLs and IP allow-lists
       # at rest. Compose fails fast rather than starting an insecure instance.
       - NODE_ENV=${NODE_ENV:-production}
-      - 'ENCRYPTION_KEY=${ENCRYPTION_KEY:?required - copy .env.example to .env and run openssl rand -base64 32}'
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY} # ! required - copy .env.example to .env and run openssl rand -base64 32
       - PORT=${SERVER_PORT:-4321}
-      # Streamed payloads. Off by default: the server accepts inline secrets
-      # only, exactly as before.
+      # This stack exists to enable streamed payloads, so storage is on here.
+      # docker-compose.yaml is the inline-only stack and leaves it off.
       - BLOB_STORAGE_ENABLED=${BLOB_STORAGE_ENABLED:-true}
       - BLOB_STORAGE_TYPE=${BLOB_STORAGE_TYPE:-s3}
+      # Retention is ON in this stack: a burned link leaves its object in the
+      # bucket, reaped by the 5-year lifecycle rule rather than on read. That is
+      # a deliberate departure from the ephemeral guarantee in SPECIFICATION.md
+      # — set ALLOW_PERSISTENCE=false to delete objects the moment they burn.
       - ALLOW_PERSISTENCE=${ALLOW_PERSISTENCE:-true}
       - S3_BUCKET=${S3_BUCKET:-crypt-secrets}
       - S3_ENDPOINT=${S3_ENDPOINT:-http://minio:9000}
@@ -100,6 +104,9 @@ services:
         # compiled into the static bundle, so `--build` is required to change them.
         - VITE_REQUIRE_PASSWORD=${REQUIRE_PASSWORD:-false}
         - VITE_PASSWORD_MIN_LENGTH=${PASSWORD_MIN_LENGTH:-5}
+        # Without this the UI caps uploads at the inline threshold and the
+        # streamed path is unreachable, even though this stack can store it.
+        - VITE_MAX_FILE_SIZE=${VITE_MAX_FILE_SIZE:-2147483648}
     environment:
       - API_URL=${API_URL:-http://localhost:${SERVER_PORT:-4321}}
     ports:
