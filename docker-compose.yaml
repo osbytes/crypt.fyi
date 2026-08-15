@@ -4,11 +4,16 @@ services:
     # Bound memory so a flood of secrets can't exhaust the host. Secrets are
     # TTL'd and must never be silently dropped, so use noeviction: once the cap
     # is hit, new writes are rejected (surfacing pressure) rather than evicting
-    # live secrets. Tune REDIS_MAXMEMORY to the host.
+    # live secrets.
+    #
+    # Only inline secrets live here — a streamed payload costs ~0.4 KB in Redis
+    # regardless of its size. Give the container roughly double this value in
+    # real memory: RDB snapshots fork, and copy-on-write can approach 2x during
+    # the write.
     command:
       - redis-server
       - --maxmemory
-      - ${REDIS_MAXMEMORY:-256mb}
+      - ${REDIS_MAXMEMORY:-4gb}
       - --maxmemory-policy
       - noeviction
       - --save

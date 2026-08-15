@@ -1,3 +1,5 @@
+import { INLINE_PAYLOAD_MAX_BYTES } from '@crypt.fyi/core';
+
 export const config = Object.freeze({
   API_URL: import.meta.env.VITE_API_URL ?? 'http://localhost:4321',
   IS_DEV: import.meta.env.DEV,
@@ -12,9 +14,10 @@ export const config = Object.freeze({
     'https://railway.com/deploy/Pmkrsc?referralCode=ToZEjF&utm_medium=integration&utm_source=template&utm_campaign=generic',
   CRYPT_FYI_DOCKER_DOCS_URL: 'https://github.com/osbytes/crypt.fyi#docker',
   CRYPT_FYI_SPEC_URL: 'https://github.com/osbytes/crypt.fyi/blob/main/SPECIFICATION.md',
-  // Largest file the UI will accept. Defaults to the inline threshold; raise it
-  // on deployments that enable object storage (BLOB_STORAGE_ENABLED on the API).
-  MAX_FILE_SIZE: parsePositiveInt(import.meta.env.VITE_MAX_FILE_SIZE, 1024 * 1024),
+  // Largest file the UI will accept. Defaults to the inline threshold so an
+  // inline-only deployment cannot offer a file it has nowhere to put; raise it
+  // wherever object storage is enabled (BLOB_STORAGE_ENABLED on the API).
+  MAX_FILE_SIZE: parsePositiveInt(import.meta.env.VITE_MAX_FILE_SIZE, INLINE_PAYLOAD_MAX_BYTES),
   MAX_IP_RESTRICTIONS: 3,
   KEY_LENGTH: 32,
   // Password policy is a deployment decision, not a product one: a public

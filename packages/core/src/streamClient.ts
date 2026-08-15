@@ -28,10 +28,16 @@ export type ProgressEvent = {
 };
 
 /**
- * Payloads above the inline threshold take the streamed path. Kept here so the
- * client, the UI, and the CLI all route on the same number.
+ * Payloads above this take the streamed path. Kept here so the client, the UI,
+ * and the CLI all route on the same number.
+ *
+ * Deliberately small: an inline secret is stored whole in Redis, and expands
+ * ~1.8x (no password) to ~2.4x (password) through encryption and base64, so
+ * every byte of threshold costs multiples of itself in memory. 128 KiB covers
+ * text secrets and small files comfortably while keeping a max-size inline
+ * entry around 300 KB rather than 3.5 MB.
  */
-export const INLINE_PAYLOAD_MAX_BYTES = 1024 * 1024;
+export const INLINE_PAYLOAD_MAX_BYTES = 128 * 1024;
 
 /**
  * A payload the client can read piecewise. A `File` never has to be resident:
