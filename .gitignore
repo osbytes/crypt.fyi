@@ -10,3 +10,4 @@ extension.zip
 **/playwright-report/
 **/blob-report/
 .yarn/
+docker-compose.s3.local.yaml
