@@ -24,6 +24,7 @@ import {
   completeStreamParamsSchema,
   completeStreamRequestSchema,
   generateRandomString,
+  INLINE_PAYLOAD_MAX_BYTES,
   ErrorInvalidKeyAndOrPassword,
   type Vault,
   type VaultReadResult,
@@ -213,6 +214,39 @@ export const initApp = async (config: Config, deps: AppDeps) => {
       res.status(redisOK ? 200 : 503).send({
         status: redisOK ? 'ok' : 'error',
         kv: redisOK ? 'ok' : 'error',
+      });
+    },
+  });
+
+  app.withTypeProvider<ZodTypeProvider>().route({
+    method: 'GET',
+    url: '/config',
+    exposeHeadRoute: false,
+    schema: {
+      description:
+        'Limits a client needs before it can offer a sensible interface. Deliberately minimal: it reports what this deployment accepts, not what it is or how it is built.',
+      tags: ['config'],
+      summary: 'Client-facing limits',
+      response: {
+        200: z.object({
+          maxFileSize: z.number().describe('largest payload this deployment accepts, in bytes'),
+          streaming: z
+            .boolean()
+            .describe('whether payloads above the inline threshold can be stored'),
+          inlineThreshold: z
+            .number()
+            .describe('payloads above this are streamed to object storage'),
+        }),
+      },
+    },
+    handler: async (_, res) => {
+      // Without object storage the ceiling is the inline threshold, since
+      // anything larger has nowhere to go.
+      const streaming = Boolean(blobStorage);
+      return res.send({
+        maxFileSize: streaming ? config.maxBlobBytes : INLINE_PAYLOAD_MAX_BYTES,
+        streaming,
+        inlineThreshold: INLINE_PAYLOAD_MAX_BYTES,
       });
     },
   });

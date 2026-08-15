@@ -18,6 +18,9 @@ export const config = Object.freeze({
   // inline-only deployment cannot offer a file it has nowhere to put; raise it
   // wherever object storage is enabled (BLOB_STORAGE_ENABLED on the API).
   MAX_FILE_SIZE: parsePositiveInt(import.meta.env.VITE_MAX_FILE_SIZE, INLINE_PAYLOAD_MAX_BYTES),
+  // Shown in the header and the browser tab. Set VITE_APP_NAME to rebrand
+  // without touching source.
+  APP_NAME: import.meta.env.VITE_APP_NAME?.trim() || 'CyberForce Crypt',
   MAX_IP_RESTRICTIONS: 3,
   KEY_LENGTH: 32,
   // Password policy is a deployment decision, not a product one: a public

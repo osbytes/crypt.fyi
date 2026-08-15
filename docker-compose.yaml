@@ -52,6 +52,7 @@ services:
         # compiled into the static bundle, so `--build` is required to change them.
         - VITE_REQUIRE_PASSWORD=${REQUIRE_PASSWORD:-false}
         - VITE_PASSWORD_MIN_LENGTH=${PASSWORD_MIN_LENGTH:-5}
+        - VITE_APP_NAME=${APP_NAME:-CyberForce Crypt}
     environment:
       - API_URL=${API_URL:-http://localhost:${SERVER_PORT:-4321}}
     ports:

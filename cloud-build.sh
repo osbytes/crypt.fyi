@@ -22,6 +22,7 @@ REQUIRE_PASSWORD="${REQUIRE_PASSWORD:-false}"
 PASSWORD_MIN_LENGTH="${PASSWORD_MIN_LENGTH:-5}"
 # Inline threshold by default; raise where object storage is enabled.
 MAX_FILE_SIZE="${MAX_FILE_SIZE:-131072}"
+APP_NAME="${APP_NAME:-CyberForce Crypt}"
 
 echo "========================================="
 echo "Cloud Build Configuration"
@@ -59,6 +60,7 @@ docker buildx build \
   --build-arg VITE_REQUIRE_PASSWORD="$REQUIRE_PASSWORD" \
   --build-arg VITE_PASSWORD_MIN_LENGTH="$PASSWORD_MIN_LENGTH" \
   --build-arg VITE_MAX_FILE_SIZE="$MAX_FILE_SIZE" \
+  --build-arg VITE_APP_NAME="$APP_NAME" \
   -t "$REGISTRY/crypt-web:$VERSION" \
   -t "$REGISTRY/crypt-web:latest" \
   --push .

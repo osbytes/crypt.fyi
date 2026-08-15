@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { config } from '@/config';
 import { Card } from '@/components/ui/card';
@@ -75,7 +75,6 @@ import { buildSecretLinks } from '@/lib/secretUrl';
 import type { SecretLinks } from '@/lib/secretUrl';
 
 const VALID_FILE_TYPES = ['Files', 'text/plain', 'text/uri-list', 'text/html'];
-const MAX_FILE_SIZE = config.MAX_FILE_SIZE;
 const formatBytes = (bytes: number) => {
   const units = ['B', 'KB', 'MB', 'GB'];
   let value = bytes;
@@ -86,7 +85,6 @@ const formatBytes = (bytes: number) => {
   }
   return `${value % 1 === 0 ? value : value.toFixed(1)} ${units[unit]}`;
 };
-const MAX_FILE_SIZE_LABEL = formatBytes(MAX_FILE_SIZE);
 
 const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
@@ -451,6 +449,19 @@ export function CreatePage() {
   }, [watch]);
 
   const { client } = useClient();
+
+  // The server knows whether object storage is enabled and how large a payload
+  // it will take. Asking beats baking a number into the bundle, which could
+  // understate a storage-backed deployment or overstate an inline-only one.
+  const { data: serverLimits } = useQuery({
+    queryKey: ['server-config'],
+    queryFn: () => client.serverConfig(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+  const maxFileSize = serverLimits?.maxFileSize ?? config.MAX_FILE_SIZE;
+  const maxFileSizeLabel = formatBytes(maxFileSize);
+  const inlineThreshold = serverLimits?.inlineThreshold ?? INLINE_PAYLOAD_MAX_BYTES;
   // Share URLs contain the raw key. Keep them out of React Query mutation data.
   const createdLinksRef = useRef<SecretLinks | null>(null);
   const createdDecryptionKeyRef = useRef('');
@@ -475,7 +486,7 @@ export function CreatePage() {
       // Anything past the inline threshold is framed and uploaded in parts to
       // object storage; the file is read from disk a frame at a time and never
       // held whole. Small secrets keep the original single-request path.
-      const streamed = Boolean(selectedFile) && selectedFile!.size > INLINE_PAYLOAD_MAX_BYTES;
+      const streamed = Boolean(selectedFile) && selectedFile!.size > inlineThreshold;
 
       let result: { id: string; dt: string; key: string };
       if (streamed && selectedFile) {
@@ -539,8 +550,8 @@ export function CreatePage() {
     if (files.length > 0) {
       const file = files[0];
 
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error(t('create.errors.fileSizeExceeded', { max: MAX_FILE_SIZE_LABEL }));
+      if (file.size > maxFileSize) {
+        toast.error(t('create.errors.fileSizeExceeded', { max: maxFileSizeLabel }));
         setSelectedFile(null);
         form.resetField('c');
         return;
@@ -561,8 +572,8 @@ export function CreatePage() {
     const content = handleContentDrop(e.dataTransfer);
 
     if (content instanceof File) {
-      if (content.size > MAX_FILE_SIZE) {
-        toast.error(t('create.errors.fileSizeExceeded', { max: MAX_FILE_SIZE_LABEL }));
+      if (content.size > maxFileSize) {
+        toast.error(t('create.errors.fileSizeExceeded', { max: maxFileSizeLabel }));
         setSelectedFile(null);
         form.resetField('c');
         return;
@@ -579,7 +590,7 @@ export function CreatePage() {
   async function onSubmit(data: FormValues) {
     let content = data.c;
 
-    if (selectedFile && selectedFile.size > INLINE_PAYLOAD_MAX_BYTES) {
+    if (selectedFile && selectedFile.size > inlineThreshold) {
       // Read lazily by the stream client; `c` is unused on that path.
       await createMutation.mutateAsync({ ...data, c: content });
       return;
@@ -863,7 +874,7 @@ export function CreatePage() {
                                 })}
                               </span>
                             ) : (
-                              t('create.form.content.fileHint', { max: MAX_FILE_SIZE_LABEL })
+                              t('create.form.content.fileHint', { max: maxFileSizeLabel })
                             )}
                           </p>
                           {selectedFile && (

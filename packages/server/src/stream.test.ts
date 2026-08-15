@@ -44,13 +44,14 @@ const initStreamTest = async (overrides: Partial<Config> = {}) => {
     'foobar',
   );
   const blobStorage = createMemoryBlobStorage();
+  const storageEnabled = config.blobStorageEnabled;
 
   const app = await initApp(config, {
     logger,
     vault,
     redis,
-    blobStorage,
-    uploadStore: createRedisUploadStore(redis),
+    blobStorage: storageEnabled ? blobStorage : undefined,
+    uploadStore: storageEnabled ? createRedisUploadStore(redis) : undefined,
   });
   await app.fastify.listen();
 
@@ -645,5 +646,42 @@ describe('streamed payloads / regressions', () => {
     expect(res.statusCode).toBe(400);
     const payload = (await res.body.json()) as { msg?: string };
     expect(typeof payload.msg).toBe('string');
+  });
+});
+
+describe('client-facing config', () => {
+  it('advertises the streamed ceiling when object storage is on', async () => {
+    const ctx = await initStreamTest({ maxBlobBytes: 5 * 1024 * 1024 * 1024 });
+    try {
+      const res = await ctx.client.request({ method: 'GET', path: '/config' });
+      expect(res.statusCode).toBe(200);
+      const body = (await res.body.json()) as Record<string, unknown>;
+      expect(body).toEqual({
+        maxFileSize: 5 * 1024 * 1024 * 1024,
+        streaming: true,
+        inlineThreshold: 128 * 1024,
+      });
+      // Deliberately says nothing about version, service name, or topology.
+      expect(Object.keys(body).sort()).toEqual(['inlineThreshold', 'maxFileSize', 'streaming']);
+    } finally {
+      await ctx.app.shutdown();
+      await ctx.app.fastify.close();
+      await ctx.client.close();
+    }
+  });
+
+  it('caps at the inline threshold when object storage is off', async () => {
+    const ctx = await initStreamTest({ blobStorageEnabled: false });
+    try {
+      const res = await ctx.client.request({ method: 'GET', path: '/config' });
+      const body = (await res.body.json()) as Record<string, unknown>;
+      // Nothing larger has anywhere to go, so the UI must not offer it.
+      expect(body.streaming).toBe(false);
+      expect(body.maxFileSize).toBe(128 * 1024);
+    } finally {
+      await ctx.app.shutdown();
+      await ctx.app.fastify.close();
+      await ctx.client.close();
+    }
   });
 });

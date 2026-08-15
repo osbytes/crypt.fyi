@@ -1,5 +1,7 @@
 import { Buffer } from './buffer';
 import {
+  serverConfigResponseSchema,
+  type ServerConfigResponse,
   CreateVaultRequest,
   CreateVaultResponse,
   DeleteVaultRequest,
@@ -262,6 +264,15 @@ export class Client {
       }
       throw new ErrorUnexpectedStatus(response.status);
     }
+  }
+
+  /** Limits this deployment accepts. Falls back to the caller's default. */
+  async serverConfig(): Promise<ServerConfigResponse> {
+    const res = await fetch(`${this.apiUrl}/config`, { headers: this.getHeaders() });
+    if (!res.ok) {
+      throw new ErrorUnexpectedStatus(res.status);
+    }
+    return serverConfigResponseSchema.parse(await res.json());
   }
 
   async exists(id: string): Promise<boolean> {

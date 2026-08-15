@@ -3,6 +3,8 @@ import { Button } from './ui/button';
 import { useTheme } from '@/theme';
 import { Link } from '@tanstack/react-router';
 import { ErrorBoundary } from './error-boundary';
+import { config } from '@/config';
+import { useEffect } from 'react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,6 +12,12 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const [theme, setTheme] = useTheme();
+
+  // The static <title> in index.html cannot see build-time config, so keep the
+  // tab in step with the header.
+  useEffect(() => {
+    document.title = config.APP_NAME;
+  }, []);
 
   return (
     <ErrorBoundary>
@@ -21,7 +29,7 @@ export function Layout({ children }: LayoutProps) {
                 className="text-xl font-bold tracking-tight text-foreground"
                 style={{ fontFamily: "'Roboto Condensed', sans-serif" }}
               >
-                CyberForce Crypt
+                {config.APP_NAME}
               </span>
             </Link>
             <Button

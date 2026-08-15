@@ -89,3 +89,14 @@ export const deleteVaultRequestSchema = z.object({
   dt: z.string(),
 });
 export type DeleteVaultRequest = z.infer<typeof deleteVaultRequestSchema>;
+
+/**
+ * What a deployment accepts. Fetched at runtime so the UI reflects the server
+ * it is actually talking to, rather than whatever was baked in at build time.
+ */
+export const serverConfigResponseSchema = z.object({
+  maxFileSize: z.number(),
+  streaming: z.boolean(),
+  inlineThreshold: z.number(),
+});
+export type ServerConfigResponse = z.infer<typeof serverConfigResponseSchema>;
