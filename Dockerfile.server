@@ -21,6 +21,9 @@ WORKDIR /app
 
 COPY --from=build /app ./
 
+# Without this the server falls back to development mode, which substitutes a
+# hardcoded ENCRYPTION_KEY and skips graceful shutdown.
+ENV NODE_ENV=production
 ENV PORT=4321
 EXPOSE ${PORT}
 
