@@ -79,11 +79,23 @@
 ### Docker
 
 ```bash
-API_URL=https://{your-domain-here} docker compose up --build
+API_URL=https://{your-domain-here} ENCRYPTION_KEY=$(openssl rand -base64 32) docker compose up --build
 ```
+
+`ENCRYPTION_KEY` encrypts IP restrictions and webhook URLs at rest in Redis. Keep it stable across restarts (e.g. in a `.env` file next to `docker-compose.yaml`); changing it makes existing secrets with those options unreadable.
 
 > [!IMPORTANT]
 > `--build` is required if `API_URL` is changed to ensure nginx and the web client are rebuilt with the correct configuration.
+
+A prebuilt API server image (`linux/amd64`, `linux/arm64`) is published to GHCR on every release:
+
+```bash
+docker pull ghcr.io/osbytes/crypt.fyi-server:latest
+```
+
+It runs with `NODE_ENV=production` and requires `REDIS_URL` and `ENCRYPTION_KEY`.
+
+The web client is not published as an image because `API_URL` is compiled into it at build time.
 
 ### Railway
 

@@ -26,6 +26,8 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379
       - PORT=${SERVER_PORT:-4321}
+      # Encrypts IP restrictions and webhook URLs at rest in Redis.
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:?ENCRYPTION_KEY is required (e.g. openssl rand -base64 32)}
     ports:
       - '${SERVER_PORT:-4321}:${SERVER_PORT:-4321}'
     depends_on:
