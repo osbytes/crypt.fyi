@@ -1,5 +1,11 @@
 # @crypt.fyi/server
 
+## 0.0.21
+
+### Patch Changes
+
+- [#152](https://github.com/osbytes/crypt.fyi/pull/152) [`f9491b6`](https://github.com/osbytes/crypt.fyi/commit/f9491b679988079d9be306b92e583f860c73e00d) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Upgrade dependencies to resolve open security advisories: fastify, undici, vite, vitest, OpenTelemetry instrumentations (no longer emit `db.user` span attributes), and transitive fast-uri, brace-expansion, js-yaml, handlebars, shell-quote, adm-zip, source-map-js, and @grpc/grpc-js.
+
 ## 0.0.20
 
 ## 0.0.19
