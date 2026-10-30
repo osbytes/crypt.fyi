@@ -7,7 +7,7 @@
   "dependencies": {
     "@crypt.fyi/core": "workspace:*",
     "webextension-polyfill": "^0.12.0",
-    "zod": "^4.1.5"
+    "zod": "^4.6.6"
   },
   "scripts": {
     "dev": "cross-env VITE_API_URL=http://localhost:4321 VITE_WEB_URL=http://localhost:5173 vite",
