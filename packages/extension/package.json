@@ -31,7 +31,7 @@
     "tailwindcss": "^4.3.3",
     "ts-jest": "^29.4.1",
     "typescript": "^5.9.2",
-    "vite": "^8.0.16",
+    "vite": "^8.1.6",
     "vite-plugin-web-extension": "^4.5.0"
   }
 }
