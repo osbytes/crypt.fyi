@@ -1,0 +1,56 @@
+name: Changeset
+
+on:
+  pull_request:
+    branches: [main]
+    # labeled/unlabeled so adding or removing `no-changeset` re-evaluates the check
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: changeset-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changeset:
+    # The Version Packages PR from release.yml consumes changesets, so it never has one.
+    if: >-
+      !startsWith(github.head_ref, 'changeset-release/') &&
+      !contains(github.event.pull_request.labels.*.name, 'no-changeset')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Require changeset for changed packages
+        run: pnpm exec changeset status --since=origin/main
+
+      # `changeset status` only maps files under packages/*, so security fixes made purely
+      # through root overrides or the lockfile would otherwise ship without a release.
+      - name: Require changeset for root dependency changes
+        run: |
+          if git diff --name-only origin/main...HEAD -- pnpm-workspace.yaml pnpm-lock.yaml | grep -q . \
+            && ! git diff --name-only --diff-filter=A origin/main...HEAD -- '.changeset/*.md' | grep -qv '^.changeset/README.md$'; then
+            echo "::error::pnpm-workspace.yaml or pnpm-lock.yaml changed without a changeset. Run \`pnpm changeset\` (or \`pnpm changeset --empty\` if no release is needed), or add the no-changeset label."
+            exit 1
+          fi
