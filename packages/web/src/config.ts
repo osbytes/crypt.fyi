@@ -1,5 +1,8 @@
 export const config = Object.freeze({
-  API_URL: import.meta.env.VITE_API_URL ?? 'http://localhost:4321',
+  // Runtime value (container API_URL) wins over the build-time one so a single
+  // prebuilt image can be pointed at any API.
+  API_URL:
+    window.__CRYPT_FYI_CONFIG__?.apiUrl || import.meta.env.VITE_API_URL || 'http://localhost:4321',
   IS_DEV: import.meta.env.DEV,
   IS_PROD: import.meta.env.PROD,
   CRYPT_FYI_GITHUB_URL: 'https://github.com/osbytes/crypt.fyi',

@@ -82,8 +82,7 @@
 API_URL=https://{your-domain-here} docker compose up --build
 ```
 
-> [!IMPORTANT]
-> `--build` is required if `API_URL` is changed to ensure nginx and the web client are rebuilt with the correct configuration.
+`API_URL` is read when the web container starts, so changing it only needs a restart (`docker compose up -d`), not a rebuild. It must be a plain `http(s)://host[:port][/path]` URL; the container refuses to start otherwise.
 
 ### Railway
 
