@@ -89,8 +89,8 @@ importers:
         specifier: ^8.2.0
         version: 8.2.0
       zod:
-        specifier: ^4.1.5
-        version: 4.4.3
+        specifier: ^4.6.6
+        version: 4.6.6
     devDependencies:
       '@jest/globals':
         specifier: ^30.4.1
@@ -144,8 +144,8 @@ importers:
         specifier: ^2.1.0
         version: 2.2.0
       zod:
-        specifier: ^4.1.5
-        version: 4.4.3
+        specifier: ^4.6.6
+        version: 4.6.6
     devDependencies:
       '@jest/globals':
         specifier: ^30.4.1
@@ -190,8 +190,8 @@ importers:
         specifier: ^0.12.0
         version: 0.12.0
       zod:
-        specifier: ^4.1.5
-        version: 4.4.3
+        specifier: ^4.6.6
+        version: 4.6.6
     devDependencies:
       '@jest/globals':
         specifier: ^30.4.1
@@ -288,7 +288,7 @@ importers:
         version: 5.12.7
       fastify-type-provider-zod:
         specifier: ^5.0.3
-        version: 5.1.0(@fastify/swagger@9.8.1(supports-color@10.2.2))(fastify@5.12.7)(openapi-types@12.1.3)(zod@4.4.3)
+        version: 5.1.0(@fastify/swagger@9.8.1(supports-color@10.2.2))(fastify@5.12.7)(openapi-types@12.1.3)(zod@4.6.6)
       http-graceful-shutdown:
         specifier: ^3.1.14
         version: 3.1.16(supports-color@10.2.2)
@@ -305,8 +305,8 @@ importers:
         specifier: ^9.9.0
         version: 9.14.0
       zod:
-        specifier: ^4.1.5
-        version: 4.4.3
+        specifier: ^4.6.6
+        version: 4.6.6
     devDependencies:
       '@babel/core':
         specifier: 7.29.6
@@ -379,7 +379,7 @@ importers:
         version: link:../core
       '@hookform/resolvers':
         specifier: ^5.2.1
-        version: 5.5.7(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.83.0(react@19.2.8))(zod@4.4.3)
+        version: 5.5.7(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.83.0(react@19.2.8))(zod@4.6.6)
       '@radix-ui/react-checkbox':
         specifier: ^1.3.3
         version: 1.3.11(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -477,8 +477,8 @@ importers:
         specifier: ^4.5.0
         version: 4.5.0(rollup@4.62.3)(supports-color@10.2.2)(typescript@5.9.2)(vite@8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0))
       zod:
-        specifier: ^4.1.5
-        version: 4.4.3
+        specifier: ^4.6.6
+        version: 4.6.6
     devDependencies:
       '@eslint/js':
         specifier: ^9.34.0
@@ -4417,6 +4417,7 @@ packages:
   eslint@9.39.2:
     resolution: {integrity: sha512-LEyamqS7W5HB3ujJyvi0HQK/dtVINZvd5mAAp9eT5S/ujByGjiZLCzPcHVzuXbpJDJF/cxwHlfceVUDZ2lnSTw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -7116,8 +7117,8 @@ packages:
   zip-dir@2.0.0:
     resolution: {integrity: sha512-uhlsJZWz26FLYXOD6WVuq+fIcZ3aBPGo/cFdiLlv3KNwpa52IF3ISV8fLhQLiqVu5No3VhlqlgthN6gehil1Dg==}
 
-  zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+  zod@4.6.6:
+    resolution: {integrity: sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==}
 
 snapshots:
 
@@ -8321,7 +8322,7 @@ snapshots:
       protobufjs: 7.6.5
       yargs: 17.7.3
 
-  '@hookform/resolvers@5.5.7(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.83.0(react@19.2.8))(zod@4.4.3)':
+  '@hookform/resolvers@5.5.7(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.83.0(react@19.2.8))(zod@4.6.6)':
     dependencies:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.83.0(react@19.2.8)
@@ -8329,7 +8330,7 @@ snapshots:
       '@sinclair/typebox': 0.34.52
       '@standard-schema/spec': 1.1.0
       ajv: 8.20.0
-      zod: 4.4.3
+      zod: 4.6.6
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -10064,7 +10065,7 @@ snapshots:
       jiti: 2.7.0
       magic-string: 0.30.21
       prettier: 3.6.2
-      zod: 4.4.3
+      zod: 4.6.6
     transitivePeerDependencies:
       - supports-color
 
@@ -10078,7 +10079,7 @@ snapshots:
       '@tanstack/router-utils': 1.162.2(supports-color@10.2.2)
       chokidar: 5.0.0
       unplugin: 3.3.0(esbuild@0.25.0)(rolldown@1.2.16)(rollup@4.62.3)(vite@8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0))
-      zod: 4.4.3
+      zod: 4.6.6
     optionalDependencies:
       '@tanstack/react-router': 1.170.18(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       vite: 8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0)
@@ -11497,13 +11498,13 @@ snapshots:
 
   fastify-plugin@6.0.0: {}
 
-  fastify-type-provider-zod@5.1.0(@fastify/swagger@9.8.1(supports-color@10.2.2))(fastify@5.12.7)(openapi-types@12.1.3)(zod@4.4.3):
+  fastify-type-provider-zod@5.1.0(@fastify/swagger@9.8.1(supports-color@10.2.2))(fastify@5.12.7)(openapi-types@12.1.3)(zod@4.6.6):
     dependencies:
       '@fastify/error': 4.2.0
       '@fastify/swagger': 9.8.1(supports-color@10.2.2)
       fastify: 5.12.7
       openapi-types: 12.1.3
-      zod: 4.4.3
+      zod: 4.6.6
 
   fastify@5.12.7:
     dependencies:
@@ -12152,7 +12153,7 @@ snapshots:
       jest-regex-util: 30.4.0
       jest-util: 30.4.1
       jest-worker: 30.4.1
-      picomatch: 4.0.5
+      picomatch: 4.0.7
       walker: 1.0.8
     optionalDependencies:
       fsevents: 2.3.3
@@ -12299,7 +12300,7 @@ snapshots:
       chalk: 4.1.2
       ci-info: 4.4.0
       graceful-fs: 4.2.11
-      picomatch: 4.0.5
+      picomatch: 4.0.7
 
   jest-validate@30.4.1:
     dependencies:
@@ -14180,4 +14181,4 @@ snapshots:
       async: 3.2.6
       jszip: 3.10.1
 
-  zod@4.4.3: {}
+  zod@4.6.6: {}
