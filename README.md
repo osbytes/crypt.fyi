@@ -85,6 +85,14 @@ API_URL=https://{your-domain-here} docker compose up --build
 > [!IMPORTANT]
 > `--build` is required if `API_URL` is changed to ensure nginx and the web client are rebuilt with the correct configuration.
 
+A prebuilt API server image (`linux/amd64`, `linux/arm64`) is published to GHCR on every release:
+
+```bash
+docker pull ghcr.io/osbytes/crypt.fyi-server:latest
+```
+
+The web client is not published as an image because `API_URL` is compiled into it at build time.
+
 ### Railway
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/Pmkrsc?referralCode=ToZEjF&utm_medium=integration&utm_source=template&utm_campaign=generic)
