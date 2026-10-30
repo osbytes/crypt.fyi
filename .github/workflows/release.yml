@@ -3,8 +3,8 @@ name: Release
 on:
   push:
     branches: [main]
-  # Manual runs publish the current extension version to the Chrome Web Store
-  # even if the git tag already exists (tag ≠ Web Store publish).
+  # Manual runs re-publish the current released version to the Chrome Web Store and
+  # GHCR (built from its release tag) — use after a store rejection or failed image push.
   workflow_dispatch:
 
 concurrency:
@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       published: ${{ steps.changesets.outputs.published }}
+      publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -59,30 +61,77 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Versions are fixed across packages, and main only carries a new version once the
+      # Version Packages PR merges, so this is always the latest released (tagged) version.
+      - name: Read released version
+        id: version
+        if: ${{ !cancelled() }}
+        run: echo "version=$(node -p "require('./packages/core/package.json').version")" >> "$GITHUB_OUTPUT"
+
+  chrome:
+    name: Publish extension to Chrome Web Store
+    needs: release
+    # Separate job so a store-side rejection fails only this job. publishedPackages is a
+    # JSON string; a substring match avoids fromJSON erroring when it is empty.
+    if: >-
+      !cancelled() && needs.release.outputs.version != '' &&
+      (contains(needs.release.outputs.publishedPackages, '"@crypt.fyi/extension"') ||
+      (github.event_name == 'workflow_dispatch' && needs.release.result == 'success'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: refs/tags/@crypt.fyi/extension@${{ needs.release.outputs.version }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and publish extension
+        run: pnpm release:extension
+        env:
+          REQUIRE_CHROME_PUBLISH: '1'
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
           CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
           CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
           CHROME_PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
-          PUBLISH_CHROME: ${{ github.event_name == 'workflow_dispatch' }}
 
   docker:
     name: Publish server image to GHCR
     needs: release
-    # `published` is only true when `changeset publish` emitted new tags. Versions are
-    # fixed across packages, so the server version matches the release that was just cut.
-    if: needs.release.outputs.published == 'true'
+    # `published` is only true when `changeset publish` emitted new tags. Built from the
+    # release tag so a manual run never ships unreleased main under a released version.
+    if: >-
+      !cancelled() && needs.release.outputs.version != '' &&
+      (needs.release.outputs.published == 'true' ||
+      (github.event_name == 'workflow_dispatch' && needs.release.result == 'success'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
-      - name: Checkout
+      - name: Checkout release tag
         uses: actions/checkout@v4
-
-      - name: Read server version
-        id: version
-        run: echo "version=$(node -p "require('./packages/server/package.json').version")" >> "$GITHUB_OUTPUT"
+        with:
+          ref: refs/tags/@crypt.fyi/server@${{ needs.release.outputs.version }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -103,8 +152,8 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/crypt.fyi-server
           tags: |
-            type=semver,pattern={{version}},value=${{ steps.version.outputs.version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.version }}
+            type=semver,pattern={{version}},value=${{ needs.release.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release.outputs.version }}
             type=raw,value=latest
 
       # Only the server image is published: the web image bakes VITE_API_URL in at build
