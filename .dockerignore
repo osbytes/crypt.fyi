@@ -1,5 +1,10 @@
-node_modules
-.env
-dist
-build
+**/node_modules
+**/.env
+**/dist
+**/build
+**/.turbo
 .tap
+.git
+redis-data
+packages/web/playwright-report
+packages/web/test-results
