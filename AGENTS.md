@@ -6,7 +6,7 @@ Human docs: [README.md](./README.md), [CONTRIBUTING.md](./CONTRIBUTING.md), [SEC
 
 ## Project map
 
-pnpm + Turborepo monorepo (`Node >= 22`, `pnpm >= 11.17` via Corepack).
+pnpm + Turborepo monorepo (`Node >= 22`, Active LTS 26 in `.nvmrc`/CI/Docker; `pnpm >= 11.17` via Corepack).
 
 | Package | Role |
 | --- | --- |
@@ -21,6 +21,7 @@ Encryption/decryption and key material live in `@crypt.fyi/core` and must stay c
 ## Commands
 
 ```bash
+npm install -g corepack   # Node 25+ no longer bundles it
 corepack enable
 pnpm install
 cp .env.example .env   # if needed

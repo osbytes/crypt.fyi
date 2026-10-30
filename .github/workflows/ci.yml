@@ -19,7 +19,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        # Floor of package.json engines plus the current Active LTS (.nvmrc).
+        node-version: [22.x, 26.x]
 
     services:
       redis:
@@ -33,18 +34,15 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Enable Corepack
-        run: corepack enable
+      - uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           run_install: false
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
