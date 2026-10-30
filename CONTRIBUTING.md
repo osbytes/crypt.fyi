@@ -48,6 +48,8 @@ pnpm release            # build, publish npm packages, tag, upload Chrome extens
 
 On `main`, `.github/workflows/release.yml` opens a Version Packages PR or runs `pnpm release`.
 
+Pull requests must include a changeset when they change files under `packages/*` or the root `pnpm-workspace.yaml` / `pnpm-lock.yaml` (dependency and security override bumps ship as patch releases). `.github/workflows/changeset.yml` enforces this. For changes that don't need a release (docs, tests, CI), run `pnpm changeset --empty` or ask a maintainer to add the `no-changeset` label.
+
 ## Pull Request Process
 
 1. Ensure your code follows the project's style guide (uses Prettier)
