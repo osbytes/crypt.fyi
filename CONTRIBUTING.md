@@ -23,6 +23,7 @@ By participating in this project, you agree to maintain a respectful and constru
 1. Enable Corepack and install dependencies:
 
    ```bash
+   npm install -g corepack   # Node 25+ no longer bundles it
    corepack enable
    pnpm install
    ```

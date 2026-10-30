@@ -105,6 +105,7 @@ The web client image is not published to GHCR yet; build it with `docker compose
 1. Clone the repository
 2. Enable Corepack (uses the `packageManager` field → pnpm):
    ```bash
+   npm install -g corepack   # Node 25+ no longer bundles it
    corepack enable
    ```
 3. Install dependencies:
