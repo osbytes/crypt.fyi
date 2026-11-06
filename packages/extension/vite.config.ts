@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import webExtension from 'vite-plugin-web-extension';
 import tailwindcss from '@tailwindcss/vite';
+import { themeInitScript } from '@crypt.fyi/theme/vite';
 import path from 'path';
 import fs from 'fs';
 
@@ -16,6 +17,7 @@ export default defineConfig({
   },
   plugins: [
     tailwindcss(),
+    themeInitScript(),
     {
       name: 'emit-managed-schema',
       generateBundle() {

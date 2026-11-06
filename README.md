@@ -82,7 +82,7 @@
 API_URL=https://{your-domain-here} ENCRYPTION_KEY=$(openssl rand -base64 32) docker compose up --build
 ```
 
-`ENCRYPTION_KEY` encrypts IP restrictions and webhook URLs at rest in Redis. Keep it stable across restarts (e.g. in a `.env` file next to `docker-compose.yaml`); changing it makes existing secrets with those options unreadable.
+`ENCRYPTION_KEY` protects verification hashes, delete tokens, IP restrictions and webhook URLs at rest in Redis. Keep it stable across restarts (e.g. in a `.env` file next to `docker-compose.yaml`); changing it makes all existing secrets unreadable until they expire.
 
 `API_URL` is read when the web container starts, so changing it only needs a restart (`docker compose up -d`), not a rebuild. It must be a plain `http(s)://host[:port][/path]` URL; the container refuses to start otherwise.
 

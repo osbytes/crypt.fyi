@@ -1,4 +1,5 @@
 import './styles.css';
+import './theme';
 import { findClosestTtl, TTL_OPTIONS, type ConfigOverride, type ExtensionConfig } from '../config';
 import { parseConfigOverride } from '../configSchema';
 import { toExportOverride } from '../configMerge';

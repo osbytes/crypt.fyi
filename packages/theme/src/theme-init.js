@@ -1,12 +1,14 @@
+/* global window, document */
 // Runs synchronously before first paint so a stored or OS-preferred theme never
 // flashes the wrong colors. Lives in its own file because CSP forbids inline scripts
-// (script-src 'self'). Keep the colors in sync with --background in src/index.css.
+// (script-src 'self'). Keep the colors in sync with --background in tokens.css;
+// theme.test.ts enforces this.
 (function () {
   var preference = 'system';
   try {
     var stored = window.localStorage.getItem('theme');
     if (stored === 'light' || stored === 'dark') preference = stored;
-  } catch (_) {
+  } catch {
     // Storage can be blocked (private modes, policies); fall back to the OS preference.
   }
   var isDark =

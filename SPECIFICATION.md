@@ -129,7 +129,7 @@ Abstract
 
    - MUST handle only encrypted data operations
    - MUST NOT receive or process URLs containing decryption keys
-   - MUST only receive hashed keys for verification (SHA-512)
+   - MUST only receive hashed keys for verification (see Section 3.2)
    - MUST operate independently from web server
 
    This separation ensures that even if the web server logs are
@@ -168,7 +168,9 @@ Abstract
 ### 3.2. Hash Functions
 
    Implementations MUST use:
-   - SHA-512 for key verification hash (key + optional password)
+   - SHA-512 for key verification hash without a password (key only), and
+     for legacy links
+   - Argon2id for key verification hash with a password (key + password)
    - SHA3-512 for key derivation in ML-KEM-768-2
 
 ### 3.3. Compression
@@ -184,7 +186,7 @@ Abstract
 ```json
 {
   "c": "<base64-encoded-encrypted-content>",
-  "h": "<sha512-hash-of-key-and-password>",
+  "h": "<verification-hash-of-key-and-password>",
   "m": {
     "compression": {
       "algorithm": "zlib:pako" | "none"
@@ -288,13 +290,19 @@ Abstract
      remain in an append-only log until the log is next compacted, so
      implementations SHOULD compact it regularly and SHOULD encrypt the
      underlying disk
+   - The verification hash MUST NOT be stored in plaintext; servers MUST store
+     a keyed digest (HMAC-SHA-256) bound to the vault ID, so a datastore dump
+     alone cannot be replayed to read or burn an entry
+   - Delete tokens MUST NOT be stored in plaintext; servers MUST store them
+     encrypted so they can be returned in webhook payloads
 
 ### 6.3. Access Control
 
    - IP address restrictions MAY use CIDR notation
    - Implementations MUST NOT allow more than 3 IP restrictions per
      vault entry
-   - Key authentication MUST use SHA-512 hash verification
+   - Key authentication MUST use the verification hash defined in
+     Section 3.2
 
 ### 6.4. Transport Security
 

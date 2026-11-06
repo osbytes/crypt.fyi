@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
-import '@fontsource-variable/inter/wght.css';
-import '@fontsource-variable/jetbrains-mono/wght.css';
-import '@fontsource-variable/space-grotesk/wght.css';
+import '@crypt.fyi/theme/fonts/inter';
+import '@crypt.fyi/theme/fonts/jetbrains-mono';
+import '@crypt.fyi/theme/fonts/space-grotesk';
 import './index.css';
 import './i18n';
 import { migrateLegacyQueryKey } from './lib/secretUrl';
