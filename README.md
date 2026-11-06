@@ -96,6 +96,45 @@ It runs with `NODE_ENV=production` and requires `REDIS_URL` and `ENCRYPTION_KEY`
 
 The web client image is not published to GHCR yet; build it with `docker compose` as above.
 
+#### Redis persistence
+
+The compose file stores Redis data in the `redis_data` volume using an append-only file (AOF) that is synced to disk before each write is acknowledged, so secrets and queued webhooks survive restarts and crashes. A secret that was burned stays burned, even after a crash. RDB snapshots stay off because restoring an older snapshot could bring a burned secret back. See the [specification](./SPECIFICATION.md) for the requirements.
+
+What this means for operators:
+
+- **The disk holds sensitive data.** The volume contains ciphertext, keyed digests of verification hashes and encrypted delete tokens, but never plaintext or decryption keys. The digests and tokens rely on `ENCRYPTION_KEY`, so keep that key off this disk where you can. Once a secret is deleted, the server never returns it, even if its ciphertext remains in the AOF until Redis next compacts it. Encrypt the disk.
+- **Don't back up the volume.** Restoring a backup can bring back burned secrets.
+- **Writes are slower** than without persistence, because each one waits for the disk.
+- **`docker compose down -v` deletes the volume** and every unexpired secret with it.
+
+To run without persistence, set `--appendonly no` and remove the volume. A Redis restart then drops all unexpired secrets and queued webhooks. If you run Redis any other way (the GHCR image with your own Redis, a managed service, a hosting platform), apply these settings yourself: by default Redis takes snapshots and doesn't use AOF.
+
+##### Upgrading from RDB snapshots
+
+Deployments from before this change store data in a `dump.rdb` snapshot, which Redis ignores once AOF is on. **Upgrading without these steps loses all unexpired secrets**, and the old snapshot stays on disk. Before pulling the new compose file, turn on AOF in the running Redis:
+
+```bash
+docker compose exec redis redis-cli config set appendonly yes
+```
+
+Wait until this shows `aof_rewrite_in_progress:0` and `aof_last_bgrewrite_status:ok`:
+
+```bash
+docker compose exec redis redis-cli info persistence
+```
+
+Then pull the new compose file and restart:
+
+```bash
+docker compose up -d
+```
+
+Once you've confirmed existing secrets still open, delete the old snapshot:
+
+```bash
+docker compose exec redis rm /data/dump.rdb
+```
+
 ### Railway
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/Pmkrsc?referralCode=ToZEjF&utm_medium=integration&utm_source=template&utm_campaign=generic)

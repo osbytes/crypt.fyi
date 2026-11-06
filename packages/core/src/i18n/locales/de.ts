@@ -395,7 +395,8 @@ export const de: TranslationKeys = {
         tls: 'TLS-Verschlüsselung für alle API-Kommunikation',
         expiration: 'Automatischer Datenablauf mit konfigurierbarer Lebensdauer (TTL)',
         deletion: 'Sichere Datenlöschung nach Zugriff oder Ablauf',
-        storage: 'Keine dauerhafte Speicherung sensibler Informationen',
+        storage:
+          'Geheimnisse gelangen nur verschlüsselt auf die Festplatte, und gelöschte Einträge können dort bis zur nächsten Log-Komprimierung verbleiben; Klartext und Schlüssel werden nie gespeichert',
       },
     },
     thirdParty: {
