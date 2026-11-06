@@ -2,6 +2,9 @@ import type { TranslationKeys } from '../types';
 
 export const de: TranslationKeys = {
   common: {
+    newSecret: 'Neues Geheimnis',
+    skipToContent: 'Zum Inhalt springen',
+    theme: { label: 'Design', system: 'System', light: 'Hell', dark: 'Dunkel' },
     createSecret: 'Geheimnis erstellen',
     starOnGithub: 'Auf GitHub markieren',
     features: 'Funktionen',
@@ -29,6 +32,15 @@ export const de: TranslationKeys = {
     },
   },
   landing: {
+    demo: {
+      badge: 'Open Source · selbst hostbar',
+      browser: 'In deinem Browser',
+      server: 'Auf unserem Server',
+      afterRead: 'Nach dem Lesen',
+      nothing: 'nichts',
+      burned: 'Vernichtet',
+      ariaLabel: 'Wie sich ein Geheimnis von deinem Browser bis zur Löschung verändert',
+    },
     title: 'Zero-Knowledge Geheimnis-Sharing',
     subtitle:
       'Im Browser verschlüsseln. Einmal teilen. Für immer weg. Post-Quanten Ende-zu-Ende-Verschlüsselung — unsere Server sehen Ihre Geheimnisse nie.',
@@ -92,8 +104,10 @@ export const de: TranslationKeys = {
     },
   },
   create: {
+    encryptedHere: 'In diesem Browser verschlüsselt',
     form: {
       content: {
+        attach: 'Datei anhängen (max. {{max}})',
         label: 'Geheimer Inhalt',
         placeholder: 'Geben Sie hier Ihren geheimen Inhalt ein...',
         fileHint: 'Datei per Drag & Drop hinzufügen oder hier klicken (max. 1 MB)',
@@ -102,6 +116,8 @@ export const de: TranslationKeys = {
         invalidFileType: 'Ungültiger Dateityp',
       },
       password: {
+        show: 'Passwort anzeigen',
+        hide: 'Passwort verbergen',
         label: 'Passwort',
         placeholder: 'Optional (aber empfohlen)',
       },
@@ -147,6 +163,17 @@ export const de: TranslationKeys = {
       },
     },
     success: {
+      sealed: 'Versiegelt',
+      tagline: 'Kopiere den Link und sende ihn. Er wird nur hier und nur einmal angezeigt.',
+      oneLink: 'Ein Link',
+      separate: 'Link + Schlüssel getrennt',
+      qrLabel: 'QR-Code',
+      confirmDelete: {
+        title: 'Dieses Geheimnis löschen?',
+        description:
+          'Der Link funktioniert dann sofort nicht mehr. Das kann nicht rückgängig gemacht werden.',
+        cancel: 'Geheimnis behalten',
+      },
       title: 'Geheimnis erstellt!',
       description: {
         main: 'Ihr Geheimnis wurde erstellt. Wählen Sie unten eine Freigabeoption aus.',
@@ -206,6 +233,12 @@ export const de: TranslationKeys = {
     },
   },
   view: {
+    gate: {
+      title: 'Jemand hat ein Geheimnis mit dir geteilt',
+      description:
+        'Es wird in diesem Browser entschlüsselt. Beim Öffnen wird es möglicherweise endgültig gelöscht, halte also einen sicheren Ort dafür bereit.',
+      notice: 'Unser Server kann es nicht lesen',
+    },
     notFound: {
       title: 'Geheimnis nicht gefunden',
       description: 'Dieses Geheimnis ist möglicherweise abgelaufen oder wurde gelöscht.',
@@ -270,7 +303,7 @@ export const de: TranslationKeys = {
       showContent: 'Inhalt anzeigen',
       copyToClipboard: 'In die Zwischenablage kopieren',
       copiedToClipboard: 'Geheimnis in die Zwischenablage kopiert',
-      clickToReveal: 'Klicken Sie auf das Augensymbol oben, um das Geheimnis anzuzeigen',
+      clickToReveal: 'Klicken, um das Geheimnis anzuzeigen',
       passwordProtected:
         'Dieses Geheimnis ist passwortgeschützt. Klicken Sie, um das Passwort einzugeben.',
       ariaLabel: 'Geheimer Inhalt',

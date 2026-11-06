@@ -21,6 +21,12 @@ test.describe('create and read smoke', () => {
     await page.getByRole('button', { name: 'View Secret' }).click();
 
     await expect(page.getByLabel('Secret content')).toHaveText(secret);
+    // Concealed by default, and copying must not require revealing it first.
+    await expect(page.getByRole('button', { name: /reveal the secret/i })).toBeVisible();
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.getByRole('button', { name: 'Copy to clipboard' }).click();
+    await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(secret);
+    await expect(page.getByRole('button', { name: /reveal the secret/i })).toBeVisible();
     await expect(page.getByText(/permanently deleted/i)).toBeVisible();
 
     // Same-URL goto can no-op in Chromium; leave and return to remount View.

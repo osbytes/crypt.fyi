@@ -58,6 +58,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    // Small font subsets would otherwise become data: URIs, which CSP (font-src 'self') blocks.
+    assetsInlineLimit: (file) => (file.endsWith('.woff2') ? false : undefined),
   },
   // Keep Playwright specs out of `pnpm test` (vitest); they run via `pnpm test:e2e`.
   test: {

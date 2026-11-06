@@ -1,10 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster, toast } from 'sonner';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
+import { MotionConfig } from 'framer-motion';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientProvider } from './context/client';
-import { ThemeProvider } from './theme';
+import { ThemeProvider, useTheme } from './theme';
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
@@ -32,28 +33,39 @@ interface AppProps {
 export default function App({ legacyQueryKeyMigrated = false }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <ClientProvider>
-          <TooltipProvider>
-            <RouterProvider router={router} />
-          </TooltipProvider>
-          <Toaster
-            toastOptions={{
-              classNames: {
-                toast: '!bg-background !p-2 !rounded-lg !outline-accent !border-accent',
-                title: '!text-foreground',
-                description: '!text-muted-foreground',
-                closeButton: '!text-foreground',
-                actionButton: '!text-foreground',
-                cancelButton: '!text-foreground',
-                icon: '!text-foreground',
-              },
-            }}
-          />
-          {legacyQueryKeyMigrated && <LegacyQueryKeyWarning />}
-        </ClientProvider>
-      </ThemeProvider>
+      <MotionConfig reducedMotion="user">
+        <ThemeProvider>
+          <ClientProvider>
+            <TooltipProvider>
+              <RouterProvider router={router} />
+            </TooltipProvider>
+            <ThemedToaster />
+            {legacyQueryKeyMigrated && <LegacyQueryKeyWarning />}
+          </ClientProvider>
+        </ThemeProvider>
+      </MotionConfig>
     </QueryClientProvider>
+  );
+}
+
+function ThemedToaster() {
+  const { resolved } = useTheme();
+
+  return (
+    <Toaster
+      theme={resolved}
+      toastOptions={{
+        classNames: {
+          toast: '!bg-popover !border-border !rounded-lg',
+          title: '!text-foreground',
+          description: '!text-muted-foreground',
+          closeButton: '!text-foreground',
+          actionButton: '!text-foreground',
+          cancelButton: '!text-foreground',
+          icon: '!text-foreground',
+        },
+      }}
+    />
   );
 }
 

@@ -1,5 +1,8 @@
 export interface TranslationKeys {
   common: {
+    newSecret: string;
+    skipToContent: string;
+    theme: { label: string; system: string; light: string; dark: string };
     createSecret: string;
     starOnGithub: string;
     features: string;
@@ -27,6 +30,15 @@ export interface TranslationKeys {
     };
   };
   landing: {
+    demo: {
+      badge: string;
+      browser: string;
+      server: string;
+      afterRead: string;
+      nothing: string;
+      burned: string;
+      ariaLabel: string;
+    };
     title: string;
     subtitle: string;
     pillars: {
@@ -84,8 +96,10 @@ export interface TranslationKeys {
     };
   };
   create: {
+    encryptedHere: string;
     form: {
       content: {
+        attach: string;
         label: string;
         placeholder: string;
         fileHint: string;
@@ -94,6 +108,8 @@ export interface TranslationKeys {
         invalidFileType: string;
       };
       password: {
+        show: string;
+        hide: string;
         label: string;
         placeholder: string;
       };
@@ -135,6 +151,12 @@ export interface TranslationKeys {
       };
     };
     success: {
+      sealed: string;
+      tagline: string;
+      oneLink: string;
+      separate: string;
+      qrLabel: string;
+      confirmDelete: { title: string; description: string; cancel: string };
       title: string;
       description: {
         main: string;
@@ -192,6 +214,7 @@ export interface TranslationKeys {
     };
   };
   view: {
+    gate: { title: string; description: string; notice: string };
     notFound: {
       title: string;
       description: string;

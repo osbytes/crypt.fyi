@@ -2,6 +2,9 @@ import type { TranslationKeys } from '../types';
 
 export const zh: TranslationKeys = {
   common: {
+    newSecret: '新建密文',
+    skipToContent: '跳到主要内容',
+    theme: { label: '主题', system: '跟随系统', light: '浅色', dark: '深色' },
     createSecret: '创建密文',
     starOnGithub: '在 GitHub 上标星',
     features: '功能特点',
@@ -29,9 +32,18 @@ export const zh: TranslationKeys = {
     },
   },
   landing: {
-    title: '零知识秘密共享',
+    demo: {
+      badge: '开源 · 可自托管',
+      browser: '在你的浏览器中',
+      server: '在我们的服务器上',
+      afterRead: '读取之后',
+      nothing: '什么都没有',
+      burned: '已销毁',
+      ariaLabel: '密文从你的浏览器到被删除的变化过程',
+    },
+    title: '零知识密文共享',
     subtitle:
-      '在浏览器中加密。分享一次。永久消失。后量子端到端加密——我们的服务器永远看不到您的秘密。',
+      '在浏览器中加密。分享一次。永久消失。后量子端到端加密——我们的服务器永远看不到您的密文。',
     pillars: {
       title: '为信任而构建',
       zeroKnowledge: {
@@ -90,8 +102,10 @@ export const zh: TranslationKeys = {
     },
   },
   create: {
+    encryptedHere: '已在此浏览器中加密',
     form: {
       content: {
+        attach: '附加文件（最大 {{max}}）',
         label: '密文内容',
         placeholder: '在此输入您的密文内容...',
         fileHint: '拖放或点击此处添加文件（最大 1 MB）',
@@ -100,6 +114,8 @@ export const zh: TranslationKeys = {
         invalidFileType: '无效的文件类型',
       },
       password: {
+        show: '显示密码',
+        hide: '隐藏密码',
         label: '密码',
         placeholder: '可选（但建议使用）',
       },
@@ -141,6 +157,16 @@ export const zh: TranslationKeys = {
       },
     },
     success: {
+      sealed: '已封存',
+      tagline: '复制链接并发送。它只会在这里显示一次。',
+      oneLink: '单个链接',
+      separate: '链接和密钥分开',
+      qrLabel: '二维码',
+      confirmDelete: {
+        title: '删除此密文？',
+        description: '链接将立即失效。此操作无法撤销。',
+        cancel: '保留密文',
+      },
       title: '密文已创建！',
       description: {
         main: '您的密文已创建。请从下方选择分享方式。',
@@ -198,6 +224,11 @@ export const zh: TranslationKeys = {
     },
   },
   view: {
+    gate: {
+      title: '有人与你分享了一个密文',
+      description: '它会在此浏览器中解密。打开后可能会被永久删除，请先准备好安全的保存位置。',
+      notice: '我们的服务器无法读取它',
+    },
     notFound: {
       title: '未找到密文',
       description: '此密文可能已过期或被删除。',
@@ -256,7 +287,7 @@ export const zh: TranslationKeys = {
       showContent: '显示内容',
       copyToClipboard: '复制到剪贴板',
       copiedToClipboard: '密文已复制到剪贴板',
-      clickToReveal: '点击上方的眼睛图标显示密文',
+      clickToReveal: '点击以显示密文',
       passwordProtected: '此密文受密码保护。点击输入密码。',
       ariaLabel: '密文内容',
     },
@@ -276,10 +307,10 @@ export const zh: TranslationKeys = {
     title: '关于',
     what: {
       description:
-        'crypt.fyi 是一种零知识方式，通过链接分享敏感信息——密码、API 密钥、文件。加密在您的浏览器中完成，我们的服务器永远看不到明文，秘密可在被读取后消失。',
+        'crypt.fyi 是一种零知识方式，通过链接分享敏感信息——密码、API 密钥、文件。加密在您的浏览器中完成，我们的服务器永远看不到明文，密文可在被读取后消失。',
       traditionalTitle: '为什么不直接发邮件或短信？',
       traditionalDescription:
-        '邮件、短信、Slack 和聊天都会留下副本：收件箱、消息记录、运营商日志，以及每台同步过的设备。一旦把密码粘贴到这些渠道，你就失去了对谁能事后找到它的控制。crypt.fyi 用于一次刻意的交接——分享链接，可选添加密码或 IP 白名单，并在用完后让秘密消失。',
+        '邮件、短信、Slack 和聊天都会留下副本：收件箱、消息记录、运营商日志，以及每台同步过的设备。一旦把密码粘贴到这些渠道，你就失去了对谁能事后找到它的控制。crypt.fyi 用于一次刻意的交接——分享链接，可选添加密码或 IP 白名单，并在用完后让密文消失。',
     },
     letter: {
       title: '作者的一封短笺',
@@ -299,16 +330,16 @@ export const zh: TranslationKeys = {
   privacy: {
     title: '隐私政策',
     intro:
-      '在 crypt.fyi，我们严肃对待您的隐私。本隐私政策说明了当您使用我们的零知识、端到端加密的秘密共享平台时，我们如何处理您的信息。',
+      '在 crypt.fyi，我们严肃对待您的隐私。本隐私政策说明了当您使用我们的零知识、端到端加密的密文共享平台时，我们如何处理您的信息。',
     doNotCollect: {
       title: '我们不收集的信息',
       description: '由于我们的零知识架构，我们在技术上无法访问：',
       items: {
-        secrets: '您的未加密秘密或文件',
+        secrets: '您的未加密密文或文件',
         keys: '加密密钥或密码',
         urls: '包含解密信息的 URL 片段',
         content: '您的加密数据的内容',
-        recipients: '您的秘密接收者的信息',
+        recipients: '您的密文接收者的信息',
       },
     },
     collect: {
@@ -318,7 +349,7 @@ export const zh: TranslationKeys = {
         encrypted: '加密数据（我们无法解密）',
         hashes: '密钥验证哈希（用于验证访问权限而无需知道实际密钥）',
         metadata: '基本请求元数据（IP 地址、时间戳）用于速率限制和滥用预防',
-        webhooks: '如果提供了 webhook URL（用于秘密访问和删除通知）',
+        webhooks: '如果提供了 webhook URL（用于密文访问和删除通知）',
       },
       note: '所有存储的数据在过期后或访问时自动删除（如果启用了阅后即焚）。',
     },
@@ -326,7 +357,7 @@ export const zh: TranslationKeys = {
       title: '我们如何使用信息',
       description: '我们仅将收集的信息用于：',
       items: {
-        transmission: '促进您的加密秘密的安全传输',
+        transmission: '促进您的加密密文的安全传输',
         rateLimits: '实施速率限制以防止滥用',
         ipControl: '在配置时实施 IP/CIDR 白名单',
         notifications: '在启用时发送 webhook 通知',
@@ -349,7 +380,7 @@ export const zh: TranslationKeys = {
       title: '第三方服务',
       description: '除以下情况外，我们不与第三方共享信息：',
       items: {
-        webhooks: '当您启用 webhooks 时，我们向您提供的 URL 发送有关秘密访问和删除的通知',
+        webhooks: '当您启用 webhooks 时，我们向您提供的 URL 发送有关密文访问和删除的通知',
         infrastructure: '托管我们服务的基础设施提供商（他们只能看到无法解密的加密数据）',
       },
     },
@@ -357,7 +388,7 @@ export const zh: TranslationKeys = {
       title: '您的权利和选择',
       description: '您可以控制您的数据：',
       items: {
-        expiration: '为您的秘密选择自定义过期时间',
+        expiration: '为您的密文选择自定义过期时间',
         burn: '启用阅后即焚以在访问后立即删除',
         password: '添加密码保护以增加安全性',
         ip: '配置 IP 限制以控制访问',
