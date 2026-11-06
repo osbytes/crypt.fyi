@@ -6,6 +6,7 @@
   "type": "module",
   "dependencies": {
     "@crypt.fyi/core": "workspace:*",
+    "@crypt.fyi/theme": "workspace:*",
     "webextension-polyfill": "^0.12.0",
     "zod": "^4.6.6"
   },

@@ -1,62 +1,79 @@
 @import 'tailwindcss';
+@import '@crypt.fyi/theme/tokens.css';
 
-/* Match packages/web design tokens (neutral black/white brand). */
-@theme {
-  --font-sans: 'Segoe UI', 'Helvetica Neue', ui-sans-serif, sans-serif;
-  --color-ink: hsl(0 0% 5%);
-  --color-ink-muted: hsl(0 0% 47%);
-  --color-paper: hsl(0 0% 100%);
-  --color-paper-elevated: hsl(0 0% 100%);
-  --color-line: hsl(0 0% 91%);
-  --color-primary: hsl(0 0% 11%);
-  --color-primary-fg: hsl(0 0% 98%);
-  --color-muted: hsl(0 0% 96%);
-  --color-danger: hsl(0 84% 40%);
-  --color-danger-soft: hsl(0 84% 96%);
-  --color-ok-soft: hsl(0 0% 96%);
+/*
+  Unlayered on purpose: Chrome injects its own font-family and 75% font-size on extension
+  pages, and that unlayered rule would beat the body styles in the theme's base layer.
+*/
+body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  @theme {
-    --color-ink: hsl(0 0% 98%);
-    --color-ink-muted: hsl(0 0% 65%);
-    --color-paper: hsl(0 0% 5%);
-    --color-paper-elevated: hsl(0 0% 5%);
-    --color-line: hsl(0 0% 25%);
-    --color-primary: hsl(0 0% 98%);
-    --color-primary-fg: hsl(0 0% 11%);
-    --color-muted: hsl(0 0% 17%);
-    --color-danger: hsl(0 65% 68%);
-    --color-danger-soft: hsl(0 40% 16%);
-    --color-ok-soft: hsl(0 0% 17%);
-  }
-}
-
+/* Plain HTML equivalents of the web client's Input, Button and Card components. */
 @layer base {
-  html {
-    color-scheme: light dark;
-  }
-
-  body {
-    @apply m-0 min-h-screen bg-paper font-sans text-ink antialiased;
-  }
-
   input[type='url'],
   input[type='text'],
   input[type='number'],
   select {
-    @apply w-full rounded-md border border-line bg-paper-elevated px-3 py-2.5 text-ink shadow-sm outline-none transition;
+    @apply h-11 w-full rounded-lg border border-border bg-muted px-3 py-1 text-sm text-foreground outline-hidden transition-colors hover:border-input;
   }
 
-  input:focus,
-  select:focus,
+  input[type='checkbox'] {
+    @apply size-4 shrink-0 accent-primary;
+  }
+
+  input:focus-visible,
+  select:focus-visible,
   button:focus-visible,
-  .file-btn:focus-within {
-    @apply ring-2 ring-primary/25 ring-offset-2 ring-offset-paper;
+  .btn:focus-within {
+    @apply ring-2 ring-ring ring-offset-2 ring-offset-background outline-hidden;
   }
 
   input:disabled,
   select:disabled {
     @apply cursor-not-allowed opacity-50;
+  }
+}
+
+@layer components {
+  .card {
+    @apply space-y-4 rounded-xl border bg-card p-5 text-card-foreground shadow-[var(--card-shadow)] sm:p-6;
+  }
+
+  .card-title {
+    @apply font-display text-base font-semibold tracking-tight;
+  }
+
+  .field {
+    @apply block space-y-1.5;
+  }
+
+  .field-label {
+    @apply block text-sm font-medium;
+  }
+
+  .field-hint {
+    @apply block text-xs text-muted-foreground;
+  }
+
+  .option-row {
+    @apply flex items-center gap-2.5 text-sm;
+  }
+
+  .btn {
+    @apply inline-flex h-11 cursor-pointer items-center justify-center rounded-lg px-4 text-sm font-semibold whitespace-nowrap transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/85;
+  }
+
+  .btn-outline {
+    @apply border border-border bg-card hover:border-input hover:bg-accent;
+  }
+
+  .theme-option {
+    @apply grid size-8 cursor-pointer place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground aria-pressed:bg-accent aria-pressed:text-foreground;
   }
 }

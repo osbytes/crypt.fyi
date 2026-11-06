@@ -13,6 +13,10 @@ This browser extension allows you to quickly encrypt and share text selections u
 
 Password defaults are intentionally not supported — use the web app when a password is required.
 
+## Theme
+
+Settings page styling comes from [`@crypt.fyi/theme`](../theme/README.md), the same tokens, fonts and System/Light/Dark logic the web client uses. Its theme choice is stored separately from the web client because the two have different origins.
+
 ## Development
 
 1. Install dependencies:
