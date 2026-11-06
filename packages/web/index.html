@@ -2,7 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo-light.svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/logo-dark.svg"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/logo-light.svg"
+      media="(prefers-color-scheme: dark)"
+    />
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
@@ -45,7 +56,7 @@
     />
     <meta name="author" content="crypt.fyi" />
     <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0e0f12" />
 
     <!-- Additional SEO meta tags -->
     <link rel="canonical" href="https://crypt.fyi" />
@@ -93,6 +104,8 @@
     </script>
   </head>
   <body>
+    <!-- Classic (non-module) script: must set the theme before first paint. -->
+    <script src="/theme-init.js"></script>
     <div id="root"></div>
     <!-- Classic (non-module) script so it runs before the deferred app bundle. -->
     <script src="/config.js"></script>

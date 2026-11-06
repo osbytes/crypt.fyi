@@ -1,11 +1,12 @@
-import LogoLight from '../../public/logo-light.svg?react';
-import LogoDark from '../../public/logo-dark.svg?react';
-import { useTheme } from '@/theme';
+import LogoMark from '../../public/logo-light.svg?react';
 import { cn } from '@/lib/utils';
 
-export function Logo({ className, animate = true }: { className?: string; animate?: boolean }) {
-  const [theme] = useTheme();
-  const Logo = theme === 'dark' ? LogoLight : LogoDark;
-
-  return <Logo className={cn('h-fit', animate && 'logo-animate', className)} />;
+/** Colored with currentColor from CSS, so it can never disagree with the active theme. */
+export function Logo({ className, animate = false }: { className?: string; animate?: boolean }) {
+  return (
+    <LogoMark
+      aria-hidden
+      className={cn('h-fit', animate ? 'logo-animate' : 'logo-static', className)}
+    />
+  );
 }

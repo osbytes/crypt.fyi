@@ -45,7 +45,6 @@ import {
   IconShare,
   IconFile,
   IconWebhook,
-  IconInfoCircle,
 } from '@tabler/icons-react';
 import { useRef, useState } from 'react';
 import { clipboardCopy } from '@/lib/clipboardCopy';
@@ -63,8 +62,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { useTranslation } from 'react-i18next';
 import { useClient } from '@/context/client';
 import { NumberInput } from '@/components/NumberInput';
-import { TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Tooltip } from '@/components/ui/tooltip';
+import { RevealInput } from '@/components/RevealInput';
+import { Pill } from '@/components/ui/pill';
+import { Switch } from '@/components/ui/switch';
 import { buildSecretLinks } from '@/lib/secretUrl';
 import type { SecretLinks } from '@/lib/secretUrl';
 
@@ -562,6 +562,8 @@ export function CreatePage() {
     setIsKeylessUrlMasked(true);
     setIsKeyMasked(true);
     setIsQrDialogOpen(false);
+    setIsDeleteDialogOpen(false);
+    setShareMode('combined');
     createdLinksRef.current = null;
     createdDecryptionKeyRef.current = '';
     createMutation.reset();
@@ -591,6 +593,8 @@ export function CreatePage() {
   const [isCombinedUrlMasked, setIsCombinedUrlMasked] = useState(true);
   const [isKeylessUrlMasked, setIsKeylessUrlMasked] = useState(true);
   const [isKeyMasked, setIsKeyMasked] = useState(true);
+  const [shareMode, setShareMode] = useState<'combined' | 'separate'>('combined');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const createdLinks = createdLinksRef.current;
   const createdId = createMutation.data?.id;
   const maskUrl = (value: string) => {
@@ -690,7 +694,7 @@ export function CreatePage() {
 
   return (
     <div
-      className="max-w-3xl mx-auto py-8 relative"
+      className="relative mx-auto max-w-5xl"
       onDragEnter={handleDragEnter}
       onDragOver={handleDragEnter}
       onDragLeave={handleDragLeave}
@@ -703,7 +707,7 @@ export function CreatePage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className={cn(
-              'absolute inset-0 border-2 border-dashed rounded-lg z-50 flex items-center justify-center backdrop-blur-xs',
+              'absolute inset-0 z-50 flex items-center justify-center rounded-xl border-2 border-dashed backdrop-blur-xs',
               dragState === 'dragging'
                 ? 'border-primary bg-primary/5'
                 : 'border-destructive bg-destructive/5',
@@ -711,7 +715,7 @@ export function CreatePage() {
           >
             <p
               className={cn(
-                'text-2xl font-medium',
+                'font-display text-2xl font-semibold',
                 dragState === 'dragging' ? 'text-primary' : 'text-destructive',
               )}
             >
@@ -727,81 +731,76 @@ export function CreatePage() {
         {!isSubmitSuccessful ? (
           <motion.div
             key="form"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
           >
-            <Card className="p-4">
-              <Form {...form}>
-                <form
-                  onKeyDown={(e) => {
-                    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-                      form.handleSubmit(onSubmit)(e);
-                    }
-                  }}
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={form.control}
-                    name="c"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('create.form.content.label')}</FormLabel>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2 sm:mb-6">
+              <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+                {t('common.newSecret')}
+              </h1>
+              <Pill tone="sealed">
+                <IconLock aria-hidden />
+                {t('create.encryptedHere')}
+              </Pill>
+            </div>
+            <Form {...form}>
+              <form
+                onKeyDown={(e) => {
+                  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                    form.handleSubmit(onSubmit)(e);
+                  }
+                }}
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-6"
+              >
+                <FormField
+                  control={form.control}
+                  name="c"
+                  render={({ field }) => (
+                    <FormItem className="space-y-0 lg:sticky lg:top-6">
+                      <Card className="flex flex-col p-2 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
+                        <FormLabel className="px-2.5 pt-2.5">
+                          {t('create.form.content.label')}
+                        </FormLabel>
                         <FormControl>
                           <Textarea
                             {...field}
                             disabled={createMutation.isPending || field.disabled || !!selectedFile}
                             placeholder={t('create.form.content.placeholder')}
                             autoFocus
+                            spellCheck={false}
+                            className="min-h-28 resize-y sm:min-h-44 border-0 bg-transparent px-2.5 font-mono focus-visible:ring-0 focus-visible:ring-offset-0 md:text-sm lg:min-h-80"
                           />
                         </FormControl>
-                        <FormMessage />
-                        <div className="flex items-center gap-2 text-[0.8rem] text-muted-foreground">
-                          <p
-                            role="button"
-                            tabIndex={createMutation.isPending ? -1 : 0}
-                            className={cn(
-                              'flex items-center justify-between cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                              createMutation.isPending && 'pointer-events-none',
-                            )}
-                            aria-disabled={createMutation.isPending}
-                            onClick={() =>
-                              !createMutation.isPending && fileInputRef.current?.click()
-                            }
-                            onKeyDown={(e) => {
-                              if (
-                                !createMutation.isPending &&
-                                (e.key === 'Enter' || e.key === ' ')
-                              ) {
-                                e.preventDefault();
-                                fileInputRef.current?.click();
-                              }
-                            }}
+                        <div className="flex items-center gap-1 border-t px-1 pt-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto min-h-9 min-w-0 whitespace-normal py-1.5 text-left font-medium"
+                            title={t('create.form.content.fileHint')}
+                            disabled={createMutation.isPending}
+                            onClick={() => fileInputRef.current?.click()}
                           >
-                            <IconFile size={18} className="mr-1" />
-                            {selectedFile ? (
-                              <span className="flex items-center gap-2">
-                                {t('create.form.content.fileSelected', {
+                            <IconFile aria-hidden />
+                            {selectedFile
+                              ? t('create.form.content.fileSelected', {
                                   name: selectedFile.name,
                                   size: (selectedFile.size / 1024).toFixed(1),
-                                })}
-                              </span>
-                            ) : (
-                              t('create.form.content.fileHint')
-                            )}
-                          </p>
+                                })
+                              : t('create.form.content.attach', { max: MAX_FILE_SIZE_LABEL })}
+                          </Button>
                           {selectedFile && (
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="h-4 w-4"
+                              className="size-9 shrink-0"
+                              aria-label={t('common.delete')}
                               disabled={createMutation.isPending || field.disabled}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
+                              onClick={() => {
                                 setSelectedFile(null);
                                 form.resetField('c');
                                 if (fileInputRef.current) {
@@ -810,49 +809,43 @@ export function CreatePage() {
                                 }
                               }}
                             >
-                              <IconX className="h-3 w-3" />
+                              <IconX aria-hidden />
                             </Button>
                           )}
                           <input
                             type="file"
                             ref={fileInputRef}
+                            tabIndex={-1}
+                            aria-hidden
                             onChange={(e) => {
                               const files = Array.from(e.target.files ?? []);
                               handleFiles(files);
                             }}
-                            className="absolute inset-0 opacity-0 w-0 h-0"
+                            className="absolute h-0 w-0 opacity-0"
                             disabled={createMutation.isPending || field.disabled}
                           />
                         </div>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="p"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('create.form.password.label')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder={t('create.form.password.placeholder')}
-                            {...field}
-                            disabled={createMutation.isPending || field.disabled}
-                            type="password"
-                            autoComplete="new-password"
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex flex-wrap gap-4">
+                      </Card>
+                      <FormMessage className="mt-2" />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex flex-col gap-4">
+                  <div className="space-y-4 rounded-xl border bg-card p-5">
                     <FormField
                       control={form.control}
                       name="b"
                       render={({ field: { value, onChange, ...rest } }) => (
-                        <FormItem className="flex-1 min-w-[240px] flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormItem className="flex flex-row items-start justify-between gap-4 space-y-0">
+                          <div className="space-y-1">
+                            <FormLabel className="text-sm">{t('create.form.burn.label')}</FormLabel>
+                            <FormDescription className="hidden sm:block">
+                              {t('create.form.burn.description')}
+                            </FormDescription>
+                          </div>
                           <FormControl>
-                            <Checkbox
+                            <Switch
                               {...rest}
                               checked={value}
                               onCheckedChange={(checked) => {
@@ -864,18 +857,15 @@ export function CreatePage() {
                               disabled={createMutation.isPending || rest.disabled}
                             />
                           </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>{t('create.form.burn.label')}</FormLabel>
-                            <FormDescription>{t('create.form.burn.description')}</FormDescription>
-                          </div>
                         </FormItem>
                       )}
                     />
+                    <hr />
                     <FormField
                       control={form.control}
                       name="ttl"
                       render={({ field }) => (
-                        <FormItem className="flex-1 min-w-[240px]">
+                        <FormItem className="flex flex-row flex-wrap items-center justify-between gap-x-4 gap-y-1 space-y-0">
                           <FormLabel>{t('create.form.ttl.label')}</FormLabel>
                           <FormControl>
                             <Select
@@ -885,7 +875,7 @@ export function CreatePage() {
                               defaultValue={field.value?.toString()}
                               disabled={createMutation.isPending || field.disabled}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger className="w-40">
                                 <SelectValue placeholder={t('create.form.ttl.placeholder')} />
                               </SelectTrigger>
                               <SelectContent>
@@ -901,578 +891,518 @@ export function CreatePage() {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name="p"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('create.form.password.label')}</FormLabel>
+                          <FormControl>
+                            <RevealInput
+                              placeholder={t('create.form.password.placeholder')}
+                              {...field}
+                              disabled={createMutation.isPending || field.disabled}
+                              autoComplete="new-password"
+                              showLabel={t('create.form.password.show')}
+                              hideLabel={t('create.form.password.hide')}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <Collapsible
-                      open={isAdvancedConfigurationOpen}
-                      onOpenChange={setIsAdvancedConfigurationOpen}
-                    >
-                      <CollapsibleTrigger className="group flex w-full items-center justify-start gap-2 text-sm text-muted-foreground hover:text-foreground">
-                        <IconChevronDown className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+
+                  <Collapsible
+                    open={isAdvancedConfigurationOpen}
+                    onOpenChange={setIsAdvancedConfigurationOpen}
+                    className="rounded-xl border bg-card"
+                  >
+                    <CollapsibleTrigger className="group flex min-h-12 w-full items-center justify-between gap-2 rounded-xl px-5 text-sm font-semibold focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
+                      <span className="inline-block first-letter:uppercase">
                         {t('create.form.advanced.toggle')}
-                      </CollapsibleTrigger>
-                      <AnimatePresence initial={false}>
-                        <CollapsibleContent asChild>
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <div className="space-y-4 pt-4">
-                              <div className="flex flex-wrap gap-4">
+                      </span>
+                      <IconChevronDown
+                        className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180"
+                        aria-hidden
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="space-y-4 border-t p-5">
+                        <FormField
+                          control={form.control}
+                          name="rc"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('create.form.advanced.readCount.label')}</FormLabel>
+                              <FormControl>
+                                <NumberInput
+                                  {...field}
+                                  onValueChange={(value) => {
+                                    form.setValue('b', !value);
+                                    field.onChange(value);
+                                  }}
+                                  disabled={createMutation.isPending || !!field.disabled}
+                                  min={2}
+                                  max={10}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {t('create.form.advanced.readCount.description')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="fc"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                {t('create.form.advanced.failedAttempts.label')}
+                              </FormLabel>
+                              <FormControl>
+                                <NumberInput
+                                  {...field}
+                                  onValueChange={(value) => {
+                                    field.onChange(value);
+                                  }}
+                                  disabled={createMutation.isPending || field.disabled}
+                                  min={1}
+                                  max={10}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {t('create.form.advanced.failedAttempts.description')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="ips"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('create.form.advanced.ip.label')}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder={t('create.form.advanced.ip.placeholder')}
+                                  {...field}
+                                  disabled={createMutation.isPending || field.disabled}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {t('create.form.advanced.ip.description')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="whu"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('create.form.advanced.webhook.label')}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="url"
+                                  placeholder={t('create.form.advanced.webhook.placeholder')}
+                                  {...field}
+                                  disabled={createMutation.isPending || field.disabled}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {t('create.form.advanced.webhook.description')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        {form.watch('whu') && (
+                          <div className="space-y-4 rounded-lg border p-4">
+                            <FormField
+                              control={form.control}
+                              name="whn"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>
+                                    {t('create.form.advanced.webhook.nameLabel')}
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="text"
+                                      placeholder={t(
+                                        'create.form.advanced.webhook.namePlaceholder',
+                                      )}
+                                      {...field}
+                                      disabled={createMutation.isPending || field.disabled}
+                                    />
+                                  </FormControl>
+                                  <FormDescription>
+                                    {t('create.form.advanced.webhook.nameDescription')}
+                                  </FormDescription>
+                                </FormItem>
+                              )}
+                            />
+                            <div className="space-y-2.5">
+                              {(
+                                [
+                                  ['whr', t('create.form.advanced.webhook.read')],
+                                  ['whfpk', t('create.form.advanced.webhook.failureToReadPK')],
+                                  ['whfip', t('create.form.advanced.webhook.failureToReadIP')],
+                                  ['whb', t('create.form.advanced.webhook.burn')],
+                                ] as const
+                              ).map(([name, label]) => (
                                 <FormField
+                                  key={name}
                                   control={form.control}
-                                  name="rc"
-                                  render={({ field }) => (
-                                    <FormItem className="flex-1 min-w-[240px] group">
-                                      <FormLabel className="flex items-center gap-2">
-                                        {t('create.form.advanced.readCount.label')}
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            {t('create.form.advanced.readCount.description')}
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      </FormLabel>
+                                  name={name}
+                                  render={({ field: { value, onChange, ...rest } }) => (
+                                    <FormItem className="flex flex-row items-center gap-2.5 space-y-0">
                                       <FormControl>
-                                        <NumberInput
-                                          {...field}
-                                          onValueChange={(value) => {
-                                            form.setValue('b', !value);
-                                            field.onChange(value);
-                                          }}
-                                          disabled={createMutation.isPending || !!field.disabled}
-                                          min={2}
-                                          max={10}
+                                        <Checkbox
+                                          {...rest}
+                                          checked={value}
+                                          onCheckedChange={onChange}
+                                          disabled={createMutation.isPending || rest.disabled}
                                         />
                                       </FormControl>
-                                      <FormMessage />
+                                      <FormLabel className="font-normal">{label}</FormLabel>
                                     </FormItem>
                                   )}
                                 />
-                                <FormField
-                                  control={form.control}
-                                  name="fc"
-                                  render={({ field }) => (
-                                    <FormItem className="flex-1 min-w-[240px] group">
-                                      <FormLabel className="flex items-center gap-2">
-                                        {t('create.form.advanced.failedAttempts.label')}
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            {t('create.form.advanced.failedAttempts.description')}
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      </FormLabel>
-                                      <FormControl>
-                                        <NumberInput
-                                          {...field}
-                                          onValueChange={(value) => {
-                                            field.onChange(value);
-                                          }}
-                                          disabled={createMutation.isPending || field.disabled}
-                                          min={1}
-                                          max={10}
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </div>
-                              <FormField
-                                control={form.control}
-                                name="ips"
-                                render={({ field }) => (
-                                  <FormItem className="group">
-                                    <FormLabel className="flex items-center gap-2">
-                                      {t('create.form.advanced.ip.label')}
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          {t('create.form.advanced.ip.description')}
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </FormLabel>
-                                    <FormControl>
-                                      <Input
-                                        type="text"
-                                        placeholder={t('create.form.advanced.ip.placeholder')}
-                                        {...field}
-                                        disabled={createMutation.isPending || field.disabled}
-                                      />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              <FormField
-                                control={form.control}
-                                name="whu"
-                                render={({ field }) => (
-                                  <FormItem className="group">
-                                    <FormLabel className="flex items-center gap-2">
-                                      {t('create.form.advanced.webhook.label')}
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          {t('create.form.advanced.webhook.description')}
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </FormLabel>
-                                    <FormControl>
-                                      <Input
-                                        type="url"
-                                        placeholder={t('create.form.advanced.webhook.placeholder')}
-                                        {...field}
-                                        disabled={createMutation.isPending || field.disabled}
-                                      />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              {form.watch('whu') && (
-                                <div className="px-4 flex flex-col gap-4">
-                                  <FormField
-                                    control={form.control}
-                                    name="whn"
-                                    render={({ field }) => (
-                                      <FormItem className="group">
-                                        <FormLabel className="flex items-center gap-2">
-                                          {t('create.form.advanced.webhook.nameLabel')}
-                                          <Tooltip>
-                                            <TooltipTrigger asChild>
-                                              <IconInfoCircle className="w-3 h-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity" />
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                              {t('create.form.advanced.webhook.nameDescription')}
-                                            </TooltipContent>
-                                          </Tooltip>
-                                        </FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            type="text"
-                                            placeholder={t(
-                                              'create.form.advanced.webhook.namePlaceholder',
-                                            )}
-                                            {...field}
-                                            disabled={createMutation.isPending || field.disabled}
-                                          />
-                                        </FormControl>
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <FormField
-                                      control={form.control}
-                                      name="whr"
-                                      render={({ field: { value, onChange, ...rest } }) => (
-                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                          <FormControl>
-                                            <Checkbox
-                                              {...rest}
-                                              checked={value}
-                                              onCheckedChange={onChange}
-                                              disabled={createMutation.isPending || rest.disabled}
-                                            />
-                                          </FormControl>
-                                          <FormLabel>
-                                            {t('create.form.advanced.webhook.read')}
-                                          </FormLabel>
-                                        </FormItem>
-                                      )}
-                                    />
-                                    <FormField
-                                      control={form.control}
-                                      name="whfpk"
-                                      render={({ field: { value, onChange, ...rest } }) => (
-                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                          <FormControl>
-                                            <Checkbox
-                                              {...rest}
-                                              checked={value}
-                                              onCheckedChange={onChange}
-                                              disabled={createMutation.isPending || rest.disabled}
-                                            />
-                                          </FormControl>
-                                          <FormLabel>
-                                            {t('create.form.advanced.webhook.failureToReadPK')}
-                                          </FormLabel>
-                                        </FormItem>
-                                      )}
-                                    />
-                                    <FormField
-                                      control={form.control}
-                                      name="whfip"
-                                      render={({ field: { value, onChange, ...rest } }) => (
-                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                          <FormControl>
-                                            <Checkbox
-                                              {...rest}
-                                              checked={value}
-                                              onCheckedChange={onChange}
-                                              disabled={createMutation.isPending || rest.disabled}
-                                            />
-                                          </FormControl>
-                                          <FormLabel>
-                                            {t('create.form.advanced.webhook.failureToReadIP')}
-                                          </FormLabel>
-                                        </FormItem>
-                                      )}
-                                    />
-                                    <FormField
-                                      control={form.control}
-                                      name="whb"
-                                      render={({ field: { value, onChange, ...rest } }) => (
-                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                          <FormControl>
-                                            <Checkbox
-                                              {...rest}
-                                              checked={value}
-                                              onCheckedChange={onChange}
-                                              disabled={createMutation.isPending || rest.disabled}
-                                            />
-                                          </FormControl>
-                                          <FormLabel>
-                                            {t('create.form.advanced.webhook.burn')}
-                                          </FormLabel>
-                                        </FormItem>
-                                      )}
-                                    />
-                                  </div>
-                                  <pre className="text-xs text-wrap bg-card text-card-foreground">
-                                    {getWebhookSchemaString({
-                                      name: form.watch('whn'),
-                                      read: form.watch('whr'),
-                                      burn: form.watch('whb'),
-                                      failureKeyPassword: form.watch('whfpk'),
-                                      failureIpAddress: form.watch('whfip'),
-                                    })}
-                                  </pre>
-                                </div>
-                              )}{' '}
+                              ))}
                             </div>
-                          </motion.div>
-                        </CollapsibleContent>
-                      </AnimatePresence>
-                    </Collapsible>
-                  </div>
-                  <div className="flex justify-end">
-                    <Button type="submit" isLoading={createMutation.isPending}>
-                      <IconLock />
-                      {t('common.create')}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </Card>
+                            <pre className="overflow-x-auto font-mono text-xs text-muted-foreground">
+                              {getWebhookSchemaString({
+                                name: form.watch('whn'),
+                                read: form.watch('whr'),
+                                burn: form.watch('whb'),
+                                failureKeyPassword: form.watch('whfpk'),
+                                failureIpAddress: form.watch('whfip'),
+                              })}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+
+                {/* Sticky so opening advanced options can never push the action off screen. */}
+                <div className="sticky bottom-0 z-10 -mx-4 flex items-center justify-between gap-4 border-t bg-background px-4 py-3 sm:mx-0 sm:px-0 lg:col-span-2">
+                  <p className="hidden min-w-0 text-sm text-muted-foreground sm:block">
+                    {[
+                      t('create.success.info.expires', {
+                        time:
+                          ttlOptions.find((option) => option.value === form.watch('ttl'))?.label ??
+                          '',
+                      }),
+                      form.watch('b') && t('create.success.info.burn'),
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </p>
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full sm:w-auto sm:min-w-48"
+                    isLoading={createMutation.isPending}
+                  >
+                    <IconLock />
+                    {t('common.create')}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </motion.div>
         ) : (
           <motion.div
             key="success"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+            className="mx-auto max-w-2xl space-y-5"
           >
-            <Card className="p-4">
-              <div className="space-y-4">
-                <div className="text-center mb-8">
-                  <h2 className="text-xl font-bold mb-2">{t('create.success.title')}</h2>
-                  <p className="text-muted-foreground text-sm mb-1">
-                    {t('create.success.description.main')}
-                  </p>
-                  <p className="text-muted-foreground text-sm mb-1">
+            <div className="space-y-1.5">
+              <h2 className="flex items-center gap-2.5 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+                <IconLock className="size-6 shrink-0 text-sealed" aria-hidden />
+                {t('create.success.title')}
+              </h2>
+              <p className="text-muted-foreground">{t('create.success.tagline')}</p>
+            </div>
+
+            <Card className="space-y-5 p-4 sm:p-6">
+              <div
+                role="group"
+                aria-label={t('create.success.description.main')}
+                className="inline-flex max-w-full gap-0.5 rounded-lg border p-0.5"
+              >
+                {(
+                  [
+                    ['combined', t('create.success.oneLink')],
+                    ['separate', t('create.success.separate')],
+                  ] as const
+                ).map(([mode, label]) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    aria-pressed={shareMode === mode}
+                    onClick={() => setShareMode(mode)}
+                    className={cn(
+                      'min-h-9 rounded-md px-3 py-1 text-[13px] font-semibold transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+                      shareMode === mode
+                        ? 'bg-accent text-foreground'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {shareMode === 'combined' ? (
+                <div className="space-y-3">
+                  <SecretField
+                    id="combined-url"
+                    label={t('create.success.combinedUrl')}
+                    value={displayedCombinedUrl ?? ''}
+                    isMasked={isCombinedUrlMasked}
+                    onToggleMask={() => setIsCombinedUrlMasked(!isCombinedUrlMasked)}
+                    showLabel={t('create.success.actions.showUrl')}
+                    hideLabel={t('create.success.actions.hideUrl')}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      className="min-w-48 flex-1"
+                      onClick={() => createdLinks && copyUrl(createdLinks.combinedUrl)}
+                    >
+                      <IconCopy />
+                      {t('create.success.actions.copyUrl')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 sm:flex-none"
+                      onClick={() => setIsQrDialogOpen(true)}
+                      aria-label={t('create.success.actions.showQr')}
+                    >
+                      <IconQrcode />
+                      {t('create.success.qrLabel')}
+                    </Button>
+                    {canShare && (
+                      <Button
+                        variant="outline"
+                        className="flex-1 sm:flex-none"
+                        aria-label={t('create.success.actions.shareUrl')}
+                        onClick={() => createdLinks && shareUrl(createdLinks.combinedUrl)}
+                      >
+                        <IconShare />
+                        {t('common.share')}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <p className="text-sm text-muted-foreground">
                     {t('create.success.description.separateKey')}
                   </p>
-                  <p className="text-muted-foreground text-sm">
-                    {form.watch('p') && t('create.success.description.password')}
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2 p-4 bg-muted rounded-lg">
-                    <Label htmlFor="combined-url">{t('create.success.combinedUrl')}</Label>
-                    <div className="flex items-center gap-2">
-                      <Input id="combined-url" value={displayedCombinedUrl ?? ''} readOnly />
+                  <div className="space-y-3">
+                    <SecretField
+                      id="keyless-url"
+                      label={t('create.success.keylessUrl')}
+                      value={displayedKeylessUrl ?? ''}
+                      isMasked={isKeylessUrlMasked}
+                      onToggleMask={() => setIsKeylessUrlMasked(!isKeylessUrlMasked)}
+                      showLabel={t('create.success.actions.showUrl')}
+                      hideLabel={t('create.success.actions.hideUrl')}
+                    />
+                    <div className="flex flex-wrap gap-2">
                       <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setIsCombinedUrlMasked(!isCombinedUrlMasked)}
-                        title={
-                          isCombinedUrlMasked
-                            ? t('create.success.actions.showUrl')
-                            : t('create.success.actions.hideUrl')
-                        }
-                        aria-label={
-                          isCombinedUrlMasked
-                            ? t('create.success.actions.showUrl')
-                            : t('create.success.actions.hideUrl')
-                        }
-                        aria-pressed={!isCombinedUrlMasked}
-                      >
-                        {isCombinedUrlMasked ? <IconEyeOff /> : <IconEye />}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        title={t('create.success.actions.copyUrl')}
-                        aria-label={t('create.success.actions.copyUrl')}
-                        onClick={() => createdLinks && copyUrl(createdLinks.combinedUrl)}
+                        className="min-w-48 flex-1"
+                        onClick={() => createdLinks && copyUrl(createdLinks.keylessUrl)}
                       >
                         <IconCopy />
+                        {t('create.success.actions.copyUrl')}
                       </Button>
                       {canShare && (
                         <Button
                           variant="outline"
-                          size="icon"
-                          title={t('create.success.actions.shareUrl')}
+                          className="flex-1 sm:flex-none"
                           aria-label={t('create.success.actions.shareUrl')}
-                          onClick={() => createdLinks && shareUrl(createdLinks.combinedUrl)}
+                          onClick={() => createdLinks && shareUrl(createdLinks.keylessUrl)}
                         >
                           <IconShare />
+                          {t('common.share')}
                         </Button>
                       )}
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setIsQrDialogOpen(true)}
-                        title={t('create.success.actions.showQr')}
-                        aria-label={t('create.success.actions.showQr')}
-                      >
-                        <IconQrcode />
+                    </div>
+                  </div>
+                  <hr />
+                  <div className="space-y-3">
+                    <SecretField
+                      id="decryption-key"
+                      label={t('create.success.decryptionKey')}
+                      value={displayedDecryptionKey}
+                      isMasked={isKeyMasked}
+                      onToggleMask={() => setIsKeyMasked(!isKeyMasked)}
+                      showLabel={t('create.success.actions.showKey')}
+                      hideLabel={t('create.success.actions.hideKey')}
+                    />
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" className="min-w-48 flex-1" onClick={copyKey}>
+                        <IconCopy />
+                        {t('create.success.actions.copyKey')}
                       </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 p-4 bg-muted rounded-lg">
-                    <div className="space-y-2">
-                      <Label htmlFor="keyless-url">{t('create.success.keylessUrl')}</Label>
-                      <div className="flex items-center gap-2">
-                        <Input id="keyless-url" value={displayedKeylessUrl ?? ''} readOnly />
+                      {canShare && (
                         <Button
                           variant="outline"
-                          size="icon"
-                          onClick={() => setIsKeylessUrlMasked(!isKeylessUrlMasked)}
-                          title={
-                            isKeylessUrlMasked
-                              ? t('create.success.actions.showUrl')
-                              : t('create.success.actions.hideUrl')
-                          }
-                          aria-label={
-                            isKeylessUrlMasked
-                              ? t('create.success.actions.showUrl')
-                              : t('create.success.actions.hideUrl')
-                          }
-                          aria-pressed={!isKeylessUrlMasked}
+                          className="flex-1 sm:flex-none"
+                          aria-label={t('create.success.actions.shareKey')}
+                          onClick={shareKey}
                         >
-                          {isKeylessUrlMasked ? <IconEyeOff /> : <IconEye />}
+                          <IconShare />
+                          {t('common.share')}
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          title={t('create.success.actions.copyUrl')}
-                          aria-label={t('create.success.actions.copyUrl')}
-                          onClick={() => createdLinks && copyUrl(createdLinks.keylessUrl)}
-                        >
-                          <IconCopy />
-                        </Button>
-                        {canShare && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            title={t('create.success.actions.shareUrl')}
-                            aria-label={t('create.success.actions.shareUrl')}
-                            onClick={() => createdLinks && shareUrl(createdLinks.keylessUrl)}
-                          >
-                            <IconShare />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="decryption-key">{t('create.success.decryptionKey')}</Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          id="decryption-key"
-                          value={displayedDecryptionKey}
-                          readOnly
-                          autoComplete="off"
-                          spellCheck={false}
-                        />
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => setIsKeyMasked(!isKeyMasked)}
-                          title={
-                            isKeyMasked
-                              ? t('create.success.actions.showKey')
-                              : t('create.success.actions.hideKey')
-                          }
-                          aria-label={
-                            isKeyMasked
-                              ? t('create.success.actions.showKey')
-                              : t('create.success.actions.hideKey')
-                          }
-                          aria-pressed={!isKeyMasked}
-                        >
-                          {isKeyMasked ? <IconEyeOff /> : <IconEye />}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          title={t('create.success.actions.copyKey')}
-                          aria-label={t('create.success.actions.copyKey')}
-                          onClick={copyKey}
-                        >
-                          <IconCopy />
-                        </Button>
-                        {canShare && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            title={t('create.success.actions.shareKey')}
-                            aria-label={t('create.success.actions.shareKey')}
-                            onClick={shareKey}
-                          >
-                            <IconShare />
-                          </Button>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>
+              )}
 
-                <div className="flex justify-end flex-wrap gap-2">
-                  <Button variant="outline" onClick={resetForNewSecret}>
-                    {t('create.success.createAnother')}
-                  </Button>
-                  {createMutation.data && (
-                    <Button
-                      variant="destructive"
-                      onClick={() => {
-                        if (createMutation.data) {
-                          deleteMutation.mutate({
-                            id: createMutation.data.id,
-                            dt: createMutation.data.dt,
-                          });
-                        }
-                      }}
-                      isLoading={deleteMutation.isPending}
-                    >
-                      {t('create.success.deleteSecret')}
-                    </Button>
-                  )}
-                </div>
-                <div className="grid grid-cols-[auto_1fr] gap-2 text-xs">
-                  <IconClock className="text-muted-foreground size-4" />
-                  <p className="text-muted-foreground">
-                    {t('create.success.info.expires', {
-                      time:
-                        ttlOptions.find((option) => option.value === form.watch('ttl'))?.label ??
-                        '',
+              <hr />
+
+              <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-[13px] text-muted-foreground">
+                <SummaryItem icon={IconClock}>
+                  {t('create.success.info.expires', {
+                    time:
+                      ttlOptions.find((option) => option.value === form.watch('ttl'))?.label ?? '',
+                  })}
+                </SummaryItem>
+                {form.watch('b') && (
+                  <SummaryItem icon={IconFlame} burn>
+                    {t('create.success.info.burn')}
+                  </SummaryItem>
+                )}
+                {form.watch('fc') && (
+                  <SummaryItem icon={IconFlame} burn>
+                    {t('create.success.info.failureCount', { count: form.watch('fc') })}
+                  </SummaryItem>
+                )}
+                {form.watch('p') && (
+                  <SummaryItem icon={IconLock}>
+                    {t('create.success.info.passwordProtected')} ·{' '}
+                    <span className="font-medium text-foreground">
+                      {t('create.success.description.password')}
+                    </span>
+                  </SummaryItem>
+                )}
+                {form.watch('rc') && (
+                  <SummaryItem icon={IconEye}>
+                    {t('create.success.info.readCount', { count: form.watch('rc') })}
+                  </SummaryItem>
+                )}
+                {form.watch('ips') && (
+                  <SummaryItem icon={IconNetwork}>
+                    {t('create.success.info.ipRestrictions', {
+                      ips: form
+                        .watch('ips')
+                        ?.split(',')
+                        .map((ip) => ip.trim())
+                        .join(', '),
                     })}
-                  </p>
-                  {form.watch('b') && (
-                    <>
-                      <IconFlame className="text-muted-foreground size-4" />
-                      <p className="text-muted-foreground">{t('create.success.info.burn')}</p>
-                    </>
-                  )}
-                  {form.watch('fc') && (
-                    <>
-                      <IconFlame className="text-muted-foreground size-4" />
-                      <p className="text-muted-foreground">
-                        {t('create.success.info.failureCount', {
-                          count: form.watch('fc'),
-                        })}
-                      </p>
-                    </>
-                  )}
-                  {form.watch('p') && (
-                    <>
-                      <IconLock className="text-muted-foreground size-4" />
-                      <p className="text-muted-foreground">
-                        {t('create.success.info.passwordProtected')}
-                      </p>
-                    </>
-                  )}
-                  {form.watch('ips') && (
-                    <>
-                      <IconNetwork className="text-muted-foreground size-4" />
-                      <p className="text-muted-foreground">
-                        {t('create.success.info.ipRestrictions', {
-                          ips: form
-                            .watch('ips')
-                            ?.split(',')
-                            .map((ip) => ip.trim())
-                            .join(', '),
-                        })}
-                      </p>
-                    </>
-                  )}
-                  {form.watch('rc') && (
-                    <>
-                      <IconEye className="text-muted-foreground size-4" />
-                      <p className="text-muted-foreground">
-                        {t('create.success.info.readCount', { count: form.watch('rc') })}
-                      </p>
-                    </>
-                  )}
-                  {form.watch('whu') && (
-                    <>
-                      <IconWebhook className="text-muted-foreground size-4" />
-                      <p className="text-muted-foreground">
-                        {t('create.success.info.webhook', {
-                          url: form.watch('whu'),
-                          events: [
-                            form.watch('whr') && 'read',
-                            form.watch('whb') && 'burn',
-                            form.watch('whfpk') && 'failure (key/password)',
-                            form.watch('whfip') && 'failure (IP)',
-                          ]
-                            .filter(Boolean)
-                            .join(', '),
-                        })}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
+                  </SummaryItem>
+                )}
+                {form.watch('whu') && (
+                  <SummaryItem icon={IconWebhook}>
+                    {t('create.success.info.webhook', {
+                      url: form.watch('whu'),
+                      events: [
+                        form.watch('whr') && 'read',
+                        form.watch('whb') && 'burn',
+                        form.watch('whfpk') && 'failure (key/password)',
+                        form.watch('whfip') && 'failure (IP)',
+                      ]
+                        .filter(Boolean)
+                        .join(', '),
+                    })}
+                  </SummaryItem>
+                )}
+              </ul>
             </Card>
-            <div className="mt-4 text-center">
-              <a
-                href={config.CRYPT_FYI_GITHUB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <IconBrandGithub className="size-4" />
-                {t('common.starOnGithub')}
-              </a>
+
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              {createMutation.data && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  isLoading={deleteMutation.isPending}
+                >
+                  {t('create.success.deleteSecret')}
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={resetForNewSecret}>
+                {t('create.success.createAnother')}
+              </Button>
             </div>
+
+            <a
+              href={config.CRYPT_FYI_GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <IconBrandGithub className="size-4" aria-hidden />
+              {t('common.starOnGithub')}
+            </a>
           </motion.div>
         )}
       </AnimatePresence>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="text-left">
+            <DialogTitle className="font-display text-xl tracking-tight">
+              {t('create.success.confirmDelete.title')}
+            </DialogTitle>
+            <DialogDescription>{t('create.success.confirmDelete.description')}</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              {t('create.success.confirmDelete.cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              isLoading={deleteMutation.isPending}
+              onClick={() => {
+                if (createMutation.data) {
+                  deleteMutation.mutate({
+                    id: createMutation.data.id,
+                    dt: createMutation.data.dt,
+                  });
+                }
+              }}
+            >
+              {t('create.success.deleteSecret')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t('create.success.qrCode.title')}</DialogTitle>
+          <DialogHeader className="text-left">
+            <DialogTitle className="font-display text-xl tracking-tight">
+              {t('create.success.qrCode.title')}
+            </DialogTitle>
             <DialogDescription>{t('create.success.qrCode.description')}</DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col items-center space-y-4">
-            <div className="qr-code p-4">
+          <div className="flex flex-col items-center gap-4">
+            {/* Scanners need dark-on-light, so the code stays white in both themes. */}
+            <div className="qr-code rounded-lg bg-white">
               {createdLinks?.qrUrl && (
                 <QRCodeSVG
                   ref={qrCodeRef}
@@ -1484,19 +1414,80 @@ export function CreatePage() {
                 />
               )}
             </div>
-            <div className="flex space-x-2">
-              <Button
-                title={t('common.download')}
-                aria-label={t('common.download')}
-                variant="outline"
-                onClick={handleDownloadQR}
-              >
-                <IconDownload className="size-4" />
-              </Button>
-            </div>
+            <Button variant="outline" onClick={handleDownloadQR}>
+              <IconDownload />
+              {t('common.download')}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function SummaryItem({
+  icon: Icon,
+  burn = false,
+  children,
+}: {
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+  burn?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <li className="flex min-w-0 items-start gap-1.5 break-words">
+      <Icon className={cn('mt-0.5 size-3.5 shrink-0', burn && 'text-ember')} aria-hidden />
+      <span className="min-w-0">{children}</span>
+    </li>
+  );
+}
+
+function SecretField({
+  id,
+  label,
+  value,
+  isMasked,
+  onToggleMask,
+  showLabel,
+  hideLabel,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  isMasked: boolean;
+  onToggleMask: () => void;
+  showLabel: string;
+  hideLabel: string;
+}) {
+  const toggleLabel = isMasked ? showLabel : hideLabel;
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>{label}</Label>
+      <div className="relative">
+        <Input
+          id={id}
+          value={value}
+          readOnly
+          autoComplete="off"
+          spellCheck={false}
+          className="pr-11 font-mono text-[13px] md:text-[13px]"
+        />
+        <button
+          type="button"
+          onClick={onToggleMask}
+          title={toggleLabel}
+          aria-label={toggleLabel}
+          aria-pressed={!isMasked}
+          className="absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {isMasked ? (
+            <IconEyeOff className="size-4" aria-hidden />
+          ) : (
+            <IconEye className="size-4" aria-hidden />
+          )}
+        </button>
+      </div>
     </div>
   );
 }

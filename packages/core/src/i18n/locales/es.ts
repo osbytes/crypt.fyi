@@ -2,6 +2,9 @@ import type { TranslationKeys } from '../types';
 
 export const es: TranslationKeys = {
   common: {
+    newSecret: 'Nuevo secreto',
+    skipToContent: 'Saltar al contenido',
+    theme: { label: 'Tema', system: 'Sistema', light: 'Claro', dark: 'Oscuro' },
     createSecret: 'Crear Secreto',
     starOnGithub: 'Estrella en GitHub',
     features: 'Características',
@@ -30,6 +33,15 @@ export const es: TranslationKeys = {
     },
   },
   landing: {
+    demo: {
+      badge: 'Código abierto · autoalojable',
+      browser: 'En tu navegador',
+      server: 'En nuestro servidor',
+      afterRead: 'Después de leerlo',
+      nothing: 'nada',
+      burned: 'Destruido',
+      ariaLabel: 'Cómo cambia un secreto desde tu navegador hasta su eliminación',
+    },
     title: 'Compartir Secretos de Conocimiento Cero',
     subtitle:
       'Cifra en tu navegador. Comparte una vez. Desaparece para siempre. Cifrado post-cuántico de extremo a extremo — nuestros servidores nunca ven tus secretos.',
@@ -93,8 +105,10 @@ export const es: TranslationKeys = {
     },
   },
   create: {
+    encryptedHere: 'Cifrado en este navegador',
     form: {
       content: {
+        attach: 'Adjuntar un archivo (máx. {{max}})',
         label: 'Contenido secreto',
         placeholder: 'Ingresa tu contenido secreto aquí...',
         fileHint: 'agrega un archivo arrastrándolo o haciendo clic aquí (máx 1 MB)',
@@ -103,6 +117,8 @@ export const es: TranslationKeys = {
         invalidFileType: 'Tipo de archivo no válido',
       },
       password: {
+        show: 'Mostrar contraseña',
+        hide: 'Ocultar contraseña',
         label: 'Contraseña',
         placeholder: 'Opcional (pero recomendado)',
       },
@@ -148,6 +164,16 @@ export const es: TranslationKeys = {
       },
     },
     success: {
+      tagline: 'Copia el enlace y envíalo. Solo se muestra aquí, una vez.',
+      oneLink: 'Un enlace',
+      separate: 'Enlace + clave por separado',
+      qrLabel: 'Código QR',
+      confirmDelete: {
+        title: '¿Eliminar este secreto?',
+        description:
+          'El enlace dejará de funcionar de inmediato. Esta acción no se puede deshacer.',
+        cancel: 'Conservar secreto',
+      },
       title: '¡Secreto Creado!',
       description: {
         main: 'Tu secreto ha sido creado. Elige una opción para compartirlo.',
@@ -207,6 +233,11 @@ export const es: TranslationKeys = {
     },
   },
   view: {
+    gate: {
+      title: 'Alguien ha compartido un secreto contigo',
+      description:
+        'Se descifra en este navegador. Abrirlo puede eliminarlo para siempre, así que ten preparado un lugar seguro donde guardarlo.',
+    },
     notFound: {
       title: 'Secreto No Encontrado',
       description: 'Este secreto puede haber expirado o sido eliminado.',
@@ -269,7 +300,7 @@ export const es: TranslationKeys = {
       showContent: 'Mostrar contenido',
       copyToClipboard: 'Copiar al portapapeles',
       copiedToClipboard: 'Secreto copiado al portapapeles',
-      clickToReveal: 'Haz clic en el ícono del ojo arriba para revelar el secreto',
+      clickToReveal: 'Haz clic para revelar el secreto',
       passwordProtected:
         'Este secreto está protegido con contraseña. Haz clic para ingresar la contraseña.',
       ariaLabel: 'Contenido secreto',
