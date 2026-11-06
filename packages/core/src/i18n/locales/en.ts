@@ -387,7 +387,8 @@ export const en: TranslationKeys = {
         tls: 'TLS encryption for all API communications',
         expiration: 'Automatic data expiration with configurable Time-To-Live (TTL)',
         deletion: 'Secure deletion of data after access or expiration',
-        storage: 'No persistent storage of sensitive information',
+        storage:
+          'Secrets reach disk only in encrypted form and deleted entries can remain there until the log is next compacted; plaintext and keys are never stored',
       },
     },
     thirdParty: {

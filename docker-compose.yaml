@@ -5,6 +5,12 @@ services:
     # TTL'd and must never be silently dropped, so use noeviction: once the cap
     # is hit, new writes are rejected (surfacing pressure) rather than evicting
     # live secrets. Tune REDIS_MAXMEMORY to the host.
+    #
+    # Secrets survive restarts through an AOF synced before each write is
+    # acknowledged (SPECIFICATION.md 6.2), so a burn can't be undone by a crash.
+    # RDB save points stay off because restoring an older snapshot could bring a
+    # burned secret back. The low rewrite threshold limits how long deleted
+    # entries remain in the log on small instances.
     command:
       - redis-server
       - --maxmemory
@@ -12,8 +18,13 @@ services:
       - --maxmemory-policy
       - noeviction
       - --save
-      - '900'
-      - '1'
+      - ''
+      - --appendonly
+      - 'yes'
+      - --appendfsync
+      - always
+      - --auto-aof-rewrite-min-size
+      - 1mb
       - --loglevel
       - warning
     volumes:
