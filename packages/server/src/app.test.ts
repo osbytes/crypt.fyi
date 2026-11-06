@@ -6,7 +6,7 @@ import type { AddressInfo } from 'node:net';
 import { pino } from 'pino';
 import { createRedisVault } from './vault/redis.js';
 import { createTokenGenerator } from './vault/tokens.js';
-import { createNopWebhookSender } from './webhook.js';
+import { createNopWebhookSender, type Message } from './webhook.js';
 import { Redis } from 'ioredis';
 import { Client } from 'undici';
 import { machine, type CreateVaultRequest } from '@crypt.fyi/core';
@@ -376,6 +376,129 @@ describe('app', () => {
 
     expect(decryptedIps).toBe('192.168.1.1,10.0.0.0/24');
     expect(decryptedWhU).toBe('https://example.com/webhook');
+  });
+
+  describe('verification hash and delete token at rest', () => {
+    const m = { encryption: { algorithm: 'aes-256-gcm' as const } };
+    const createEntry = async (body: Partial<CreateVaultRequest> = {}) => {
+      const response = await testContext.client.request({
+        method: 'POST',
+        path: '/vault',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          c: 'secret-content',
+          b: false,
+          h: 'abc123',
+          ttl: 60_000,
+          m,
+          ...body,
+        } satisfies CreateVaultRequest),
+      });
+      expect(response.statusCode).toBe(201);
+      return (await response.body.json()) as { id: string; dt: string };
+    };
+    const read = (id: string, h: string) =>
+      testContext.client.request({
+        method: 'GET',
+        path: `/vault/${id}?h=${encodeURIComponent(h)}`,
+      });
+    const remove = (id: string, dt: string) =>
+      testContext.client.request({
+        method: 'DELETE',
+        path: `/vault/${id}`,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dt }),
+      });
+    const stored = async (id: string) =>
+      JSON.parse((await testContext.redis.get(`vault:${id}`))!) as Record<string, unknown>;
+
+    it('stores neither value in plaintext', async () => {
+      const { id, dt } = await createEntry();
+      const raw = (await testContext.redis.get(`vault:${id}`))!;
+
+      expect(raw).not.toContain('abc123');
+      expect(raw).not.toContain(dt);
+      expect(machine.isDigest((await stored(id)).h as string)).toBe(true);
+      expect(machine.isEncrypted((await stored(id)).dt as string)).toBe(true);
+    });
+
+    it('verifies with the original hash and rejects the stored digest', async () => {
+      const { id } = await createEntry();
+      const { h: storedH } = await stored(id);
+
+      expect((await read(id, storedH as string)).statusCode).toBe(400);
+      expect((await read(id, 'abc123')).statusCode).toBe(200);
+    });
+
+    it('does not let a stored delete token delete the entry', async () => {
+      const { id, dt } = await createEntry();
+      const { dt: storedDt } = await stored(id);
+
+      expect((await remove(id, storedDt as string)).statusCode).toBe(404);
+      expect((await remove(id, dt)).statusCode).toBe(200);
+    });
+
+    it('produces different digests for the same hash on different entries', async () => {
+      const [a, b] = await Promise.all([createEntry(), createEntry()]);
+      expect((await stored(a.id)).h).not.toBe((await stored(b.id)).h);
+    });
+
+    it('still serves entries written before this scheme', async () => {
+      const seed = async (id: string, dt: string) =>
+        testContext.redis.set(
+          `vault:${id}`,
+          JSON.stringify({ c: 'c', h: 'legacyhash', b: false, dt, ttl: 60_000, cd: Date.now(), m }),
+          'PX',
+          60_000,
+        );
+
+      await seed('legacy-read', 'legacy-dt-1');
+      expect((await read('legacy-read', 'wrong')).statusCode).toBe(400);
+      expect((await read('legacy-read', 'legacyhash')).statusCode).toBe(200);
+      await testContext.redis.del('vault:legacy-read');
+
+      await seed('legacy-delete', 'legacy-dt-2');
+      expect((await remove('legacy-delete', 'nope')).statusCode).toBe(404);
+      expect((await remove('legacy-delete', 'legacy-dt-2')).statusCode).toBe(200);
+    });
+
+    it('sends the original delete token to webhooks', async () => {
+      const messages: Message[] = [];
+      const vault = createRedisVault(
+        testContext.redis,
+        createTokenGenerator({ vaultEntryIdentifierLength: 20, vaultEntryDeleteTokenLength: 20 }),
+        { send: async (message) => void messages.push(message) },
+        'foobar',
+      );
+      const { id, dt } = await vault.set({
+        c: 'c',
+        h: 'abc123',
+        b: false,
+        ttl: 60_000,
+        m,
+        wh: { u: 'https://example.com/webhook', r: true, fpk: false, fip: false, b: false },
+      });
+
+      await vault.get(id, 'abc123', '127.0.0.1');
+
+      expect(messages).toHaveLength(1);
+      expect(messages[0]?.dt).toBe(dt);
+    });
+
+    it('fails without using up attempts when the encryption key has changed', async () => {
+      const { id } = await createEntry({ fc: 1 });
+      const rotated = createRedisVault(
+        testContext.redis,
+        createTokenGenerator({ vaultEntryIdentifierLength: 20, vaultEntryDeleteTokenLength: 20 }),
+        createNopWebhookSender(),
+        'a-different-key',
+      );
+
+      await expect(rotated.get(id, 'abc123', '127.0.0.1')).rejects.toThrow();
+
+      expect((await stored(id)).fc).toBe(1);
+      expect((await read(id, 'abc123')).statusCode).toBe(200);
+    });
   });
 
   it('deletes vault entry', async () => {

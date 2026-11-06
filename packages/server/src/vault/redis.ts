@@ -24,6 +24,11 @@ const parseResult = async (result: string, encryptionKey: string) => {
       // ignore - this maintains backward compatibility with existing vault entries that don't have ips encrypted
     }
   }
+  // Entries written before delete tokens were encrypted hold them in plaintext
+  // and stay readable until they expire (at most the max TTL).
+  if (typeof jsonParsed.dt === 'string' && machine.isEncrypted(jsonParsed.dt)) {
+    jsonParsed.dt = await machine.decrypt(jsonParsed.dt, encryptionKey);
+  }
   return vaultValueSchema.parse(jsonParsed);
 };
 
@@ -34,6 +39,9 @@ export const createRedisVault = (
   encryptionKey: string,
 ): Vault => {
   const getKey = (id: string) => `vault:${id}`;
+  // Binding the digest to the entry id stops a digest being moved between
+  // entries and hides whether two entries share a verification hash.
+  const digestH = (id: string, h: string) => machine.digest(h, encryptionKey, `vault-h:${id}`);
 
   return {
     async set(value) {
@@ -42,9 +50,12 @@ export const createRedisVault = (
 
       const key = getKey(id);
 
-      const [encryptedIps, encryptedWhU] = await Promise.all([
+      // The delete token is encrypted rather than digested because webhook
+      // payloads must carry the original value back to the creator.
+      const [encryptedIps, encryptedWhU, encryptedDt] = await Promise.all([
         ips ? machine.encrypt(ips, encryptionKey) : undefined,
         wh ? machine.encrypt(wh.u, encryptionKey) : undefined,
+        machine.encrypt(dt, encryptionKey),
       ]);
 
       // Single atomic SET with NX + PX: only creates the key if absent AND sets
@@ -54,10 +65,10 @@ export const createRedisVault = (
         key,
         JSON.stringify({
           c,
-          h,
+          h: digestH(id, h),
           b,
           fc,
-          dt,
+          dt: encryptedDt,
           ttl,
           cd: Date.now(),
           m,
@@ -84,7 +95,17 @@ export const createRedisVault = (
         return undefined;
       }
 
-      const { ips, c, b, ttl, cd, dt, wh, m } = await parseResult(result, encryptionKey);
+      const {
+        h: storedH,
+        ips,
+        c,
+        b,
+        ttl,
+        cd,
+        dt,
+        wh,
+        m,
+      } = await parseResult(result, encryptionKey);
       if (!isIpAllowed(ip, ips)) {
         if (wh?.fip) {
           void webhookSender.send({
@@ -98,6 +119,12 @@ export const createRedisVault = (
         }
         return undefined;
       }
+
+      // The stored format decides the comparison, never the request. Accepting
+      // either form would let someone holding a Redis dump submit the stored
+      // digest as `h`. Entries without a digest predate this scheme and expire
+      // within the max TTL.
+      const expectedH = machine.isDigest(storedH) ? digestH(id, h) : h;
 
       const outcome = (await redis.eval(
         // https://redis.io/docs/latest/develop/interact/programmability/lua-api/
@@ -167,7 +194,7 @@ export const createRedisVault = (
 `,
         1,
         key,
-        h,
+        expectedH,
       )) as string | null;
       if (!outcome) {
         return undefined;
