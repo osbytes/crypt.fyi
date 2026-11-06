@@ -44,7 +44,7 @@ test.describe('theme', () => {
   test('applies the stored theme before the app bundle renders', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'light' });
     await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
-    // Block the bundle: only public/theme-init.js can have set the class.
+    // Block the bundle: only theme-init.js can have set the class.
     await page.route('**/assets/*.js', (route) => route.abort());
     await page.goto('/about');
     expect(await isDark(page)).toBe(true);

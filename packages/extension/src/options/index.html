@@ -6,46 +6,128 @@
     <title>crypt.fyi settings</title>
   </head>
   <body>
-    <main class="mx-auto max-w-xl px-5 py-10 sm:py-14">
-      <header class="mb-8">
-        <p class="text-sm font-semibold tracking-wide text-ink-muted">Browser extension</p>
-        <h1 class="mt-1 text-3xl font-semibold tracking-tight text-ink sm:text-4xl">crypt.fyi</h1>
-        <p class="mt-3 max-w-prose text-[0.95rem] leading-relaxed text-ink-muted">
+    <main class="mx-auto max-w-2xl px-4 py-8 sm:py-12">
+      <header class="mb-6">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <img src="/48.png" alt="" width="40" height="40" class="size-10 rounded-lg" />
+            <div>
+              <h1 class="font-display text-2xl font-semibold tracking-tight">crypt.fyi</h1>
+              <p class="text-sm text-muted-foreground">Browser extension</p>
+            </div>
+          </div>
+          <div
+            role="group"
+            aria-label="Theme"
+            class="inline-flex gap-0.5 rounded-lg border bg-card p-0.5"
+          >
+            <button
+              type="button"
+              class="theme-option"
+              data-theme-option="system"
+              aria-label="System"
+              title="System"
+              aria-pressed="true"
+            >
+              <svg
+                class="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 5a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10"
+                />
+                <path d="M7 20h10" />
+                <path d="M9 16v4" />
+                <path d="M15 16v4" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="theme-option"
+              data-theme-option="light"
+              aria-label="Light"
+              title="Light"
+              aria-pressed="false"
+            >
+              <svg
+                class="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                <path
+                  d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="theme-option"
+              data-theme-option="dark"
+              aria-label="Dark"
+              title="Dark"
+              aria-pressed="false"
+            >
+              <svg
+                class="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <p class="mt-5 text-sm leading-relaxed text-muted-foreground">
           Defaults used when you encrypt text from the context menu.
         </p>
         <p
           id="status"
-          class="mt-4 hidden rounded-md border border-line bg-ok-soft px-3 py-2.5 text-sm text-ink"
+          class="mt-4 hidden rounded-lg bg-sealed-tint px-3 py-2.5 text-sm text-foreground"
           role="status"
         ></p>
         <p
           id="errors"
-          class="mt-4 hidden whitespace-pre-wrap rounded-md border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger"
+          class="mt-4 hidden rounded-lg bg-ember-tint px-3 py-2.5 text-sm whitespace-pre-wrap text-ember"
           role="alert"
         ></p>
       </header>
 
-      <form id="settings-form" class="space-y-8" novalidate>
-        <section class="space-y-4 border-t border-line pt-6">
-          <h2 class="text-sm font-semibold uppercase tracking-[0.08em] text-ink-muted">
-            Endpoints
-          </h2>
-          <label class="block space-y-1.5">
-            <span class="text-sm font-semibold text-ink">API URL</span>
+      <form id="settings-form" class="space-y-4" novalidate>
+        <section class="card">
+          <h2 class="card-title">Endpoints</h2>
+          <label class="field">
+            <span class="field-label">API URL</span>
             <input id="apiUrl" name="apiUrl" type="url" autocomplete="off" required />
           </label>
-          <label class="block space-y-1.5">
-            <span class="text-sm font-semibold text-ink">Web URL</span>
+          <label class="field">
+            <span class="field-label">Web URL</span>
             <input id="webUrl" name="webUrl" type="url" autocomplete="off" required />
           </label>
         </section>
 
-        <section class="space-y-4 border-t border-line pt-6">
-          <h2 class="text-sm font-semibold uppercase tracking-[0.08em] text-ink-muted">
-            Secret defaults
-          </h2>
-          <label class="block space-y-1.5">
-            <span class="text-sm font-semibold text-ink">Time to live</span>
+        <section class="card">
+          <h2 class="card-title">Secret defaults</h2>
+          <label class="field">
+            <span class="field-label">Time to live</span>
             <!-- Options are also filled in HTML so the dropdown works even if JS is slow to hydrate -->
             <select id="ttl" name="ttl">
               <option value="300000">5 minutes</option>
@@ -58,17 +140,17 @@
               <option value="604800000">7 days</option>
             </select>
           </label>
-          <label class="flex items-start gap-3 rounded-md border border-line bg-muted px-3 py-3">
-            <input id="burn" name="burn" type="checkbox" class="mt-1 size-4 accent-primary" />
-            <span class="text-sm leading-snug text-ink">
-              <span class="font-semibold">Burn after reading</span>
-              <span class="mt-0.5 block text-ink-muted"
+          <label class="flex items-start gap-3 rounded-lg border bg-muted px-3 py-3">
+            <input id="burn" name="burn" type="checkbox" class="mt-0.5" />
+            <span class="text-sm leading-snug">
+              <span class="font-medium">Burn after reading</span>
+              <span class="mt-0.5 block text-muted-foreground"
                 >Delete the secret after the first successful read.</span
               >
             </span>
           </label>
-          <label class="block space-y-1.5">
-            <span class="text-sm font-semibold text-ink">IP / CIDR allow-list</span>
+          <label class="field">
+            <span class="field-label">IP / CIDR allow-list</span>
             <input
               id="ips"
               name="ips"
@@ -76,26 +158,26 @@
               placeholder="203.0.113.1, 198.51.100.0/24"
               autocomplete="off"
             />
-            <span class="text-xs text-ink-muted">Comma-separated, max 3 entries</span>
+            <span class="field-hint">Comma-separated, max 3 entries</span>
           </label>
           <div class="grid gap-4 sm:grid-cols-2">
-            <label class="block space-y-1.5">
-              <span class="text-sm font-semibold text-ink">Read count</span>
+            <label class="field">
+              <span class="field-label">Read count</span>
               <input id="rc" name="rc" type="number" min="2" max="10" step="1" />
-              <span class="text-xs text-ink-muted">2–10. Off when burn is enabled.</span>
+              <span class="field-hint">2–10. Off when burn is enabled.</span>
             </label>
-            <label class="block space-y-1.5">
-              <span class="text-sm font-semibold text-ink">Failure count</span>
+            <label class="field">
+              <span class="field-label">Failure count</span>
               <input id="fc" name="fc" type="number" min="1" max="10" step="1" />
-              <span class="text-xs text-ink-muted">Burn after N failed attempts</span>
+              <span class="field-hint">Burn after N failed attempts</span>
             </label>
           </div>
         </section>
 
-        <section class="space-y-4 border-t border-line pt-6">
-          <h2 class="text-sm font-semibold uppercase tracking-[0.08em] text-ink-muted">Webhook</h2>
-          <label class="block space-y-1.5">
-            <span class="text-sm font-semibold text-ink">URL</span>
+        <section class="card">
+          <h2 class="card-title">Webhook</h2>
+          <label class="field">
+            <span class="field-label">URL</span>
             <input
               id="webhookUrl"
               name="webhookUrl"
@@ -104,83 +186,44 @@
               autocomplete="off"
             />
           </label>
-          <label class="block space-y-1.5">
-            <span class="text-sm font-semibold text-ink">Name</span>
+          <label class="field">
+            <span class="field-label">Name</span>
             <input id="webhookName" name="webhookName" type="text" maxlength="50" />
           </label>
-          <fieldset class="space-y-2 rounded-md border border-line bg-muted p-3">
-            <legend class="px-1 text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
-              Events
-            </legend>
-            <label class="flex items-center gap-2.5 text-sm text-ink">
-              <input
-                id="webhookOnRead"
-                name="webhookOnRead"
-                type="checkbox"
-                class="size-4 accent-primary"
-              />
+          <fieldset class="space-y-2.5">
+            <legend class="field-label mb-2.5">Events</legend>
+            <label class="option-row">
+              <input id="webhookOnRead" name="webhookOnRead" type="checkbox" />
               <span>On read</span>
             </label>
-            <label class="flex items-center gap-2.5 text-sm text-ink">
-              <input
-                id="webhookOnFailPassword"
-                name="webhookOnFailPassword"
-                type="checkbox"
-                class="size-4 accent-primary"
-              />
+            <label class="option-row">
+              <input id="webhookOnFailPassword" name="webhookOnFailPassword" type="checkbox" />
               <span>On password/key failure</span>
             </label>
-            <label class="flex items-center gap-2.5 text-sm text-ink">
-              <input
-                id="webhookOnFailIp"
-                name="webhookOnFailIp"
-                type="checkbox"
-                class="size-4 accent-primary"
-              />
+            <label class="option-row">
+              <input id="webhookOnFailIp" name="webhookOnFailIp" type="checkbox" />
               <span>On IP failure</span>
             </label>
-            <label class="flex items-center gap-2.5 text-sm text-ink">
-              <input
-                id="webhookOnBurn"
-                name="webhookOnBurn"
-                type="checkbox"
-                class="size-4 accent-primary"
-              />
+            <label class="option-row">
+              <input id="webhookOnBurn" name="webhookOnBurn" type="checkbox" />
               <span>On burn</span>
             </label>
           </fieldset>
         </section>
 
-        <div class="flex flex-wrap gap-2 border-t border-line pt-6">
-          <button
-            type="submit"
-            class="rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-fg shadow-sm transition hover:opacity-90"
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            id="reset-btn"
-            class="rounded-md border border-line bg-paper-elevated px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-muted"
-          >
-            Reset to defaults
-          </button>
-          <button
-            type="button"
-            id="export-btn"
-            class="rounded-md border border-line bg-paper-elevated px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-muted"
-          >
-            Export JSON
-          </button>
+        <div class="flex flex-wrap gap-2 pt-2">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" id="reset-btn" class="btn btn-outline">Reset to defaults</button>
+          <button type="button" id="export-btn" class="btn btn-outline">Export JSON</button>
           <label
-            class="file-btn inline-flex cursor-pointer items-center rounded-md border border-line bg-paper-elevated px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-muted"
+            class="btn btn-outline"
             title="Replaces all saved overrides with the file contents. Omitted keys fall back to organization/built-in defaults."
           >
             Import JSON (replace)
             <input id="import-input" type="file" accept="application/json,.json" class="sr-only" />
           </label>
         </div>
-        <p class="text-xs leading-relaxed text-ink-muted">
+        <p class="text-xs leading-relaxed text-muted-foreground">
           Import replaces your saved overrides entirely (same as Save). Use Export to capture the
           current effective settings, including cleared optional fields as
           <code class="text-[0.7rem]">null</code>.

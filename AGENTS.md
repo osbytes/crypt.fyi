@@ -15,6 +15,7 @@ pnpm + Turborepo monorepo (`Node >= 22`, Active LTS 26 in `.nvmrc`/CI/Docker; `p
 | `@crypt.fyi/server` | Fastify API + Redis |
 | `@crypt.fyi/cli` | npm CLI |
 | `@crypt.fyi/extension` | Chrome extension |
+| `@crypt.fyi/theme` | Design tokens, fonts and theme logic shared by web and extension (private, no build) |
 
 Encryption/decryption and key material live in `@crypt.fyi/core` and must stay client-side. The server stores ciphertext and verification hashes only — never plaintext secrets or raw keys/passwords.
 
@@ -57,6 +58,10 @@ When adding or changing UI copy:
 1. Add/update keys in `types.ts`
 2. Update **every** locale file (`en`, `es`, `de`, `fr`, `zh`)
 3. Register new languages in `index.ts` (`resources` + `supportedLanguages`)
+
+## Theming
+
+Change colors, fonts, radii and theme behavior in `packages/theme`, not per package, so web and the extension stay in step. UI components are not shared: web uses React/shadcn and the extension settings page is plain HTML.
 
 ## Coding norms
 

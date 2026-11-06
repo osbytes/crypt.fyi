@@ -5,6 +5,7 @@ import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
+import { themeInitScript } from '@crypt.fyi/theme/vite';
 import { loadProductionCsp } from './csp';
 
 const getGitHash = () => {
@@ -28,7 +29,7 @@ const previewCsp = process.env.CRYPT_FYI_PREVIEW_CSP ?? loadProductionCsp(apiUrl
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), TanStackRouterVite(), svgr()],
+  plugins: [react(), TanStackRouterVite(), svgr(), themeInitScript()],
   server: {
     port: 5173,
   },
