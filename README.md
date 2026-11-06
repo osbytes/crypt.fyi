@@ -102,7 +102,7 @@ The compose file stores Redis data in the `redis_data` volume using an append-on
 
 What this means for operators:
 
-- **The disk holds sensitive data.** The volume contains ciphertext, keyed digests of verification hashes and encrypted delete tokens, but never plaintext or decryption keys. The digests and tokens rely on `ENCRYPTION_KEY`, so keep that key off this disk where you can. A deleted secret's ciphertext can remain in the AOF until Redis next compacts it, so encrypt the disk.
+- **The disk holds sensitive data.** The volume contains ciphertext, keyed digests of verification hashes and encrypted delete tokens, but never plaintext or decryption keys. The digests and tokens rely on `ENCRYPTION_KEY`, so keep that key off this disk where you can. Once a secret is deleted, the server never returns it, even if its ciphertext remains in the AOF until Redis next compacts it. Encrypt the disk.
 - **Don't back up the volume.** Restoring a backup can bring back burned secrets.
 - **Writes are slower** than without persistence, because each one waits for the disk.
 - **`docker compose down -v` deletes the volume** and every unexpired secret with it.

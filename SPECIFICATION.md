@@ -63,7 +63,7 @@ Abstract
    o  Web Client (Browser-based interface)
    o  Web Server (Static file server)
    o  API Server
-   o  Data Store (Redis, holding entries until they expire or are burned)
+   o  Data Store (currently Redis, holding entries until they are deleted)
 
 ### 2.2. Component Interaction Flow
 
@@ -272,24 +272,31 @@ Abstract
 ### 6.2. Data Security
 
    - Data MUST have automatic expiration (TTL: 1 second to 7 days)
-   - Burn after reading MUST use atomic Redis operations
+   - Burn after reading MUST use atomic data store operations
    - Read count limits MUST NOT exceed 10 reads
    - Failed attempt limits MUST be between 1-10 attempts before burning
-   - Implementations MAY keep data in memory only, in which case a data
-     store restart loses all unexpired entries
-   - Implementations that persist data MUST use an append-only log that is
-     synced to disk before each write is acknowledged (in Redis,
-     `appendonly yes` and `appendfsync always`), so that an acknowledged
-     burn or delete survives a crash
-   - Implementations MUST NOT recover from periodic snapshots (Redis RDB save
-     points), because restoring one can bring back a burned entry
-   - Backups of persisted data SHOULD NOT be taken, for the same reason
+   - Implementations MAY persist data to disk or keep it in memory only. A
+     memory-only data store loses all unexpired entries when it restarts
    - Persisted data MUST NOT include plaintext secrets, encryption keys, or
      passwords
-   - Data MUST be deleted upon expiration or burning. A deleted entry can
-     remain in an append-only log until the log is next compacted, so
-     implementations SHOULD compact it regularly and SHOULD encrypt the
-     underlying disk
+   - An entry is deleted when it expires, is burned, exhausts its failed
+     attempts, or is removed with its delete token. Deletion carries two
+     separate guarantees:
+     - Deleted entries MUST NOT be released. Deciding to release an entry
+       and deleting it MUST be a single atomic operation, so that concurrent
+       requests cannot race, and once an entry is deleted the server MUST NOT
+       release it through the API. This MUST also hold after a data store
+       restart or crash: an acknowledged deletion MUST be durable, and
+       recovery MUST NOT restore a deleted entry. Backups of persisted data
+       SHOULD NOT be taken, because restoring one can bring back deleted
+       entries
+     - Deleted entries MUST be purged. The data store MUST release any
+       snapshot, memory, or other reference to a deleted entry as soon as is
+       possible at scale. Data that remains on disk but cannot be released
+       through the API is acceptable until the data store is able to purge
+       it, which SHOULD happen as soon as it can. Implementations SHOULD
+       encrypt the underlying disk, because purging does not guarantee that
+       the physical blocks are erased
    - The verification hash MUST NOT be stored in plaintext; servers MUST store
      a keyed digest (HMAC-SHA-256) bound to the vault ID, so a datastore dump
      alone cannot be replayed to read or burn an entry
@@ -333,10 +340,16 @@ Abstract
 
 ### 7.1. Storage Requirements
 
-#### 7.1.1. Redis Configuration
+#### 7.1.1. Data Store Configuration
 
-   - Implementations MUST meet the persistence requirements in Section 6.2
-     (Redis recommended)
+   - Implementations MUST meet the requirements in Section 6.2 through a data
+     store adapter. Redis is the current adapter; others, such as PostgreSQL
+     or SQLite, MAY be added if they meet the same requirements
+   - The Redis adapter, when persisting data, MUST use `appendonly yes` and
+     `appendfsync always` so that a deletion is on disk before it is
+     acknowledged. RDB save points MUST be disabled, because restoring an
+     older snapshot can bring back a deleted entry. Deleted data is purged
+     when Redis rewrites the append-only file
    - TTL per entry MUST be configurable (1 second to 7 days)
    - Automatic expiration and cleanup MUST be implemented
    - Atomic operations MUST be used for critical functions:
@@ -348,8 +361,9 @@ Abstract
 
    - Implementations MUST support concurrent access
    - Data consistency MUST be maintained using atomic transactions
-   - Atomic operations SHOULD use Lua scripts to prevent race conditions
-   - Concurrent read/delete operations MUST be handled properly
+   - Atomic operations SHOULD use the data store's native mechanism to prevent
+     race conditions (Lua scripts in Redis)
+   - Concurrent read/delete operations MUST meet the guarantees in Section 6.2
 
 #### 7.1.3. Performance Requirements
 
