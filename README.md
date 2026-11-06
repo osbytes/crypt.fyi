@@ -96,6 +96,18 @@ It runs with `NODE_ENV=production` and requires `REDIS_URL` and `ENCRYPTION_KEY`
 
 The web client image is not published to GHCR yet; build it with `docker compose` as above.
 
+#### Redis is memory-only
+
+The compose file runs Redis with RDB and AOF disabled and no data volume, because the [specification](./SPECIFICATION.md) forbids persistent storage: a snapshot would keep ciphertext, verification hashes and delete tokens on disk after a secret is burned. As a result, **any Redis restart, including recreating the container during an upgrade, drops all unexpired secrets and queued webhooks**. Their links stop working, and undelivered webhooks are not sent. Rate-limit counters reset too.
+
+If you deployed before persistence was disabled, your old volume still holds a snapshot and is no longer used. Delete it (`docker volume ls` shows the name, usually `<project>_redis_data`):
+
+```bash
+docker volume rm <project>_redis_data
+```
+
+If you run Redis any other way (the GHCR image with your own Redis, a managed service, a hosting platform), set `save ""` and `appendonly no` and don't attach a volume yourself, since Redis snapshots by default and these settings aren't applied by the server.
+
 ### Railway
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/Pmkrsc?referralCode=ToZEjF&utm_medium=integration&utm_source=template&utm_campaign=generic)

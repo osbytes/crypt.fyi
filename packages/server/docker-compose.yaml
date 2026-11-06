@@ -1,10 +1,16 @@
 services:
   redis:
     image: redis:latest
+    # Memory only, matching the root docker-compose.yaml. The image snapshots by
+    # default, so persistence has to be turned off explicitly.
+    command:
+      - redis-server
+      - --save
+      - ''
+      - --appendonly
+      - 'no'
     ports:
       - '6379:6379'
-    volumes:
-      - redis_data:/data
   jaeger:
     image: jaegertracing/all-in-one:latest
     environment:
@@ -12,6 +18,3 @@ services:
     ports:
       - 16686:16686
       - 4318:4318
-
-volumes:
-  redis_data:
