@@ -151,7 +151,6 @@ export interface TranslationKeys {
       };
     };
     success: {
-      sealed: string;
       tagline: string;
       oneLink: string;
       separate: string;
@@ -214,7 +213,7 @@ export interface TranslationKeys {
     };
   };
   view: {
-    gate: { title: string; description: string; notice: string };
+    gate: { title: string; description: string };
     notFound: {
       title: string;
       description: string;

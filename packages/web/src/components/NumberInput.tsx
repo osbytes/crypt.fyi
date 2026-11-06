@@ -97,7 +97,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     };
 
     return (
-      <div className="flex min-w-0 items-center">
+      <div className="relative min-w-0">
         <NumericFormat
           value={value}
           onValueChange={handleChange}
@@ -113,16 +113,17 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           prefix={prefix}
           customInput={Input}
           placeholder={placeholder}
-          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none rounded-r-none relative"
+          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none pr-10"
           getInputRef={ref}
           {...props}
         />
 
-        <div className="flex shrink-0 flex-col">
+        <div className="absolute inset-y-1 right-1 flex w-8 flex-col">
           <Button
             aria-label="Increase value"
-            className="px-2 h-[22px] rounded-l-none rounded-br-none border-input border-l-0 border-b-[0.5px] focus-visible:relative"
-            variant="outline"
+            className="h-1/2 w-full rounded-sm p-0"
+            variant="ghost"
+            type="button"
             onClick={(e) => {
               e.preventDefault();
               handleIncrement();
@@ -133,8 +134,9 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           </Button>
           <Button
             aria-label="Decrease value"
-            className="px-2 h-[22px] rounded-l-none rounded-tr-none border-input border-l-0 border-t-[0.5px] focus-visible:relative"
-            variant="outline"
+            className="h-1/2 w-full rounded-sm p-0"
+            variant="ghost"
+            type="button"
             onClick={(e) => {
               e.preventDefault();
               handleDecrement();

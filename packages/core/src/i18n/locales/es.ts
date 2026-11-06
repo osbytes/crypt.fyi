@@ -164,7 +164,6 @@ export const es: TranslationKeys = {
       },
     },
     success: {
-      sealed: 'Sellado',
       tagline: 'Copia el enlace y envíalo. Solo se muestra aquí, una vez.',
       oneLink: 'Un enlace',
       separate: 'Enlace + clave por separado',
@@ -238,7 +237,6 @@ export const es: TranslationKeys = {
       title: 'Alguien ha compartido un secreto contigo',
       description:
         'Se descifra en este navegador. Abrirlo puede eliminarlo para siempre, así que ten preparado un lugar seguro donde guardarlo.',
-      notice: 'Nuestro servidor no puede leerlo',
     },
     notFound: {
       title: 'Secreto No Encontrado',

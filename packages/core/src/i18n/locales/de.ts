@@ -163,7 +163,6 @@ export const de: TranslationKeys = {
       },
     },
     success: {
-      sealed: 'Versiegelt',
       tagline: 'Kopiere den Link und sende ihn. Er wird nur hier und nur einmal angezeigt.',
       oneLink: 'Ein Link',
       separate: 'Link + Schlüssel getrennt',
@@ -237,7 +236,6 @@ export const de: TranslationKeys = {
       title: 'Jemand hat ein Geheimnis mit dir geteilt',
       description:
         'Es wird in diesem Browser entschlüsselt. Beim Öffnen wird es möglicherweise endgültig gelöscht, halte also einen sicheren Ort dafür bereit.',
-      notice: 'Unser Server kann es nicht lesen',
     },
     notFound: {
       title: 'Geheimnis nicht gefunden',

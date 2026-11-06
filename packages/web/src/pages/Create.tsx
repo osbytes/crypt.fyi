@@ -917,7 +917,7 @@ export function CreatePage() {
                     onOpenChange={setIsAdvancedConfigurationOpen}
                     className="rounded-xl border bg-card"
                   >
-                    <CollapsibleTrigger className="group flex min-h-12 w-full items-center justify-between gap-2 rounded-xl px-5 text-sm font-semibold focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
+                    <CollapsibleTrigger className="group flex min-h-12 w-full items-center justify-between gap-2 rounded-xl px-5 text-sm font-semibold focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
                       <span className="inline-block first-letter:uppercase">
                         {t('create.form.advanced.toggle')}
                       </span>
@@ -1022,7 +1022,7 @@ export function CreatePage() {
                           )}
                         />
                         {form.watch('whu') && (
-                          <div className="space-y-4 rounded-lg bg-muted p-4">
+                          <div className="space-y-4 rounded-lg border p-4">
                             <FormField
                               control={form.control}
                               name="whn"
@@ -1128,18 +1128,12 @@ export function CreatePage() {
             transition={{ duration: 0.2 }}
             className="mx-auto max-w-2xl space-y-5"
           >
-            <div className="flex flex-col items-start gap-2.5">
-              <Pill tone="sealed">
-                <IconLock aria-hidden />
-                {t('create.success.sealed')}
-              </Pill>
-              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+            <div className="space-y-1.5">
+              <h2 className="flex items-center gap-2.5 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+                <IconLock className="size-6 shrink-0 text-sealed" aria-hidden />
                 {t('create.success.title')}
               </h2>
               <p className="text-muted-foreground">{t('create.success.tagline')}</p>
-              {form.watch('p') && (
-                <p className="font-medium">{t('create.success.description.password')}</p>
-              )}
             </div>
 
             <Card className="space-y-5 p-4 sm:p-6">
@@ -1282,41 +1276,38 @@ export function CreatePage() {
 
               <hr />
 
-              <div className="flex flex-wrap gap-2">
-                <Pill>
-                  <IconClock aria-hidden />
+              <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-[13px] text-muted-foreground">
+                <SummaryItem icon={IconClock}>
                   {t('create.success.info.expires', {
                     time:
                       ttlOptions.find((option) => option.value === form.watch('ttl'))?.label ?? '',
                   })}
-                </Pill>
+                </SummaryItem>
                 {form.watch('b') && (
-                  <Pill tone="ember">
-                    <IconFlame aria-hidden />
+                  <SummaryItem icon={IconFlame} burn>
                     {t('create.success.info.burn')}
-                  </Pill>
+                  </SummaryItem>
                 )}
                 {form.watch('fc') && (
-                  <Pill tone="ember">
-                    <IconFlame aria-hidden />
+                  <SummaryItem icon={IconFlame} burn>
                     {t('create.success.info.failureCount', { count: form.watch('fc') })}
-                  </Pill>
+                  </SummaryItem>
                 )}
                 {form.watch('p') && (
-                  <Pill>
-                    <IconLock aria-hidden />
-                    {t('create.success.info.passwordProtected')}
-                  </Pill>
+                  <SummaryItem icon={IconLock}>
+                    {t('create.success.info.passwordProtected')} ·{' '}
+                    <span className="font-medium text-foreground">
+                      {t('create.success.description.password')}
+                    </span>
+                  </SummaryItem>
                 )}
                 {form.watch('rc') && (
-                  <Pill>
-                    <IconEye aria-hidden />
+                  <SummaryItem icon={IconEye}>
                     {t('create.success.info.readCount', { count: form.watch('rc') })}
-                  </Pill>
+                  </SummaryItem>
                 )}
                 {form.watch('ips') && (
-                  <Pill className="break-all">
-                    <IconNetwork aria-hidden />
+                  <SummaryItem icon={IconNetwork}>
                     {t('create.success.info.ipRestrictions', {
                       ips: form
                         .watch('ips')
@@ -1324,11 +1315,10 @@ export function CreatePage() {
                         .map((ip) => ip.trim())
                         .join(', '),
                     })}
-                  </Pill>
+                  </SummaryItem>
                 )}
                 {form.watch('whu') && (
-                  <Pill className="break-all">
-                    <IconWebhook aria-hidden />
+                  <SummaryItem icon={IconWebhook}>
                     {t('create.success.info.webhook', {
                       url: form.watch('whu'),
                       events: [
@@ -1340,9 +1330,9 @@ export function CreatePage() {
                         .filter(Boolean)
                         .join(', '),
                     })}
-                  </Pill>
+                  </SummaryItem>
                 )}
-              </div>
+              </ul>
             </Card>
 
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1435,6 +1425,23 @@ export function CreatePage() {
   );
 }
 
+function SummaryItem({
+  icon: Icon,
+  burn = false,
+  children,
+}: {
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+  burn?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <li className="flex min-w-0 items-start gap-1.5 break-words">
+      <Icon className={cn('mt-0.5 size-3.5 shrink-0', burn && 'text-ember')} aria-hidden />
+      <span className="min-w-0">{children}</span>
+    </li>
+  );
+}
+
 function SecretField({
   id,
   label,
@@ -1464,7 +1471,7 @@ function SecretField({
           readOnly
           autoComplete="off"
           spellCheck={false}
-          className="border-border bg-muted pr-11 font-mono text-[13px] md:text-[13px]"
+          className="pr-11 font-mono text-[13px] md:text-[13px]"
         />
         <button
           type="button"

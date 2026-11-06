@@ -164,7 +164,6 @@ export const fr: TranslationKeys = {
       },
     },
     success: {
-      sealed: 'Scellé',
       tagline: "Copiez le lien et envoyez-le. Il n'est affiché qu'ici, une seule fois.",
       oneLink: 'Un seul lien',
       separate: 'Lien + clé séparés',
@@ -238,7 +237,6 @@ export const fr: TranslationKeys = {
       title: "Quelqu'un a partagé un secret avec vous",
       description:
         "Il est déchiffré dans ce navigateur. L'ouvrir peut le supprimer définitivement : prévoyez un endroit sûr où le conserver.",
-      notice: 'Notre serveur ne peut pas le lire',
     },
     notFound: {
       title: 'Secret Non Trouvé',

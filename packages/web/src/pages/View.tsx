@@ -9,14 +9,7 @@ import { StatusCard } from '@/components/StatusCard';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button/button';
 import { toast } from 'sonner';
-import {
-  IconEyeOff,
-  IconCopy,
-  IconFlame,
-  IconDownload,
-  IconClock,
-  IconLock,
-} from '@tabler/icons-react';
+import { IconEyeOff, IconCopy, IconFlame, IconDownload, IconClock } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { clipboardCopy } from '@/lib/clipboardCopy';
 import { formatDistanceToNow } from 'date-fns';
@@ -264,10 +257,6 @@ function VaultView({ id, isPasswordSet }: VaultViewProps) {
         >
           {t('view.actions.viewSecret')}
         </Button>
-        <Pill tone="sealed">
-          <IconLock aria-hidden />
-          {t('view.gate.notice')}
-        </Pill>
       </StatusCard>
     );
   }

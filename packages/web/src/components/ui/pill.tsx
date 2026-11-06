@@ -8,8 +8,8 @@ const pillVariants = cva(
     variants: {
       tone: {
         neutral: 'bg-card text-muted-foreground',
-        ember: 'border-transparent bg-ember-tint text-ember',
-        sealed: 'border-transparent bg-sealed-tint text-sealed',
+        ember: 'border-ember/30 bg-ember-tint text-ember',
+        sealed: 'border-sealed/30 bg-sealed-tint text-sealed',
       },
     },
     defaultVariants: { tone: 'neutral' },

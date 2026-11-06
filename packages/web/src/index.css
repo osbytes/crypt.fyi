@@ -5,9 +5,11 @@
 @layer base {
   /*
     Semantic tokens only: components never pick a shade per theme. Text tokens hold
-    WCAG AA (4.5:1) on background, card and muted in both themes; --input holds the
-    3:1 required for control boundaries. --background is mirrored in
-    public/theme-init.js and src/theme/theme.ts for the browser chrome color.
+    WCAG AA (4.5:1) on background, card and muted in both themes. --input holds 3:1 for
+    controls with no other affordance (checkbox, switch) and is the hover border on
+    fields, which otherwise read through their fill and label to stay visually quiet.
+    --background is mirrored in public/theme-init.js and src/theme/theme.ts for the
+    browser chrome color.
   */
   :root {
     color-scheme: light;

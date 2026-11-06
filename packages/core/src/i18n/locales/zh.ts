@@ -157,7 +157,6 @@ export const zh: TranslationKeys = {
       },
     },
     success: {
-      sealed: '已封存',
       tagline: '复制链接并发送。它只会在这里显示一次。',
       oneLink: '单个链接',
       separate: '链接和密钥分开',
@@ -227,7 +226,6 @@ export const zh: TranslationKeys = {
     gate: {
       title: '有人与你分享了一个密文',
       description: '它会在此浏览器中解密。打开后可能会被永久删除，请先准备好安全的保存位置。',
-      notice: '我们的服务器无法读取它',
     },
     notFound: {
       title: '未找到密文',

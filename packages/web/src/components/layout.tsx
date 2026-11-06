@@ -93,7 +93,7 @@ export function Layout({ children }: LayoutProps) {
                   }
                 }}
               >
-                <SelectTrigger aria-label="Language" className="h-9 w-auto gap-1.5 px-2.5">
+                <SelectTrigger aria-label="Language" className="h-9 w-auto gap-1.5 bg-card px-2.5">
                   <IconLanguage className="size-4 text-muted-foreground" aria-hidden />
                   <span className="max-sm:sr-only">
                     <SelectValue />

@@ -161,7 +161,6 @@ export const en: TranslationKeys = {
       },
     },
     success: {
-      sealed: 'Sealed',
       tagline: 'Copy the link and send it. It is only shown here, once.',
       oneLink: 'One link',
       separate: 'Link + key separately',
@@ -234,7 +233,6 @@ export const en: TranslationKeys = {
       title: 'Someone shared a secret with you',
       description:
         'It decrypts in this browser. Opening it may delete it for good, so have somewhere safe to put it first.',
-      notice: "Our server can't read it",
     },
     notFound: {
       title: 'Secret Not Found',
