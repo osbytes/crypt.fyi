@@ -63,8 +63,8 @@ overrides:
   # node-notifier / web-ext-run still declare uuid@8; CJS named exports remain compatible
   uuid: 11.1.1
   # Selective overrides for vulnerable ranges previously pinned under Yarn.
-  'glob@>=10.2.0 <10.5.0': '>=10.5.0'
-  'glob@>=11.0.0 <11.1.0': '>=11.1.0'
+  # GHSA-3g3m-2fjr-6pw4 (AbortSignal cancellation bypass) + earlier selective glob pins; only 14.0.2+ is patched
+  glob@>=9.0.0 <14.0.2: ^14.0.2
   'undici@>=6.25.0 <6.27.0': 6.27.0
   # Prefer exact patched majors; range overrides below catch other semver shapes.
   'js-yaml@3': 3.15.2
@@ -88,3 +88,11 @@ overrides:
   source-map-js@<1.2.2: ^1.2.2
   # OTel gRPC exporters -> @grpc/grpc-js: getAuthContext unauthorized certs
   '@grpc/grpc-js@>=1.14.0 <1.14.5': ^1.14.5
+  # GHSA-g3hv-75wg-m249 (globparts amplification DoS); only 11.0.1+ is patched
+  minimatch@>=7.0.0 <11.0.1: ^11.0.1
+  # web-ext-run -> adbkit: PEM/TLS DoS, PKCS#12 MAC forgery, basicConstraints bypass, AES-GCM tag bypass, and others fixed in 1.4.1
+  node-forge@<1.4.1: ^1.4.1
+  # @tanstack/router-core: GHSA-p6vx-979v-rg4c and fromJSON DoS / callable-invocation / script-injection fixes through 1.6.10
+  seroval@<1.6.10: ^1.6.10
+  # Released in lockstep with seroval
+  seroval-plugins@<1.6.10: ^1.6.10
