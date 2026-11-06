@@ -394,7 +394,8 @@ export const fr: TranslationKeys = {
         tls: 'Chiffrement TLS pour toutes les communications API',
         expiration: 'Expiration automatique des données avec durée de vie configurable (TTL)',
         deletion: 'Suppression sécurisée des données après accès ou expiration',
-        storage: "Pas de stockage persistant d'informations sensibles",
+        storage:
+          "Les secrets n'atteignent le disque que chiffrés et les entrées supprimées peuvent y rester jusqu'au prochain compactage du journal ; le texte en clair et les clés ne sont jamais stockés",
       },
     },
     thirdParty: {

@@ -393,7 +393,8 @@ export const es: TranslationKeys = {
         tls: 'Cifrado TLS para todas las comunicaciones API',
         expiration: 'Vencimiento automático de datos con tiempo de vida configurable (TTL)',
         deletion: 'Eliminación segura de datos después del acceso o vencimiento',
-        storage: 'Sin almacenamiento persistente de información sensible',
+        storage:
+          'Los secretos solo llegan al disco cifrados y las entradas eliminadas pueden permanecer allí hasta la siguiente compactación del registro; el texto plano y las claves nunca se almacenan',
       },
     },
     thirdParty: {

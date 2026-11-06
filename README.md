@@ -96,17 +96,44 @@ It runs with `NODE_ENV=production` and requires `REDIS_URL` and `ENCRYPTION_KEY`
 
 The web client image is not published to GHCR yet; build it with `docker compose` as above.
 
-#### Redis is memory-only
+#### Redis persistence
 
-The compose file runs Redis with RDB and AOF disabled and no data volume, because the [specification](./SPECIFICATION.md) forbids persistent storage: a snapshot would keep ciphertext, verification hashes and delete tokens on disk after a secret is burned. As a result, **any Redis restart, including recreating the container during an upgrade, drops all unexpired secrets and queued webhooks**. Their links stop working, and undelivered webhooks are not sent. Rate-limit counters reset too.
+The compose file stores Redis data in the `redis_data` volume using an append-only file (AOF) that is synced to disk before each write is acknowledged, so secrets and queued webhooks survive restarts and crashes. A secret that was burned stays burned, even after a crash. RDB snapshots stay off because restoring an older snapshot could bring a burned secret back. See the [specification](./SPECIFICATION.md) for the requirements.
 
-If you deployed before persistence was disabled, your old volume still holds a snapshot and is no longer used. Delete it (`docker volume ls` shows the name, usually `<project>_redis_data`):
+What this means for operators:
+
+- **The disk holds sensitive data.** The volume contains ciphertext, verification hashes and delete tokens, but never plaintext or decryption keys. A deleted secret's ciphertext can remain in the AOF until Redis next compacts it, so encrypt the disk.
+- **Don't back up the volume.** Restoring a backup can bring back burned secrets.
+- **Writes are slower** than without persistence, because each one waits for the disk.
+- **`docker compose down -v` deletes the volume** and every unexpired secret with it.
+
+To run without persistence, set `--appendonly no` and remove the volume. A Redis restart then drops all unexpired secrets and queued webhooks. If you run Redis any other way (the GHCR image with your own Redis, a managed service, a hosting platform), apply these settings yourself: by default Redis takes snapshots and doesn't use AOF.
+
+##### Upgrading from RDB snapshots
+
+Deployments from before this change store data in a `dump.rdb` snapshot, which Redis ignores once AOF is on. **Upgrading without these steps loses all unexpired secrets**, and the old snapshot stays on disk. Before pulling the new compose file, turn on AOF in the running Redis:
 
 ```bash
-docker volume rm <project>_redis_data
+docker compose exec redis redis-cli config set appendonly yes
 ```
 
-If you run Redis any other way (the GHCR image with your own Redis, a managed service, a hosting platform), set `save ""` and `appendonly no` and don't attach a volume yourself, since Redis snapshots by default and these settings aren't applied by the server.
+Wait until this shows `aof_rewrite_in_progress:0` and `aof_last_bgrewrite_status:ok`:
+
+```bash
+docker compose exec redis redis-cli info persistence
+```
+
+Then pull the new compose file and restart:
+
+```bash
+docker compose up -d
+```
+
+Once you've confirmed existing secrets still open, delete the old snapshot:
+
+```bash
+docker compose exec redis rm /data/dump.rdb
+```
 
 ### Railway
 

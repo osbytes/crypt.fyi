@@ -63,7 +63,7 @@ Abstract
    o  Web Client (Browser-based interface)
    o  Web Server (Static file server)
    o  API Server
-   o  Data Store (Redis for ephemeral storage)
+   o  Data Store (Redis, holding entries until they expire or are burned)
 
 ### 2.2. Component Interaction Flow
 
@@ -273,9 +273,21 @@ Abstract
    - Burn after reading MUST use atomic Redis operations
    - Read count limits MUST NOT exceed 10 reads
    - Failed attempt limits MUST be between 1-10 attempts before burning
-   - Implementation MUST NOT use persistent storage - ephemeral Redis
-     storage only
-   - Data MUST be securely deleted upon expiration or burning
+   - Implementations MAY keep data in memory only, in which case a data
+     store restart loses all unexpired entries
+   - Implementations that persist data MUST use an append-only log that is
+     synced to disk before each write is acknowledged (in Redis,
+     `appendonly yes` and `appendfsync always`), so that an acknowledged
+     burn or delete survives a crash
+   - Implementations MUST NOT recover from periodic snapshots (Redis RDB save
+     points), because restoring one can bring back a burned entry
+   - Backups of persisted data SHOULD NOT be taken, for the same reason
+   - Persisted data MUST NOT include plaintext secrets, encryption keys, or
+     passwords
+   - Data MUST be deleted upon expiration or burning. A deleted entry can
+     remain in an append-only log until the log is next compacted, so
+     implementations SHOULD compact it regularly and SHOULD encrypt the
+     underlying disk
 
 ### 6.3. Access Control
 
@@ -315,7 +327,8 @@ Abstract
 
 #### 7.1.1. Redis Configuration
 
-   - Implementations MUST use ephemeral storage (Redis recommended)
+   - Implementations MUST meet the persistence requirements in Section 6.2
+     (Redis recommended)
    - TTL per entry MUST be configurable (1 second to 7 days)
    - Automatic expiration and cleanup MUST be implemented
    - Atomic operations MUST be used for critical functions:

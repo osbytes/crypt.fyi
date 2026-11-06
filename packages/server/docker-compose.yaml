@@ -1,8 +1,8 @@
 services:
   redis:
     image: redis:latest
-    # Memory only, matching the root docker-compose.yaml. The image snapshots by
-    # default, so persistence has to be turned off explicitly.
+    # Memory only: dev data is disposable. The image snapshots by default, so
+    # persistence has to be turned off explicitly.
     command:
       - redis-server
       - --save

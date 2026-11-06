@@ -6,9 +6,11 @@ services:
     # is hit, new writes are rejected (surfacing pressure) rather than evicting
     # live secrets. Tune REDIS_MAXMEMORY to the host.
     #
-    # Memory only (SPECIFICATION.md 6.2): a snapshot or AOF would keep ciphertext,
-    # verification hashes and delete tokens on disk after a burn. A Redis restart
-    # therefore drops unexpired secrets and queued webhooks.
+    # Secrets survive restarts through an AOF synced before each write is
+    # acknowledged (SPECIFICATION.md 6.2), so a burn can't be undone by a crash.
+    # RDB save points stay off because restoring an older snapshot could bring a
+    # burned secret back. The low rewrite threshold limits how long deleted
+    # entries remain in the log on small instances.
     command:
       - redis-server
       - --maxmemory
@@ -18,9 +20,15 @@ services:
       - --save
       - ''
       - --appendonly
-      - 'no'
+      - 'yes'
+      - --appendfsync
+      - always
+      - --auto-aof-rewrite-min-size
+      - 1mb
       - --loglevel
       - warning
+    volumes:
+      - redis_data:/data
 
   server:
     build:
@@ -46,3 +54,6 @@ services:
       - '${WEB_PORT:-80}:80'
     depends_on:
       - server
+
+volumes:
+  redis_data:

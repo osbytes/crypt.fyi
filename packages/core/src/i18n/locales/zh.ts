@@ -371,7 +371,8 @@ export const zh: TranslationKeys = {
         tls: '所有 API 通信都使用 TLS 加密',
         expiration: '具有可配置生存时间 (TTL) 的自动数据过期',
         deletion: '访问或过期后安全删除数据',
-        storage: '不持久存储敏感信息',
+        storage:
+          '秘密内容仅以加密形式写入磁盘,已删除的条目可能保留到下一次日志压缩;绝不存储明文和密钥',
       },
     },
     thirdParty: {
