@@ -8,6 +8,7 @@ import {
   IconShieldCheck,
   IconCode,
   IconBrandGithub,
+  IconCoffee,
   IconBrandDocker,
   IconTerminal2,
   IconBrandChrome,
@@ -212,6 +213,11 @@ export function LandingPage() {
             href: config.CRYPT_FYI_GITHUB_URL,
             icon: IconBrandGithub,
             label: t('landing.ecosystem.github'),
+          },
+          {
+            href: config.CRYPT_FYI_KOFI_URL,
+            icon: IconCoffee,
+            label: t('landing.ecosystem.kofi'),
           },
         ].map(({ href, icon: Icon, label }) => (
           <a

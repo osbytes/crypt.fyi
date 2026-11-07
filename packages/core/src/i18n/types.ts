@@ -5,6 +5,7 @@ export interface TranslationKeys {
     theme: { label: string; system: string; light: string; dark: string };
     createSecret: string;
     starOnGithub: string;
+    supportOnKofi: string;
     features: string;
     learnMore: string;
     loading: string;
@@ -79,6 +80,7 @@ export interface TranslationKeys {
       cli: string;
       chromeExtension: string;
       github: string;
+      kofi: string;
     };
     steps: {
       encrypt: {
@@ -302,6 +304,9 @@ export interface TranslationKeys {
       signOff: string;
     };
     openSource: {
+      description: string;
+    };
+    support: {
       description: string;
     };
     technical: {

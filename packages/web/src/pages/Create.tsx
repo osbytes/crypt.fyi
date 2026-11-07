@@ -42,6 +42,7 @@ import {
   IconNetwork,
   IconChevronDown,
   IconBrandGithub,
+  IconCoffee,
   IconShare,
   IconFile,
   IconWebhook,
@@ -1351,15 +1352,26 @@ export function CreatePage() {
               </Button>
             </div>
 
-            <a
-              href={config.CRYPT_FYI_GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <IconBrandGithub className="size-4" aria-hidden />
-              {t('common.starOnGithub')}
-            </a>
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+              <a
+                href={config.CRYPT_FYI_GITHUB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <IconBrandGithub className="size-4" aria-hidden />
+                {t('common.starOnGithub')}
+              </a>
+              <a
+                href={config.CRYPT_FYI_KOFI_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <IconCoffee className="size-4" aria-hidden />
+                {t('common.supportOnKofi')}
+              </a>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

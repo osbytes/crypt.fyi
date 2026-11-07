@@ -15,6 +15,7 @@ export const config = Object.freeze({
     'https://railway.com/deploy/Pmkrsc?referralCode=ToZEjF&utm_medium=integration&utm_source=template&utm_campaign=generic',
   CRYPT_FYI_DOCKER_DOCS_URL: 'https://github.com/osbytes/crypt.fyi#docker',
   CRYPT_FYI_SPEC_URL: 'https://github.com/osbytes/crypt.fyi/blob/main/SPECIFICATION.md',
+  CRYPT_FYI_KOFI_URL: 'https://ko-fi.com/osbytes',
   MAX_IP_RESTRICTIONS: 3,
   KEY_LENGTH: 32,
   VERSION: __APP_VERSION__,

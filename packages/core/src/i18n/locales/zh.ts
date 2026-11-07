@@ -7,6 +7,7 @@ export const zh: TranslationKeys = {
     theme: { label: '主题', system: '跟随系统', light: '浅色', dark: '深色' },
     createSecret: '创建密文',
     starOnGithub: '在 GitHub 上标星',
+    supportOnKofi: '在 Ko-fi 上支持我们',
     features: '功能特点',
     learnMore: '了解更多',
     loading: '加载中...',
@@ -85,6 +86,7 @@ export const zh: TranslationKeys = {
       cli: 'CLI',
       chromeExtension: 'Chrome 扩展',
       github: 'GitHub',
+      kofi: 'Ko-fi',
     },
     steps: {
       encrypt: {
@@ -319,6 +321,9 @@ export const zh: TranslationKeys = {
     },
     openSource: {
       description: 'crypt.fyi 开源且可审计。你可以审查实现、自行托管，或在此贡献：',
+    },
+    support: {
+      description: 'crypt.fyi 可免费使用。如果它对你有帮助，你可以在此资助托管和开发：',
     },
     technical: {
       prompt: '想了解更多技术细节？',

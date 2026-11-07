@@ -7,6 +7,7 @@ export const de: TranslationKeys = {
     theme: { label: 'Design', system: 'System', light: 'Hell', dark: 'Dunkel' },
     createSecret: 'Geheimnis erstellen',
     starOnGithub: 'Auf GitHub markieren',
+    supportOnKofi: 'Auf Ko-fi unterstützen',
     features: 'Funktionen',
     learnMore: 'Mehr erfahren',
     loading: 'Lädt...',
@@ -87,6 +88,7 @@ export const de: TranslationKeys = {
       cli: 'CLI',
       chromeExtension: 'Chrome-Erweiterung',
       github: 'GitHub',
+      kofi: 'Ko-fi',
     },
     steps: {
       encrypt: {
@@ -338,6 +340,10 @@ export const de: TranslationKeys = {
     openSource: {
       description:
         'crypt.fyi ist Open Source und prüfbar. Sie können die Implementierung einsehen, selbst hosten oder mitwirken auf',
+    },
+    support: {
+      description:
+        'crypt.fyi ist kostenlos nutzbar. Wenn es Ihnen nützt, können Sie Hosting und Entwicklung unterstützen auf',
     },
     technical: {
       prompt: 'Mehr technische Details?',
