@@ -1,4 +1,4 @@
-import { IconApi, IconBrandGithub, IconLanguage, IconPlus } from '@tabler/icons-react';
+import { IconApi, IconBrandGithub, IconCoffee, IconLanguage, IconPlus } from '@tabler/icons-react';
 import { Button } from './ui/button';
 import { Logo } from './Logo';
 import { Link, useRouterState } from '@tanstack/react-router';
@@ -80,6 +80,22 @@ export function Layout({ children }: LayoutProps) {
                     <IconBrandGithub />
                   </a>
                 </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  asChild
+                  title={t('common.supportOnKofi')}
+                  className="size-9"
+                >
+                  <a
+                    href={config.CRYPT_FYI_KOFI_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={t('common.supportOnKofi')}
+                  >
+                    <IconCoffee />
+                  </a>
+                </Button>
               </nav>
               <ThemeToggle />
               <Select
@@ -150,6 +166,14 @@ export function Layout({ children }: LayoutProps) {
                 className={footerLinkClass}
               >
                 API
+              </a>
+              <a
+                href={config.CRYPT_FYI_KOFI_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={footerLinkClass}
+              >
+                Ko-fi
               </a>
               <a
                 href="https://www.osbytes.io"

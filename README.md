@@ -32,6 +32,9 @@
   <a href="https://github.com/osbytes/crypt.fyi/tree/main/packages/core/src/i18n/locales" target="_blank">
     <img src="https://img.shields.io/badge/i18n-✓-blue?logo=translate" alt="i18n" />
   </a>
+  <a href="https://ko-fi.com/osbytes" target="_blank">
+    <img src="https://img.shields.io/badge/Ko--fi-Support-FF5E5B?logo=ko-fi&logoColor=white" alt="Support on Ko-fi" />
+  </a>
 </p>
 
 ## Features
@@ -204,3 +207,7 @@ Publishable packages: `@crypt.fyi/core` and `@crypt.fyi/cli` (npm), plus the Chr
 ## Contributing
 
 Contributions are welcome! Please feel free to submit an [Issue](https://github.com/osbytes/crypt.fyi/issues) or [Pull Request](https://github.com/osbytes/crypt.fyi/pulls) on [GitHub](https://github.com/osbytes/crypt.fyi).
+
+## Support
+
+crypt.fyi is free to use. If it's useful to you, you can help fund hosting and development on [Ko-fi](https://ko-fi.com/osbytes).

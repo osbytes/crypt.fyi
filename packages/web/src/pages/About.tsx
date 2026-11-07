@@ -1,6 +1,6 @@
 import { config } from '@/config';
 import { Link } from '@tanstack/react-router';
-import { IconBrandGithub, IconFileDescription } from '@tabler/icons-react';
+import { IconBrandGithub, IconCoffee, IconFileDescription } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button/button';
 
@@ -41,7 +41,7 @@ export function About() {
         </section>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <section className="space-y-3 rounded-xl border bg-card p-6">
           <IconBrandGithub className="size-5 text-muted-foreground" aria-hidden />
           <p className="leading-relaxed text-muted-foreground">
@@ -68,6 +68,21 @@ export function About() {
               className="prose-link"
             >
               {t('about.technical.specLink')}
+            </a>
+            .
+          </p>
+        </section>
+        <section className="space-y-3 rounded-xl border bg-card p-6">
+          <IconCoffee className="size-5 text-muted-foreground" aria-hidden />
+          <p className="leading-relaxed text-muted-foreground">
+            {t('about.support.description')}{' '}
+            <a
+              href={config.CRYPT_FYI_KOFI_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="prose-link"
+            >
+              Ko-fi
             </a>
             .
           </p>
