@@ -57,8 +57,6 @@ overrides:
   '@opentelemetry/core': 2.12.0
   '@opentelemetry/propagator-jaeger': 2.12.0
   '@babel/core': 7.29.6
-  # swagger-ui still declares ^9.x; 10.1.2 is the first line with the path-bypass fixes
-  '@fastify/static': 10.1.2
   adm-zip: 0.6.1
   # node-notifier / web-ext-run still declare uuid@8; CJS named exports remain compatible
   uuid: 11.1.1

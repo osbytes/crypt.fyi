@@ -13,7 +13,6 @@ overrides:
   '@opentelemetry/core': 2.12.0
   '@opentelemetry/propagator-jaeger': 2.12.0
   '@babel/core': 7.29.6
-  '@fastify/static': 10.1.2
   adm-zip: 0.6.1
   uuid: 11.1.1
   glob@>=9.0.0 <14.0.2: ^14.0.2
@@ -260,8 +259,8 @@ importers:
         specifier: ^9.5.1
         version: 9.8.1(supports-color@10.2.2)
       '@fastify/swagger-ui':
-        specifier: ^5.2.3
-        version: 5.2.6
+        specifier: ^6.1.1
+        version: 6.1.3
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.1
@@ -376,7 +375,7 @@ importers:
         version: 8.12.3
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.12)(esbuild@0.25.0)(jiti@2.7.0)(vite@8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0))(yaml@2.9.0)
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.12)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0)
 
   packages/theme:
     dependencies:
@@ -404,7 +403,7 @@ importers:
         version: 8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0)
       vitest:
         specifier: 4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.12)(esbuild@0.25.0)(jiti@2.7.0)(vite@8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0))(yaml@2.9.0)
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.12)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0)
 
   packages/web:
     dependencies:
@@ -573,7 +572,7 @@ importers:
         version: 8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0)
       vitest:
         specifier: 4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.12)(esbuild@0.25.0)(jiti@2.7.0)(vite@8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0))(yaml@2.9.0)
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.12)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0)
 
 packages:
 
@@ -1500,8 +1499,8 @@ packages:
   '@fastify/static@10.1.2':
     resolution: {integrity: sha512-G/g18cG9tLutT/OVyN1AIsHIl9L1UwmJ+S3dkyhVpplIx0nEMicd7RGQ+uJLyhKKF4a3tTcQydccn3Mop1fX+Q==}
 
-  '@fastify/swagger-ui@5.2.6':
-    resolution: {integrity: sha512-OMnms0O5s9wb6wis/K5nlrAMLsgUbr1GA8uphM41IasWe3AFdgxz6r/3bA9HTxlDNUYc2FGGKeqMp3ntxmSiNA==}
+  '@fastify/swagger-ui@6.1.3':
+    resolution: {integrity: sha512-gEV0wqNx9yBqTUAw0TOpVQRtHPxehk91rVRRTDrWVbi1FnV0R4Vb6qh7jYlqoEiL1/qSix/dhHzmeUbKbgrAGg==}
 
   '@fastify/swagger@9.8.1':
     resolution: {integrity: sha512-VpHMnqZTY8iBZYJE8WWkbKPrXIYWy2rDfIf5qLr6DzZSpQYZ+KxQVcJFiq/AMlvNwI4gCBd66++iUlxXXGT0IQ==}
@@ -7001,7 +7000,6 @@ packages:
       '@vitest/ui': 4.1.12
       happy-dom: '*'
       jsdom: '*'
-      vite: 8.3.5
     peerDependenciesMeta:
       '@edge-runtime/vm':
         optional: true
@@ -8342,10 +8340,10 @@ snapshots:
       fastq: 1.20.1
       glob: 14.0.3
 
-  '@fastify/swagger-ui@5.2.6':
+  '@fastify/swagger-ui@6.1.3':
     dependencies:
       '@fastify/static': 10.1.2
-      fastify-plugin: 5.1.0
+      fastify-plugin: 6.0.0
       openapi-types: 12.1.3
       rfdc: 1.4.1
       yaml: 2.9.0
@@ -10677,7 +10675,7 @@ snapshots:
       obug: 2.1.4
       std-env: 4.2.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.12)(esbuild@0.25.0)(jiti@2.7.0)(vite@8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0))(yaml@2.9.0)
+      vitest: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.12)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0)
 
   '@vitest/expect@4.1.12':
     dependencies:
@@ -14033,7 +14031,7 @@ snapshots:
       jiti: 2.7.0
       yaml: 2.9.0
 
-  vitest@4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.12)(esbuild@0.25.0)(jiti@2.7.0)(vite@8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0))(yaml@2.9.0):
+  vitest@4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.12)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0):
     dependencies:
       '@vitest/expect': 4.1.12
       '@vitest/mocker': 4.1.12(vite@8.3.5(@types/node@22.20.1)(esbuild@0.25.0)(jiti@2.7.0)(yaml@2.9.0))

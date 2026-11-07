@@ -67,6 +67,31 @@ describe('app', () => {
     expect(response.statusCode).toBe(200);
   });
 
+  it('serves the swagger UI, its assets and the OpenAPI document', async () => {
+    const get = (path: string) => testContext.client.request({ method: 'GET', path });
+    const { swaggerUIPath } = testContext.config;
+
+    const page = await get(swaggerUIPath);
+    expect(page.statusCode).toBe(200);
+    const html = await page.body.text();
+    expect(html).toContain('swagger-ui');
+    // helmet's default CSP blocks inline scripts, so the page only works if all of them are external.
+    expect(html).not.toMatch(/<script(?![^>]*\bsrc=)[^>]*>/);
+
+    const bundle = await get(`${swaggerUIPath}/static/swagger-ui-bundle.js`);
+    expect(bundle.statusCode).toBe(200);
+    await bundle.body.dump();
+
+    const initializer = await get(`${swaggerUIPath}/static/swagger-initializer.js`);
+    expect(initializer.statusCode).toBe(200);
+    await initializer.body.dump();
+
+    const spec = await get(`${swaggerUIPath}/json`);
+    expect(spec.statusCode).toBe(200);
+    const { paths } = (await spec.body.json()) as { paths: Record<string, unknown> };
+    expect(paths).toHaveProperty('/vault');
+  });
+
   it('retrieves and burns vault entry', async () => {
     const createResponse = await testContext.client.request({
       method: 'POST',
