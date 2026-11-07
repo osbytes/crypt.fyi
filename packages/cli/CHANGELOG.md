@@ -1,5 +1,12 @@
 # @crypt.fyi/cli
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`60fd59f`](https://github.com/osbytes/crypt.fyi/commit/60fd59f2af031e2c7bfee01ce097141cd598ee3c)]:
+  - @crypt.fyi/core@0.1.1
+
 ## 0.1.0
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @crypt.fyi/web
 
+## 0.1.1
+
+### Patch Changes
+
+- [#166](https://github.com/osbytes/crypt.fyi/pull/166) [`60fd59f`](https://github.com/osbytes/crypt.fyi/commit/60fd59f2af031e2c7bfee01ce097141cd598ee3c) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Add Ko-fi support links to the web app header, footer, landing page, About page and post-create screen, with translations for the new copy.
+
+- Updated dependencies [[`60fd59f`](https://github.com/osbytes/crypt.fyi/commit/60fd59f2af031e2c7bfee01ce097141cd598ee3c)]:
+  - @crypt.fyi/core@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
