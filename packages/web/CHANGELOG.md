@@ -1,5 +1,20 @@
 # @crypt.fyi/web
 
+## 0.1.0
+
+### Minor Changes
+
+- [#159](https://github.com/osbytes/crypt.fyi/pull/159) [`9c5dee0`](https://github.com/osbytes/crypt.fyi/commit/9c5dee0e8fff3f907aa6aa4ec9a1d597a4c0632c) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Redesign the web app with a new design language, a System/Light/Dark theme system with no flash on load, a clearer recipient flow, and new translations for the added copy.
+
+### Patch Changes
+
+- [#161](https://github.com/osbytes/crypt.fyi/pull/161) [`012b06a`](https://github.com/osbytes/crypt.fyi/commit/012b06a73dfb48f6fee5490ab5cd94446cf11892) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Update dependencies to resolve security advisories, including requiring zod 4.6.6 or later (GHSA-mrhx-c7xc-m3w5) and patched seroval and glob versions.
+
+- [#165](https://github.com/osbytes/crypt.fyi/pull/165) [`91572c8`](https://github.com/osbytes/crypt.fyi/commit/91572c80cddbc2bee67bbed5d138a502a7b7e21b) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Share design tokens, fonts and theme logic through a new private `@crypt.fyi/theme` package. The extension settings page adopts the redesigned look with a System/Light/Dark control, which also fixes it always rendering dark.
+
+- Updated dependencies [[`58cc940`](https://github.com/osbytes/crypt.fyi/commit/58cc940afd424e98ce0ca6da2709333bc7b74ce4), [`c6a41a4`](https://github.com/osbytes/crypt.fyi/commit/c6a41a4600fc8596cba2cf69913275ca83f9fd5c), [`012b06a`](https://github.com/osbytes/crypt.fyi/commit/012b06a73dfb48f6fee5490ab5cd94446cf11892), [`9c5dee0`](https://github.com/osbytes/crypt.fyi/commit/9c5dee0e8fff3f907aa6aa4ec9a1d597a4c0632c)]:
+  - @crypt.fyi/core@0.1.0
+
 ## 0.0.21
 
 ### Patch Changes

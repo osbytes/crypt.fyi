@@ -1,5 +1,14 @@
 # @crypt.fyi/cli
 
+## 0.1.0
+
+### Patch Changes
+
+- [#161](https://github.com/osbytes/crypt.fyi/pull/161) [`012b06a`](https://github.com/osbytes/crypt.fyi/commit/012b06a73dfb48f6fee5490ab5cd94446cf11892) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Update dependencies to resolve security advisories, including requiring zod 4.6.6 or later (GHSA-mrhx-c7xc-m3w5) and patched seroval and glob versions.
+
+- Updated dependencies [[`58cc940`](https://github.com/osbytes/crypt.fyi/commit/58cc940afd424e98ce0ca6da2709333bc7b74ce4), [`c6a41a4`](https://github.com/osbytes/crypt.fyi/commit/c6a41a4600fc8596cba2cf69913275ca83f9fd5c), [`012b06a`](https://github.com/osbytes/crypt.fyi/commit/012b06a73dfb48f6fee5490ab5cd94446cf11892), [`9c5dee0`](https://github.com/osbytes/crypt.fyi/commit/9c5dee0e8fff3f907aa6aa4ec9a1d597a4c0632c)]:
+  - @crypt.fyi/core@0.1.0
+
 ## 0.0.21
 
 ### Patch Changes
