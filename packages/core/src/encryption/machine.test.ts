@@ -1,4 +1,20 @@
-import { encrypt, decrypt, digest, isDigest, isEncrypted } from './machine';
+import {
+  encrypt,
+  decrypt,
+  digest,
+  isDigest,
+  isEncrypted,
+  keyId,
+  keyIdOf,
+  createKeyring,
+  encryptWithKeyring,
+  decryptWithKeyring,
+  digestWithKeyring,
+  digestCandidates,
+  hasPreviousKeys,
+  isOnPrimaryKey,
+} from './machine';
+import { DecryptError } from './encryption';
 import { encrypt as gcmEncrypt } from './gcm';
 
 describe('machine digest', () => {
@@ -55,5 +71,107 @@ describe('machine cipher', () => {
     const legacy = await gcmEncrypt(plaintext, key);
     expect(legacy.startsWith('m1:')).toBe(false);
     expect(await decrypt(legacy, key)).toBe(plaintext);
+  });
+});
+
+describe('machine keyring', () => {
+  const oldKey = 'old-high-entropy-machine-key-0123456789';
+  const newKey = 'new-high-entropy-machine-key-9876543210';
+  const before = createKeyring(oldKey);
+  const rotating = createKeyring(newKey, [oldKey]);
+  const after = createKeyring(newKey);
+
+  it('derives a stable, url-safe id that does not contain the key', () => {
+    expect(keyId(oldKey)).toBe(keyId(oldKey));
+    expect(keyId(oldKey)).not.toBe(keyId(newKey));
+    expect(keyId(oldKey)).toMatch(/^[A-Za-z0-9_-]{8}$/);
+    expect(oldKey).not.toContain(keyId(oldKey));
+  });
+
+  it('uses the first key as primary and ignores duplicates and blanks', () => {
+    const keyring = createKeyring(newKey, [oldKey, newKey, '']);
+    expect(keyring.primaryId).toBe(keyId(newKey));
+    expect([...keyring.keys.keys()]).toEqual([keyId(newKey), keyId(oldKey)]);
+    expect(() => createKeyring('')).toThrow();
+  });
+
+  it('tags ciphertext with the primary key id', async () => {
+    const enc = await encryptWithKeyring('secret', rotating);
+    expect(enc.startsWith(`m2:${keyId(newKey)}:`)).toBe(true);
+    expect(isEncrypted(enc)).toBe(true);
+    expect(keyIdOf(enc)).toBe(keyId(newKey));
+    expect(enc).not.toContain('secret');
+  });
+
+  it('reads values written before a rotation while writing with the new key', async () => {
+    const written = await encryptWithKeyring('secret', before);
+    expect(await decryptWithKeyring(written, rotating)).toBe('secret');
+    expect(keyIdOf(await encryptWithKeyring('secret', rotating))).toBe(keyId(newKey));
+  });
+
+  it('fails once the key a value was written with is removed', async () => {
+    const written = await encryptWithKeyring('secret', before);
+    await expect(decryptWithKeyring(written, after)).rejects.toThrow();
+  });
+
+  it('rejects a ciphertext relabelled with another key id', async () => {
+    const written = await encryptWithKeyring('secret', before);
+    const relabelled = written.replace(keyId(oldKey), keyId(newKey));
+    await expect(decryptWithKeyring(relabelled, rotating)).rejects.toThrow();
+  });
+
+  it('reads m1 and legacy PBKDF2 values under any key in the ring', async () => {
+    const m1 = await encrypt('m1 value', oldKey);
+    const legacy = await gcmEncrypt('legacy value', oldKey);
+    expect(await decryptWithKeyring(m1, rotating)).toBe('m1 value');
+    expect(await decryptWithKeyring(legacy, rotating)).toBe('legacy value');
+    await expect(decryptWithKeyring(m1, after)).rejects.toThrow();
+  });
+
+  it('digests with the primary key and tags the digest', () => {
+    const d = digestWithKeyring('value', rotating, 'ctx');
+    expect(d.startsWith(`hm2:${keyId(newKey)}:`)).toBe(true);
+    expect(isDigest(d)).toBe(true);
+    expect(d).toBe(digestWithKeyring('value', after, 'ctx'));
+    expect(d).not.toBe(digestWithKeyring('value', before, 'ctx'));
+  });
+
+  it('matches stored digests by the key they name', () => {
+    const stored = digestWithKeyring('value', before, 'ctx');
+    expect(digestCandidates(stored, 'value', rotating, 'ctx')).toEqual([stored]);
+    expect(digestCandidates(stored, 'other', rotating, 'ctx')).not.toContain(stored);
+    expect(digestCandidates(stored, 'value', after, 'ctx')).toEqual([]);
+  });
+
+  it('matches hm1 digests under any key and passes pre-digest values through', () => {
+    const hm1 = digest('value', oldKey, 'ctx');
+    expect(digestCandidates(hm1, 'value', rotating, 'ctx')).toContain(hm1);
+    expect(digestCandidates(hm1, 'value', after, 'ctx')).not.toContain(hm1);
+    expect(digestCandidates('abc123', 'abc123', rotating, 'ctx')).toEqual(['abc123']);
+  });
+
+  it('rejects values that cannot be ciphertext without trying each key', async () => {
+    await expect(decryptWithKeyring('192.168.1.1,10.0.0.0/24', rotating)).rejects.toThrow(
+      DecryptError,
+    );
+    await expect(decryptWithKeyring('::1', rotating)).rejects.toThrow(DecryptError);
+  });
+
+  it('tells whether a value was written with the primary key', async () => {
+    expect(await isOnPrimaryKey(await encryptWithKeyring('x', rotating), rotating)).toBe(true);
+    expect(await isOnPrimaryKey(await encryptWithKeyring('x', before), rotating)).toBe(false);
+    expect(await isOnPrimaryKey(await encrypt('x', newKey), rotating)).toBe(true);
+    expect(await isOnPrimaryKey(await encrypt('x', oldKey), rotating)).toBe(false);
+  });
+
+  it('reports whether a keyring holds previous keys', () => {
+    expect(hasPreviousKeys(rotating)).toBe(true);
+    expect(hasPreviousKeys(after)).toBe(false);
+    expect(hasPreviousKeys(createKeyring(newKey, [newKey]))).toBe(false);
+  });
+
+  it('never accepts the stored digest itself as the value', () => {
+    const stored = digestWithKeyring('value', rotating, 'ctx');
+    expect(digestCandidates(stored, stored, rotating, 'ctx')).not.toContain(stored);
   });
 });

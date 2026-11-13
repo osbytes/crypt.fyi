@@ -17,6 +17,7 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc && copyfiles -u 2 \"src/assets/**/*\" dist/assets",
     "start": "node dist/index.js",
+    "keys:rotate": "node dist/rotate-keys.js",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",

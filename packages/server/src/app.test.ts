@@ -26,7 +26,12 @@ const initAppTest = async () => {
     vaultEntryDeleteTokenLength: config.vaultEntryDeleteTokenLength,
   });
   const redis = new Redis();
-  const vault = createRedisVault(redis, tokenGenerator, createNopWebhookSender(), 'foobar');
+  const vault = createRedisVault(
+    redis,
+    tokenGenerator,
+    createNopWebhookSender(),
+    machine.createKeyring('foobar'),
+  );
   const app = await initApp(config, {
     logger,
     vault,
@@ -395,8 +400,8 @@ describe('app', () => {
     expect(parsedValue.wh.u.length).toBeGreaterThan(0);
 
     const [decryptedIps, decryptedWhU] = await Promise.all([
-      machine.decrypt(parsedValue.ips, testContext.config.encryptionKey),
-      machine.decrypt(parsedValue.wh.u, testContext.config.encryptionKey),
+      machine.decryptWithKeyring(parsedValue.ips, machine.createKeyring('foobar')),
+      machine.decryptWithKeyring(parsedValue.wh.u, machine.createKeyring('foobar')),
     ]);
 
     expect(decryptedIps).toBe('192.168.1.1,10.0.0.0/24');
@@ -493,7 +498,7 @@ describe('app', () => {
         testContext.redis,
         createTokenGenerator({ vaultEntryIdentifierLength: 20, vaultEntryDeleteTokenLength: 20 }),
         { send: async (message) => void messages.push(message) },
-        'foobar',
+        machine.createKeyring('foobar'),
       );
       const { id, dt } = await vault.set({
         c: 'c',
@@ -516,7 +521,7 @@ describe('app', () => {
         testContext.redis,
         createTokenGenerator({ vaultEntryIdentifierLength: 20, vaultEntryDeleteTokenLength: 20 }),
         createNopWebhookSender(),
-        'a-different-key',
+        machine.createKeyring('a-different-key'),
       );
 
       await expect(rotated.get(id, 'abc123', '127.0.0.1')).rejects.toThrow();

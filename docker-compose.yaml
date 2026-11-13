@@ -39,6 +39,8 @@ services:
       - PORT=${SERVER_PORT:-4321}
       # Protects verification hashes, delete tokens, IP restrictions and webhook URLs at rest in Redis.
       - ENCRYPTION_KEY=${ENCRYPTION_KEY:?ENCRYPTION_KEY is required (e.g. openssl rand -base64 32)}
+      # Comma-separated keys kept for reading existing entries while rotating ENCRYPTION_KEY (see README).
+      - ENCRYPTION_PREVIOUS_KEYS=${ENCRYPTION_PREVIOUS_KEYS:-}
     ports:
       - '${SERVER_PORT:-4321}:${SERVER_PORT:-4321}'
     depends_on:
