@@ -1,5 +1,11 @@
 # @crypt.fyi/server
 
+## 0.2.0
+
+### Minor Changes
+
+- [#170](https://github.com/osbytes/crypt.fyi/pull/170) [`4d0c330`](https://github.com/osbytes/crypt.fyi/commit/4d0c330fa4248eb9658ff27ae10f9351f3f976bf) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Allow rotating the server's `ENCRYPTION_KEY` without losing unexpired secrets. Data encrypted or digested at rest now records which key wrote it, and the new `ENCRYPTION_PREVIOUS_KEYS` setting keeps old keys available for reads. A new `rotate-keys` command re-encrypts existing entries with the new key and reports when the old key can be removed. Core adds `machine.createKeyring` and keyring-based encrypt, decrypt and digest functions, and `machine.isEncrypted` and `machine.isDigest` also recognise the new formats.
+
 ## 0.1.1
 
 ## 0.1.0
