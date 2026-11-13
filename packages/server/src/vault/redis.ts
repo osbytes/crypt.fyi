@@ -11,14 +11,14 @@ import {
 import { isIpAllowed } from './ips.js';
 import type { WebhookSender } from '../webhook.js';
 
-const parseResult = async (result: string, encryptionKey: string) => {
+const parseResult = async (result: string, keyring: machine.Keyring) => {
   const jsonParsed = JSON.parse(result);
   if ('wh' in jsonParsed && jsonParsed.wh.u) {
-    jsonParsed.wh.u = await machine.decrypt(jsonParsed.wh.u, encryptionKey);
+    jsonParsed.wh.u = await machine.decryptWithKeyring(jsonParsed.wh.u, keyring);
   }
   if (jsonParsed.ips) {
     try {
-      const ips = await machine.decrypt(jsonParsed.ips, encryptionKey);
+      const ips = await machine.decryptWithKeyring(jsonParsed.ips, keyring);
       jsonParsed.ips = ips;
     } catch {
       // ignore - this maintains backward compatibility with existing vault entries that don't have ips encrypted
@@ -27,21 +27,24 @@ const parseResult = async (result: string, encryptionKey: string) => {
   // Entries written before delete tokens were encrypted hold them in plaintext
   // and stay readable until they expire (at most the max TTL).
   if (typeof jsonParsed.dt === 'string' && machine.isEncrypted(jsonParsed.dt)) {
-    jsonParsed.dt = await machine.decrypt(jsonParsed.dt, encryptionKey);
+    jsonParsed.dt = await machine.decryptWithKeyring(jsonParsed.dt, keyring);
   }
   return vaultValueSchema.parse(jsonParsed);
 };
+
+export const VAULT_KEY_PREFIX = 'vault:';
+export const getVaultKey = (id: string) => `${VAULT_KEY_PREFIX}${id}`;
+// Binding the digest to the entry id stops a digest being moved between
+// entries and hides whether two entries share a verification hash.
+export const vaultHashContext = (id: string) => `vault-h:${id}`;
 
 export const createRedisVault = (
   redis: Redis,
   tokenGenerator: TokenGenerator,
   webhookSender: WebhookSender,
-  encryptionKey: string,
+  keyring: machine.Keyring,
 ): Vault => {
-  const getKey = (id: string) => `vault:${id}`;
-  // Binding the digest to the entry id stops a digest being moved between
-  // entries and hides whether two entries share a verification hash.
-  const digestH = (id: string, h: string) => machine.digest(h, encryptionKey, `vault-h:${id}`);
+  const getKey = getVaultKey;
 
   return {
     async set(value) {
@@ -53,9 +56,9 @@ export const createRedisVault = (
       // The delete token is encrypted rather than digested because webhook
       // payloads must carry the original value back to the creator.
       const [encryptedIps, encryptedWhU, encryptedDt] = await Promise.all([
-        ips ? machine.encrypt(ips, encryptionKey) : undefined,
-        wh ? machine.encrypt(wh.u, encryptionKey) : undefined,
-        machine.encrypt(dt, encryptionKey),
+        ips ? machine.encryptWithKeyring(ips, keyring) : undefined,
+        wh ? machine.encryptWithKeyring(wh.u, keyring) : undefined,
+        machine.encryptWithKeyring(dt, keyring),
       ]);
 
       // Single atomic SET with NX + PX: only creates the key if absent AND sets
@@ -65,7 +68,7 @@ export const createRedisVault = (
         key,
         JSON.stringify({
           c,
-          h: digestH(id, h),
+          h: machine.digestWithKeyring(h, keyring, vaultHashContext(id)),
           b,
           fc,
           dt: encryptedDt,
@@ -95,17 +98,7 @@ export const createRedisVault = (
         return undefined;
       }
 
-      const {
-        h: storedH,
-        ips,
-        c,
-        b,
-        ttl,
-        cd,
-        dt,
-        wh,
-        m,
-      } = await parseResult(result, encryptionKey);
+      const { h: storedH, ips, c, b, ttl, cd, dt, wh, m } = await parseResult(result, keyring);
       if (!isIpAllowed(ip, ips)) {
         if (wh?.fip) {
           void webhookSender.send({
@@ -123,8 +116,15 @@ export const createRedisVault = (
       // The stored format decides the comparison, never the request. Accepting
       // either form would let someone holding a Redis dump submit the stored
       // digest as `h`. Entries without a digest predate this scheme and expire
-      // within the max TTL.
-      const expectedH = machine.isDigest(storedH) ? digestH(id, h) : h;
+      // within the max TTL. During a key rotation an hm1 digest may have been
+      // made with any key in the ring, so every candidate is checked.
+      const expectedHs = machine.digestCandidates(storedH, h, keyring, vaultHashContext(id));
+      if (expectedHs.length === 0) {
+        // The entry's key was removed from the keyring. Failing here keeps a
+        // server misconfiguration from counting as a wrong password and
+        // burning the entry through its failed-attempt limit.
+        throw new Error('vault entry digest was made with an encryption key that is not loaded');
+      }
 
       const outcome = (await redis.eval(
         // https://redis.io/docs/latest/develop/interact/programmability/lua-api/
@@ -136,7 +136,14 @@ export const createRedisVault = (
   end
 
   local data = cjson.decode(value)
-  if data.h ~= ARGV[1] then
+  local matched = false
+  for i = 1, #ARGV do
+    if data.h == ARGV[i] then
+      matched = true
+      break
+    end
+  end
+  if not matched then
     -- Handle failed attempts
     if data.fc then
       data.fc = (data.fc or 0) - 1
@@ -194,7 +201,7 @@ export const createRedisVault = (
 `,
         1,
         key,
-        expectedH,
+        ...expectedHs,
       )) as string | null;
       if (!outcome) {
         return undefined;
@@ -271,7 +278,7 @@ export const createRedisVault = (
         return false;
       }
 
-      const { dt: actualDt } = await parseResult(result, encryptionKey);
+      const { dt: actualDt } = await parseResult(result, keyring);
       const dtBuf = Buffer.from(dt);
       const actualDtBuf = Buffer.from(actualDt);
       if (dtBuf.length !== actualDtBuf.length || !timingSafeEqual(dtBuf, actualDtBuf)) {

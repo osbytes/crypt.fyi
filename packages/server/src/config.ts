@@ -89,7 +89,16 @@ const configSchema = z.object({
     .describe(
       'allowed CORS headers (comma-separated) https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers',
     ),
-  encryptionKey: z.string().describe('encryption key'),
+  encryptionKey: z
+    .string()
+    .min(1)
+    .describe('primary key for metadata encrypted or digested at rest; used for all new writes'),
+  encryptionPreviousKeys: z
+    .array(z.string().min(1))
+    .default([])
+    .describe(
+      'retired keys still accepted for reading existing entries during a key rotation (comma-separated)',
+    ),
   otelEnabled: z.coerce.boolean().default(false).describe('enable OpenTelemetry tracing'),
   otelExporterOtlpEndpoint: z.string().describe('OpenTelemetry collector endpoint').optional(),
   otelExporterOtlpHeaders: z
@@ -182,6 +191,9 @@ export const config = (() => {
     corsMethods: process.env.CORS_METHODS,
     corsHeaders: process.env.CORS_HEADERS,
     encryptionKey,
+    encryptionPreviousKeys: process.env.ENCRYPTION_PREVIOUS_KEYS?.split(',')
+      .map((key) => key.trim())
+      .filter(Boolean),
     otelEnabled: process.env.OTEL_ENABLED,
     otelExporterOtlpEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
     otelExporterOtlpHeaders: process.env.OTEL_EXPORTER_OTLP_HEADERS

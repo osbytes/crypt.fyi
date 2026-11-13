@@ -17,6 +17,9 @@ const messageSchema = z.object({
 
 export type Message = z.infer<typeof messageSchema>;
 
+export const WEBHOOK_QUEUE_NAME = 'webhooks';
+const JOB_NAME = 'webhook';
+
 export interface WebhookSender {
   send(message: Message): Promise<void>;
 }
@@ -36,7 +39,7 @@ interface BaseWebhookSenderOptions {
 
 type BullMQWebhookSenderOptions = BaseWebhookSenderOptions & {
   redis: Redis;
-  encryptionKey: string;
+  keyring: machine.Keyring;
   maxAttempts: number;
   backoffType: 'fixed' | 'exponential';
   backoffDelayMs: number;
@@ -50,7 +53,7 @@ type BullMQWebhookSenderOptions = BaseWebhookSenderOptions & {
 export const createBullMQWebhookSender = ({
   logger,
   redis,
-  encryptionKey,
+  keyring,
   requestTimeoutMs,
   maxAttempts,
   backoffType,
@@ -63,9 +66,7 @@ export const createBullMQWebhookSender = ({
   fetchFn = fetch,
   shouldRetry = isRetryableFetchError,
 }: BullMQWebhookSenderOptions): { webhookSender: WebhookSender; cleanup: () => Promise<void> } => {
-  const QUEUE_NAME = 'webhooks';
-  const JOB_NAME = 'webhook';
-  const queue = new Queue<string>(QUEUE_NAME, {
+  const queue = new Queue<string>(WEBHOOK_QUEUE_NAME, {
     connection: redis.options,
     streams: {
       events: {
@@ -83,14 +84,14 @@ export const createBullMQWebhookSender = ({
     },
   });
   const worker = new Worker<string>(
-    QUEUE_NAME,
+    WEBHOOK_QUEUE_NAME,
     async (job) => {
       if (job.name !== JOB_NAME) {
         logger.warn({ job: job.name }, 'skipping unexpected job');
         return;
       }
 
-      const dataString = await machine.decrypt(job.data, encryptionKey);
+      const dataString = await machine.decryptWithKeyring(job.data, keyring);
       const message = messageSchema.parse(JSON.parse(dataString));
 
       const ac = new AbortController();
@@ -142,7 +143,7 @@ export const createBullMQWebhookSender = ({
 
   worker.on('failed', async (job, error) => {
     if (job && job.attemptsMade >= maxAttempts) {
-      const dataString = await machine.decrypt(job.data, encryptionKey);
+      const dataString = await machine.decryptWithKeyring(job.data, keyring);
       const message = messageSchema.parse(JSON.parse(dataString));
       logger.info(
         {
@@ -160,7 +161,10 @@ export const createBullMQWebhookSender = ({
   return {
     webhookSender: {
       send: async (message) => {
-        await queue.add(JOB_NAME, await machine.encrypt(JSON.stringify(message), encryptionKey));
+        await queue.add(
+          JOB_NAME,
+          await machine.encryptWithKeyring(JSON.stringify(message), keyring),
+        );
       },
     },
     cleanup: async () => {

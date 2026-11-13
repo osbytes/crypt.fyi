@@ -302,6 +302,20 @@ Abstract
      alone cannot be replayed to read or burn an entry
    - Delete tokens MUST NOT be stored in plaintext; servers MUST store them
      encrypted so they can be returned in webhook payloads
+   - The server-side key that protects these values MUST be rotatable without
+     making unexpired entries unreadable. Servers SHOULD hold a keyring of one
+     primary key, used for all new writes, and previous keys used only for
+     reads, and SHOULD tag each stored ciphertext and digest with the id of
+     the key that produced it. The reference implementation uses
+     `m2:<kid>:` ciphertexts (AES-256-GCM with an HKDF-derived key, the header
+     bound as associated data) and `hm2:<kid>:` HMAC-SHA-256 digests, where
+     `kid` is derived from the key itself. Encrypted values SHOULD be
+     re-encrypted with the primary key after a rotation. Digests cannot be
+     re-keyed without the original hash, so a previous key MUST stay loaded
+     until every entry digested with it has expired, which the maximum TTL
+     bounds
+   - A read MUST fail without consuming a failed attempt when the entry's key
+     is not loaded, so a misconfigured keyring cannot burn entries
 
 ### 6.3. Access Control
 
@@ -378,7 +392,9 @@ Abstract
 
    Key configuration parameters:
    - `REDIS_URL`: Redis connection string
-   - `ENCRYPTION_KEY`: Server-side encryption key for metadata
+   - `ENCRYPTION_KEY`: Server-side encryption key for metadata (primary key)
+   - `ENCRYPTION_PREVIOUS_KEYS`: Comma-separated previous keys, accepted for
+     reads only while rotating `ENCRYPTION_KEY`
    - `RATE_LIMIT_MAX`: Maximum requests per time window
    - `BODY_LIMIT_BYTES`: Maximum request body size
    - `CORS_ORIGIN`: Allowed CORS origins

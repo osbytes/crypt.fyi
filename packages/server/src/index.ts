@@ -11,10 +11,16 @@ import {
   createHTTPWebhookSender,
   type WebhookSender,
 } from './webhook.js';
-import { createFetchRetryClient } from '@crypt.fyi/core';
+import { createFetchRetryClient, machine } from '@crypt.fyi/core';
 
 const main = async () => {
   const logger = await initLogging(config);
+  const keyring = machine.createKeyring(config.encryptionKey, config.encryptionPreviousKeys);
+  // Key ids are safe to log and let operators confirm which keys a node loaded.
+  logger.info(
+    { primaryKeyId: keyring.primaryId, keyIds: [...keyring.keys.keys()] },
+    'Loaded encryption keyring',
+  );
   const redis = new Redis(config.redisUrl, { family: 0 });
   await redis.ping();
   const tokenGenerator = createTokenGenerator({
@@ -32,7 +38,7 @@ const main = async () => {
       createBullMQWebhookSender({
         logger,
         redis: bullmqRedis,
-        encryptionKey: config.encryptionKey,
+        keyring,
         requestTimeoutMs: config.webhookRequestTimeoutMs,
         maxAttempts: config.webhookMaxAttempts,
         backoffType: config.webhookBackoffType,
@@ -59,7 +65,7 @@ const main = async () => {
     throw new Error(`Invalid webhook sender: ${config.webhookSender}`);
   }
 
-  const vault = createRedisVault(redis, tokenGenerator, webhookSender, config.encryptionKey);
+  const vault = createRedisVault(redis, tokenGenerator, webhookSender, keyring);
 
   const app = await initApp(config, {
     logger,

@@ -85,7 +85,25 @@
 API_URL=https://{your-domain-here} ENCRYPTION_KEY=$(openssl rand -base64 32) docker compose up --build
 ```
 
-`ENCRYPTION_KEY` protects verification hashes, delete tokens, IP restrictions and webhook URLs at rest in Redis. Keep it stable across restarts (e.g. in a `.env` file next to `docker-compose.yaml`); changing it makes all existing secrets unreadable until they expire.
+`ENCRYPTION_KEY` protects verification hashes, delete tokens, IP restrictions and webhook URLs at rest in Redis. Keep it stable across restarts (e.g. in a `.env` file next to `docker-compose.yaml`). Replacing it outright makes all existing secrets unreadable until they expire; to change it without losing any, follow [Rotating `ENCRYPTION_KEY`](#rotating-encryption_key).
+
+#### Rotating `ENCRYPTION_KEY`
+
+The server holds a keyring: `ENCRYPTION_KEY` is the primary key, used for every new write, and `ENCRYPTION_PREVIOUS_KEYS` is a comma-separated list of older keys that are only used to read existing entries. Everything written at rest records which key wrote it, so the server picks the right key on each read.
+
+1. **Generate a new key:** `openssl rand -base64 32`.
+2. **Multiple server instances only: make the new key known everywhere first.** Add the new key to `ENCRYPTION_PREVIOUS_KEYS` on every instance and roll them all out. Otherwise an instance that already writes with the new key can produce entries that an instance still on the old configuration can't read. A single instance can skip this step.
+3. **Promote the new key.** Set `ENCRYPTION_KEY` to the new key and move the old key to `ENCRYPTION_PREVIOUS_KEYS`, then restart every instance. The startup log line `Loaded encryption keyring` shows each key's id (never the key), so you can confirm every instance runs the same keyring.
+4. **Re-encrypt existing entries.** With the same environment as the server, run:
+
+   ```bash
+   docker compose exec server node packages/server/dist/rotate-keys.js
+   ```
+
+   (`pnpm --filter @crypt.fyi/server keys:rotate` outside Docker; add `--dry-run` to report without writing.) It re-encrypts IP restrictions, webhook URLs and delete tokens with the new key, keeping each entry's TTL and never overwriting a concurrent read or burn. It's safe to run repeatedly while the server takes traffic. Verification-hash digests can't be re-keyed, because the server never learns the hash itself, so entries created before step 3 keep needing the old key until they expire. The report's `previousKeysNeededUntil` says when that is (at most the max TTL, 7 days by default).
+5. **Retire the old key.** After `previousKeysNeededUntil` has passed, run the command again. Once it reports `"safeToRemovePreviousKeys": true` (no entry or queued webhook depends on a previous key), remove the old key from `ENCRYPTION_PREVIOUS_KEYS` and restart.
+
+If the old key leaked, you can shorten step 5, but removing it before `previousKeysNeededUntil` makes the remaining older secrets unreadable. Entries already re-encrypted in step 4 no longer expose their IP restrictions, webhook URLs or delete tokens to the old key. A non-zero `unreadable` count in the report means an entry was written with a key that is no longer configured; its secret can't be recovered unless you add that key back.
 
 `API_URL` is read when the web container starts, so changing it only needs a restart (`docker compose up -d`), not a rebuild. It must be a plain `http(s)://host[:port][/path]` URL; the container refuses to start otherwise.
 
@@ -95,7 +113,7 @@ A prebuilt API server image (`linux/amd64`, `linux/arm64`) is published to GHCR 
 docker pull ghcr.io/osbytes/crypt.fyi-server:latest
 ```
 
-It runs with `NODE_ENV=production` and requires `REDIS_URL` and `ENCRYPTION_KEY`.
+It runs with `NODE_ENV=production` and requires `REDIS_URL` and `ENCRYPTION_KEY` (plus `ENCRYPTION_PREVIOUS_KEYS` while [rotating it](#rotating-encryption_key)).
 
 The web client image is not published to GHCR yet; build it with `docker compose` as above.
 
