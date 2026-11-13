@@ -93,7 +93,7 @@ The server holds a keyring: `ENCRYPTION_KEY` is the primary key, used for every 
 
 1. **Generate a new key:** `openssl rand -base64 32`.
 2. **Multiple server instances only: make the new key known everywhere first.** Add the new key to `ENCRYPTION_PREVIOUS_KEYS` on every instance and roll them all out. Otherwise an instance that already writes with the new key can produce entries that an instance still on the old configuration can't read. A single instance can skip this step.
-3. **Promote the new key.** Set `ENCRYPTION_KEY` to the new key and move the old key to `ENCRYPTION_PREVIOUS_KEYS`, then restart every instance. The startup log line `Loaded encryption keyring` shows each key's id (never the key), so you can confirm every instance runs the same keyring.
+3. **Promote the new key.** Set `ENCRYPTION_KEY` to the new key and move the old key to `ENCRYPTION_PREVIOUS_KEYS`, then restart every instance. The startup log line `Loaded encryption keyring` shows how many previous keys each instance loaded.
 4. **Re-encrypt existing entries.** With the same environment as the server, run:
 
    ```bash

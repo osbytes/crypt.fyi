@@ -44,14 +44,12 @@ export const createRedisVault = (
   webhookSender: WebhookSender,
   keyring: machine.Keyring,
 ): Vault => {
-  const getKey = getVaultKey;
-
   return {
     async set(value) {
       const { c, h, b, ttl, ips, rc, wh, fc, m } = value;
       const { id, dt } = await tokenGenerator.generate();
 
-      const key = getKey(id);
+      const key = getVaultKey(id);
 
       // The delete token is encrypted rather than digested because webhook
       // payloads must carry the original value back to the creator.
@@ -90,7 +88,7 @@ export const createRedisVault = (
       return { id, dt };
     },
     async get(id, h, ip) {
-      const key = getKey(id);
+      const key = getVaultKey(id);
 
       // TODO: try to not pull the full redis entry into memory until the ip address is confirmed to be allowed
       const result = await redis.get(key);
@@ -272,7 +270,7 @@ export const createRedisVault = (
       };
     },
     async del(id, dt) {
-      const key = getKey(id);
+      const key = getVaultKey(id);
       const result = await redis.get(key);
       if (!result) {
         return false;
@@ -290,7 +288,7 @@ export const createRedisVault = (
       return delResult === 1;
     },
     async exists(id) {
-      const key = getKey(id);
+      const key = getVaultKey(id);
       const result = await redis.exists(key);
       return result === 1;
     },

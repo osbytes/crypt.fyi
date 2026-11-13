@@ -16,11 +16,9 @@ import { createFetchRetryClient, machine } from '@crypt.fyi/core';
 const main = async () => {
   const logger = await initLogging(config);
   const keyring = machine.createKeyring(config.encryptionKey, config.encryptionPreviousKeys);
-  // Key ids are safe to log and let operators confirm which keys a node loaded.
-  logger.info(
-    { primaryKeyId: keyring.primaryId, keyIds: [...keyring.keys.keys()] },
-    'Loaded encryption keyring',
-  );
+  // Only the count is logged: key ids are derived from the keys, so logging
+  // them would let anyone with log access check guesses of a weak key offline.
+  logger.info({ previousKeyCount: keyring.keys.size - 1 }, 'Loaded encryption keyring');
   const redis = new Redis(config.redisUrl, { family: 0 });
   await redis.ping();
   const tokenGenerator = createTokenGenerator({

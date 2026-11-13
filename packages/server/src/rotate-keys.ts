@@ -14,6 +14,8 @@ import { config } from './config.js';
 import { rotateVaultKeys, countWebhookJobsOnPreviousKeys } from './vault/rotate.js';
 import { WEBHOOK_QUEUE_NAME } from './webhook.js';
 
+const JOB_PAGE_SIZE = 500;
+
 const main = async () => {
   const dryRun = process.argv.includes('--dry-run');
   const keyring = machine.createKeyring(config.encryptionKey, config.encryptionPreviousKeys);
@@ -26,11 +28,21 @@ const main = async () => {
     if (config.webhookSender === 'bullmq') {
       const queue = new Queue<string>(WEBHOOK_QUEUE_NAME, { connection: redis.options });
       try {
-        const jobs = await queue.getJobs(['waiting', 'delayed', 'active', 'paused', 'prioritized']);
-        webhookJobsOnPreviousKeys = countWebhookJobsOnPreviousKeys(
-          jobs.flatMap((job) => (typeof job?.data === 'string' ? [job.data] : [])),
-          keyring,
-        );
+        // Paged per state so a large backlog never has to fit in memory at once.
+        // Jobs moving between states mid-count can be missed or counted twice;
+        // rerunning before removing a key covers that.
+        for (const state of ['waiting', 'delayed', 'active', 'paused', 'prioritized'] as const) {
+          for (let start = 0; ; start += JOB_PAGE_SIZE) {
+            const jobs = await queue.getJobs([state], start, start + JOB_PAGE_SIZE - 1);
+            webhookJobsOnPreviousKeys += await countWebhookJobsOnPreviousKeys(
+              jobs.flatMap((job) => (typeof job?.data === 'string' ? [job.data] : [])),
+              keyring,
+            );
+            if (jobs.length < JOB_PAGE_SIZE) {
+              break;
+            }
+          }
+        }
       } finally {
         await queue.close();
       }
@@ -42,7 +54,7 @@ const main = async () => {
       report.dependentOnPreviousKeys === 0 &&
       webhookJobsOnPreviousKeys === 0;
 
-    // Only key ids and counts are printed, never key material or entry contents.
+    // Only counts are printed, never keys, key ids or entry contents.
     console.log(
       JSON.stringify({ ...report, webhookJobsOnPreviousKeys, safeToRemovePreviousKeys }, null, 2),
     );

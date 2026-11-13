@@ -13,8 +13,19 @@ import { VAULT_KEY_PREFIX } from './redis.js';
 // bounded by the max TTL. The report gives the time after which no entry can
 // depend on a previous key any more.
 
-const ENCRYPTED_FIELDS = ['ips', 'dt', 'wh.u'] as const;
-type EncryptedField = (typeof ENCRYPTED_FIELDS)[number];
+type Entry = Record<string, unknown> & { wh?: Record<string, unknown> };
+
+interface EncryptedField {
+  name: 'ips' | 'dt' | 'wh.u';
+  get: (entry: Entry) => unknown;
+  set: (entry: Entry, value: string) => void;
+}
+
+const ENCRYPTED_FIELDS: readonly EncryptedField[] = [
+  { name: 'ips', get: (e) => e.ips, set: (e, v) => void (e.ips = v) },
+  { name: 'dt', get: (e) => e.dt, set: (e, v) => void (e.dt = v) },
+  { name: 'wh.u', get: (e) => e.wh?.u, set: (e, v) => void (e.wh!.u = v) },
+];
 
 // Writes the new value only if the entry is unchanged since it was read, and
 // keeps its remaining TTL. A concurrent read can decrement rc/fc or burn the
@@ -30,9 +41,11 @@ return 1
 
 const MAX_ATTEMPTS = 3;
 
+// Key ids are derived from the keys, so the report shows only how many keys
+// are loaded: an id would let anyone reading the output check guesses of a
+// weak key offline.
 export interface RotationReport {
-  primaryKeyId: string;
-  previousKeyIds: string[];
+  previousKeyCount: number;
   dryRun: boolean;
   /** Vault entries examined. */
   scanned: number;
@@ -53,22 +66,6 @@ export interface RotationReport {
   /** Dependent entries without a TTL; previous keys stay needed until they are deleted. */
   dependentWithoutTtl: number;
 }
-
-const getField = (entry: Record<string, unknown>, field: EncryptedField): unknown => {
-  if (field === 'wh.u') {
-    const wh = entry.wh as Record<string, unknown> | undefined;
-    return wh?.u;
-  }
-  return entry[field];
-};
-
-const setField = (entry: Record<string, unknown>, field: EncryptedField, value: string) => {
-  if (field === 'wh.u') {
-    (entry.wh as Record<string, unknown>).u = value;
-    return;
-  }
-  entry[field] = value;
-};
 
 type EntryOutcome =
   | { kind: 'gone' }
@@ -91,7 +88,7 @@ const rotateEntry = async (
       return { kind: 'gone' };
     }
 
-    let entry: Record<string, unknown>;
+    let entry: Entry;
     try {
       entry = JSON.parse(raw);
     } catch {
@@ -102,32 +99,45 @@ const rotateEntry = async (
     let dependent = false;
     let unreadable = false;
     for (const field of ENCRYPTED_FIELDS) {
-      const value = getField(entry, field);
+      const value = field.get(entry);
       if (typeof value !== 'string' || machine.keyIdOf(value) === keyring.primaryId) {
         continue;
       }
       // Delete tokens written before they were encrypted are plaintext and
       // carry no machine prefix; the server still reads them as-is. Unprefixed
       // ips or webhook URLs may be legacy PBKDF2 ciphertext, so those are tried.
-      if (field === 'dt' && !machine.isEncrypted(value)) {
+      if (field.name === 'dt' && !machine.isEncrypted(value)) {
         continue;
       }
       try {
         const plaintext = await machine.decryptWithKeyring(value, keyring);
-        setField(entry, field, await machine.encryptWithKeyring(plaintext, keyring));
+        field.set(entry, await machine.encryptWithKeyring(plaintext, keyring));
         changed = true;
+        // A dry run rewrites nothing, so a field still on a previous key keeps
+        // depending on it. m1 values on the primary key are rewrapped only to
+        // gain a key id and depend on nothing else.
+        if (dryRun && !(await machine.isOnPrimaryKey(value, keyring))) {
+          dependent = true;
+        }
       } catch {
         // IP restrictions written before they were encrypted are plaintext,
         // which the server also tolerates.
-        if (field === 'ips' && !machine.isEncrypted(value)) {
+        if (field.name === 'ips' && !machine.isEncrypted(value)) {
           continue;
         }
         unreadable = true;
       }
     }
 
+    // An hm1 digest doesn't record its key, and checking it needs the original
+    // hash, so it can only depend on a previous key if the keyring has one.
     const h = entry.h;
-    if (typeof h === 'string' && machine.isDigest(h) && machine.keyIdOf(h) !== keyring.primaryId) {
+    if (
+      typeof h === 'string' &&
+      machine.isDigest(h) &&
+      machine.keyIdOf(h) !== keyring.primaryId &&
+      machine.hasPreviousKeys(keyring)
+    ) {
       dependent = true;
     }
 
@@ -160,8 +170,7 @@ export const rotateVaultKeys = async ({
   now?: number;
 }): Promise<RotationReport> => {
   const report: RotationReport = {
-    primaryKeyId: keyring.primaryId,
-    previousKeyIds: [...keyring.keys.keys()].filter((id) => id !== keyring.primaryId),
+    previousKeyCount: keyring.keys.size - 1,
     dryRun,
     scanned: 0,
     rewrapped: 0,
@@ -172,6 +181,8 @@ export const rotateVaultKeys = async ({
     dependentWithoutTtl: 0,
   };
   let maxDependentPttl = -1;
+  // SCAN may return a key more than once; count each entry once.
+  const seen = new Set<string>();
 
   let cursor = '0';
   do {
@@ -184,6 +195,10 @@ export const rotateVaultKeys = async ({
     );
     cursor = next;
     for (const key of keys) {
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
       const outcome = await rotateEntry(redis, key, keyring, dryRun);
       if (outcome.kind === 'gone') {
         continue;
@@ -200,9 +215,7 @@ export const rotateVaultKeys = async ({
       if (outcome.rewrapped) {
         report.rewrapped++;
       }
-      // In a dry run nothing was rewritten, so rewrappable fields still depend
-      // on the previous key too.
-      if (outcome.dependent || (dryRun && outcome.rewrapped)) {
+      if (outcome.dependent) {
         report.dependentOnPreviousKeys++;
         if (outcome.pttl < 0) {
           report.dependentWithoutTtl++;
@@ -224,7 +237,15 @@ export const rotateVaultKeys = async ({
  * Jobs live for at most their retry window, so these are left to drain rather
  * than rewritten inside BullMQ's own data structures.
  */
-export const countWebhookJobsOnPreviousKeys = (
+export const countWebhookJobsOnPreviousKeys = async (
   jobData: readonly string[],
   keyring: machine.Keyring,
-): number => jobData.filter((data) => machine.keyIdOf(data) !== keyring.primaryId).length;
+): Promise<number> => {
+  let count = 0;
+  for (const data of jobData) {
+    if (!(await machine.isOnPrimaryKey(data, keyring))) {
+      count++;
+    }
+  }
+  return count;
+};

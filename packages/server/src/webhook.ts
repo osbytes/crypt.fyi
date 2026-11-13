@@ -143,15 +143,25 @@ export const createBullMQWebhookSender = ({
 
   worker.on('failed', async (job, error) => {
     if (job && job.attemptsMade >= maxAttempts) {
-      const dataString = await machine.decryptWithKeyring(job.data, keyring);
-      const message = messageSchema.parse(JSON.parse(dataString));
+      // This listener is async, so a throw here would be an unhandled
+      // rejection. Decrypting fails when the job's key was removed from the
+      // keyring before the queue drained; log what's known without the payload.
+      let message: Message | undefined;
+      try {
+        message = messageSchema.parse(
+          JSON.parse(await machine.decryptWithKeyring(job.data, keyring)),
+        );
+      } catch {
+        message = undefined;
+      }
       logger.info(
         {
           jobId: job.id,
-          id: message.id,
-          event: message.event,
+          id: message?.id,
+          event: message?.event,
           error,
           attempts: job.attemptsMade,
+          ...(message ? {} : { payloadUnreadable: true }),
         },
         'Webhook failed permanently after all retry attempts',
       );

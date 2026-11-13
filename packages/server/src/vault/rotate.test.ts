@@ -109,8 +109,7 @@ describe('encryption key rotation', () => {
     const report = await rotateVaultKeys({ redis, keyring: rotating, now });
 
     expect(report).toMatchObject({
-      primaryKeyId: rotating.primaryId,
-      previousKeyIds: [before.primaryId],
+      previousKeyCount: 1,
       scanned: 1,
       rewrapped: 1,
       unreadable: 0,
@@ -157,6 +156,31 @@ describe('encryption key rotation', () => {
     });
   });
 
+  it('does not report hm1/m1 entries as dependent when there are no previous keys', async () => {
+    const id = 'pre-keyring-primary';
+    await redis.set(
+      getVaultKey(id),
+      JSON.stringify({
+        c: 'ciphertext',
+        h: machine.digest('abc123', NEW_KEY, `vault-h:${id}`),
+        b: false,
+        dt: await machine.encrypt('the-delete-token', NEW_KEY),
+        ttl: 60_000,
+        cd: Date.now(),
+        m,
+      }),
+      'PX',
+      60_000,
+    );
+
+    const dry = await rotateVaultKeys({ redis, keyring: after, dryRun: true });
+    expect(dry).toMatchObject({ previousKeyCount: 0, rewrapped: 1, dependentOnPreviousKeys: 0 });
+
+    const report = await rotateVaultKeys({ redis, keyring: after });
+    expect(report).toMatchObject({ rewrapped: 1, dependentOnPreviousKeys: 0 });
+    expect(machine.keyIdOf((await stored(id)).dt as string)).toBe(after.primaryId);
+  });
+
   it('counts entries whose key was removed too early as unreadable and leaves them alone', async () => {
     const { id } = await create(vaultWith(before));
     const raw = await redis.get(getVaultKey(id));
@@ -179,6 +203,10 @@ describe('encryption key rotation', () => {
       await machine.encryptWithKeyring('{}', rotating),
       await machine.encrypt('{}', OLD_KEY),
     ];
-    expect(countWebhookJobsOnPreviousKeys(jobs, rotating)).toBe(2);
+    expect(await countWebhookJobsOnPreviousKeys(jobs, rotating)).toBe(2);
+    // m1 jobs written with the primary key don't depend on a previous key.
+    expect(
+      await countWebhookJobsOnPreviousKeys([await machine.encrypt('{}', NEW_KEY)], rotating),
+    ).toBe(0);
   });
 });

@@ -11,7 +11,10 @@ import {
   decryptWithKeyring,
   digestWithKeyring,
   digestCandidates,
+  hasPreviousKeys,
+  isOnPrimaryKey,
 } from './machine';
+import { DecryptError } from './encryption';
 import { encrypt as gcmEncrypt } from './gcm';
 
 describe('machine digest', () => {
@@ -145,6 +148,26 @@ describe('machine keyring', () => {
     expect(digestCandidates(hm1, 'value', rotating, 'ctx')).toContain(hm1);
     expect(digestCandidates(hm1, 'value', after, 'ctx')).not.toContain(hm1);
     expect(digestCandidates('abc123', 'abc123', rotating, 'ctx')).toEqual(['abc123']);
+  });
+
+  it('rejects values that cannot be ciphertext without trying each key', async () => {
+    await expect(decryptWithKeyring('192.168.1.1,10.0.0.0/24', rotating)).rejects.toThrow(
+      DecryptError,
+    );
+    await expect(decryptWithKeyring('::1', rotating)).rejects.toThrow(DecryptError);
+  });
+
+  it('tells whether a value was written with the primary key', async () => {
+    expect(await isOnPrimaryKey(await encryptWithKeyring('x', rotating), rotating)).toBe(true);
+    expect(await isOnPrimaryKey(await encryptWithKeyring('x', before), rotating)).toBe(false);
+    expect(await isOnPrimaryKey(await encrypt('x', newKey), rotating)).toBe(true);
+    expect(await isOnPrimaryKey(await encrypt('x', oldKey), rotating)).toBe(false);
+  });
+
+  it('reports whether a keyring holds previous keys', () => {
+    expect(hasPreviousKeys(rotating)).toBe(true);
+    expect(hasPreviousKeys(after)).toBe(false);
+    expect(hasPreviousKeys(createKeyring(newKey, [newKey]))).toBe(false);
   });
 
   it('never accepts the stored digest itself as the value', () => {

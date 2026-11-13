@@ -35,15 +35,27 @@ const DIGEST_PREFIX = 'hm1:';
 // derived from the same machine key.
 const DIGEST_HKDF_INFO = utf8ToBytes('crypt.fyi/machine-digest');
 
+// Keyring formats, described in the keyring section below.
+const KEYED_SCHEME_PREFIX = 'm2:';
+const KEYED_DIGEST_PREFIX = 'hm2:';
+
 const deriveKey = (key: string, salt: Uint8Array): Uint8Array =>
   hkdf(sha256, utf8ToBytes(key), salt, HKDF_INFO, KEY_LENGTH);
 
-// Both cover the keyring formats (m2/hm2) defined below as well as m1/hm1.
+const deriveDigestKey = (key: string): Uint8Array =>
+  hkdf(sha256, utf8ToBytes(key), undefined, DIGEST_HKDF_INFO, KEY_LENGTH);
+
 export const isEncrypted = (value: string): boolean =>
-  value.startsWith(SCHEME_PREFIX) || value.startsWith('m2:');
+  value.startsWith(SCHEME_PREFIX) || value.startsWith(KEYED_SCHEME_PREFIX);
 
 export const isDigest = (value: string): boolean =>
-  value.startsWith(DIGEST_PREFIX) || value.startsWith('hm2:');
+  value.startsWith(DIGEST_PREFIX) || value.startsWith(KEYED_DIGEST_PREFIX);
+
+/** Raw base64 HMAC, shared by the hm1 and hm2 formats. */
+const rawDigest = (value: string, digestKey: Uint8Array, context: string): string => {
+  const message = concatBytes(utf8ToBytes(context), new Uint8Array([0]), utf8ToBytes(value));
+  return Buffer.from(hmac(sha256, digestKey, message)).toString('base64');
+};
 
 /**
  * Deterministic keyed digest, for values that must be compared where the machine
@@ -51,11 +63,8 @@ export const isDigest = (value: string): boolean =>
  * digest to one use and must not contain a NUL byte, which separates it from
  * `value` so the pair is encoded unambiguously.
  */
-export const digest = (value: string, key: string, context: string): string => {
-  const digestKey = hkdf(sha256, utf8ToBytes(key), undefined, DIGEST_HKDF_INFO, KEY_LENGTH);
-  const message = concatBytes(utf8ToBytes(context), new Uint8Array([0]), utf8ToBytes(value));
-  return DIGEST_PREFIX + Buffer.from(hmac(sha256, digestKey, message)).toString('base64');
-};
+export const digest = (value: string, key: string, context: string): string =>
+  DIGEST_PREFIX + rawDigest(value, deriveDigestKey(key), context);
 
 export const encrypt: Encrypt = async (content, key) => {
   try {
@@ -118,16 +127,20 @@ export const decrypt: Decrypt = async (encryptedContent, key) => {
 // so operators never assign or track ids and every server computes the same id
 // for the same key. 48 bits is plenty to tell a handful of live keys apart.
 
-const KEYED_SCHEME_PREFIX = 'm2:';
-const KEYED_DIGEST_PREFIX = 'hm2:';
 const KEY_ID_HKDF_INFO = utf8ToBytes('crypt.fyi/machine-key-id');
 const KEY_ID_LENGTH = 6;
+// Legacy PBKDF2 ciphertext is plain base64. Anything else (such as plaintext IP
+// restrictions from before they were encrypted) can't be one, and skipping it
+// avoids running the deliberately slow PBKDF2 once per key on a hot path.
+const BASE64 = /^[A-Za-z0-9+/]+={0,2}$/;
 
 export interface Keyring {
   /** Id of the key used for new ciphertexts and digests. */
   readonly primaryId: string;
   /** Every key this keyring can read with, primary first. */
   readonly keys: ReadonlyMap<string, string>;
+  /** HMAC key per key id, derived once because every vault read needs one. */
+  readonly digestKeys: ReadonlyMap<string, Uint8Array>;
 }
 
 const toBase64Url = (bytes: Uint8Array): string =>
@@ -160,8 +173,12 @@ export const createKeyring = (primary: string, previous: readonly string[] = [])
     }
     keys.set(id, key);
   }
-  return { primaryId: keyId(primary), keys };
+  const digestKeys = new Map([...keys].map(([id, key]) => [id, deriveDigestKey(key)]));
+  return { primaryId: keyId(primary), keys, digestKeys };
 };
+
+/** Whether the keyring holds any key besides the primary. */
+export const hasPreviousKeys = (keyring: Keyring): boolean => keyring.keys.size > 1;
 
 const primaryKey = (keyring: Keyring): string => {
   const key = keyring.keys.get(keyring.primaryId);
@@ -231,6 +248,10 @@ export const decryptWithKeyring = async (value: string, keyring: Keyring): Promi
     }
   }
 
+  if (!value.startsWith(SCHEME_PREFIX) && !BASE64.test(value)) {
+    throw new DecryptError(new Error('not a machine ciphertext'));
+  }
+
   let lastError: unknown;
   for (const key of keyring.keys.values()) {
     try {
@@ -242,12 +263,37 @@ export const decryptWithKeyring = async (value: string, keyring: Keyring): Promi
   throw lastError instanceof DecryptError ? lastError : new DecryptError(lastError);
 };
 
-const keyedDigest = (value: string, key: string, kid: string, context: string): string =>
-  `${KEYED_DIGEST_PREFIX}${kid}:${digest(value, key, context).slice(DIGEST_PREFIX.length)}`;
+/**
+ * Whether a machine ciphertext was written with the keyring's primary key.
+ * Values without a key id are checked by decrypting with the primary key.
+ */
+export const isOnPrimaryKey = async (value: string, keyring: Keyring): Promise<boolean> => {
+  const kid = keyIdOf(value);
+  if (kid !== undefined) {
+    return kid === keyring.primaryId;
+  }
+  try {
+    await decrypt(value, primaryKey(keyring));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const keyedDigest = (value: string, digestKey: Uint8Array, kid: string, context: string) =>
+  `${KEYED_DIGEST_PREFIX}${kid}:${rawDigest(value, digestKey, context)}`;
+
+const primaryDigestKey = (keyring: Keyring): Uint8Array => {
+  const digestKey = keyring.digestKeys.get(keyring.primaryId);
+  if (digestKey === undefined) {
+    throw new Error('machine keyring is missing its primary key');
+  }
+  return digestKey;
+};
 
 /** Deterministic keyed digest with the keyring's primary key. See {@link digest}. */
 export const digestWithKeyring = (value: string, keyring: Keyring, context: string): string =>
-  keyedDigest(value, primaryKey(keyring), keyring.primaryId, context);
+  keyedDigest(value, primaryDigestKey(keyring), keyring.primaryId, context);
 
 /**
  * The digests of `value` that `stored` could legitimately equal, computed in
@@ -266,11 +312,13 @@ export const digestCandidates = (
 ): string[] => {
   const keyed = splitKeyed(stored, KEYED_DIGEST_PREFIX);
   if (keyed) {
-    const key = keyring.keys.get(keyed.kid);
-    return key === undefined ? [] : [keyedDigest(value, key, keyed.kid, context)];
+    const digestKey = keyring.digestKeys.get(keyed.kid);
+    return digestKey === undefined ? [] : [keyedDigest(value, digestKey, keyed.kid, context)];
   }
   if (isDigest(stored)) {
-    return [...keyring.keys.values()].map((key) => digest(value, key, context));
+    return [...keyring.digestKeys.values()].map(
+      (digestKey) => DIGEST_PREFIX + rawDigest(value, digestKey, context),
+    );
   }
   return [value];
 };
