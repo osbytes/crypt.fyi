@@ -1,5 +1,14 @@
 # @crypt.fyi/web
 
+## 0.2.0
+
+### Patch Changes
+
+- [#168](https://github.com/osbytes/crypt.fyi/pull/168) [`c9fd325`](https://github.com/osbytes/crypt.fyi/commit/c9fd3259264eb94c2ea45e06d95ae1e0e4f3d222) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Refresh the social share image to match the redesigned site, serve it at 1200x630 from an absolute URL with size and alt metadata, and add `pnpm og:image` to regenerate it.
+
+- Updated dependencies [[`4d0c330`](https://github.com/osbytes/crypt.fyi/commit/4d0c330fa4248eb9658ff27ae10f9351f3f976bf)]:
+  - @crypt.fyi/core@0.2.0
+
 ## 0.1.1
 
 ### Patch Changes
