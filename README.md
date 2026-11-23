@@ -52,7 +52,7 @@
 - 🌐 IP/CIDR allow-listing
 - 🔢 Read count limits
 - 📱 QR code generation
-- ⌨️ [CLI](https://www.npmjs.com/package/@crypt.fyi/cli) for interacting with the API
+- ⌨️ [CLI](https://www.npmjs.com/package/@crypt.fyi/cli) for interacting with the API (`npm install -g @crypt.fyi/cli`, or via [Homebrew](./packages/cli/README.md#homebrew-macos--linux))
 - 🧩 [Chrome Extension](https://chromewebstore.google.com/detail/cryptfyi/hkmbmkjfjfdbpohlllleaacjkacfhald)
 - 🐳 Docker images for the api server and web client
 - 🌐 Internationalization support for multiple languages
@@ -183,7 +183,7 @@ docker compose exec redis rm /data/dump.rdb
 Publishable packages: `@crypt.fyi/core` and `@crypt.fyi/cli` (npm), plus the Chrome extension.
 
 1. Record changes: `pnpm changeset`
-2. Merge to `main` — the Release workflow opens a Version Packages PR (or publishes when that PR is merged)
+2. Merge to `main` — the Release workflow opens a Version Packages PR (or publishes when that PR is merged). After a CLI publish it also commits the new npm tarball `url` and `sha256` to the Homebrew formula in `Formula/crypt-fyi.rb`
 3. Required GitHub secrets for publishing:
    - `NPM_TOKEN`
    - `CHROME_EXTENSION_ID`, `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN`, `CHROME_PUBLISHER_ID`

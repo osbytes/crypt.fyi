@@ -165,3 +165,66 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  homebrew:
+    name: Bump Homebrew formula
+    needs: release
+    # Formula/crypt-fyi.rb pins the npm tarball by sha256, so it can only be updated once
+    # the CLI is actually on the registry. Manual runs re-sync it to the released version.
+    if: >-
+      !cancelled() && needs.release.outputs.version != '' &&
+      (contains(needs.release.outputs.publishedPackages, '"@crypt.fyi/cli"') ||
+      (github.event_name == 'workflow_dispatch' && needs.release.result == 'success'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Update formula url and sha256
+        env:
+          VERSION: ${{ needs.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          url="https://registry.npmjs.org/@crypt.fyi/cli/-/cli-${VERSION}.tgz"
+          tarball="$RUNNER_TEMP/cli.tgz"
+          # The registry can lag a fresh publish by a few seconds; -f makes a 404 retryable.
+          curl -fsSL --retry 10 --retry-delay 10 --retry-all-errors -o "$tarball" "$url"
+          # Cross-check the download against the integrity npm recorded at publish time.
+          expected="$(npm view "@crypt.fyi/cli@${VERSION}" dist.integrity)"
+          actual="sha512-$(openssl dgst -sha512 -binary "$tarball" | base64 -w0)"
+          if [ "$expected" != "$actual" ]; then
+            echo "::error::Downloaded tarball does not match npm dist.integrity for ${VERSION}"
+            exit 1
+          fi
+          sha256="$(sha256sum "$tarball" | cut -d' ' -f1)"
+          sed -i -E \
+            -e "s|^  url \".*\"$|  url \"${url}\"|" \
+            -e "s|^  sha256 \".*\"$|  sha256 \"${sha256}\"|" \
+            Formula/crypt-fyi.rb
+          grep -qF "url \"${url}\"" Formula/crypt-fyi.rb
+          grep -qF "sha256 \"${sha256}\"" Formula/crypt-fyi.rb
+
+      # Pushed with GITHUB_TOKEN, which does not trigger further workflow runs.
+      - name: Commit and push
+        env:
+          VERSION: ${{ needs.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- Formula/crypt-fyi.rb; then
+            echo "Formula already points at ${VERSION}"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(cli): bump Homebrew formula to ${VERSION}" -- Formula/crypt-fyi.rb
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            sleep $((attempt * 5))
+          done
+          exit 1
