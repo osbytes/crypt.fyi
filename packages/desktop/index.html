@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f6f7" />
+    <title>crypt.fyi</title>
+  </head>
+  <body>
+    <main class="mx-auto flex min-h-screen max-w-md flex-col px-4 py-5">
+      <header class="mb-4 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <img src="/icon.png" alt="" width="32" height="32" class="size-8 rounded-lg" />
+          <div>
+            <h1 class="font-display text-lg leading-tight font-semibold tracking-tight">
+              crypt.fyi
+            </h1>
+            <p class="text-xs text-muted-foreground" data-i18n="desktop.tagline"></p>
+          </div>
+        </div>
+        <button
+          type="button"
+          id="open-settings"
+          class="icon-btn"
+          data-i18n-title="desktop.settings.title"
+          data-i18n-aria-label="desktop.settings.title"
+        >
+          <svg
+            class="size-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065"
+            />
+            <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+          </svg>
+        </button>
+      </header>
+
+      <p
+        id="alert"
+        class="mb-4 hidden rounded-lg bg-ember-tint px-3 py-2.5 text-sm whitespace-pre-wrap text-ember"
+        role="alert"
+      ></p>
+
+      <!-- Quick-create view -->
+      <section id="view-create" class="flex flex-1 flex-col">
+        <form id="create-form" class="flex flex-1 flex-col gap-4" novalidate>
+          <label class="field flex flex-1 flex-col">
+            <span class="field-label" data-i18n="desktop.create.contentLabel"></span>
+            <textarea
+              id="content"
+              name="content"
+              class="min-h-28 flex-1"
+              spellcheck="false"
+              autocomplete="off"
+              data-i18n-placeholder="desktop.create.contentPlaceholder"
+            ></textarea>
+            <span
+              id="clipboard-hint"
+              class="field-hint hidden"
+              data-i18n="desktop.create.fromClipboard"
+            ></span>
+          </label>
+
+          <label class="field">
+            <span class="field-label" data-i18n="desktop.create.passwordLabel"></span>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="off"
+              data-i18n-placeholder="desktop.create.passwordPlaceholder"
+            />
+          </label>
+
+          <label class="field">
+            <span class="field-label" data-i18n="desktop.create.ttlLabel"></span>
+            <select id="ttl" name="ttl"></select>
+          </label>
+
+          <label class="flex items-start gap-3 rounded-lg border bg-muted px-3 py-3">
+            <input id="burn" name="burn" type="checkbox" class="mt-0.5" />
+            <span class="text-sm leading-snug">
+              <span class="font-medium" data-i18n="desktop.create.burnLabel"></span>
+              <span
+                class="mt-0.5 block text-muted-foreground"
+                data-i18n="desktop.create.burnDescription"
+              ></span>
+            </span>
+          </label>
+
+          <button
+            type="submit"
+            id="create-submit"
+            class="btn btn-primary w-full"
+            data-i18n="desktop.create.submit"
+          ></button>
+          <p id="shortcut-hint" class="text-center text-xs text-muted-foreground"></p>
+        </form>
+      </section>
+
+      <!-- Shown when the link could not be announced with a notification -->
+      <section id="view-result" class="flex flex-1 flex-col gap-4" hidden>
+        <div class="card">
+          <h2 class="card-title" id="result-title" data-i18n="desktop.result.title"></h2>
+          <p class="text-sm text-muted-foreground" data-i18n="desktop.result.description"></p>
+          <label class="field">
+            <span class="field-label" data-i18n="desktop.result.linkLabel"></span>
+            <input id="result-url" type="text" readonly class="font-mono" />
+          </label>
+          <p
+            id="password-reminder"
+            class="hidden rounded-lg bg-sealed-tint px-3 py-2.5 text-sm"
+            data-i18n="desktop.result.passwordReminder"
+          ></p>
+        </div>
+        <button
+          type="button"
+          id="result-done"
+          class="btn btn-primary w-full"
+          data-i18n="desktop.result.done"
+        ></button>
+      </section>
+
+      <!-- Settings view -->
+      <section id="view-settings" hidden>
+        <form id="settings-form" class="space-y-4" novalidate>
+          <section class="card">
+            <h2 class="card-title" data-i18n="desktop.settings.server"></h2>
+            <label class="field">
+              <span class="field-label" data-i18n="desktop.settings.apiUrl"></span>
+              <input id="apiUrl" name="apiUrl" type="url" autocomplete="off" required />
+            </label>
+            <label class="field">
+              <span class="field-label" data-i18n="desktop.settings.webUrl"></span>
+              <input id="webUrl" name="webUrl" type="url" autocomplete="off" required />
+              <span class="field-hint" data-i18n="desktop.settings.endpointHint"></span>
+            </label>
+          </section>
+
+          <section class="card">
+            <h2 class="card-title" data-i18n="desktop.settings.shortcut"></h2>
+            <label class="field">
+              <span class="sr-only" data-i18n="desktop.settings.shortcut"></span>
+              <input id="shortcut" type="text" readonly autocomplete="off" />
+              <span class="field-hint" data-i18n="desktop.settings.shortcutHint"></span>
+            </label>
+          </section>
+
+          <section class="card">
+            <h2 class="card-title" data-i18n="desktop.settings.defaults"></h2>
+            <label class="field">
+              <span class="field-label" data-i18n="desktop.create.ttlLabel"></span>
+              <select id="default-ttl" name="ttl"></select>
+            </label>
+            <label class="option-row">
+              <input id="default-burn" name="burn" type="checkbox" />
+              <span data-i18n="desktop.create.burnLabel"></span>
+            </label>
+            <label class="option-row">
+              <input id="prefill" name="prefillFromClipboard" type="checkbox" />
+              <span data-i18n="desktop.settings.prefillFromClipboard"></span>
+            </label>
+          </section>
+
+          <section class="card">
+            <h2 class="card-title" data-i18n="desktop.settings.appearance"></h2>
+            <label class="field">
+              <span class="field-label" data-i18n="desktop.settings.language"></span>
+              <select id="language" name="language"></select>
+            </label>
+            <label class="field">
+              <span class="field-label" data-i18n="common.theme.label"></span>
+              <select id="theme" name="theme">
+                <option value="system" data-i18n="common.theme.system"></option>
+                <option value="light" data-i18n="common.theme.light"></option>
+                <option value="dark" data-i18n="common.theme.dark"></option>
+              </select>
+            </label>
+          </section>
+
+          <div class="flex flex-wrap gap-2 pt-1">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              data-i18n="desktop.settings.save"
+            ></button>
+            <button
+              type="button"
+              id="settings-back"
+              class="btn btn-outline"
+              data-i18n="desktop.settings.back"
+            ></button>
+            <button
+              type="button"
+              id="settings-reset"
+              class="btn btn-outline"
+              data-i18n="desktop.settings.reset"
+            ></button>
+          </div>
+          <p
+            id="settings-status"
+            class="hidden rounded-lg bg-sealed-tint px-3 py-2.5 text-sm"
+            role="status"
+          ></p>
+        </form>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

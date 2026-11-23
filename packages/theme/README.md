@@ -1,6 +1,6 @@
 # @crypt.fyi/theme
 
-The design language shared by `@crypt.fyi/web` and `@crypt.fyi/extension`. It is private and has no build step: consumers compile its sources with their own Vite and Tailwind.
+The design language shared by `@crypt.fyi/web`, `@crypt.fyi/extension` and `@crypt.fyi/desktop`. It is private and has no build step: consumers compile its sources with their own Vite and Tailwind.
 
 | Export | Contents |
 | --- | --- |
@@ -11,4 +11,4 @@ The design language shared by `@crypt.fyi/web` and `@crypt.fyi/extension`. It is
 
 UI components are deliberately not shared. The web client uses React and shadcn, and the extension's settings page stays plain HTML, so a shared component library would add React to the extension for a single form.
 
-A preference is stored in `localStorage`, which is per origin. The web client and the extension therefore keep separate choices.
+A preference is stored in `localStorage`, which is per origin. The web client, the extension and the desktop app therefore keep separate choices.

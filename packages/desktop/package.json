@@ -1,0 +1,36 @@
+{
+  "name": "@crypt.fyi/desktop",
+  "license": "Apache-2.0",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:frontend": "vite",
+    "build": "tsc --noEmit && vite build",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "dependencies": {
+    "@crypt.fyi/core": "workspace:*",
+    "@crypt.fyi/theme": "workspace:*",
+    "@tauri-apps/api": "2.12.5",
+    "@tauri-apps/plugin-clipboard-manager": "2.5.0",
+    "@tauri-apps/plugin-global-shortcut": "2.4.1",
+    "@tauri-apps/plugin-notification": "2.8.1",
+    "zod": "^4.6.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "@tauri-apps/cli": "2.12.6",
+    "@types/node": "^22.18.0",
+    "eslint": "^9.34.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~5.9.2",
+    "vite": "^8.1.6",
+    "vitest": "4.1.12"
+  }
+}

@@ -34,7 +34,7 @@ export default [
   },
   // Browser environment config
   {
-    files: ['packages/web/**/*', 'packages/extension/**/*'],
+    files: ['packages/web/**/*', 'packages/extension/**/*', 'packages/desktop/**/*'],
     languageOptions: {
       globals: Object.fromEntries(
         Object.entries(globals.browser).map(([key, value]) => [key.trim(), value]),

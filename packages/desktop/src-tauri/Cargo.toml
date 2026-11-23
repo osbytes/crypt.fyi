@@ -1,0 +1,34 @@
+[package]
+name = "crypt-fyi-desktop"
+version = "0.0.0"
+description = "crypt.fyi desktop app for quick, end-to-end encrypted secret links"
+authors = ["osbytes"]
+license = "Apache-2.0"
+repository = "https://github.com/osbytes/crypt.fyi"
+edition = "2021"
+rust-version = "1.77.2"
+publish = false
+
+[lib]
+# The `_lib` suffix keeps the library name distinct from the binary on Windows.
+name = "crypt_fyi_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+tauri = { version = "2.12", features = ["tray-icon"] }
+tauri-plugin-clipboard-manager = "2.5"
+tauri-plugin-notification = "2.8"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-global-shortcut = "2.4"
+tauri-plugin-single-instance = "2.5"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

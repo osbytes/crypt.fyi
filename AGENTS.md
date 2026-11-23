@@ -15,7 +15,8 @@ pnpm + Turborepo monorepo (`Node >= 22`, Active LTS 26 in `.nvmrc`/CI/Docker; `p
 | `@crypt.fyi/server` | Fastify API + Redis |
 | `@crypt.fyi/cli` | npm CLI |
 | `@crypt.fyi/extension` | Chrome extension |
-| `@crypt.fyi/theme` | Design tokens, fonts and theme logic shared by web and extension (private, no build) |
+| `@crypt.fyi/desktop` | Tauri tray app (macOS/Windows/Linux); Rust in `src-tauri` is only built by the Desktop workflow (private) |
+| `@crypt.fyi/theme` | Design tokens, fonts and theme logic shared by web, extension and desktop (private, no build) |
 
 Encryption/decryption and key material live in `@crypt.fyi/core` and must stay client-side. The server stores ciphertext and verification hashes only — never plaintext secrets or raw keys/passwords.
 
@@ -61,7 +62,7 @@ When adding or changing UI copy:
 
 ## Theming
 
-Change colors, fonts, radii and theme behavior in `packages/theme`, not per package, so web and the extension stay in step. UI components are not shared: web uses React/shadcn and the extension settings page is plain HTML.
+Change colors, fonts, radii and theme behavior in `packages/theme`, not per package, so web, the extension and the desktop app stay in step. UI components are not shared: web uses React/shadcn, while the extension settings page and the desktop app are plain HTML.
 
 ## Coding norms
 

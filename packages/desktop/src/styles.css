@@ -1,0 +1,84 @@
+@import 'tailwindcss';
+@import '@crypt.fyi/theme/tokens.css';
+
+/* Plain HTML equivalents of the web client's Input, Button and Card components. */
+@layer base {
+  input[type='url'],
+  input[type='text'],
+  input[type='password'],
+  select,
+  textarea {
+    @apply w-full rounded-lg border border-border bg-muted px-3 py-1 text-sm text-foreground outline-hidden transition-colors hover:border-input;
+  }
+
+  input[type='url'],
+  input[type='text'],
+  input[type='password'],
+  select {
+    @apply h-11;
+  }
+
+  textarea {
+    @apply resize-none py-2.5 font-mono;
+  }
+
+  input[type='checkbox'] {
+    @apply size-4 shrink-0 accent-primary;
+  }
+
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  button:focus-visible {
+    @apply ring-2 ring-ring ring-offset-2 ring-offset-background outline-hidden;
+  }
+
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  button:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+}
+
+@layer components {
+  .card {
+    @apply space-y-4 rounded-xl border bg-card p-5 text-card-foreground shadow-[var(--card-shadow)];
+  }
+
+  .card-title {
+    @apply font-display text-base font-semibold tracking-tight;
+  }
+
+  .field {
+    @apply block space-y-1.5;
+  }
+
+  .field-label {
+    @apply block text-sm font-medium;
+  }
+
+  .field-hint {
+    @apply block text-xs text-muted-foreground;
+  }
+
+  .option-row {
+    @apply flex items-center gap-2.5 text-sm;
+  }
+
+  .btn {
+    @apply inline-flex h-11 cursor-pointer items-center justify-center rounded-lg px-4 text-sm font-semibold whitespace-nowrap transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/85;
+  }
+
+  .btn-outline {
+    @apply border border-border bg-card hover:border-input hover:bg-accent;
+  }
+
+  .icon-btn {
+    @apply grid size-9 cursor-pointer place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground;
+  }
+}

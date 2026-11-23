@@ -1,0 +1,113 @@
+name: Desktop
+
+# Builds the Tauri desktop app on every platform it ships for. Kept separate from CI so the
+# main pipeline never needs a Rust toolchain or native WebView libraries.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/desktop/**'
+      - 'packages/core/**'
+      - 'packages/theme/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/desktop.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/desktop/**'
+      - 'packages/core/**'
+      - 'packages/theme/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/desktop.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS (Apple Silicon)
+            platform: macos-latest
+            args: --target aarch64-apple-darwin
+            rust-targets: aarch64-apple-darwin
+          - name: macOS (Intel)
+            platform: macos-latest
+            args: --target x86_64-apple-darwin
+            rust-targets: x86_64-apple-darwin
+          - name: Linux
+            platform: ubuntu-22.04
+            args: ''
+            rust-targets: ''
+          - name: Windows
+            platform: windows-latest
+            args: ''
+            rust-targets: ''
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-targets }}
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/desktop/src-tauri -> target
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # tauri::generate_context! embeds the built frontend, so it must exist before clippy runs;
+      # turbo builds @crypt.fyi/core first because the frontend imports its dist output.
+      - name: Build frontend
+        run: pnpm turbo build --filter=@crypt.fyi/desktop
+
+      - name: Lint Rust
+        working-directory: packages/desktop/src-tauri
+        run: |
+          cargo fmt --check
+          cargo clippy --all-targets ${{ matrix.args }} -- -D warnings
+
+      - name: Upload Cargo.lock
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v7
+        with:
+          name: cargo-lock
+          path: packages/desktop/src-tauri/Cargo.lock
+
+      - name: Build app
+        uses: tauri-apps/tauri-action@v1
+        with:
+          projectPath: packages/desktop
+          tauriScript: pnpm tauri
+          args: ${{ matrix.args }}
+          uploadWorkflowArtifacts: true
