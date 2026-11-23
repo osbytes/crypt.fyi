@@ -1,5 +1,11 @@
 # @crypt.fyi/server
 
+## 0.2.2
+
+### Patch Changes
+
+- [#175](https://github.com/osbytes/crypt.fyi/pull/175) [`904992b`](https://github.com/osbytes/crypt.fyi/commit/904992bc403792d97471f64c4b186f316e9db583) Thanks [@dillonstreator](https://github.com/dillonstreator)! - Upgrade bullmq to v6 to pick up security fixes.
+
 ## 0.2.1
 
 ## 0.2.0
