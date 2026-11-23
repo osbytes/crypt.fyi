@@ -390,6 +390,68 @@ export interface TranslationKeys {
       description: string;
     };
   };
+  desktop: {
+    tagline: string;
+    tray: {
+      newSecret: string;
+      settings: string;
+      quit: string;
+    };
+    create: {
+      title: string;
+      contentLabel: string;
+      contentPlaceholder: string;
+      fromClipboard: string;
+      passwordLabel: string;
+      passwordPlaceholder: string;
+      ttlLabel: string;
+      burnLabel: string;
+      burnDescription: string;
+      submit: string;
+      submitting: string;
+      shortcutHint: string;
+      emptyError: string;
+    };
+    result: {
+      title: string;
+      description: string;
+      linkLabel: string;
+      passwordReminder: string;
+      notificationTitle: string;
+      notificationBody: string;
+      done: string;
+    };
+    settings: {
+      title: string;
+      back: string;
+      server: string;
+      apiUrl: string;
+      webUrl: string;
+      endpointHint: string;
+      shortcut: string;
+      shortcutHint: string;
+      shortcutRecording: string;
+      defaults: string;
+      prefillFromClipboard: string;
+      appearance: string;
+      language: string;
+      languageSystem: string;
+      save: string;
+      saved: string;
+      reset: string;
+      invalidUrl: string;
+      invalidShortcut: string;
+    };
+    errors: {
+      network: string;
+      rateLimited: string;
+      tooLarge: string;
+      server: string;
+      unknown: string;
+      clipboard: string;
+      shortcutUnavailable: string;
+    };
+  };
 }
 
 export type TranslationNamespace = keyof TranslationKeys;

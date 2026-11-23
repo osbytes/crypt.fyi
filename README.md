@@ -54,6 +54,7 @@
 - 📱 QR code generation
 - ⌨️ [CLI](https://www.npmjs.com/package/@crypt.fyi/cli) for interacting with the API
 - 🧩 [Chrome Extension](https://chromewebstore.google.com/detail/cryptfyi/hkmbmkjfjfdbpohlllleaacjkacfhald)
+- 🖥️ [Desktop app](./packages/desktop/README.md) for macOS, Windows and Linux: a tray app with a global shortcut that turns your clipboard into a secret link from anywhere
 - 🐳 Docker images for the api server and web client
 - 🌐 Internationalization support for multiple languages
   - Currently supported: [View supported languages](https://github.com/osbytes/crypt.fyi/tree/main/packages/core/src/i18n/locales)
@@ -197,6 +198,7 @@ Publishable packages: `@crypt.fyi/core` and `@crypt.fyi/cli` (npm), plus the Chr
 - [Fastify](https://fastify.dev/)
 - [Redis](https://redis.io/)
 - [OpenTelemetry](https://opentelemetry.io/)
+- [Tauri](https://v2.tauri.app/) (desktop app)
 
 ## Known Issues & Development Considerations
 

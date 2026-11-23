@@ -437,4 +437,72 @@ export const fr: TranslationKeys = {
         'Si vous avez des questions concernant cette Politique de Confidentialité, vous pouvez nous contacter via notre',
     },
   },
+  desktop: {
+    tagline: 'Application de bureau',
+    tray: {
+      newSecret: 'Nouveau secret',
+      settings: 'Paramètres',
+      quit: 'Quitter crypt.fyi',
+    },
+    create: {
+      title: 'Nouveau secret',
+      contentLabel: 'Secret',
+      contentPlaceholder: 'Collez ou saisissez le texte à chiffrer',
+      fromClipboard: 'Rempli depuis votre presse-papiers. Vérifiez-le avant de le partager.',
+      passwordLabel: 'Mot de passe (facultatif)',
+      passwordPlaceholder: 'Communiquez-le séparément au destinataire',
+      ttlLabel: 'Expire après',
+      burnLabel: 'Détruire après lecture',
+      burnDescription: 'Supprime le secret après la première lecture réussie.',
+      submit: 'Chiffrer et copier le lien',
+      submitting: 'Chiffrement…',
+      shortcutHint:
+        "Appuyez sur {{shortcut}} n'importe où pour ouvrir cette fenêtre. Échap la masque.",
+      emptyError: 'Saisissez un secret à chiffrer.',
+    },
+    result: {
+      title: 'Lien copié',
+      description:
+        'Le secret a été chiffré sur cet appareil. Le serveur ne voit jamais son contenu ni la clé.',
+      linkLabel: 'Lien du secret',
+      passwordReminder: 'Envoyez le mot de passe par un autre canal que le lien.',
+      notificationTitle: 'Lien du secret copié',
+      notificationBody:
+        "Collez-le n'importe où pour le partager. Il a été chiffré sur cet appareil.",
+      done: 'Terminé',
+    },
+    settings: {
+      title: 'Paramètres',
+      back: 'Retour',
+      server: 'Serveur',
+      apiUrl: "URL de l'API",
+      webUrl: 'URL web',
+      endpointHint: "Utilisez https. Le http simple n'est autorisé que pour localhost.",
+      shortcut: 'Raccourci global',
+      shortcutHint:
+        'Sélectionnez le champ, puis appuyez sur une combinaison de touches avec Ctrl, Alt ou Cmd.',
+      shortcutRecording: 'Appuyez sur une combinaison de touches…',
+      defaults: 'Valeurs par défaut des nouveaux secrets',
+      prefillFromClipboard: 'Remplir les nouveaux secrets depuis le presse-papiers',
+      appearance: 'Apparence',
+      language: 'Langue',
+      languageSystem: 'Langue du système',
+      save: 'Enregistrer',
+      saved: 'Paramètres enregistrés.',
+      reset: 'Rétablir les valeurs par défaut',
+      invalidUrl: "{{field}} doit être une URL https (http n'est autorisé que pour localhost).",
+      invalidShortcut: 'Utilisez une combinaison de touches avec Ctrl, Alt ou Cmd.',
+    },
+    errors: {
+      network:
+        "Impossible de joindre {{host}}. Vérifiez votre connexion et l'URL de l'API dans les paramètres.",
+      rateLimited: 'Trop de requêtes. Patientez un instant puis réessayez.',
+      tooLarge: 'Ce secret est trop volumineux pour le serveur.',
+      server: 'Le serveur a refusé la requête (statut {{status}}).',
+      unknown: 'Une erreur est survenue lors de la création du secret.',
+      clipboard: "Le secret a été créé, mais le lien n'a pas pu être copié. Copiez-le ci-dessous.",
+      shortcutUnavailable:
+        "Impossible d'enregistrer {{shortcut}}. Une autre application l'utilise peut-être déjà.",
+    },
+  },
 };
