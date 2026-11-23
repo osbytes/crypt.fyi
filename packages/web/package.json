@@ -37,7 +37,7 @@
     "copy-to-clipboard": "^3.3.3",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.42.2",
-    "i18next": "^25.4.2",
+    "i18next": "^26.3.4",
     "i18next-browser-languagedetector": "^8.2.0",
     "motion": "^12.23.12",
     "parse-duration": "2.1.4",
