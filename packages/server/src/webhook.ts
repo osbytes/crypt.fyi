@@ -1,4 +1,4 @@
-import { Queue, Worker } from 'bullmq';
+import { Queue, Worker, type RedisOptions } from 'bullmq';
 import { machine, isRetryableFetchError } from '@crypt.fyi/core';
 import type { Logger } from './logging.js';
 import { Redis } from 'ioredis';
@@ -18,6 +18,17 @@ const messageSchema = z.object({
 export type Message = z.infer<typeof messageSchema>;
 
 export const WEBHOOK_QUEUE_NAME = 'webhooks';
+
+/**
+ * Connection options for a BullMQ Queue/Worker derived from an ioredis client.
+ * Passing options rather than the client keeps each Queue/Worker on its own
+ * connections, so closing them never races with the caller quitting `redis`.
+ * ioredis types `retryStrategy` as nullable but BullMQ v6 does not accept null.
+ */
+export const toBullMQConnection = (redis: Redis): RedisOptions => {
+  const { retryStrategy, ...options } = redis.options;
+  return { ...options, retryStrategy: retryStrategy ?? undefined };
+};
 const JOB_NAME = 'webhook';
 
 export interface WebhookSender {
@@ -66,8 +77,9 @@ export const createBullMQWebhookSender = ({
   fetchFn = fetch,
   shouldRetry = isRetryableFetchError,
 }: BullMQWebhookSenderOptions): { webhookSender: WebhookSender; cleanup: () => Promise<void> } => {
+  const connection = toBullMQConnection(redis);
   const queue = new Queue<string>(WEBHOOK_QUEUE_NAME, {
-    connection: redis.options,
+    connection,
     streams: {
       events: {
         maxLen: streamEventsMaxLength,
@@ -138,7 +150,7 @@ export const createBullMQWebhookSender = ({
         clearTimeout(timeoutId);
       }
     },
-    { connection: redis.options, concurrency, drainDelay: Math.round(drainDelayMs / 1000) },
+    { connection, concurrency, drainDelay: Math.round(drainDelayMs / 1000) },
   );
 
   worker.on('failed', async (job, error) => {
