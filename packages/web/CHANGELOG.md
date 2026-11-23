@@ -1,5 +1,12 @@
 # @crypt.fyi/web
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`a42dd0f`](https://github.com/osbytes/crypt.fyi/commit/a42dd0f611aaa978dc45fe7a730e4388c17ed80c)]:
+  - @crypt.fyi/core@0.2.1
+
 ## 0.2.0
 
 ### Patch Changes
