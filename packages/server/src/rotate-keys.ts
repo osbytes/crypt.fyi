@@ -12,7 +12,7 @@ import { Queue } from 'bullmq';
 import { machine } from '@crypt.fyi/core';
 import { config } from './config.js';
 import { rotateVaultKeys, countWebhookJobsOnPreviousKeys } from './vault/rotate.js';
-import { WEBHOOK_QUEUE_NAME } from './webhook.js';
+import { WEBHOOK_QUEUE_NAME, toBullMQConnection } from './webhook.js';
 
 const JOB_PAGE_SIZE = 500;
 
@@ -26,12 +26,14 @@ const main = async () => {
 
     let webhookJobsOnPreviousKeys = 0;
     if (config.webhookSender === 'bullmq') {
-      const queue = new Queue<string>(WEBHOOK_QUEUE_NAME, { connection: redis.options });
+      const queue = new Queue<string>(WEBHOOK_QUEUE_NAME, {
+        connection: toBullMQConnection(redis),
+      });
       try {
         // Paged per state so a large backlog never has to fit in memory at once.
         // Jobs moving between states mid-count can be missed or counted twice;
         // rerunning before removing a key covers that.
-        for (const state of ['waiting', 'delayed', 'active', 'paused', 'prioritized'] as const) {
+        for (const state of ['waiting', 'delayed', 'active', 'prioritized'] as const) {
           for (let start = 0; ; start += JOB_PAGE_SIZE) {
             const jobs = await queue.getJobs([state], start, start + JOB_PAGE_SIZE - 1);
             webhookJobsOnPreviousKeys += await countWebhookJobsOnPreviousKeys(
