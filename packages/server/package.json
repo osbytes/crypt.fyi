@@ -63,7 +63,7 @@
     "@opentelemetry/sdk-node": "^0.223.0",
     "@opentelemetry/sdk-trace-base": "^2.0.1",
     "@opentelemetry/semantic-conventions": "^1.36.0",
-    "bullmq": "^5.58.3",
+    "bullmq": "^6.7.1",
     "bytes": "^3.1.2",
     "fastify": "^5.12.5",
     "fastify-type-provider-zod": "^5.0.3",
