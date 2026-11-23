@@ -95,14 +95,7 @@ jobs:
         working-directory: packages/desktop/src-tauri
         run: |
           cargo fmt --check
-          cargo clippy --all-targets ${{ matrix.args }} -- -D warnings
-
-      - name: Upload Cargo.lock
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v7
-        with:
-          name: cargo-lock
-          path: packages/desktop/src-tauri/Cargo.lock
+          cargo clippy --locked --all-targets ${{ matrix.args }} -- -D warnings
 
       - name: Build app
         uses: tauri-apps/tauri-action@v1
